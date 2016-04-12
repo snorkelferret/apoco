@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" >
+    <meta name="description" content="" >
+    <meta name="keywords" content="" >
+    <title>Harvey</title> <!-- this is purposely left blank -->
+    <link type="text/css" href="css/jquery-ui-1.11.4.custom/jquery-ui.css" rel="stylesheet" >
+    <link type="text/css" href="css/base.css" rel="stylesheet" >
+    <link type="text/css" href="css/form.css" rel="stylesheet" >
+    <script type="text/javascript" src="css/jquery-ui-1.11.4.custom/jquery.js"></script>
+    <script type="text/javascript" src="css/jquery-ui-1.11.4.custom/jquery-ui.js"></script>
+    <script type="text/javascript"src="HarveyCoreChild.js"> </script>
+    <script type="text/javascript" src="HarveyUtils.js"></script>
+    <script type="text/javascript" src="HarveyTypes.js"></script>
+    <script type="text/javascript" src="HarveyFields.js"></script>
+    <script type="text/javascript" src="HarveyDisplayPopups.js"></script>
+    <script type="text/javascript" src="HarveyDisplayBase.js"></script>
+    <script type="text/javascript" src="HarveyDisplayGrid.js"></script>
+    <script type="text/javascript" src="HarveyDisplayForm.js"></script>
+    <script type="text/javascript" src="HarveyDisplayFieldset.js"></script>
+    <script type="text/javascript" src="HarveyDisplayTabs.js"></script>
+    <script type="text/javascript" src="HarveyNodes.js"></script>
+    <script type="text/javascript" src="HarveySort.js"></script>
+     <script type="text/javascript">
+
+        $(document).ready(function(){
+            console.log("child window document ready");
+            if(!Harvey){
+               console.log("Harvey undefined");
+            }
+            if(!Harvey.display){
+              console.log("Harvey.display is undefined");
+           }
+          Harvey.childReady();
+   
+        });
+   </script>
+
+   </head>
+
+<body>
+
+
+<div id="wrapper"> 
+
+    <div class="bannertop"> 
+	<div id="Head">
+	</div>
+   </div> <!-- end bannertop -->
+
+ <div id="main">
+
+	<div id="Content" class="ui-corner-bottom">
+	
+	</div>
+   
+	<div>  
+	  <noscript>
+	     <div style=" background-color: #800; padding: 30px">
+	      <h1 style="margin-left: 100px;" > No Javascript enabled ...</h1>
+	      <h1 style="margin-left: 100px;" > This site won't work without it !!! </h1>
+	       </div>
+	  </noscript>
+      
+        </div>
+
+ 
+
+
+  
+   </div>
+  
+
+ <div id="Tail">
+      <p class="footer_text">
+	
+       <!-- put the time here -->
+      </p>
+</div>
+   
+   </div> <!-- end wrapper -->
+  </body>
+</html>
