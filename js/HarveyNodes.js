@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 // Node class for static elements like headings and text etc
 // No callbacks or publish or listeners for these elements
 // if you need callbacks use Harvey.fields
@@ -9,11 +11,11 @@
         if(!d){
             throw new Error("Harvey: node, No params");
         }
-   
+
 	if(d && !d.node){
             throw new Error("Harvey: node doesn't know how to make",d.node);
         };
-        
+
   	for(var k in d){
 	    this[k]=d[k];
 	}
@@ -22,7 +24,7 @@
         //    var promise=
 
         _getNode[d.node](this);
-        
+
 	if(this.class){
 	    this.element.addClass(this.class);
 	}
@@ -41,7 +43,7 @@
         //    console.log("Node appending to element");
             element.append(this.element);
         }
-	
+
     };
 
     _Node.prototype={
@@ -73,19 +75,19 @@
 	    case "h2":
 	    case "H2":
 		that.element=$("<h2>" + that.text + "</h2>");
-		return;	 
+		return;
 	    case "h3":
 	    case "H3":
 		that.element=$("<h3>" + that.text + "</h3>");
-		return; 
+		return;
 	    case "h4":
 	    case "H4":
 		that.element=$("<h4>" + that.text + "</h4>");
-		return; 
+		return;
 	    case "h5":
 	    case "H5":
 		that.element=$("<h5>" + that.text + "</h5>");
-		return; 
+		return;
 	    case "h6":
 	    case "H6":
 		that.element=$("<h6>" + that.text + "</h6>");
@@ -125,8 +127,8 @@
                             that.element.append("<dt>" + that.items[i].labels[j] + "</dt>");
                         }
                     }
-                    
-                    
+
+
                 }
                 if (that.items[i].description){
                     that.element.append("<dd>" + that.items[i].description + "</dd>");
@@ -187,14 +189,14 @@
         },
 	clock: function(that){  // this needs to be changed to get the time from the server- shows server alive
             that.element=$("<div class='Harvey_clock'> </div>");
-	    
+
             var cb=function(t){
                 var d=new Date();
                 that.element.html(d.toLocaleTimeString());
 		//t.html(d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds());
             };
 	    window.setInterval(function(){cb(that);},1000);
-	}, 
+	},
         button:function(that){
             var t=that.text?that.text: that.name;
 	    that.element=$("<button type='button'>" + t + "</button>");
@@ -208,23 +210,23 @@
             }
 	},
         paginate:function(that){
-      
+
             if(!that.number){
                 throw new Error("paginate needs a number");
             }
-            
+
 	    that.current_num=0;
             //console.log("paginator init with number " + that.number);
 	    // var that=this;
             that.element=$("<div class='Harvey_paginate'></<div>");
-            
+
             var cb=function(index,el){
               //  console.log("index is " + index);
                 el.addClass("ui-state-active");
                 el.siblings().removeClass("ui-state-active");
                 that.current_num=index;
                 that.action(that);
-            };  
+            };
             if(this.prevNext){
                 var n;
                 var b=("<button> previous </button>");
@@ -239,8 +241,8 @@
                     var t=this.element.find('button[name="' + n + '"]');
                     t.trigger("click");
                 });
-                
-            } 
+
+            }
             for(var i=0;i<that.number;i++){
                 //console.log("making button number " + i);
                 var b=$("<button name='" + i + "'>" + (i+1) + "</button>");
@@ -251,19 +253,19 @@
                         cb(index,$(this));
                   //      console.log("got a click for " + index);
                     };
-                    
-                }(i)); 
-            } 
+
+                }(i));
+            }
             if(this.prevNext){
-                var b=("<button> next </button>"); 
+                var b=("<button> next </button>");
                 this.element.append(b);
                 b.on("click",function(){
                     var n=(that.current_num+1)%that.number;
                     var t=this.element.find('button[name="' + n + '"]');
                     t.trigger("click");
                 });
-            }  
-        }, 
+            }
+        },
         progressBar:function(that){
             var max=100;
             if($("#Harvey_progressBar").length === 0 ){
@@ -274,8 +276,8 @@
                     //return pb;
                 }
             }
-      
-        } 
+
+        }
     };
 
       /*          that.setValue=function(){
@@ -285,12 +287,12 @@
                     }
 	        };
                 that.reset= function(){
-                    
+
                 };
                 that.init(that);
             };
             return  mkPaginator; */
-  
+
     Harvey.node=function(options,el){
         if(options === "node_list"){ // return the list of nodes- internal use only
             var nl={};
@@ -305,4 +307,4 @@
             return new _Node(options,el);
         }
     };
-})(jQuery);
+})(require('jquery'));

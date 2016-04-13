@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 ;(function($){
 
     Harvey.IO={
@@ -130,4 +132,4 @@
             return promise;
         }
     };
-})(jQuery);
+})(require('jquery'));

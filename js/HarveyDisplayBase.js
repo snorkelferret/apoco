@@ -1,15 +1,14 @@
+var Harvey = require('./declare.js');
 
-
-
-;(function($){    
+;(function($){
 
     'use strict';
     // these are the components allowed in display objects
-    
+
     var _display_components=["fields","nodes","tabs","grids","list"];
-    
+
     Harvey._DisplayBase=function(options,win){
-      
+
 	this.DEBUG=true;
 	var defaults={
 	    parent: null,
@@ -18,9 +17,9 @@
 	};
         var observer=null;
         var that=this;
-	this.options = $.extend({}, defaults,options);   
-        
-        
+	this.options = $.extend({}, defaults,options);
+
+
 	for(var k in this.options){
 	    this[k]=this.options[k];
 	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
@@ -28,7 +27,7 @@
 
         //console.log("============================== Adding display object  with id " + this.id + " window " + win + "+++++++++++++++++++++++++++");
 	var t;
-        
+
         if(win){
           //  console.log("Adding display to child window");
 	    this.DOM=$(win.document).find("#" + this.DOM);
@@ -41,19 +40,19 @@
         }
 	if(this.DOM.length === 0){
 	    throw new Error("_HarveyDisplayBase DOM element does not exist");
-	} 
+	}
 
 	if($(t)){
-	    $(t).remove(); 
+	    $(t).remove();
 	}
- 
+
         var doit=function(context){
            // console.log("DOIT IS HERE");
             if(context.action){
 	 	context.action(context);
 	    }
         };
-        // if the execution depends on another node 
+        // if the execution depends on another node
         if(this.dependsOn && $("#" + this.dependsOn).length === 0){ // watch for node
             //console.log("in displayBase id is " + this.dependsOn);
             Harvey.Utils.observer.add(this.dependsOn, doit,this);
@@ -70,13 +69,13 @@
             //console.log("listen listen listen");
 	    Harvey.IO.listen(this);  // needs to be here cause listener needs element.
 	}
-     
+
     	//console.log("end of libbase");
     };
-    
 
-   
-    // var methods= { 
+
+
+    // var methods= {
     Harvey._DisplayBase.prototype={
 	getChildren: function(){
 	    var comp=[];
@@ -147,21 +146,21 @@
 	getDisplayType: function(){
 	    return this.display;
 	},
-	getName: function(){  
+	getName: function(){
 	    if(this.name){
 		return this.name;
 	    }
 	    return null;
 	},
 	getKey: function(){  // this is used by CBM Command etc as the key to look up the obj in templates or DB
-	    if(this.name){  // if this is a real instance 
+	    if(this.name){  // if this is a real instance
 		return this.name;
 	    }
 	    if(this.id){
 		return this.id;
 	    }
 	    return null;
-	}, 
+	},
 	getParent: function(){
 	    return this.parent;  // DisplaySet to which this element belongs
 	},
@@ -171,7 +170,7 @@
                 var c=[];
 		//console.log("getSiblings: creator has " + this.parent.Components.length + " elements");
 		for(var i=0;i<t.length;i++){
-		    if(t[i] !== this){ 
+		    if(t[i] !== this){
 			//console.log("getSiblings: found " + t[i].getKey());
 			c.push(t[i]);
 		    }
@@ -182,11 +181,11 @@
 		throw new Error("Parent is not defined for " + this.name);
 	    }
 	},
-	execute: function( data ) { 
-	    return null;  // if function has not been overwritten - bad return null 
-	},	 
+	execute: function( data ) {
+	    return null;  // if function has not been overwritten - bad return null
+	},
 	show: function(){
-           console.log("HarveyDisplayBase: showing " + this.id);    
+           console.log("HarveyDisplayBase: showing " + this.id);
 	    if(this.publish !== undefined){
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Harvey.IO.publish(this);
@@ -218,7 +217,7 @@
             return true;
  	},
         displayType: function(){
-            return this.displayType;  
+            return this.displayType;
         },
         hide:function(){
           // console.log("trying to hide " + this.id);
@@ -252,15 +251,14 @@
                     this[c].length=0;
                 }
             }
-	    
+
 	    this.element.remove();  //removes events and data as well
             this.element=null;
 	    if(this.parent && msg_from_parent === undefined){
 		//console.log("WE have a parent");
 		this.parent.deleteChild(this);
-	    } 
+	    }
 	}
     };
- 
-})(jQuery);
 
+})(require('jquery'));

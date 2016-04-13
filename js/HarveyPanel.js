@@ -1,15 +1,17 @@
+var Harvey = require('./declare.js');
+
 // Copyright (c) 2015 Pooka Ltd.
 // Name: HarveyDisplaySet.js
-// Function: maintains a reference to  all commands that are currently displayed in _DisplayObjects 
+// Function: maintains a reference to  all commands that are currently displayed in _DisplayObjects
 
 ;(function($) {
     'use strict';
     var DEBUG=true;
-    
+
     if(!Harvey.Obsever){ // create an observer- only need one
         Harvey.Utils.observer.create();
     }
-   
+
     function check(ar){
 	if(!Harvey.checkType["object"](ar)){
 	    throw new Error("This is not a window display object" + ar);
@@ -26,7 +28,7 @@
 		    if(!Harvey.display[d]){
 			msg=msg.concat("Harvey does not know how to create " + d);
 		    }
-		    else{ 
+		    else{
 			OK++;
 		    }
                     break;
@@ -53,7 +55,7 @@
 		 //   console.log("this is default");
 		    break;
 		}
-		
+
 	    }
 	    if(OK !== 3 ){
 		//console.log("got " + OK );
@@ -62,7 +64,7 @@
 	}
 	return true;
     }
-    
+
     Harvey.Window={
         _list:{},
         close:function(name){
@@ -88,7 +90,7 @@
              //   console.log("window in list is " + k);
                 if(k == name){
                     return this._list[k];
-                }  
+                }
             }
             return null;
         },
@@ -104,7 +106,7 @@
                 personalbar:0
             };
 
-         
+
             if(this.inList(d.name)){
                 throw new Error("Harvey,Window: " + d.name + " already exists");
             }
@@ -120,7 +122,7 @@
                 var n=$.extend({},defaults,d.opts);
                 for(var k in n){
                     if(settings === ""){
-                        settings=settings.concat((k + "=" + n[k]));    
+                        settings=settings.concat((k + "=" + n[k]));
                     }
                     else{
                         settings=settings.concat(("," + k + "=" + n[k]));
@@ -137,7 +139,7 @@
 	        return function(e){
 		    if(e.data === win){
 		 //       console.log("window equals e.data");
-                        that._list[d.name]=win; 
+                        that._list[d.name]=win;
 		        p.resolve({"window":win,"name": d.name});
 		    }
 		   // console.log("Parent child is ready");
@@ -148,7 +150,7 @@
                     //console.log("got child closed " + d.name);
                     // delete the window from the list
                     var p=that._list[d.name];
-                    
+
                     if(p !== null){
                         Harvey.Panel._deletePanel(p);
                         delete that._list[d.name];
@@ -158,16 +160,16 @@
                     }
                 };
             });
-            
+
 	    return p;
         }
     };
 
- 
 
-    Harvey.Panel={ 
-	
-	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object. 
+
+    Harvey.Panel={
+
+	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
         UIStart:function(w){
             var nv;
             for(var i=0;i<w.length;i++){
@@ -179,7 +181,7 @@
                     throw new Error("Harvey.Panel: No panel called " + w[i] + "was found in UI.Panels");
                 }
             }
-            
+
         },
         _UIGet:function(name){
             for(var k in UI.Panels){
@@ -196,7 +198,7 @@
                 if(this._list[i].window == win){
                     this.delete(this._list[i].name);
                 }
-            }  
+            }
         },
 	inList: function(k){
 	    for(var i=0;i< this._list.length;i++){
@@ -249,7 +251,7 @@
             var c=p.getChildren();
             for(var i=0;i<c.length;i++){
                 c[i].element.detach();
-            } 
+            }
         },
         getList: function(){
             var l=[];
@@ -277,7 +279,7 @@
                                 }
                             }
                            $.extend(stuff.components[i],d);
-                        } 
+                        }
                     }
                 var np=Harvey._panelComponents(stuff);
                 this._list.push(np);
@@ -293,14 +295,14 @@
                 var w=this._UIGet(panel);
                 panel=w;
             }
-	    
+
 	    if(this.inList(panel.name) === null){
 		check(panel.components);
-		
-		var p=Harvey._panelComponents(panel); 
+
+		var p=Harvey._panelComponents(panel);
 	//	 for(var k in p){
 	//	     console.log("panel base has keys " + k);
-	//	 } 
+	//	 }
 		this._list.push(p);
 	    }
 	    else{
@@ -309,7 +311,7 @@
             return p;
 	},
         deleteAll: function(d){
-            
+
             var n=this._list.length;
             for(var i=0;i<n; i++){
                 console.log("window: removing panel " + this._list[i].name + " from list");
@@ -331,14 +333,14 @@
 	    if(p !== null){
 		var c=this._list[p].deleteChildren();
 		console.log("panel: removing panel " + k + " from list");
-		this._list.splice(p,1); 
+		this._list.splice(p,1);
 	    }
             else {
                 throw new Error(k + "is not in the list of Panels");
             }
 	}
-	
-	
+
+
     };
 
 
@@ -346,13 +348,13 @@
     var _Components=function(obj){
 	this.DEBUG=true;
         var that=this;
-       
+
 	for(var k in obj){
 	    this[k]=obj[k];
 	   //console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
 	}
 
-	if(this.window){ 
+	if(this.window){
 	    var p=Harvey.Window.open(this.window);  // create a new browser window
 	    p.done(function(w){
 		w.window.focus();
@@ -364,13 +366,13 @@
 	        that._addComponents();
 	    } );
 	}
-        else{    
+        else{
 	    that._addComponents();
         }
     };
-    
+
     _Components.prototype={
-    
+
 	_addComponents: function(){
 	    var that=this;
             var d;
@@ -406,27 +408,27 @@
 		    doit(this,i);
 		}
 	    }
-	   
+
 	},
 	addChild: function(display_object){ // to existing panel
-          
-         
+
+
             if(this.getChild(display_object.id)){
                 throw new Error("Harvey.Panel: already have a child with id " + display_object.id);
             }
             if(!display_object.display){
                 throw new Error("You can only add display objects to a window");
             }
-  
+
             if(!display_object.displayType()){ //has not been instantiated
                 var d=display_object;
                 display_object=Harvey.display[d.display](d,this.window);
                 if(!display_object){
-                    throw new Error("Panel.addChild: could not create display object " + d.display); 
+                    throw new Error("Panel.addChild: could not create display object " + d.display);
                 }
-            } 
-    
-     
+            }
+
+
      //       console.log("adding child length is " + this.components.length);
             display_object.parent=this;
             if(!display_object.element || display_object.element.length==0){
@@ -452,12 +454,12 @@
             //var obj=o;
             if(!obj){
                 throw new Error("Harvey.Panel: deleteChild obj is null");
-            }    
+            }
             if(Harvey.checkType['string'](obj)){
                 console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
-         
+
            // console.log("deleteing child length is " + this.components.length);
 	   // console.log("Panel delete child is here");
             if(obj.listen){ // remove the listener
@@ -469,11 +471,11 @@
 		    this.components.splice(i,1);
 		}
 	    }
-            
+
 	  //  if(this.components.length === 0){
 	//	console.log("No components left");
 	 //       Harvey.Panel.delete(this.name);
-	 //   } 
+	 //   }
 	  //  console.log("after delete child length is " + this.components.length);
 	},
 	getChildren: function(){
@@ -501,14 +503,14 @@
 		    switch(k){
 		    case "key":
 			(child[k] === this.components[i].getKey())?found=i:found=-1;
-			break; 
+			break;
 		    case "element":
 			(child[k] === this.components[i].getElement())? found=i: found=-1;
 			break;
 		    case "name":
 			(child[k] === this.components[i].getName())? found=i: found=-1;
 			break;
-		    default: 
+		    default:
 			found=null;
 			break;
 		    }
@@ -520,7 +522,7 @@
 		if(found !== null && found !== -1){
 		    return this.components[i];
 		}
-	
+
 	    }
 	    return null;
 	}
@@ -538,8 +540,7 @@
                                      return new _Components(t);
                                  }
                              }
-                           });   
-    
+                           });
 
-})(jQuery);
 
+})(require('jquery'));

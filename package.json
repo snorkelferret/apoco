@@ -2,7 +2,7 @@
   "name": "harvey",
   "version": "0.5.0",
   "description": "harvey",
-  "main": "js/HarveyCore.js",
+  "main": "js/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,11 +10,13 @@
   "license": "ISC",
   "devDependencies": {
     "chai": "^3.5.0",
-    "jsdom": "^8.3.1"
+    "eslint": "^2.7.0",
+    "jsdom": "^8.3.1",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3"
   },
   "dependencies": {
-    "jquery": "^2.2.3"
+    "jquery": "^2.2.3",
+    "jquery-ui": "^1.10.5"
   }
 }

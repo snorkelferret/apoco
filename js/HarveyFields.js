@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 // the fields
 // requires Harvey.utils
 // requires JQuery
@@ -29,7 +31,7 @@
 	imageArray: {html_type: "image", html_field: "ImageArrayField",check:null,sort: null},
 	password: {html_type: "password", html_field:"InputField", check: "string",sort: null}
     };
-    
+
     Harvey.HtmlToType=function(html_field){
  	for(var k in  Harvey.dbToHtml){
 	    if(Harvey.dbToHtml[k].html_field == html_field){
@@ -38,8 +40,8 @@
 	}
 	return "";
     };
-   
-    
+
+
 
     var _Field=function(d,element){
 
@@ -47,7 +49,7 @@
             throw new Error("Harvey.field: Field must have a name");
         }
         $.extend(this,d);
-        
+
 	if(this.field && !this.type){
 	  //  console.log("got this field");
 	    this.html_type=Harvey.HtmlToType(this.field);
@@ -63,7 +65,7 @@
 	    throw new Error("external element for field is null");
 	}
 	this.element=element;
-	
+
 	this.element.attr("name",d.name);
 
 	if(this.label){
@@ -87,7 +89,7 @@
 				  tooltipClass: "tooltip"
 				 });
 	    //this.element.tooltip("close"); */
-//	}  
+//	}
 
 	if(this.publish !== undefined){
 	    Harvey.IO.publish(this);
@@ -196,12 +198,12 @@
                     return false;
                 }
             }
-            
+
             if(this.type){
                 if(!Harvey.checkType[this.type](v)){
                     return false;
                 }
-            
+
                 this.input.removeClass("required");
                 return true;
 	    }
@@ -241,18 +243,18 @@
 		that.element.append("<span class='float_right'> .00  </span>");
 	    }
 	    p.length=0;
-            
+
         },
         integerArray:function(that){
             var r,s,len=that.value.length;
-            
+
 	    for(var i=0;i<len;i++){
                // console.log("i is " + i);
                 //   this.input[i]=$("<input class='" + this.type + "' type='" + this.html_type + "'/>");
                 r=document.createElement("span");
                 r.setAttribute("type", that.html_type);
                 r.className=that.type;
-               
+
                 if( that.delimiter !== undefined){
                     if(i>0 && i<len){
                         s=document.createElement("span");
@@ -262,11 +264,11 @@
                 }
                 that.element[0].appendChild(r);
             }
-        }  
+        }
     };
     var _setStatic={
         float: function(that){
-            var p=parseFloat(that.value).toFixed(that.precision).toString().split("."); 
+            var p=parseFloat(that.value).toFixed(that.precision).toString().split(".");
             that.element.find("span.float_left").html(p[0]);
             if (p.length >= 2){
                 that.element.find("span.float_left").html(p[1]);
@@ -283,7 +285,7 @@
             }
         }
     };
-    
+
     var StaticField=function(d,element){
 	//console.log("static field is here");
        // var settings=checkDefaultOptions("StaticField",d);
@@ -320,7 +322,7 @@
             return true;
         },
 	popupEditor: null
-	
+
     };
   //  Harvey.Utils.extend(StaticField,_Field);
 
@@ -328,29 +330,29 @@
     var InputField=function(d,element){
 	//console.log("INPUT FIELD IS HERE with required " + d.required);
        // var settings=checkDefaultOptions("InputField",d);
-          
+
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
-  
+
         s.className=this.type;
-        
+
         this.input=$(s);
         //this.input=$("<input class='" + this.type + "' type= '" + this.html_type +  "'/>");
-    
+
         if(this.min){
-            this.input.prop("min", this.min);  
+            this.input.prop("min", this.min);
         }
         if(this.max){
-            this.input.prop("max", this.max);  
+            this.input.prop("max", this.max);
         }
         if(this.step){
-            this.input.prop("step", this.step);  
+            this.input.prop("step", this.step);
         }
         if(this.precision){
             this.input.prop("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
         }
-        
+
         if(this.required && !this.value ){
           //  console.log("REQUIRED is TRUE, value is " + this.required);
             if(this.field !== "CheckBoxField"){
@@ -358,7 +360,7 @@
                 this.input.addClass("required");
             }
         }
-        
+
         this.element.append(this.input);
 
 	if(this.value !== null && this.value !== undefined){
@@ -374,20 +376,20 @@
     var FloatField=function(d,element){
 	//console.log("FLOAT FIELD IS HERE");
         //var settings=checkDefaultOptions("FloatField",d);
-    
-        
+
+
 	_Field.call(this,d,element);
 
 	this.input=new Array(2);
 	var that=this;
 //	this.element.empty();
         this.element.addClass("float");
-        
+
 	var list=document.createElement("ul"); //" class='aligned_float'></ul>");
         list.className='aligned_float';
 	var el=document.createElement("li");
 	var dec=document.createElement("div");
-        dec.className='values';  
+        dec.className='values';
         var i=document.createElement("input");
         i.className="float_left";
         i.setAttribute("pattern",'^[-+]?[0-9]*$');
@@ -398,19 +400,19 @@
         i.setAttribute("type","text");
         this.input[1]=$(i);
 
-        
+
 	//this.input[0]=$("<input type='text' class='float_left' pattern='^[-+]?[0-9]*$' >");
 	//this.input[1]=$("<input type='text' class='float_right' pattern='^[0-9]*.{0}|.{"+ this.precision + "}$' >");
 
         // console.log("FloatField got value " + this.value);
-        
+
 	this.setValue(this.value);
-        
-        
+
+
 	dec.appendChild(this.input[0][0]);
         var s=document.createElement("span");
         s.innerHTML="&#46";
-        dec.appendChild(s); // add the . 
+        dec.appendChild(s); // add the .
 	dec.appendChild(this.input[1][0]);
 	el.appendChild(dec);
 	list.appendChild(el);
@@ -428,7 +430,7 @@
             //var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
             up=$(up);
             down=$(down);
-            
+
 	    var timer;
 	    var step_fn=function (direction){
 
@@ -508,7 +510,7 @@
 	getValue: function(){
 	    var a=this.input[0].val();
 	    var b=(this.input[1].val());
-            
+
 	    if(Harvey.checkType.blank(a)) {
 		//console.log("input integer is null");
 		if(Harvey.checkType.blank(b)){
@@ -559,14 +561,14 @@
 	},
         popupEditor: null
     };
-        
+
     Harvey.Utils.extend(FloatField,_Field);
 
 
     var DateField=function(d,element){
       //  var settings=checkDefaultOptions("DateField",d);
 
-            
+
 	InputField.call(this,d,element);
 	if(this.editable){
             if(this.value){
@@ -600,11 +602,11 @@
 
 	InputField.call(this,settings,element);
     };
-    
+
     Harvey.Utils.extend(TimeField,InputField);
 
     var CheckBoxField=function(d,element){
-        
+
         //var settings=checkDefaultOptions("CheckBoxField",d);
 
 	InputField.call(this,d,element);
@@ -662,7 +664,7 @@
 	_Field.call(this,d,element);
 
 	this.input=new Array(this.size);
-        
+
 	this.popup=true;
 
         if(this.type === "floatArray" && this.step === undefined){
@@ -685,16 +687,16 @@
                     s.innerHTML=this.delimiter;
                     this.element[0].appendChild(s);
                 }
-            } 
-            
+            }
+
             if(this.min){
-                this.input[i].prop("min", this.min);  
+                this.input[i].prop("min", this.min);
             }
             if(this.max){
-                this.input[i].prop("max", this.max);  
+                this.input[i].prop("max", this.max);
             }
             if(this.step){
-                this.input[i].prop("step", this.step);  
+                this.input[i].prop("step", this.step);
             }
 	    this.input[i].val(this.value[i]);
 	    this.element.append(this.input[i]);
@@ -710,7 +712,7 @@
                 throw new Error("NumverArratField: input array size does not equal value size");
             }
             this.value=v;
-                        
+
 	    for(var i=0;i<this.input.length;i++){
                 if(v[i]){
 	            this.input[i].val(v[i]);
@@ -803,11 +805,11 @@
 
     Harvey.Utils.extend(TextAreaField,_Field);
 
-  
+
     var SelectField=function(d,element){
 	var i;
       //  var settings=checkDefaultOptions("SelectField",d);
-        
+
 	_Field.call(this,d,element);
 	this.popup=true;
 
@@ -897,7 +899,7 @@
 
     var RadioButtonSetField=function(d,element){   // like select field - but not in a dropdown and not editable
         //var settings=checkDefaultOptions("RadioButtonSetField",d);
-   	
+
 	_Field.call(this,d,element);
 	this.popup=true;
 	if(!this.labels && this.labels.length ===0){
@@ -947,7 +949,7 @@
 		    e.stopPropagation();
                    // console.log("current value is " + that.input[index].val());
                     //console.log("current checked is " + that.input[index].prop("checked"));
-                    
+
                     if(that.input[index].prop("checked") === true && that.value[index]=== false){
                         that.value[index] = true;
                     }
@@ -963,10 +965,10 @@
                                 that.input[i].val(false);
                                 that.value[i] = false;
                             }
-                        } 
+                        }
                     }*/
 		};
-	    }(this,p)); 
+	    }(this,p));
 	},
 	reset:function(){
 	    //this.current_selection=null;
@@ -1021,7 +1023,7 @@
             }
 	    return ar;
 	},
-	checkValue:function(){ 
+	checkValue:function(){
 	    if(this.required ){ // must have at least one value set to true.
                 for(var i=0; i<this.value.length; i++){
                   //  console.log("checkbox value is " + this.value[i]);
@@ -1040,8 +1042,8 @@
 
     var CounterField=function(d,element){
         //var settings=checkDefaultOptions("CounterField",d);
-   
-        
+
+
 	_Field.call(this,d,element);
 
 	this.input=$("<input class='" + this.type + "' name='value' type= '" + this.html_type + "'/>");
@@ -1059,14 +1061,14 @@
 
     var SliderField=function(d,element){
         //var settings=checkDefaultOptions("SliderField",d);
-     
+
 	_Field.call(this,d,element);
 	this.popup=true;
 	this.input=$("<input class='" + d.type + "' type= '" + this.html_type + "'/>").css('display','none');
 
 	var that=this;
 	var slider=$("<div class='slider'></div>");
-	
+
 	var value=(this.value)?this.value: this.min;
 
 	//this.label.prop("for","amount");
@@ -1131,7 +1133,7 @@
                 sp.detach();
 		that.addValue(l);
 		var last_element=that.element.find('li').last();
-		last_element.append(sp); 
+		last_element.append(sp);
 	    });
 	    this.element.find('li').last().find('span.minus').on("click",function(e){
 		e.stopPropagation();
@@ -1140,10 +1142,10 @@
                 sp.detach();
                 that.deleteValue(l);
 	  	var last_element=that.element.find('li').last();
-		last_element.append(sp); 
-                
+		last_element.append(sp);
+
 	    });
-            
+
 	}
     };
 
@@ -1208,7 +1210,7 @@
 
     var ImageArrayField=function(d,element){
         //var settings=checkDefaultOptions("ImageArrayField",d);
-       
+
 	_Field.call(this,d,element);
 	this.popup=true;
         this.width=this.width?this.width:100;
@@ -1231,7 +1233,7 @@
 	                      //Harvey.popup.alert("Uploading Files in progress");
 	                      promise=that._getImageFileSelect(e,new_values);
                               promise.fail(function(){
-                                  throw new Error("Could not get images to upload"); 
+                                  throw new Error("Could not get images to upload");
                               });
 	                      promise.done(function(){
 		                      // Harvey.display.alert("Uploading done");
@@ -1247,14 +1249,14 @@
                           };
 	    }(new_values));
         }
-        
+
         if(this.value && this.value.length>0){  // start pre-loading
             promise=this.loadImages(this.value);
             if(this.thumbnails){
                 promise.done( this.mkThumbnails());
             }
         }
-  
+
     };
 
 
@@ -1266,7 +1268,7 @@
 	    imm.src=o.src; //e.target.result;
             console.log("getImage last is " + last);
             console.log("getImages");
- 
+
 	    imm.onload=function(){
 	//	console.log("+++++ reader onload got width " + this.width + " " + this.height + " count " + that.count);
                 o.width=this.width;
@@ -1314,7 +1316,7 @@
 		reader.readAsDataURL(files[i]);
 	    }
 	    return promise;
-            
+
         },
         loadImages: function(){
             var deferred=$.Deferred();
@@ -1329,7 +1331,7 @@
             var that=this;
 	  //  console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.find(".image_gallery");
-	    
+
             if (td.length > 0){
 		td.empty();
 		if(td.hasClass("ui-selectable")){
@@ -1341,7 +1343,7 @@
 	//	throw new Error("image gallery is null");
 	    }
 	    this.element.append(td);
-	 
+
 	    var cb=function(e,s){
 		for(var i=0;i<this.selected.length; i++){
 	//	    console.log("got selected " + this.selected[i]);
@@ -1367,11 +1369,11 @@
 		}
 		else{
 	//	    console.log("using the src component - images are already loaded");
-		    b.src=this.value[i].src; 
+		    b.src=this.value[i].src;
 		}
 		div.append(b);
 		td.append(div);
-	    } 
+	    }
             if(this.editable){
                 this.selected=[];
 	        td.selectable({stop:
@@ -1383,7 +1385,7 @@
 	    }
 	},
 	getValue:function(){
-           
+
 	    return this.value;
 
 	},
@@ -1404,19 +1406,19 @@
             if(this.thumbnails){
                 this.mk_thumbnails();
             }
-            
+
         }
     };
 
     Harvey.Utils.extend(ImageArrayField,_Field);
 
-  
-  
+
+
     var AutoCompleteField=function(d,element){
-        
+
 	var that=this;
         //var settings=checkDefaultOptions("AutoCompleteField",d);
-        
+
 	InputField.call(this,d,element);
 	this.popup=true;
 	this.input.autocomplete({
@@ -1491,8 +1493,8 @@
                 "ImageArrayField":ImageArrayField,
                 "AutoCompleteField":AutoCompleteField
                };
-        
-     
+
+
         for(var n in  ar){
           //  console.log("Field is " + n);
             Methods[n]=[];
@@ -1505,8 +1507,8 @@
                 }
             }
         }
-         return Methods; 
+         return Methods;
      };
-   
-    
-})(jQuery);
+
+
+})(require('jquery'));

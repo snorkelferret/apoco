@@ -1,5 +1,6 @@
- 
-;(function($){   
+var Harvey = require('./declare.js');
+
+;(function($){
     'use strict';
 
     var popups={
@@ -8,11 +9,11 @@
 	    var Hdialog;
 	    if($("#Harvey_dialog").length === 0){
 		// if(DEBUG)log("DIALOG ----- dialog does not exist");
-		Hdialog=$("<div id='Harvey_dialog' title='" + title + "' ></div>"); 
+		Hdialog=$("<div id='Harvey_dialog' title='" + title + "' ></div>");
 		var p=$("<p> " + message + "</p>");
 		Hdialog.append("<span class= 'ui-icon ui-icon-circle-check'> </span>");
 		Hdialog.append(p);
-		// Harvey.display.Content.append(Hdialog);	  	
+		// Harvey.display.Content.append(Hdialog);
 		Hdialog.dialog({ modal: true,
 				 autoOpen: false,
 				 buttons:{
@@ -25,7 +26,7 @@
 	    else{
 		//if(DEBUG)log("DIALOG ------------- EXISTS title now " + title + " message " + message);
 		$("#Harvey_dialog").dialog("option", "title", title);
-		$("#Harvey_dialog  p").remove(); 
+		$("#Harvey_dialog  p").remove();
 		if(message !== undefined){
 		    var p=$("<p> " + message + "</p>");
 		    $("#Harvey_dialog").append(p);
@@ -41,10 +42,10 @@
 		$("#Harvey_dialog").dialog('close');
 	    };
 	},
-     
+
 	spinner: function(on){
-	    if($("#Harvey_spinner").length === 0){  
-		var spinner=$("<div id='Harvey_spinner'>  </div>"); 
+	    if($("#Harvey_spinner").length === 0){
+		var spinner=$("<div id='Harvey_spinner'>  </div>");
 		$(document.body).append(spinner);
 	    }
 	    if(on){
@@ -57,7 +58,7 @@
 	    }
             return spinner;
 	},
-	alert: function(text){   
+	alert: function(text){
 
 	    if($("#Harvey_alert").length == 0){
 		var nd,ns,np;
@@ -73,9 +74,9 @@
             $("#Harvey_alert").delay(6000).fadeOut(4000, function(){
                 $(this).remove();
             });
-	    
+
 	    return nd;
-	    
+
 	},
 	trouble: function(heading,text){
 	    var a=$("<div  id='Harvey_trouble'>");
@@ -88,7 +89,7 @@
 	    // this should call a hard logging function
 	    $(document.body).append(a);
             this.dialog("Unrecoverable Error","Please shutdown now");
-            
+
 
 	},
 
@@ -108,16 +109,16 @@
 	    403: function(s){
 		Harvey.popup.dialog("Bad Return from server: 403","Forbidden " + s);
 	    },
-	    404: function(s) { 
+	    404: function(s) {
 		Harvey.popup.dialog("Bad Return from server: 404","Not Found " + s);
-	    },	
+	    },
 	    410: function(s){
 		Harvey.popup.dialog("Bad Return from server: 410","Gone " + s);
 	    },
-	    413: function(s){ 
+	    413: function(s){
 		Harvey.popup.dialog("Bad Return from server: 413","Request entity too large " + s);
 	    },
-	    424: function(s){ 
+	    424: function(s){
 		Harvey.popup.dialog("Bad Return from server: 424","Method Failure " + s);
 	    },
 	    500: function(s){
@@ -136,6 +137,6 @@
     };
     $.extend(true, Harvey, {
 	popup: popups
-    });   
+    });
 
-})(jQuery);
+})(require('jquery'));

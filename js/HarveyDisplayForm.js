@@ -1,12 +1,14 @@
+var Harvey = require('./declare.js');
+
 // create a form dynamically from json
 
 
 
 ;(function($) {
     "use strict";
-   
+
     var DEBUG=true;
-  
+
     var HarveyMakeForm=function(options,win){
 	this.DEBUG=true;
 	var that=this;
@@ -20,7 +22,7 @@
 	execute: function(){
 	    var that=this;
 	    this.element=$("<div id='" + this.id + "' class='harvey_form ui-widget ui-widget-content ui-corner-all '></div>");
-	    
+
             if(!this.height){
                 this.height=400;
             }
@@ -29,7 +31,7 @@
             }
             this.element.height(this.height);
             this.element.width(this.width);
-            
+
 	    var header=$("<div class='form_header ui-widget ui-state-default ui-widget-header ui-corner-all'></div>");
 
 	    this.element.append(header);
@@ -53,7 +55,7 @@
 	    var close=$("<span  class=' ui-icon ui-icon-close'> </span>");
 
 	    close.appendTo(header);
-            
+
 	    var c=(function(cmd){
 		return function(e){
 		    e.stopPropagation();
@@ -80,7 +82,7 @@
             this.components.length=0; // delete
 
             container.append(fp);
-	    
+
 
 	    if(this.buttons){
 		var button_container=$("<div class='form_button_container ui-widget-content'></div>");
@@ -99,9 +101,9 @@
                             //that.buttons[i].action(that);
                             fn(that);
                             //console.log("form button clicked");
-                        },false); 
+                        },false);
                         //console.log("button has action");
-		    }   
+		    }
 		    button_container.append(button);
 		}
 	    }
@@ -210,7 +212,7 @@
                     return new HarveyMakeForm(opts,win);
                 }
             }
-	   
+
 	}
     });
 
@@ -218,4 +220,4 @@
 
 
 
-})(jQuery);
+})(require('jquery'));

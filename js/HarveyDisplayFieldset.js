@@ -1,34 +1,36 @@
+var Harvey = require('./declare.js');
+
 // requires HarveyDisplayBase.js
 
 ;(function($){
 
     "use strict";
-    
+
     var HarveyMakeFieldset=function(options,win){
 	//console.log("display.fieldset is here");
 	this.DEBUG=true;
 	var that=this;
         this.nodes=[];
         this.fields=[];
-	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class 
+	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
     };
-    
-  
+
+
 
     HarveyMakeFieldset.prototype={
 	execute: function(){
-    
+
 	    var el,p;
 	    this.element=$("<div id='" + this.id + "' class='field_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
-            
+
             for(var i=0;i<this.components.length;i++){
-                
+
                 el=$("<div class='fieldset'></div>");
                 if(this.components[i].class){
                     el.addClass(this.components[i].class);
-                } 
-                
-                
+                }
+
+
 	        if(this.components[i].node){
                     this.addNode(this.components[i],el);
 		}
@@ -42,7 +44,7 @@
 	    return this.fields;
 	},
         getNodes:function(){
-            return this.nodes;  
+            return this.nodes;
         },
         addNode:function(d,el){
             var n;
@@ -122,10 +124,10 @@
 	}
     };
 
-    
+
 
     Harvey.Utils.extend(HarveyMakeFieldset,Harvey._DisplayBase);
-   
+
     $.extend(true, Harvey, {
 	display: {
 	    fieldset: function(opts,win){
@@ -139,9 +141,8 @@
             },
             _fieldsetBase: HarveyMakeFieldset
 	}
-    });   
+    });
 
 
 
-})(jQuery);
-
+})(require('jquery'));

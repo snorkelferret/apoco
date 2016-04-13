@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 // Menu display object
 //  requires HarveyDisplayBase.js
 //
@@ -29,14 +31,14 @@
     HarveyMakeTabs.prototype={
 	execute: function(){
 	  // console.log("execute of DisplayTabs");
-                     
+
 	    this.element=$("<div id='" + this.id + "' class='tab_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
 
 	    if(!this.tabs){
 		throw new Error("No tabs or action groupBy options");
 	    }
 
-	    
+
 	    //console.log("Tabs creating new element");
 	    var tablist=$("<ul role='tablist' class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all tabs' > </ul>");
 
@@ -68,10 +70,10 @@
                     }
                 );
 		tablist.append(this.tabs[i].element);
-  
+
 	    }
             this.select(this.selected);
-  
+
 	    this.element.append(tablist);
 	    return true;
 
@@ -135,4 +137,4 @@
 
 
 
-})(jQuery);
+})(require('jquery'));

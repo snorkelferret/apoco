@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 // Menu display object
 //  requires HarveyDisplayBase.js
 //
@@ -17,7 +19,7 @@
 	console.log("called display base");
     };
 
-    
+
     var select_menu=function(that,index){
         var name=that.list[index].name;
         var p=that.getSiblings();
@@ -72,13 +74,13 @@
                     }
 	        }
             }
-	    
+
 	    this.element.append(u);
    /*         if(this.selected){
                 var t=this.getMenu(this.selected);
                 t.element.trigger("click");
             } */
-            
+
 	    return true;
 
 	},
@@ -127,7 +129,7 @@
                     this.selected.element.siblings().removeClass("ui-state-active");
                     return;
                 }
-              
+
             }
 	}
     };
@@ -152,4 +154,4 @@
 
 
 
-})(jQuery);
+})(require('jquery'));

@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 /*
  * Copyright (c) Pooka Ltd.2012-2016
  * Distributed under MIT license.
@@ -5,7 +7,7 @@
  */
 
 /*
-  TODO 
+  TODO
    right mouse buton - add functionality to add/remove columns
    resizable does not reappear after the element has been detached
    add support for displaying/ uploading images
@@ -47,19 +49,19 @@ jsonishData={
             p[1]="";
         }
 	cell.element.append("<span class='float_left'>" + p[0] + "</span>");
-        
+
 	if (p.length >= 2){
 	    cell.element.append("<span class='float_right'> ." + p[1] + "</span>");
 	}
 	else{
 	    cell.element.append("<span class='float_right'> .00  </span>");
 	}
-        
-        
+
+
     };
     var set_aligned_float=function(val){
-        
-        var p=parseFloat(cell.value).toFixed(cell.precision).toString().split("."); 
+
+        var p=parseFloat(cell.value).toFixed(cell.precision).toString().split(".");
         this.element.find("span.float_left").html(p[0]);
         if (p.length >= 2){
             this.element.find("span.float_left").html(p[1]);
@@ -70,7 +72,7 @@ jsonishData={
     };
     */
     // end special functions
-    
+
     function rmouse_popup(element){
 
 	element.bind("contextmenu", function(e){
@@ -259,7 +261,7 @@ jsonishData={
 	    Harvey.sort(that.grids[k].rows,{ type: type,
 			                     fn: function(a){ return a[col_num];}
                                            });
-            
+
 	    if(dir === "down"){
 		that.grids[k].rows.reverse();
 	    }
@@ -323,7 +325,7 @@ jsonishData={
 	this.selection_list=[];
 	this.cellEdit=null; // cell currently being edited- this is of type Harvey.field
 	this.allowEdit=true;  // are edits allowed?
- 
+
 	if(this.sortOrder && this.userSortable){
 	    throw new Error("Cannot specify both sortOrder and sortable");
 	    return null;
@@ -544,7 +546,7 @@ jsonishData={
 				sort_callback(col_num,that,"down");
 			    };
 			}(i,that),false);
-		    
+
 
 		        h[0].addEventListener("mouseover",function(e){
 			    $(this).addClass('ui-state-hover'); }, false);
@@ -565,7 +567,7 @@ jsonishData={
 	        div_container.resizable(
                     {alsoResize: this.element});
 	    }
-            
+
             this.element.append(div_container);
 	    //body.selectable(this.select_data()); // allow multiple cells to be selected
 
@@ -593,7 +595,7 @@ jsonishData={
 		        // console.log("adding row " + i);
 		        new_row=that._mkStaticRow(rows[i]);
 		        body.append(new_row);
-		    } 
+		    }
                 }
 		else{ */
 		    for(var i=0; i<rows.length; i++){  // rows
@@ -602,7 +604,7 @@ jsonishData={
 		        body.append(new_row);
 		    }
                // }
-		return div; 
+		return div;
 	    };
 
 	    for(var i=0;i<this.grids.length;i++){
@@ -697,8 +699,8 @@ jsonishData={
    /*     _mkStaticRow: function(row){
             var val,col_name,len=this.cols.length;
             var r=$("<tr > </tr>");
-     
-            
+
+
             for(var i=0;i<len;i++){
                 col_name=this.cols[i].name;
                 val=row[col_name];
@@ -706,7 +708,7 @@ jsonishData={
                     row[col_name]={element:$("<td name='" + col_name + "'class='" +  this.cols[i].type + "'> </td>"),
                                    value: val, precision: this.cols[i].precision};
                     mk_aligned_float(row[col_name]);
-                    row[col_name].setValue=set_aligned_float; 
+                    row[col_name].setValue=set_aligned_float;
                 }
                 else{
                     row[col_name]={element:$("<td name='" + col_name + "'class='" +  this.cols[i].type + "'> " + val + " </td>"),
@@ -727,7 +729,7 @@ jsonishData={
 	    var len=this.cols.length;
 
 	    var r=$(document.createElement("tr"));
-            
+
 	    for(var i=0;i<len;i++){
 		col_name=this.cols[i].name;
 
@@ -751,7 +753,7 @@ jsonishData={
                 //console.log("c is " + JSON.stringify(c));
                 //c.addClass(this.cols[i].type);
                 row[col_name]=Harvey.field[Harvey.dbToHtml[this.cols[i].type].html_field](settings,c);
-                
+
               //  new_cell.element.removeClass(this.cols[i].type);
 		//if(!row[col_name]){ throw new Error("new cell is null");}
 
@@ -905,7 +907,7 @@ jsonishData={
                       //  if(t<20){
                       //      console.log("row " + j + " col " + c + " value " + n.rows[t][c]);
                       //  }
-                     
+
                     }
                 }
             }
@@ -993,4 +995,4 @@ jsonishData={
 	}
     });
 
-})(jQuery);
+})(require('jquery'));

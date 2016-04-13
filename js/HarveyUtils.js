@@ -1,3 +1,5 @@
+var Harvey = require('./declare.js');
+
 // check that we have the string methos to remove leading and trailing whitespace
 
 String.prototype.trim = String.prototype.trim || function trim() {
@@ -9,8 +11,8 @@ String.prototype.trim = String.prototype.trim || function trim() {
     var DEBUG=true;
     'use strict';
 
-   
-    
+
+
     Harvey.Utils={
         getCssValue:function(css_class,rule){
             var stylesheets = document.stylesheets;
@@ -132,17 +134,17 @@ String.prototype.trim = String.prototype.trim || function trim() {
 		if(superClass.prototype.constructor === Object.prototype.constructor){
 		    superClass.prototype.constructor = superClass;
 		}
-	    } 
+	    }
 	},
         formatDate: function(d){
             //	console.log("date is " + d);
-	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];  
-	    var months = ["January", "February", "March", "April", "May",   
+	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	    var months = ["January", "February", "March", "April", "May",
 		          "June", "July", "August", "September", "October", "November", "December"];
 
 
 
-	    var parts=d.split("-"); // because Safari does not understand the ISO8601 format 
+	    var parts=d.split("-"); // because Safari does not understand the ISO8601 format
             //	var date=new Date(d);
 	    var date=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])); // stuoid workaround for Safari 5.1
 	    var month=date.getMonth();
@@ -157,7 +159,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	        ending="th";
 	    }
 	    else if(last_char === "1"){
-	        
+
 	        ending="st";
 	    }
 	    else if( last_char === "2"){
@@ -171,11 +173,11 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    }
 	    //date.toLocaleString();
 	    return (days[day] + " " + n + ending + " "  +  months[month] + " " + year);
-            
+
         },
-   
+
         dateNow:function(){
-	    var n=new Date(); 
+	    var n=new Date();
 	    var now= (n.getFullYear() + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2));
 	    return now;
         },
@@ -191,7 +193,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             create: function(){
                 var that=this;
                 var check=function(mutations){
-                    
+
                     if(that._list.length>0){
                         for(var item of mutations){
                             //console.log("this is mutation item " + item);
@@ -225,25 +227,25 @@ String.prototype.trim = String.prototype.trim || function trim() {
                         Harvey.Observer.takeRecords(); //empty the list
                         Harvey.Observer.disconnect(); //stop observing
                     }
-                    
+
                     console.log("observer list is now " + that._list.length);
                 };
-                if(!Harvey.Observer){ 
-                    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;           
+                if(!Harvey.Observer){
+                    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
                     Harvey.Observer=new MutationObserver(function(mutations){
                         check(mutations);
                     });
                 }
             },
             add:  function(id,fn,context){
-                
+
                 console.log("Observer adding ____________- id is " + id);
                 if(id !== undefined){
                     this._list.push({id:id,fn:fn,context:context,found:false});
                 }
                 //console.log("obsever list is " + this._list.length + " long");
             }
-     
+
         },
         detectMobile: function(){
             if(navigator.userAgent.match(/Android/i)
@@ -255,7 +257,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             else{
                 return false;
             }
- 
+
         }
     };
 
