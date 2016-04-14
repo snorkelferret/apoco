@@ -1,4 +1,4 @@
-var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
 
 // Menu display object
 //  requires HarveyDisplayBase.js
@@ -154,4 +154,4 @@ var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
 
 
 
-})(require('jquery'));
+})(jQuery);

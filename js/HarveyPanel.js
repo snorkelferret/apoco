@@ -1,4 +1,4 @@
-var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
 
 // Copyright (c) 2015 Pooka Ltd.
 // Name: HarveyDisplaySet.js
@@ -543,4 +543,4 @@ var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
                            });
 
 
-})(require('jquery'));
+})(jQuery);

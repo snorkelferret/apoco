@@ -1,4 +1,4 @@
-var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
 
 ;(function($){
 
@@ -132,4 +132,4 @@ var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
             return promise;
         }
     };
-})(require('jquery'));
+})(jQuery);
