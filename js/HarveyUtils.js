@@ -1,4 +1,4 @@
-var Harvey = require('./declare.js');
+var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
 
 // check that we have the string methos to remove leading and trailing whitespace
 

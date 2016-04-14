@@ -1,6 +1,6 @@
 "use strict";
 
-var Harvey = require('./declare.js');
+var dcl = require('./declare.js');
 
 require("./HarveyCore.js");
 require("./HarveyUtils.js");
@@ -18,4 +18,4 @@ require("./HarveyNodes.js");
 require("./HarveyPanel.js");
 require("./HarveyPopups.js");
 
-module.exports = Harvey;
+module.exports = dcl;

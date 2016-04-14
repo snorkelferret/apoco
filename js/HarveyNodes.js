@@ -1,4 +1,4 @@
-var Harvey = require('./declare.js');
+var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
 
 // Node class for static elements like headings and text etc
 // No callbacks or publish or listeners for these elements

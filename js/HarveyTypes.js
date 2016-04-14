@@ -1,4 +1,4 @@
-var Harvey = require('./declare.js');
+var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
 
 ;(function(){
 

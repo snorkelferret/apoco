@@ -1,7 +1,7 @@
 "use strict";
 
 var      $ = require("jquery");
-var Harvey = require("./declare.js");
+var Harvey = require('./declare.js').Harvey, UI = require('./declare.js').UI;
 
 require('jquery-ui');
 
