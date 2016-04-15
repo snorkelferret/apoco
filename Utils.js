@@ -195,7 +195,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 var check=function(mutations){
 
                     if(that._list.length>0){
-                        for(var item of mutations){
+                        for(var item in mutations){
                             //console.log("this is mutation item " + item);
                             for(var i=0; i< item.addedNodes.length;i++){
                               //  console.log("Mutation observer added " + item.addedNodes[i].id);

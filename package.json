@@ -4,15 +4,20 @@
   "description": "harvey",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "eslint": "eslint -f compact --env browser *.js",
+    "eslint:test": "eslint -f compact --env mocha test/*.js",
+    "pretest": "npm run eslint && npm run eslint:test",
+    "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test"
   },
   "author": "Val Wardlaw <val@perluceo.com>",
   "license": "ISC",
   "devDependencies": {
     "chai": "^3.5.0",
+    "cross-env": "^1.0.7",
     "eslint": "^2.7.0",
     "jsdom": "^8.3.1",
     "mocha": "^2.4.5",
+    "mocha-tldr-reporter": "^1.0.0",
     "sinon": "^1.17.3"
   },
   "dependencies": {

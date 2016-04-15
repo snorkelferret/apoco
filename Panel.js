@@ -193,7 +193,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }
             return null;
         },
-        _deletePanel(win){ // remove a panel that is in a separate browser
+        _deletePanel:function(win){ // remove a panel that is in a separate browser
             for(var i=0;i<this._list.length;i++){
                 if(this._list[i].window == win){
                     this.delete(this._list[i].name);
