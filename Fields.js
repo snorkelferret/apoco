@@ -7,8 +7,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 // THIS NEEDS TO BE REWRITTEN
 
 ;(function($){
-
     "use strict";
+
     Harvey.dbToHtml={
 	integer:{html_type: "number", html_field: "InputField",check: "integer",sort:"integer"},
 	positiveInteger: {html_type:"number", html_field: "InputField",check:"positiveInteger",sort:"positiveInteger"},
@@ -59,7 +59,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    this.html_type=Harvey.dbToHtml[this.type].html_type;
 	}
         if(!element){
-            element=$(document.creatElement("div"));
+            element=$("<div></div>");
         }
 	else if(element.length === 0){
 	    throw new Error("external element for field is null");

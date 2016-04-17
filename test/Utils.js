@@ -1,8 +1,8 @@
-var Harvey=require('../declare').Harvey;
+const Harvey=require('../declare').Harvey;
 
 require("../Utils");
 
-var assert = require('chai').assert;
+const assert = require('chai').assert;
 
 describe("formatDate",function() {
     it("formats",function(){
