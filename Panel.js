@@ -14,7 +14,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     function check(ar){
 	if(!Harvey.checkType["object"](ar)){
-	    throw new Error("This is not a window display object" + ar);
+	    throw new Error("This is not a window display object " + ar);
 	}
 	for(var i in ar){
 	    var OK=0;
