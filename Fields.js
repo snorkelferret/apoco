@@ -544,17 +544,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 		this.value="";
 		return;
 	    }
+            if(!Harvey.checkType["float"](v)){
+		throw new Error("setValue: this value is not a float" + v);
+	    }
 	    v=parseFloat(v,10).toFixed(this.precision);  // not necessarily a number
 	    var p=v.toString().split(".");
 	    if(p.length !== 2){
 		throw new Error("value is not a floating point number" + v);
 		return null;
 	    }
-	    //console.log("setValue: value is " + p[0]);
-            if(!Harvey.checkType["float"](this.value)){
-		throw new Error("setValue: this value is not a float" + this.value);
-		return null;
-	    }
+            //console.log("setValue: value is " + p[0]);	  
 	    this.input[0].val(p[0]);
 	    this.input[1].val(p[1]);
 	    this.value=v;
@@ -1436,7 +1435,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     Harvey.field=(function(){
   	var make_field_or_static = function(FieldType){
 	    return function(options,element) {
-		if (!options.editable) {
+		if (options.editable === false) {
 		    return new StaticField(options,element);
 		} else {
 		    return new FieldType(options,element);
