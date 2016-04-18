@@ -29,7 +29,7 @@ describe("JSDOMfield",function(){
         assert(dom);
     });
     it("appends a node to the dom",function(){
-        $("body").append("<div id='thing'</div>");
+        $("body").append("<div id='thing'></div>");
         assert($("#thing").length>0);
     });
     it('defines Harvey',function(){
@@ -129,7 +129,7 @@ describe("FloatField",function(){
         
     });
     var f=Harvey.field["FloatField"]({name:"floatField",type: "float",precision: 3});
-    it("has a getElement method",function(){
+    it("has a getElement method",function(r){
         assert(f.getElement() !== null); 
     });
     it("creates a div element",function(){
