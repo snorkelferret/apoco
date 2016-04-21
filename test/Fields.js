@@ -12,16 +12,11 @@ const Harvey=require('../declare').Harvey;
 describe("JSDOMfield",function(){
     var $;
 
-   // beforeEach(function () {
-    /*    global.document = jsdom.jsdom('<html></html>');
-        global.window = document.defaultView;
-     $ = global.jQuery = require('jquery')(window); */
     global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
     global.window=document.defaultView;
-    $ = global.jQuery = require('jquery');
-  //  global.Harvey=require('../declare').Harvey;
-   // });
+    global.navigator=global.window.navigator;
+    $= global.jQuery = require('jquery');
 
     it('uses jquery', function () {
         var dom = $("#banner");
@@ -44,16 +39,13 @@ describe("JSDOMfield",function(){
 
 describe("InputField",function(){
     var $;
-    global.navigator=global.window.navigator;
-    $ = global.jQuery = require('jquery');
+   
     require("../Utils.js");
     require("../Types.js");
     require("../Fields.js");
     require("../node_modules/jquery-ui");
-   
-    it("defines Harvey",function(){
-        assert(Harvey !== undefined); 
-    });
+    $= global.jQuery = require('jquery');
+  
     it("defines Harvey.field",function(){
         console.log("here is Harvey.field " + Harvey.field);
        // assert(Harvey.popup !== undefined);
@@ -112,8 +104,7 @@ describe("InputField",function(){
 
 describe("FloatField",function(){
     var $;
-    global.navigator=global.window.navigator;
-    $ = global.jQuery = require('jquery');
+    $= global.jQuery = require('jquery');
     require("../Utils.js");
     require("../Types.js");
     require("../Fields.js");
@@ -129,7 +120,7 @@ describe("FloatField",function(){
         
     });
     var f=Harvey.field["FloatField"]({name:"floatField",type: "float",precision: 3});
-    it("has a getElement method",function(r){
+    it("has a getElement method",function(){
         assert(f.getElement() !== null); 
     });
     it("creates a div element",function(){
@@ -154,7 +145,379 @@ describe("FloatField",function(){
         var e=$("body").find("div[name='floatField']").find("input");
         console.log("first fields value is " + $(e[0]).val());
         assert.strictEqual($(e[0]).val(),'-23');
-        assert.strictEqual($(e[1]).val(),'-467');
+        assert.strictEqual($(e[1]).val(),'468');
+    });
+    it("gets a value",function(){
+        assert.strictEqual(f.getValue(),"-23.468"); 
+    });
+
+});
+
+describe("DateField",function(){
+    var  $;
+  
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    $= global.jQuery = require('jquery');
+    
+    it("defines Harvey",function(){
+        assert(Harvey !== undefined); 
+    });
+    it("defines Harvey.field",function(){
+        console.log("here is Harvey.field " + Harvey.field);
+       // assert(Harvey.popup !== undefined);
+        assert($.isEmptyObject(Harvey.field)!==true);
+    });
+    var f=Harvey.field["DateField"]({name:"dateField",type: "date"});
+    it("creates a div element",function(){
+        var b=f.getElement();
+        assert(b.length>0);
+        $("body").append(b);
+    });
+    it("creates an input node",function(){
+        var e=$("body").find("div[name='dateField']").find("input");
+        assert(e.length>0);
+    });
+    it("creates a jquery datepicker",function(){
+       // var e=$("body").find("div[name='dateField']").find("#ui-datepicker-div");
+        var e=$("body").find("#ui-datepicker-div");
+        assert(e.length>0);
+    });
+    it("sets a date",function(){
+        f.setValue(20160824);
+        var e=$("body").find("div[name='dateField']").find("input");
+        assert.strictEqual(e.val(),"20160824");
+    });
+    it("gets a date",function(){
+        assert.strictEqual(f.getValue(),"20160824"); 
+    });
+});
+
+describe("CheckBoxField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+   
+    var f=Harvey.field["CheckBoxField"]({name:"checkBoxField",type: "boolean"});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0);
+        $("body").append(b);
+    });
+    it("creates an input node",function(){
+        var e=$("body").find("div[name='checkBoxField']").find("input");
+        assert(e.length>0);
+    });
+    it("has a setter for value",function(){
+        f.setValue(true);
+        var e=$("body").find("div[name='checkBoxField']").find("input");
+        assert.strictEqual(e.prop("checked"),true);
+    });
+    it("gets a value",function(){
+        assert.strictEqual(f.getValue(),true); 
+    });
+    it("clicking toggles value",function(){
+        var e=$("body").find("div[name='checkBoxField']").find("input");
+        e.trigger("click");
+        assert.strictEqual(f.getValue(),false); 
+        e.trigger("click");
+        assert.strictEqual(f.getValue(),true); 
+    });
+    
+});
+
+
+describe("NumberArrayField-Integer",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["NumberArrayField"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0);
+        $("body").append(b);
+    });
+    it("creates an array of input nodes",function(){
+        var e=$("body").find("div[name='numberArrayField']").find("input");
+        assert.strictEqual(e.length,4);
+    });
+    it("can set a max value",function(){
+        var w=f.getInputElement();
+        w[0].prop("max",10);
+        var e=$("body").find("div[name='numberArrayField']").find("input");
+        assert.strictEqual($(e[0]).prop("max"),"10");
+    });
+    
+    it("has a value getter",function(){
+        var r=f.getValue();
+        assert.sameMembers(r,["1","2","",""]);
+    });
+    it("sets the values",function(){
+        f.setValue([2,5,7]);
+        var e=$("body").find("div[name='numberArrayField']").find("input");
+        assert.strictEqual($(e[0]).val(),"2");
+        assert.strictEqual($(e[1]).val(),"5");
+        assert.strictEqual($(e[2]).val(),"7");
+        assert.strictEqual($(e[3]).val(),"");
+    });
+});
+
+describe("TextAreaField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["TextAreaField"]({name:"textAreaField",type: "text"});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0);
+        $("body").append(b);
+    });
+    it("creates a textarea node",function(){
+        var e=$("body").find("div[name='textAreaField']").find("textarea");
+        assert.notStrictEqual(e.length,0);
+    });
+    it("adds text",function(){
+        var e=$("body").find("div[name='textAreaField']").find("textarea").val("blah blah blah");
+        var b=f.getValue();
+        assert.equal(b,"blah blah blah");
+    });
+    it("has a value setter",function(){
+        f.setValue("some other text");
+        var e=$("body").find("div[name='textAreaField']").find("textarea").val();
+        assert.equal(e,"some other text");
+    });
+});
+                                       
+describe("SelectField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["SelectField"]({name:"selectField",type: "string",options:["one","two","three"]});
+     it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0);
+        $("body").append(b);
+     });
+    it("creates a select node",function(){
+        var e=$("body").find("div[name='selectField']").find("select");
+        assert.notStrictEqual(e.length,0);
+    });
+    it("creates option nodes",function(){
+        var e=$("body").find("div[name='selectField']").find("option");
+        assert.strictEqual(e.length,3);
+       
+    });
+    it("sets a value",function(){
+        var e=$("body").find("div[name='selectField']").find("option:contains('two')");
+        //var e=$("body").find("div[name='selectField']").find("select");
+        e[0].selected=true;
+ 
+        $(e).trigger("change");
+        var b=f.getValue();
+        assert.strictEqual(b,"two");
+    });
+    it("has a method to set a value",function(){
+        f.setValue("three");
+        var b=$("body").find("div[name='selectField']").find("select").val();
+        
+        assert.equal(b,"three");
+    });
+    
+});
+
+describe("RadioButtonSetField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["RadioButtonSetField"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0);
+        $("body").append(b);
+    });
+    it("creates an array of input nodes",function(){
+        var e=$("body").find("div[name='radioButtonSetField']").find("input");
+        assert.strictEqual(e.length,3);
+    }); 
+    it("creates an array of label nodes",function(){
+        var e=$("body").find("div[name='radioButtonSetField']").find("li");
+        assert.strictEqual(e.length,3);
+    });
+    it("sets a value",function(){
+        var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('two')");
+        $(e).find("input").trigger("click");
+        var b=$(e).find('input').prop("checked");
+        assert.strictEqual(b,true);
+    });
+    it("uses a setter method for value",function(){
+        f.setValue("one");
+        var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('one')").find("input");
+        var b=$(e).prop("checked");
+        assert.strictEqual(b,true);
+    });
+    it("has a getter method which returns an array",function(){
+        var b=f.getValue();
+        assert.strictEqual(b.length,3);
+        assert.strictEqual(b[0].one,true);
+        assert.strictEqual(b[1].two,false);
+        assert.strictEqual(b[2].three,false);
+        
+    });
+    it("can add a new entry",function(){
+        f.addValue("four");
+        var e=$("body").find("div[name='radioButtonSetField']").find("li");
+        assert.strictEqual(e.length,4);
+        var e=$("body").find("div[name='radioButtonSetField']").find("input");
+        assert.strictEqual(e.length,4);
+    });
+    it("can set the new entry",function(){
+        var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('four')");
+        $(e).find("input").trigger("click");
+        var b=$(e).find('input').prop("checked");
+        assert.strictEqual(b,true);
+    });
+});
+
+describe("CounterField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["CounterField"]({name:"counterField",type: "integer",min:0,max:16});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0); 
+        $("body").append(b);
+    });
+    it("has a method to set a value",function(){
+        f.setValue(10);
+        var e=$("body").find("div[name='counterField']").find("input").val();
+        assert.strictEqual(e,"10");
+    });
+    it("has a method to get a value",function(){
+        var e=f.getValue();
+        assert.strictEqual(e,"10");
+    });
+    it("has a spinner which increments the value",function(){
+        var e=$("body").find("div[name='counterField']").find("a");
+        assert.strictEqual(e.length,2);
+        var r= $(e[0]).find("span.ui-icon-triangle-1-n"); //
+        assert.strictEqual(r.length,1);
+        var r=$("body").find("div[name='counterField']").find("a").first().trigger("mousedown");
+        var r=$("body").find("div[name='counterField']").find("a").first().trigger("mouseup");
+        $("body").find("div[name='counterField']").find("input").blur();
+       // f.input.trigger("change");
+        //assert.strictEqual(r.length,1);
+        var b=$("body").find("div[name='counterField']").find("input").val();
+        f.dummyClick();
+        console.log("spinner value is " + b);
+        //var b=f.getValue();
+        assert.strictEqual(b,"11");
+    });
+    
+});
+
+describe("SliderField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["SliderField"]({name:"sliderField",type: "integer",min: 0,max:10});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0); 
+        $("body").append(b);
+    });
+    it("creates a slider",function(){
+        var r=$("body").find("div[name='sliderField']").find(".ui-slider");
+        assert.strictEqual(r.length,1);
+    });
+    it("has a set value method",function(){
+        f.setValue(5);
+        var r=$("body").find("div[name='sliderField']").find("input").val();
+        assert.strictEqual(r,"5");
+    });
+});
+
+describe("StringArrayField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["StringArrayField"]({name:"stringArrayField",type: "string",value:["one","two","three"]});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0); 
+        $("body").append(b);
+    });
+    it("creates a list",function(){
+        var e=$("body").find("div[name='stringArrayField']").find("li");
+        assert.strictEqual(e.length,3);
+    });
+    it("sets the values",function(){
+        var e=$("body").find("div[name='stringArrayField']").find("input");
+        assert.strictEqual(e.length,3);
+        assert.strictEqual($(e[0]).val(),"one");
+        assert.strictEqual($(e[1]).val(),"two");
+        assert.strictEqual($(e[2]).val(),"three");
+        
+    });
+    it("has a method to get value array",function(){
+        var r=f.getValue();
+        assert.sameMembers(r,["one","two","three"]);
+    });
+    it("can add an empty field",function(){
+        var r=$("body").find("div[name='stringArrayField']").find('span.plus');
+        assert.strictEqual(r.length,1);
+        $(r).trigger("click");
+        var e=$("body").find("div[name='stringArrayField']").find("input");
+        assert.strictEqual(e.length,4);
+    });
+});
+
+describe("ImageArrayField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["ImageArrayField"]({name:"imageArrayField",type: "image"});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0); 
+        $("body").append(b);
     });
 
 });
