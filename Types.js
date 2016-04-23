@@ -43,11 +43,12 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 	},
 	negativeInteger: function(s){  //strictly negative integers of arbitary length
-	    var isNegativeInteger_re     = /^\s*(\-)?\d+\s*$/;
+	    var isNegativeInteger_re     =  /-\s?\d+\s*$/; //  /^\s*(\-)?\d+\s*$/;
 	    s=String(s);
 	    if(this.blank(s)){
 		return false;
 	    }
+   
 	    if(s.search(isNegativeInteger_re) !== -1){
 		return true; //parseInt(s,10); // base 10
 	    }
@@ -61,6 +62,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    if(this.blank(s)){
 		return false;
 	    }
+    
 	    if(s.search(isPositiveInteger_re) !== -1){
 		return true; // parseInt(s,10); // base 10
 	    }
@@ -97,8 +99,11 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    if(this.blank(s) || isNaN(s)){
 		return false;
 	    }
-	    if(s==0){ return s;} // this regex below does not match 0.0 !!!!! AHGGG WHY ?????
+	    if(s==0){ return true;} // this regex below does not match 0.0 !!!!! AHGGG WHY ?????
 	    // console.log("float as string is " + s);
+            if(!s.search){
+                return false;
+            }
 	    var isDecimal_re   =  /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
 	    if(s.search(isDecimal_re) != -1){
 		s=parseFloat(s);  //.toFixed(6); // 6 decimal places
@@ -111,6 +116,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    if(this.blank(s) || isNaN(s)){
 		return false;
 	    }
+            if(!s.search){
+                return false;
+            }
 	    var isDecimal_re     = /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
 	    if(s.search(isDecimal_re) != -1){
 		s=parseFloat(s); //.toFixed(2); // 2 decimal places
@@ -151,17 +159,22 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return false;
 	},
 	alphabetic: function(s){
+            s=String(s);
 	    if(this.blank(String(s))){
 		return false;
 	    }
 	    var isAlpha =/^[a-zA-Z]+$/;
+
 	    if(s.search(isAlpha) != -1){
 		return true;
 	    }
 	    return false;
 	},
 	string: function(s){  // any non zero string
-          //  console.log("checkType string is " + s);
+            //  console.log("checkType string is " + s);
+            if(s==="") {
+                return true;
+            }
 	    if(this.blank(String(s))){
 		return false;
 	    }
@@ -177,9 +190,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    }
 	    return true;
 	},
-	stringArray: function(s){
-	    return;
-	},
+
 	alphaNum: function(s){
 	    s=String(s);
 	    if(this.blank(s)){
@@ -317,6 +328,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	},
 	object: function(a){  // a string is an object if called with var s= new String();
 	    //var t=("testing  " + a + " is an object");
+            if(a === undefined){
+                return false;
+            }
 	    if(a !== null && typeof a === 'object'){
 		return true;
 	    }
@@ -360,20 +374,17 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }
             return true;
         },
-        stringArray:function(a){
-            if(this.array(a)){
-                for(var i=0;i<a.length;i++){
-                    if(!this.string(a[i])){
-                        return false;
-                    }
+       	stringArray: function(s){
+            if(this.array(s)){
+                for(var i=0;i<s.length;i++){
+                    if(typeof(s) !== 'string' || !(s instanceof String) ){
+		        return false;
+	            }
                 }
+                return true;
             }
-            else{
-                return false;
-            }
-            return true;
-
-        },
+	    return false;
+	},
         floatArray:function(a){
             if(this.array(a)){
                 for(var i=0;i<a.length;i++){
@@ -381,11 +392,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                         return false;
                     }
                 }
+                return true;
             }
-            else{
-                return false;
-            }
-            return true;
+            return false;
         },
         integerArray: function(a){
             if(this.array(a)){
@@ -394,11 +403,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                         return false;
                     }
                 }
+                return true;
             }
-            else{
-                return false;
-            }
-            return true;
+            return false;
         },
         booleanArray:function(a){
             if(this.array(a)){
@@ -407,11 +414,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                         return false;
                     }
                 }
+                return true;
             }
-            else{
-                return false;
-            }
-            return true;
+            return false;
         },
         inheritsFrom: function(a,c){
 	    var t=("testing Inherits from ");

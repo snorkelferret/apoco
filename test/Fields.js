@@ -91,7 +91,7 @@ describe("InputField",function(){
     it("rejects a value of the wrong type",function(){
         t.setValue("dog");
         assert.strictEqual(t.checkValue(),false);
-         t.setValue(6);
+        t.setValue(6);
     });
     it("has a getValue method that returns the value",function(){
         assert.strictEqual(t.getValue(),'6'); 
@@ -99,6 +99,8 @@ describe("InputField",function(){
     it("has a getKey method that returns the name ",function(){
         assert.strictEqual(t.getKey(),"inputNode"); 
     });
+
+    
     
 });
 
@@ -150,6 +152,13 @@ describe("FloatField",function(){
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),"-23.468"); 
     });
+    it("rejects a value of the wrong type",function(){
+        var fn=function(){
+            f.setValue("dog");
+        };
+        assert.throws(fn,"setValue: this value is not a float dog");
+        
+    });
 
 });
 
@@ -192,6 +201,11 @@ describe("DateField",function(){
     });
     it("gets a date",function(){
         assert.strictEqual(f.getValue(),"20160824"); 
+    });
+    it("rejects a value of the wrong type",function(){
+        f.setValue("dog");
+        assert.strictEqual(f.checkValue(),false);
+        f.setValue("");
     });
 });
 
@@ -268,7 +282,7 @@ describe("NumberArrayField-Integer",function(){
         assert.strictEqual($(e[1]).val(),"5");
         assert.strictEqual($(e[2]).val(),"7");
         assert.strictEqual($(e[3]).val(),"");
-    });
+    });  
 });
 
 describe("TextAreaField",function(){
@@ -397,6 +411,12 @@ describe("RadioButtonSetField",function(){
         var b=$(e).find('input').prop("checked");
         assert.strictEqual(b,true);
     });
+    it("rejects a value of the wrong type",function(){
+        var fn=function(){
+            f.setValue("dog");
+        };
+        assert.throws(fn,"RadioButtonsetfield: setValue has no member called dog");
+    });
 });
 
 describe("CounterField",function(){
@@ -430,13 +450,15 @@ describe("CounterField",function(){
         var r=$("body").find("div[name='counterField']").find("a").first().trigger("mousedown");
         var r=$("body").find("div[name='counterField']").find("a").first().trigger("mouseup");
         $("body").find("div[name='counterField']").find("input").blur();
-       // f.input.trigger("change");
-        //assert.strictEqual(r.length,1);
         var b=$("body").find("div[name='counterField']").find("input").val();
-        f.dummyClick();
-        console.log("spinner value is " + b);
-        //var b=f.getValue();
         assert.strictEqual(b,"11");
+    });
+    it("rejects a value of the wrong type",function(){
+        var fn=function(){
+            f.setValue("dog");
+        };
+        assert.throws(fn, "CounterField: setValue wrong type for value");
+        
     });
     
 });
@@ -464,6 +486,10 @@ describe("SliderField",function(){
         var r=$("body").find("div[name='sliderField']").find("input").val();
         assert.strictEqual(r,"5");
     });
+    it("rejects non-numeric values",function(){
+        f.setValue("dog");
+        assert.strictEqual(f.checkValue(),false);
+    });
 });
 
 describe("StringArrayField",function(){
@@ -474,7 +500,7 @@ describe("StringArrayField",function(){
     require("../Fields.js");
     require("../node_modules/jquery-ui");
     
-    var f=Harvey.field["StringArrayField"]({name:"stringArrayField",type: "string",value:["one","two","three"]});
+    var f=Harvey.field["StringArrayField"]({name:"stringArrayField",value:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert(b.length>0); 
@@ -503,6 +529,13 @@ describe("StringArrayField",function(){
         var e=$("body").find("div[name='stringArrayField']").find("input");
         assert.strictEqual(e.length,4);
     });
+    it("rejects a value of the wrong type",function(){
+        var fn=function(){
+            f.setValue(10);
+        };
+        assert.throws(fn,"StringArrayField: setValue not an array"); 
+        f.setValue(["big","small"]);
+    });
 });
 
 describe("ImageArrayField",function(){
@@ -513,7 +546,24 @@ describe("ImageArrayField",function(){
     require("../Fields.js");
     require("../node_modules/jquery-ui");
     
-    var f=Harvey.field["ImageArrayField"]({name:"imageArrayField",type: "image"});
+    var f=Harvey.field["ImageArrayField"]({name:"imageArrayField"});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert(b.length>0); 
+        $("body").append(b);
+    });
+
+});
+
+describe("AutoCompleteField",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Utils.js");
+    require("../Types.js");
+    require("../Fields.js");
+    require("../node_modules/jquery-ui");
+    
+    var f=Harvey.field["AutoCompleteField"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert(b.length>0); 

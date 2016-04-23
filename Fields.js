@@ -7,37 +7,37 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     "use strict";
 
     Harvey.dbToHtml={
-	integer:{html_type: "number", html_field: "InputField",check: "integer",sort:"integer"},
-	positiveInteger: {html_type:"number", html_field: "InputField",check:"positiveInteger",sort:"positiveInteger"},
-	negativeInteger:{html_type:"number", html_field: "InputField",check:"negativeInteger",sort:"negativeInteger" },
-	date: {html_type:"date", html_field: "DateField",check:"date",sort:"date"},
-	time: {html_type:"time",html_field: "TimeField",check:"time",sort: "time"},
-	string: {html_type: "text", html_field: "InputField",check:"string",sort: "string"},
-	token: {html_type:"text", html_field: "InputField",check:"token",sort: "token"},
-	alphaNum: {html_type:"text", html_field: "InputField",check:"alphaNum",sort:"alphaNum" },
-	image: {html_type:"file", html_field: "InputField",check:"image",sort: null},
-	currency: {html_type:"number", html_field: "InputField",check:"currency",sort: "currency"},
-	email: {html_type:"email", html_field: "InputField",check:"email",sort:"email"},
-	float: {html_type:"number", html_field: "FloatField",check:"float",sort:"float"},
-	integerArray: {html_type:"number", html_field: "NumberArrayField",check:"integerArray",sort: null},
-	phoneNumber: {html_type:"tel", html_field: "InputField",check:"phoneNumber",sort:null},
-	floatArray: {html_type:"number", html_field: "NumberArrayField",check:"floatArray",sort: null},
-	boolean: {html_type: "checkbox",html_field: "CheckBoxField",check:"boolean",sort:"boolean"},
-	text: { html_type:"text",html_field: "TextAreaField",check:"text",sort:null},
-	stringArray: {html_type: "text",html_field: "StringArrayField",check:null,sort: null},
-	imageArray: {html_type: "image", html_field: "ImageArrayField",check:null,sort: null},
-	password: {html_type: "password", html_field:"InputField", check: "string",sort: null}
+	integer:{html_type: "number", field: "InputField",check: "integer",sort:"integer"},
+	positiveInteger: {html_type:"number", field: "InputField",check:"positiveInteger",sort:"positiveInteger"},
+	negativeInteger:{html_type:"number", field: "InputField",check:"negativeInteger",sort:"negativeInteger" },
+	date: {html_type:"date", field: "DateField",check:"date",sort:"date"},
+	time: {html_type:"time",field: "TimeField",check:"time",sort: "time"},
+	string: {html_type: "text", field: "InputField",check:"string",sort: "string"},
+	token: {html_type:"text", field: "InputField",check:"token",sort: "token"},
+	alphaNum: {html_type:"text", field: "InputField",check:"alphaNum",sort:"alphaNum" },
+	image: {html_type:"file", field: "InputField",check:"image",sort: null},
+	currency: {html_type:"number", field: "InputField",check:"currency",sort: "currency"},
+	email: {html_type:"email", field: "InputField",check:"email",sort:"email"},
+	float: {html_type:"number", field: "FloatField",check:"float",sort:"float"},
+	integerArray: {html_type:"number", field: "NumberArrayField",check:"integerArray",sort: null},
+	phoneNumber: {html_type:"tel", field: "InputField",check:"phoneNumber",sort:null},
+	floatArray: {html_type:"number", field: "NumberArrayField",check:"floatArray",sort: null},
+	boolean: {html_type: "checkbox",field: "CheckBoxField",check:"boolean",sort:"boolean"},
+	text: { html_type:"text",field: "TextAreaField",check:"text",sort:null},
+	stringArray: {html_type: "text",field: "StringArrayField",check:null,sort: null},
+	imageArray: {html_type: "image", field: "ImageArrayField",check:null,sort: null},
+	password: {html_type: "password", field:"InputField", check: "string",sort: null}
     };
 
-    Harvey.HtmlToType=function(html_field){
+  /*  Harvey.HtmlToType=function(field){
  	for(var k in  Harvey.dbToHtml){
-	    if(Harvey.dbToHtml[k].html_field == html_field){
+	    if(Harvey.dbToHtml[k].field == field){
 		return Harvey.dbToHtml[k].html_type;
 	    }
 	}
 	return "";
     };
-
+*/
 
 
     var _Field=function(d,element){
@@ -45,19 +45,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         if(!d.name){
             throw new Error("Harvey.field: Field must have a name");
         }
-        if(!d.field && !d.type){
-            throw new Error("Harvey.field: must supply a field or a type");
-        }
-        $.extend(this,d);
 
-	if(this.field && !this.type){
+        if(!d.type){
+            throw new Error("Harvey.field: must have a type");
 	  //  console.log("got this field");
-	    this.html_type=Harvey.HtmlToType(this.field);
+	   // this.html_type=Harvey.HtmlToType(this.field);
 	    //console.log("setting type to " + this.html_type);
 	}
-	else{
-	    this.html_type=Harvey.dbToHtml[this.type].html_type;
-	}
+        $.extend(this,d);
+	this.html_type=Harvey.dbToHtml[this.type].html_type;
+
         if(!element){
             element=$("<div></div>");
         }
@@ -288,7 +285,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var StaticField=function(d,element){
 	//console.log("static field is here");
-       // var settings=checkDefaultOptions("StaticField",d);
+        // var settings=checkDefaultOptions("StaticField",d);
+        d.field="StaticField";
 	_Field.call(this,d,element);
         if(_mkStatic[this.type]){
             //console.log("got a method for " + this.type);
@@ -330,7 +328,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     var InputField=function(d,element){
 	//console.log("INPUT FIELD IS HERE with required " + d.required);
        // var settings=checkDefaultOptions("InputField",d);
-
+        d.field="InputField";
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
@@ -376,8 +374,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     var FloatField=function(d,element){
 	//console.log("FLOAT FIELD IS HERE");
         //var settings=checkDefaultOptions("FloatField",d);
-
-
+        d.field="FloatField";
+        d.type="float";
 	_Field.call(this,d,element);
 
 	this.input=new Array(2);
@@ -550,7 +548,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 		return;
 	    }
             if(!Harvey.checkType["float"](v)){
-		throw new Error("setValue: this value is not a float" + v);
+		throw new Error("setValue: this value is not a float " + v);
 	    }
 	    v=parseFloat(v,10).toFixed(this.precision);  // not necessarily a number
 	    var p=v.toString().split(".");
@@ -570,8 +568,14 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 
     var DateField=function(d,element){
-
-	InputField.call(this,d,element);
+        d.field="DateEield";
+        d.type="date";
+        _Field.call(this,d,element);
+        var s=document.createElement("input");
+        s.setAttribute("type",this.html_type);
+        s.className=this.type;
+        this.input=$(s);
+        this.element.append(this.input);
 	if(this.editable !== false){
             if(this.value){
 	        this.input.datepicker("setDate",this.value);
@@ -586,32 +590,31 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     };
 
 
-
-    DateField.prototype.popupEditor=function(func){
-	//console.log("datepicker editor is here");
-//	this.input.datepicker("destroy"); // remove the original datepicker so we can reinit with a callback function
-/*	this.input.datepicker({
- onSelect: function(date){
-		console.log("datepicker got date " + date);
-		func(date);
- }
- }); */
-	this.input.datepicker('option','onSelect',function(date){ func(date);});
-    };
-
-    Harvey.Utils.extend(DateField,InputField);
+    Harvey.Utils.extend(DateField,_Field);
 
     var TimeField=function(d,element){
-        var settings=checkDefaultOptions("TimeField",d);
+        d.field="TimeField";
+        d.type="time";
 
-	InputField.call(this,settings,element);
+	_Field.call(this,settings,element);
+        var s=document.createElement("input");
+        s.setAttribute("type",this.html_type);
+        s.className=this.type;
+        this.input=$(s);
+        this.element.append(this.input);
     };
 
-    Harvey.Utils.extend(TimeField,InputField);
+    Harvey.Utils.extend(TimeField,_Field);
 
     var CheckBoxField=function(d,element){
-
-  	InputField.call(this,d,element);
+        d.field="CheckBoxField";
+        d.type="boolean";
+  	_Field.call(this,d,element);
+        var s=document.createElement("input");
+        s.setAttribute("type",this.html_type);
+        s.className=this.type;
+        this.input=$(s);
+        this.element.append(this.input);
 	//console.log("checkbox value is " + d.value);
         this.setValue(this.value);
         if(this.editable === false){
@@ -657,7 +660,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         }
     };
 
-    Harvey.Utils.extend(CheckBoxField,InputField);
+    Harvey.Utils.extend(CheckBoxField,_Field);
 
 
     var NumberArrayField=function(d,element){
@@ -666,7 +669,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         if(!d.size && !d.value ){
             throw new Error("NumberArrayfield needs a size or value");
         }
-          
+        d.field="NumberArrayField"; 
 	_Field.call(this,d,element);
         if(!this.size){
             this.size=this.value.length;
@@ -762,7 +765,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var TextAreaField=function(d,element){
         //var settings=checkDefaultOptions("TextAreaField",d);
-
+        d.field="TextAreaField";
+        d.type="text";
 	_Field.call(this,d,element);
 	this.popup=true;
 	this.input=$("<textarea ></textarea>");
@@ -810,7 +814,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     var SelectField=function(d,element){
 	var i;
       //  var settings=checkDefaultOptions("SelectField",d);
-
+        d.field="SelectField";
 	_Field.call(this,d,element);
 
 	var options="<select>";
@@ -920,7 +924,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var RadioButtonSetField=function(d,element){   // like select field - but not in a dropdown and not editable
         //var settings=checkDefaultOptions("RadioButtonSetField",d);
-
+        d.field="RadioButtonSetField";
+        d.type="boolean";
 	_Field.call(this,d,element);
 	this.popup=true;
 	if(!this.labels && this.labels.length ===0){
@@ -998,7 +1003,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                     return true;
                 }
             }
-            return null;
+            throw new Error("RadioButtonsetfield: setValue has no member called " + value);
         },
 	deleteValue:function(label){
 	    var that=this;
@@ -1053,7 +1058,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var CounterField=function(d,element){
         //var settings=checkDefaultOptions("CounterField",d);
-
+        d.field="CounterField";
 	_Field.call(this,d,element);
 
 	this.input=$("<input class='" + this.type + "' name='value' type= '" + this.html_type + "'/>");
@@ -1069,6 +1074,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return this.spinner.spinner("value").toString();
         },
         setValue:function(v){
+            if(!Harvey.checkType[this.type](v)){
+                throw new Error("CounterField: setValue wrong type for value");
+            }
             this.spinner.spinner("value",v);
             this.value=v;
             this.input.val(v);
@@ -1079,7 +1087,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var SliderField=function(d,element){
         //var settings=checkDefaultOptions("SliderField",d);
-
+        d.field="SliderField";
 	_Field.call(this,d,element);
 	this.popup=true;
 	this.input=$("<input class='" + d.type + "' type= '" + this.html_type + "'/>").css('display','none');
@@ -1105,12 +1113,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 	this.input.val(this.slider.slider('value'));
     };
- 
+    
+    
     
     Harvey.Utils.extend(SliderField,_Field);
 
     var StringArrayField=function(d,element){
         //var settings=checkDefaultOptions("StringArrayField",d);
+        d.field="StringArrayField";
+        d.type="stringArray";
 	_Field.call(this,d,element);
 	this.popup=true;
 	var that=this;
@@ -1170,6 +1181,29 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     };
 
     StringArrayField.prototype={
+        setValue:function(v,index){
+            if(!Harvey.checkType["array"](v)){
+                if( index !== undefined && index<this.length){
+                    this.input[index].input.val(v);
+                    this.value[index]=v;
+                }
+                else{
+                    throw new Error("StringArrayField: setValue not an array");
+                }
+            } 
+            else {
+               if(v.length <= this.length){
+                    for(var i=0;i<v.length;i++){
+                        this.input[i].input.val(v[i]);
+                        this.value[i]=v[i];
+                    }
+               }
+                else{
+                    throw new Error("StringArrayField: setValue array is too long");
+                } 
+                
+            }
+        },
 	getValue:function(){
 	    var vals=[],t;
 	    for(var i=0;i<this.input.length;i++){
@@ -1184,6 +1218,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             if(this.input.length>1){
                 this.input[i].input.parent().remove();
                 this.input.splice(i,1);
+                this.value.splice(i,1);
             }
            // else{
              //   Harvey.popup.alert("StringArrayField: Cannot remove the last value");
@@ -1230,7 +1265,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var ImageArrayField=function(d,element){
         //var settings=checkDefaultOptions("ImageArrayField",d);
-
+        d.field="ImageArrayField";
+        d.type="imageArray";
 	_Field.call(this,d,element);
 	this.popup=true;
         this.width=this.width?this.width:100;
@@ -1435,12 +1471,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 
     var AutoCompleteField=function(d,element){
-
+        d.field="AutoCompleteField";
 	var that=this;
         //var settings=checkDefaultOptions("AutoCompleteField",d);
-
-	InputField.call(this,d,element);
-	this.popup=true;
+        _Field.call(this,d,element);
+        var s=document.createElement("input");
+        s.setAttribute("type",this.html_type);
+        s.className=this.type;
+        this.input=$(s);
+        this.element.append(this.input);
+	
 	this.input.autocomplete({
 	    source: this.options
 	});
@@ -1450,7 +1490,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         popupEditor: null
     };
 
-   Harvey.Utils.extend(AutoCompleteField,InputField);
+    Harvey.Utils.extend(AutoCompleteField,_Field);
 
 
     Harvey.field=(function(){
@@ -1465,7 +1505,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	};
 
 
-	var methods={
+	var r={
             exists:function(field){
                 if(this[field]){
                     return true;
@@ -1491,7 +1531,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    ImageArrayField:function(options,element){ return new  ImageArrayField(options,element);},
 	    AutoCompleteField: function(options,element){ return new AutoCompleteField(options,element);}
 	};
-	return methods;
+	return r;
     })();
 
        // get all the methods on the Fields
