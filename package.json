@@ -7,7 +7,8 @@
     "eslint": "eslint -f compact --env browser *.js",
     "eslint:test": "eslint -f compact --config test/eslint.conf --env mocha test/*.js",
     "pretest": "npm run eslint && npm run eslint:test",
-    "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test"
+    "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test",
+    "posttest": "rimraf .__browserify_string_empty.js"
   },
   "author": "Val Wardlaw <val@perluceo.com>",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "jsdom": "^8.3.1",
     "mocha": "^2.4.5",
     "mocha-tldr-reporter": "^1.0.0",
+    "rimraf": "^2.5.2",
     "sinon": "^1.17.3"
   },
   "dependencies": {
