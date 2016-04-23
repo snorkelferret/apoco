@@ -240,37 +240,79 @@ describe("CheckType(string)",function() {
     it("returns true on empty string",function(){
         assert.strictEqual(Harvey.checkType["string"](""),true);
     });
-    
+    it("returns true on integer string",function(){
+        assert.strictEqual(Harvey.checkType["string"]("10"),true);
+    });
+    it("returns false on integer ",function(){
+        assert.strictEqual(Harvey.checkType["string"](10),false);
+    });
 });
 
 describe("CheckType(password)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["password"](""),false);
     });
-    
+    it("returns false on null",function(){
+        assert.strictEqual(Harvey.checkType["password"](null),false);
+    });
+    it("returns false on undefined",function(){
+        assert.strictEqual(Harvey.checkType["password"](undefined),false);
+    });
+     it("returns true on string",function(){
+        assert.strictEqual(Harvey.checkType["password"]("hjhkjkjh"),true);
+    });
 });
 
 describe("CheckType(alphaNum)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["alphaNum"](""),false);
     });
-    
+    it("returns true on ag46fds",function(){
+        assert.strictEqual(Harvey.checkType["alphaNum"]("ag46fd"),true);
+    });
+    it("returns true on integer",function(){
+        assert.strictEqual(Harvey.checkType["alphaNum"](10),true);
+    });
+    it("returns false on float",function(){
+        assert.strictEqual(Harvey.checkType["alphaNum"](10.5),false);
+    });
 });
 
 describe("CheckType(token)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["token"](""),false);
     });
-    
+    it("returns true on integer",function(){
+        assert.strictEqual(Harvey.checkType["token"](10),true);
+    });
+    it("returns true on float",function(){
+        assert.strictEqual(Harvey.checkType["token"](10.34),true);
+    });
+    it("returns true on FG19_19.2",function(){
+        assert.strictEqual(Harvey.checkType["token"]("FG19_19.2"),true);
+    });
+    it("returns true on 28-19",function(){
+        assert.strictEqual(Harvey.checkType["token"]("28-19"),true);
+    });
+    it("returns true on #28-19",function(){
+        assert.strictEqual(Harvey.checkType["token"]("#28-19"),true);
+    });
+    it("returns false on null",function(){
+        assert.strictEqual(Harvey.checkType["token"](null),true);
+    });
 });
 
 describe("CheckType(email)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["email"](""),false);
     });
-     it("returns true on ff@junk.com",function(){
+    it("returns true on ff@junk.com",function(){
         assert.strictEqual(Harvey.checkType["email"]("ff@junk.com"),true);
     });
+    it("returns false on ff@junk",function(){
+        assert.strictEqual(Harvey.checkType["email"]("ff@junk"),false);
+    });
+    
 });
 
 describe("CheckType(currency)",function() {
@@ -309,8 +351,22 @@ describe("CheckType(time)",function() {
     it("returns true on 12:00",function(){
         assert.strictEqual(Harvey.checkType["time"]("12:00"),true);
     });
-
+    it("returns true on 23:12",function(){
+        assert.strictEqual(Harvey.checkType["time"]("23:12"),true);
+    });
+    it("returns true on 10:10PM",function(){
+        assert.strictEqual(Harvey.checkType["time"]("10:10PM"),true);
+    });
+    it("returns false on 10",function(){
+        assert.strictEqual(Harvey.checkType["time"](10),false);
+    });
+    it("returns false on AM",function(){
+        assert.strictEqual(Harvey.checkType["time"]("AM"),false);
+    });
     
+    it("returns false on 10 as string",function(){
+        assert.strictEqual(Harvey.checkType["time"]("10"),false);
+    }); 
 });
 
 describe("CheckType(image)",function() {
@@ -353,16 +409,124 @@ describe("CheckType(array)",function() {
         assert.strictEqual(Harvey.checkType["array"](["a"]),true); 
     });
 });
+
 describe("CheckType(object)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["object"](""),false);
     });
-    
+    it("returns false when value is a function",function(){
+        assert.strictEqual(Harvey.checkType["object"](function(){}),false);
+    });
+    it("returns false when value is null",function(){
+        assert.strictEqual(Harvey.checkType["object"](null),false);
+    });
+    it("returns false when value is undefined",function(){
+        assert.strictEqual(Harvey.checkType["object"](undefined),false);
+    });
 });
 
 describe("CheckType(function)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["function"](""),false);
     });
+    it("returns false on null",function(){
+        assert.strictEqual(Harvey.checkType["function"](null),false);
+    });
+    it("returns false on {}",function(){
+        assert.strictEqual(Harvey.checkType["function"]({}),false);
+    });
+    
+    it("returns true when value is a function",function(){
+        assert.strictEqual(Harvey.checkType["function"](function(){}),true);
+    });
+    
+    
 });
 
+describe("CheckType(imageArray)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["imageArray"](""),false);
+    });
+});
+
+
+
+describe("CheckType(objectArray)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["objectArray"](""),false);
+    });
+    it("returns false on an integer array",function(){
+        assert.strictEqual(Harvey.checkType["objectArray"]([0,1,2]),false);
+    });
+    it("returns true on an object array",function(){
+        var t=[{"a":1},{"b":2}];
+        assert.strictEqual(Harvey.checkType["objectArray"](t),true);
+    });
+    it("returns false if array contains one element that is not  an object ",function(){
+        var t=[{"a":1},{"b":2},"pig"];
+        assert.strictEqual(Harvey.checkType["objectArray"](t),false);
+    });
+    
+});
+
+describe("CheckType(stringArray)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["stringArray"](""),false);
+    });
+    it("returns false on an integer array",function(){
+        assert.strictEqual(Harvey.checkType["stringArray"]([0,1,2]),false);
+    });
+    it("returns true on a array of integer strings",function(){
+        assert.strictEqual(Harvey.checkType["stringArray"](["9","8","7"]),true);
+    });
+    
+});
+
+describe("CheckType(floatArray)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["floatArray"](""),false);
+    });
+    it("returns true on an integer array",function(){
+        assert.strictEqual(Harvey.checkType["floatArray"]([0,1,2]),true);
+    });
+    it("returns false if array contains a string",function(){
+        assert.strictEqual(Harvey.checkType["integerArray"]([0,1,2,"dog"]),false);
+    });   
+});
+describe("CheckType(integerArray)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["integerArray"](""),false);
+    });
+    it("returns false for [true,false,true]",function(){
+        assert.strictEqual(Harvey.checkType["integerArray"]([true,false,true]),false);
+    });
+    it("returns true on an integer array",function(){
+        assert.strictEqual(Harvey.checkType["integerArray"]([0,1,2]),true);
+    });
+    it("returns false if array contains a float",function(){
+        assert.strictEqual(Harvey.checkType["integerArray"]([0,1,2,10.5]),false);
+    });       
+
+    
+});
+
+describe("CheckType(booleanArray)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["booleanArray"](""),false);
+    });
+    it("returns true for [true,false,true]",function(){
+        assert.strictEqual(Harvey.checkType["booleanArray"]([true,false,true]),true);
+    });
+    it("returns false on a string",function(){
+        assert.strictEqual(Harvey.checkType["booleanArray"]("true"),false);
+    });
+    it("returns false for [true,false,blue,true]",function(){
+         assert.strictEqual(Harvey.checkType["booleanArray"]("[true,false,blue,true]"),false);
+     });
+    it("returns true for [0,false,1,true,0]",function(){
+        assert.strictEqual(Harvey.checkType["booleanArray"]([0,true,false,1,true]),true);
+    });
+    it("returns false on an integer array",function(){
+        assert.strictEqual(Harvey.checkType["booleanArray"]([0,1,2]),false);
+    });
+});

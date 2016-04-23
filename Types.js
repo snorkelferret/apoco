@@ -185,7 +185,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return false; //   .toString();
 	},
 	password: function(s){
-            if(this.blank(String(s))){
+            if(this.blank(s)){
 		return false;
 	    }
 	    return true;
@@ -301,7 +301,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return true;
 	},
 	boolean: function(s){
-	    console.log("check_field.boolean: value is " + s);
+	  //  console.log("check_field.boolean: value is " + s);
 	    s=String(s);
             var rf=/^([Vv]+(erdade(iro)?)?|[Ff]+(als[eo])?|[Tt]+(rue)?|0|[\+\-]?1)$/;
 	    if(this.blank(s)){
@@ -317,8 +317,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return false;
 	},
 	array: function(a){
-	   // var t=("testing  " + a + " is an array");
-	    if( Object.prototype.toString.call(a ) === '[object Array]' ) {
+	    // var t=("testing  " + a + " is an array");
+	    if( Object.prototype.toString.call(a) === '[object Array]' ) {
                 if(a.length>0){
 		    return true;
                 }
@@ -338,11 +338,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	},
 	function: function(a){
 	    function isFunction(object) {
-		return !!(object && objToString.call(object) == '[object Function]');
+                var obj={};
+		return !!(object && obj.toString.call(object) == '[object Function]');
 	    }
-	    if(isFunction(a)){
-		return true;
-	    }
+	   // if(isFunction(a)){
+	//	return true;
+	    //}
+            if(typeof a === "function"){
+                return true;
+            }
 	    return false;
 	},
         imageArray:function(a){
@@ -377,7 +381,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
        	stringArray: function(s){
             if(this.array(s)){
                 for(var i=0;i<s.length;i++){
-                    if(typeof(s) !== 'string' || !(s instanceof String) ){
+                    if(!this.string(s[i])){
 		        return false;
 	            }
                 }
@@ -425,7 +429,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 		{
 		    return true;
 		}
-		a = a.__proto__;
 	    }
 	    return false;
 	}
