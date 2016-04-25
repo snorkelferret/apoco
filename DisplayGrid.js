@@ -1,4 +1,6 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+require('./DisplayBase.js');
+require('./Fields');
 
 /*
  * Copyright (c) Pooka Ltd.2012-2016
@@ -278,9 +280,7 @@ jsonishData={
     }
 
     function sort_into_subGrids(that){
-	if(that.rows){
-	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
-	}
+
 	// see if the data has been put into subgrids
 	if(that.rows && Harvey.checkType["array"](that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
@@ -300,27 +300,22 @@ jsonishData={
                 subgrid["all"]=new Object;
 		subgrid["all"].rows=that.rows;
 	    }
-	   // that.rows.length=0; // delete rows array
+	   
 	    that.grids=new Array;
 	    var i=0;
 	    for(var k in subgrid){
 		that.grids[i]=subgrid[k];
 		i++;
 	    }
-	}
-        that.rows.length=0; //
-	if(!that.grids){
-	    throw new Error("Harvey.display.grid: no rows or grids in " + that.id);
-	}
+	    that.rows.length=0; //delete rows array
+        }
+
     }
-
-
-
 
     var HarveyMakeGrid=function(options,win){
 	var DEBUG=true;
 	var that=this;
-
+        
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	this.selection_list=[];
 	this.cellEdit=null; // cell currently being edited- this is of type Harvey.field
@@ -330,7 +325,9 @@ jsonishData={
 	    throw new Error("Cannot specify both sortOrder and sortable");
 	    return null;
 	}
-
+        for(var k in this){
+            console.log("+++====hot jwt " + k);
+        }
     };
 
 
@@ -469,7 +466,6 @@ jsonishData={
 		var ar={ type: type,
 			 fn: function(a){ return a[col_num].value;}
 		       };
-
 	    }
 	    else{
 		isSortable=false;
@@ -485,26 +481,79 @@ jsonishData={
 	    }
 
 	},
+        addCol:function(col){
+            if(this.cols === undefined){
+                this.cols=[];
+            }
+            var l=this.cols.length;
+            this.cols[l]=col;
+            console.log("this cols has length " + this.cols.length);
+        },
 	execute:function(){
-
-	    sort_into_subGrids(this);
-	    this.sort();
             var that=this;
- 	    var t0=performance.now();
-	   // var is_static=true;
-            // is this grid static?
-       /*     for(var i=0;i<this.cols.length;i++){
-                if(this.cols[i].editable === true){
-                    is_static=false;
-                }
-            } */
-          //  if(this.element=== null){
-	    this.element=$("<div id='" + this.id + "' class='grid htable'></div>");  // "  ui-widget-content'> </div>");
-           // }
-	    // right mouse button popup- not on all cols needs a rewrite
-	    //rmouse_popup(this.element);
-	    //this.DOM.append(this.element);
-
+            
+            if(this.cols === undefined){    
+                throw new Error("DisplayGrid: execute - requires at least one column " + this.cols);
+            }
+            if(this.rows !== undefined){
+                console.log("adding rows");
+	        sort_into_subGrids(this);
+                if(!this.grids){
+	            throw new Error("Harvey.display.grid: no rows or grids in " + that.id);
+	        }
+	        this.sort();
+            }
+            
+ 	 //   var t0=performance.now();
+            
+            var mk_col=function(i,r){
+                if(that.cols[i].display !== false){
+		    console.log("grid col " + that.cols[i].name);
+		    var label=(that.cols[i].label)?that.cols[i].label:that.cols[i].name;
+		    var h=$("<th class='ui-state-default " +  that.cols[i].type + "' type= '" + that.cols[i].type + "'> " + label + " </th>");
+		    that.cols[i].element=h;
+		    that.cols[i].sortable=Harvey.dbToHtml[that.cols[i].type].sort;
+		    if(that.cols[i].sortable && this.userSortable){
+		        var dec=$("<div class='arrows'></div>");
+		        var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
+		        var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
+		        dec.append(up);
+		        dec.append(down);
+		        h.append(dec);
+                        
+		        up[0].addEventListener("click",function(col_num,that){
+			    return function(e){
+                                e.stopPropagation();
+                                e.preventDefault();
+                                console.log("got that.cols " + that.cols[col_num].name);
+			        sort_callback(col_num,that,"up");
+			    };
+		        }(i,that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
+		        down[0].addEventListener("click",function(col_num,that){
+			return function(e){
+                            e.stopPropagation();
+                            e.preventDefault();
+                            console.log("got that.cols " + that.cols[col_num].name);
+			    sort_callback(col_num,that,"down");
+			};
+		        }(i,that),false);
+                        
+                        
+		        h[0].addEventListener("mouseover",function(e){
+			    $(this).addClass('ui-state-hover'); }, false);
+		        h[0].addEventListener("mouseout",function(e){
+			    $(this).removeClass('ui-state-hover');}, false);
+                    }
+		    r.append(h);
+		    if(that.cols[i].hidden){
+		        h.hide();
+		    }
+                    
+	        }
+            }; 
+        
+	    this.element=$("<div id='" + this.id + "' class='grid htable'></div>");  
+           
 	    var headtable=$("<table class='ui-widget head'></table>");
 	    var head=$("<thead></thead>");
 
@@ -513,54 +562,11 @@ jsonishData={
 
 	    var r=$("<tr></tr>");
 	    // setup the grid columns
-
+            
 	    for(var i=0; i< this.cols.length; i++){
-
-		if(this.cols[i].display !== false){
-		   if(this.DEBUG) console.log("grid col " + this.cols[i].name);
-		    var label=(this.cols[i].label)?this.cols[i].label:this.cols[i].name;
-		    var h=$("<th class='ui-state-default " +  this.cols[i].type + "' type= '" + this.cols[i].type + "'> " + label + " </th>");
-		    this.cols[i].element=h;
-		    this.cols[i].sortable=Harvey.isSortable(this.cols[i].type);
-		    if(this.cols[i].sortable && this.userSortable){
-			var dec=$("<div class='arrows'></div>");
-			var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
-			var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
-			dec.append(up);
-			dec.append(down);
-			h.append(dec);
-
-			up[0].addEventListener("click",function(col_num,that){
-			    return function(e){
-                                e.stopPropagation();
-                                e.preventDefault();
-                                console.log("got that.cols " + that.cols[col_num].name);
-				sort_callback(col_num,that,"up");
-			    };
-			}(i,that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
-			down[0].addEventListener("click",function(col_num,that){
-			    return function(e){
-                                e.stopPropagation();
-                                e.preventDefault();
-                                console.log("got that.cols " + that.cols[col_num].name);
-				sort_callback(col_num,that,"down");
-			    };
-			}(i,that),false);
-
-
-		        h[0].addEventListener("mouseover",function(e){
-			    $(this).addClass('ui-state-hover'); }, false);
-		        h[0].addEventListener("mouseout",function(e){
-			    $(this).removeClass('ui-state-hover');}, false);
-                    }
-		    r.append(h);
-		    if(this.cols[i].hidden){
-			h.hide();
-		    }
-		}
+               mk_col(i,r);
 	    }
-
-
+            return;
 	    head.append(r); // put the head row into the dom
             var div_container=$("<div class='grid_content' </div>");
             if(this.resizable){
@@ -569,9 +575,8 @@ jsonishData={
 	    }
 
             this.element.append(div_container);
+          
 	    //body.selectable(this.select_data()); // allow multiple cells to be selected
-
-
 	    var mk_grid=function(grid){
 		var new_row;
 		var name=grid.name;
@@ -589,21 +594,13 @@ jsonishData={
 		var body=$("<tbody class=''></tbody>");
 		table.append(body);
 		div_container.append(div);
-                // add the data for the rows
-            /*    if(is_static){
-                    for(var i=0; i<rows.length; i++){  // rows
-		        // console.log("adding row " + i);
-		        new_row=that._mkStaticRow(rows[i]);
-		        body.append(new_row);
-		    }
-                }
-		else{ */
-		    for(var i=0; i<rows.length; i++){  // rows
-		        // console.log("adding row " + i);
-		        new_row=that._mkRow(rows[i]);
-		        body.append(new_row);
-		    }
-               // }
+      
+		for(var i=0; i<rows.length; i++){  // rows
+		    // console.log("adding row " + i);
+		    new_row=that._mkRow(rows[i]);
+		    body.append(new_row);
+		}
+      
 		return div;
 	    };
 
@@ -611,17 +608,19 @@ jsonishData={
     	        console.log("making grid " + i);
 		this.grids[i].element= mk_grid(this.grids[i]);
 	    }
-	    var t1=performance.now();
-	    console.log("grid load " + (t1-t0) + "milliseconds ");
+	   // var t1=performance.now();
+	   // console.log("grid load " + (t1-t0) + "milliseconds ");
 	},
 	getColIndex: function(name){
-	    for(var i=0; i< this.cols.length;i++){
-		if (this.cols[i].name === name){
-		    return i;
-		}
+            if(this.cols !== undefined){
+	        for(var i=0; i< this.cols.length;i++){
+		    if (this.cols[i].name === name){
+		        return i;
+		    }
+                }
 	    }
-	    throw new Error("No column of name " + name + "exists");
-	    return -1;
+	    throw new Error("No column of name " + name + " exists");
+	    
 	},
 	getCol: function(name,grid_name){
 	   // console.log("getting columns");
@@ -696,34 +695,6 @@ jsonishData={
 		}
 	    }
 	},
-   /*     _mkStaticRow: function(row){
-            var val,col_name,len=this.cols.length;
-            var r=$("<tr > </tr>");
-
-
-            for(var i=0;i<len;i++){
-                col_name=this.cols[i].name;
-                val=row[col_name];
-                if(this.cols[i].type === "float"){
-                    row[col_name]={element:$("<td name='" + col_name + "'class='" +  this.cols[i].type + "'> </td>"),
-                                   value: val, precision: this.cols[i].precision};
-                    mk_aligned_float(row[col_name]);
-                    row[col_name].setValue=set_aligned_float;
-                }
-                else{
-                    row[col_name]={element:$("<td name='" + col_name + "'class='" +  this.cols[i].type + "'> " + val + " </td>"),
-                               value:val};
-                }
-		if(this.cols[i].display !== false){
-		    r.append(row[col_name].element);
-		    row[col_name].element.data('harvey',{name: col_name,"context": row[col_name],"type": this.cols[i].type});
-		}
-		if(this.cols[i].hidden){
-		    row[col_name].element.hide();
-		}
-            }
-            return r;
-        }, */
 	_mkRow: function(row){
 	    var c,type,settings,col_name;
 	    var len=this.cols.length;
@@ -904,10 +875,6 @@ jsonishData={
                     for(var k=0;k<this.cols.length;k++){
                         c=this.cols[k].name;
                         n.rows[t][c]=this.grids[i].rows[j][c].value;
-                      //  if(t<20){
-                      //      console.log("row " + j + " col " + c + " value " + n.rows[t][c]);
-                      //  }
-
                     }
                 }
             }

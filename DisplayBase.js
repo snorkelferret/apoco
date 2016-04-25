@@ -23,24 +23,26 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 	for(var k in this.options){
 	    this[k]=this.options[k];
-	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
+	    console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
 	}
 
         //console.log("============================== Adding display object  with id " + this.id + " window " + win + "+++++++++++++++++++++++++++");
 	var t;
 
         if(win){
-          //  console.log("Adding display to child window");
+            console.log("Adding display to child window");
 	    this.DOM=$(win.document).find("#" + this.DOM);
             t=$(win.document).find("#"+ this.id);
         }
-
         else{
-            t=("#"+ this.id);
+            t=$("#"+ this.id);
 	    this.DOM=$("#" + this.DOM);
+           // this.DOM=$("body").find("#test");
+            console.log("hpy  %j" , this.DOM);
+            console.log("length is " + this.DOM.length);
         }
 	if(this.DOM.length === 0){
-	    throw new Error("_HarveyDisplayBase DOM element does not exist");
+	    throw new Error("_HarveyDisplayBase DOM element does not exist " + this.DOM);
 	}
 
 	if($(t)){

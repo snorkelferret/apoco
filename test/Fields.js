@@ -9,15 +9,23 @@ const           fs = require('fs');
 const Harvey=require('../declare').Harvey;
 
 
-describe("JSDOMfield",function(){
-    var $;
-
     global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
     global.window=document.defaultView;
     global.navigator=global.window.navigator;
-    $= global.jQuery = require('jquery');
+   global.jQuery = require('jquery');
 
+
+
+describe("setup",function(){
+    var $;
+
+  /*  global.document=require("jsdom").jsdom(undefined,
+                                           {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
+    global.window=document.defaultView;
+    global.navigator=global.window.navigator; */
+    $= global.jQuery; // = require('jquery');
+  
     it('uses jquery', function () {
         var dom = $("#banner");
         
@@ -40,10 +48,10 @@ describe("JSDOMfield",function(){
 describe("InputField",function(){
     var $;
    
-    require("../Utils.js");
-    require("../Types.js");
+  //  require("../Utils.js");
+  //  require("../Types.js");
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+ //   require("../node_modules/jquery-ui");
     $= global.jQuery = require('jquery');
   
     it("defines Harvey.field",function(){
@@ -107,10 +115,8 @@ describe("InputField",function(){
 describe("FloatField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+  //  require("../node_modules/jquery-ui");
    
     it("defines Harvey",function(){
         assert(Harvey !== undefined); 
@@ -152,23 +158,27 @@ describe("FloatField",function(){
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),"-23.468"); 
     });
+    it("rounds a negative number down",function(){
+        f.setValue(-23.45542467);
+        assert.strictEqual(f.getValue(),"-23.455"); 
+    });
+    it("rounds a negative number up where appropriate",function(){
+        f.setValue(-23.4555567);
+        assert.strictEqual(f.getValue(),"-23.456"); 
+    });
     it("rejects a value of the wrong type",function(){
         var fn=function(){
             f.setValue("dog");
         };
         assert.throws(fn,"setValue: this value is not a float dog");
-        
     });
-
 });
 
 describe("DateField",function(){
     var  $;
   
-    require("../Utils.js");
-    require("../Types.js");
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+    //require("../node_modules/jquery-ui").datepicker;
     $= global.jQuery = require('jquery');
     
     it("defines Harvey",function(){
@@ -212,10 +222,8 @@ describe("DateField",function(){
 describe("CheckBoxField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+ 
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
    
     var f=Harvey.field["CheckBoxField"]({name:"checkBoxField",type: "boolean"});
     it("creates a div",function(){
@@ -249,11 +257,8 @@ describe("CheckBoxField",function(){
 describe("NumberArrayField-Integer",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
-    
+      
     var f=Harvey.field["NumberArrayField"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
     it("creates a div",function(){
         var b=f.getElement();
@@ -288,10 +293,9 @@ describe("NumberArrayField-Integer",function(){
 describe("TextAreaField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+  
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+  
     
     var f=Harvey.field["TextAreaField"]({name:"textAreaField",type: "text"});
     it("creates a div",function(){
@@ -318,10 +322,9 @@ describe("TextAreaField",function(){
 describe("SelectField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+ 
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+  
     
     var f=Harvey.field["SelectField"]({name:"selectField",type: "string",options:["one","two","three"]});
      it("creates a div",function(){
@@ -359,10 +362,9 @@ describe("SelectField",function(){
 describe("RadioButtonSetField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+ 
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+ 
     
     var f=Harvey.field["RadioButtonSetField"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
@@ -422,10 +424,9 @@ describe("RadioButtonSetField",function(){
 describe("CounterField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+  
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+ 
     
     var f=Harvey.field["CounterField"]({name:"counterField",type: "integer",min:0,max:16});
     it("creates a div",function(){
@@ -466,10 +467,9 @@ describe("CounterField",function(){
 describe("SliderField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+ 
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+ 
     
     var f=Harvey.field["SliderField"]({name:"sliderField",type: "integer",min: 0,max:10});
     it("creates a div",function(){
@@ -495,10 +495,9 @@ describe("SliderField",function(){
 describe("StringArrayField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+ 
     
     var f=Harvey.field["StringArrayField"]({name:"stringArrayField",value:["one","two","three"]});
     it("creates a div",function(){
@@ -541,10 +540,9 @@ describe("StringArrayField",function(){
 describe("ImageArrayField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+ 
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
+ 
     
     var f=Harvey.field["ImageArrayField"]({name:"imageArrayField"});
     it("creates a div",function(){
@@ -558,11 +556,9 @@ describe("ImageArrayField",function(){
 describe("AutoCompleteField",function(){
     var $;
     $= global.jQuery = require('jquery');
-    require("../Utils.js");
-    require("../Types.js");
+ 
     require("../Fields.js");
-    require("../node_modules/jquery-ui");
-    
+        
     var f=Harvey.field["AutoCompleteField"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
@@ -571,3 +567,6 @@ describe("AutoCompleteField",function(){
     });
 
 });
+
+
+

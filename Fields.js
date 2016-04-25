@@ -1,4 +1,11 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+require('./Utils');
+require('./Types');
+require("./node_modules/jquery-ui").datepicker;
+require("./node_modules/jquery-ui").slider;
+require("./node_modules/jquery-ui").spinner;
+require("./node_modules/jquery-ui").autocomplete;
+
 
 // editable: true by default
 // required: false by default

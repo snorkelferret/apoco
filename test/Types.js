@@ -12,11 +12,9 @@ describe("CheckType(blank)",function() {
         assert.strictEqual(Harvey.checkType["blank"](),true);
     });
     it("returns true on undefined",function(){
-        var b;
-        assert.strictEqual(Harvey.checkType["blank"](b),true);
+        assert.strictEqual(Harvey.checkType["blank"](undefined),true);
     });
     it("returns true on null",function(){
-        var b;
         assert.strictEqual(Harvey.checkType["blank"](null),true);
     });
 });
@@ -31,6 +29,9 @@ describe("CheckType(phoneNumber)",function() {
     });
     it("returns true for a number with std code",function(){
         assert.strictEqual(Harvey.checkType["phoneNumber"]("+44(0)7714576205"),true);
+    });
+    it("returns false for an implausibly small number",function(){
+        assert.strictEqual(Harvey.checkType["phoneNumber"]("1"),false);
     });
     it("returns false for a string",function(){
         assert.strictEqual(Harvey.checkType["phoneNumber"]("ffgjk"),false);
@@ -156,7 +157,6 @@ describe("CheckType(decimal)",function() {
     it("returns false on sqrt(-1)",function(){
         assert.strictEqual(Harvey.checkType["decimal"](Math.sqrt(-1)),false);
     });
-   
 });
 
 describe("CheckType(integerArray)",function() {
@@ -187,7 +187,6 @@ describe("CheckType(text)",function() {
     it("returns true on an array of numbers",function(){
         assert.strictEqual(Harvey.checkType["text"]([1,2,3,4]),true);
     });
-    
 });
 
 describe("CheckType(floatArray)",function() {
@@ -258,7 +257,7 @@ describe("CheckType(password)",function() {
     it("returns false on undefined",function(){
         assert.strictEqual(Harvey.checkType["password"](undefined),false);
     });
-     it("returns true on string",function(){
+    it("returns true on string",function(){
         assert.strictEqual(Harvey.checkType["password"]("hjhkjkjh"),true);
     });
 });
@@ -328,6 +327,12 @@ describe("CheckType(currency)",function() {
     it("returns true for GBP 56,450.50",function(){
         assert.strictEqual(Harvey.checkType["currency"]("GBP 56,450.50"),true);
     });
+    it("returns true for GBP 56,450",function(){
+        assert.strictEqual(Harvey.checkType["currency"]("GBP 56,450"),true);
+    });
+    it("returns false for  56,450 USD",function(){
+        assert.strictEqual(Harvey.checkType["currency"]("56,450 USD"),false);
+    }); 
 });
 
 describe("CheckType(date)",function() {
@@ -340,8 +345,6 @@ describe("CheckType(date)",function() {
     it("returns false on 20170632",function(){
         assert.strictEqual(Harvey.checkType["date"]("20170632"),false);
     });
-
-    
 });
 
 describe("CheckType(time)",function() {
@@ -363,7 +366,6 @@ describe("CheckType(time)",function() {
     it("returns false on AM",function(){
         assert.strictEqual(Harvey.checkType["time"]("AM"),false);
     });
-    
     it("returns false on 10 as string",function(){
         assert.strictEqual(Harvey.checkType["time"]("10"),false);
     }); 
@@ -373,7 +375,6 @@ describe("CheckType(image)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["image"](""),false);
     });
-
 });
 
 describe("CheckType(boolean)",function() {
@@ -435,12 +436,9 @@ describe("CheckType(function)",function() {
     it("returns false on {}",function(){
         assert.strictEqual(Harvey.checkType["function"]({}),false);
     });
-    
     it("returns true when value is a function",function(){
         assert.strictEqual(Harvey.checkType["function"](function(){}),true);
     });
-    
-    
 });
 
 describe("CheckType(imageArray)",function() {
@@ -448,8 +446,6 @@ describe("CheckType(imageArray)",function() {
         assert.strictEqual(Harvey.checkType["imageArray"](""),false);
     });
 });
-
-
 
 describe("CheckType(objectArray)",function() {
     it("returns false on empty string",function(){
@@ -466,7 +462,6 @@ describe("CheckType(objectArray)",function() {
         var t=[{"a":1},{"b":2},"pig"];
         assert.strictEqual(Harvey.checkType["objectArray"](t),false);
     });
-    
 });
 
 describe("CheckType(stringArray)",function() {
@@ -479,7 +474,6 @@ describe("CheckType(stringArray)",function() {
     it("returns true on a array of integer strings",function(){
         assert.strictEqual(Harvey.checkType["stringArray"](["9","8","7"]),true);
     });
-    
 });
 
 describe("CheckType(floatArray)",function() {
@@ -493,6 +487,7 @@ describe("CheckType(floatArray)",function() {
         assert.strictEqual(Harvey.checkType["integerArray"]([0,1,2,"dog"]),false);
     });   
 });
+
 describe("CheckType(integerArray)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["integerArray"](""),false);
@@ -506,8 +501,6 @@ describe("CheckType(integerArray)",function() {
     it("returns false if array contains a float",function(){
         assert.strictEqual(Harvey.checkType["integerArray"]([0,1,2,10.5]),false);
     });       
-
-    
 });
 
 describe("CheckType(booleanArray)",function() {
