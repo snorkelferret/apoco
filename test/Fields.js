@@ -106,8 +106,9 @@ describe("InputField",function(){
     });
     it("has a getKey method that returns the name ",function(){
         assert.strictEqual(t.getKey(),"inputNode"); 
+        //console.log("InputField is %j",t);
     });
-
+   
     
     
 });

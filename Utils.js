@@ -31,6 +31,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	binarySearch: function(arr,sort_order,data,closest){ // sorted list on an array of key value objects
 	    // sort_order array -  1st then 2nd etc
 	    var mid,r;
+            var len=arr.length;
 	    function compare(r){
 		var field,item,b=null;
 		for(var i=0;i<sort_order.length;i++){
@@ -70,7 +71,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    else {
 		//console.log('not here');
 		if(closest){
-		    closest=mid;
+		    closest.val=Math.min(mid,len-1);
 		}
 		return null;
 	    }

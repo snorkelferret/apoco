@@ -70,7 +70,7 @@ require("./node_modules/jquery-ui").autocomplete;
 	}
 	this.element=element;
 
-	this.element.attr("name",d.name);
+	this.element.attr("name",this.name);
 
 	if(this.label){
 	    this.element.append($("<label> " + this.label + "</label>"));

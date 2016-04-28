@@ -14,10 +14,11 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	var defaults={
 	    parent: null,
 	    element: null,
-	    DOM: null
+	    DOM: null,
+            id: null
 	};
-        var observer=null;
-        var that=this;
+       // var observer=null;
+        var that=this,t;
 	this.options = $.extend({}, defaults,options);
 
 
@@ -25,10 +26,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    this[k]=this.options[k];
 	    console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
 	}
-
-        //console.log("============================== Adding display object  with id " + this.id + " window " + win + "+++++++++++++++++++++++++++");
-	var t;
-
+        if(this.DOM === null){
+            throw new Error("Must supply a DOM id for an existing node");
+        }
+        if(this.id === null){
+            throw new Error("Must supply a unique id string");
+        }
+        
         if(win){
             console.log("Adding display to child window");
 	    this.DOM=$(win.document).find("#" + this.DOM);
