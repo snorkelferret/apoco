@@ -17,6 +17,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	var that=this;
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	console.log("called display base");
+        this.execute();
     };
 
 

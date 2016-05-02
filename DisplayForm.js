@@ -14,6 +14,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	var that=this;
         //	Harvey._DisplayBase.call(this,options);  //use class inheritance - base Class
         Harvey.display._fieldsetBase.call(this,options,win);
+        this.execute();
     };
 
 

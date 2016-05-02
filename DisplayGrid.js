@@ -1,7 +1,7 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
 require("./DisplayBase.js");
 require("./Fields.js");
-
+require("./Sort.js");
 /*
  * Copyright (c) Pooka Ltd.2012-2016
  * Distributed under MIT license.
@@ -18,7 +18,7 @@ Data Format
 jsonishData={
       DOM: "Content",
       sortOrder: [cols[i].name,cols[j].name],
-      subGrid: { groupby: some column name},
+      groupby: some column name,
 
       cols:  // have these keys
       {  name: string, // required key
@@ -270,13 +270,14 @@ jsonishData={
 		that.grids[k].rows.reverse();
 	    }
 	    that.redrawRows(k);
+            that.grids[k].sorted=true;
 	}
 
 	for(var i=0;i<that.cols.length;i++){
 	    that.cols[i].sorted=false;
 	}
 	that.cols[col_num].sorted=true;
-	this.sorted=true;
+
 
 	start_edits(that);
     }
@@ -288,13 +289,12 @@ jsonishData={
 	// see if the data has been put into subgrids
 	if(that.rows && Harvey.checkType["array"](that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
-	    if(that.subGrid){
-		var groupBy=that.subGrid.groupBy;
+	    if(that.groupBy){
 		for(var i=0;i<that.rows.length;i++){
-		    n=that.rows[i][groupBy].toString();
+		    n=that.rows[i][that.groupBy].toString();
 		    if (!subgrid[n]){
 			subgrid[n]={};
-			subgrid[n].name = that.rows[i][groupBy];
+			subgrid[n].name = that.rows[i][that.groupBy];
 			subgrid[n].rows = new Array;
 		    }
 		    subgrid[n]["rows"].push(that.rows[i]);
@@ -323,7 +323,7 @@ jsonishData={
 
     var HarveyMakeGrid=function(options,win){
 	var DEBUG=true;
-	var that=this;
+	var that=this,found=0,not_found=[];
 
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	this.selection_list=[];
@@ -334,6 +334,31 @@ jsonishData={
 	    throw new Error("Cannot specify both sortOrder and sortable");
 	    return null;
 	}
+        if(this.uniqueKey){
+            this.sortOrderUnique=true;
+            if(this.sortOrder){
+                console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
+                // to determine the absolute ordering is unique
+                // uniqueKey must be a subset of sortOrder
+                for(var i=0;i<this.uniqueKey.length;i++){
+                    for(var j=0;j<this.sortOrder.length;j++){
+                        if(this.uniqueKey[i] == this.sortOrder){
+                            found++;
+                        }
+                    }
+                    if(found !== i){
+                        not_found.push(this.uniqueKey[i]);
+                    }
+                }
+                if(found !== this.uniqueKey.length){
+                    for(var i=0;i<not_found.length;i++){
+                        this.sortOrder.push(not_found[i]);
+                    }
+                }
+                console.log("After MakeGrid sortOrder length is " + this.sortOrder.length);
+            }
+        }
+        
         if(this.cols === undefined || this.cols.length === 0){
            throw new Error("DisplayGrid: need to supply a least one column");
            
@@ -398,26 +423,18 @@ jsonishData={
 		// filter: 'td:not(:first-child)'
 	    };
 	},
-	_mkRowLookUp: function(grid){
-	    if(!this.uniqueKey){
-		throw new Error("Cannot make Row Lookup without a unique key");
-	    }
-	    if(grid.rowPos){
-		delete grid.rowPos;
-	    }
-	    grid.rowPos=new Object; // keep a record of which row the element is in the grid
-	    for(var i=0;i<grid.rows.length; i++){
-		var n=(grid.rows[i][this.uniqueKey]).toString();
-		grid.rowPos[n]=i;
-	    }
-
-	},
-	sort: function(){
-	    var isSortable=true;
-	    if(this.sortOrder){
+	sort: function(grid){
+	    var isSortable=false,grids=[],sortOrder=[];
+            if(this.sortOrder){
+                sortOrder=this.sortOrder;
+            }
+            else if(this.uniqueKey){
+                sortOrder=this.uniqueKey;
+            }
+	    if(sortOrder){
 		var ar=[],t,s;
 		for(var i=0; i< this.sortOrder.length; i++){
-		    t=this.getColIndex(this.sortOrder[i]);
+		    t=this.getColIndex(sortOrder[i]);
 		    //		console.log("col index is " + t);
 		    s=this.sortOrder[i];  // name of the column in the row
 		    console.log("name is " + s);
@@ -431,28 +448,20 @@ jsonishData={
 		    }
 		    this.cols[t].sorted=true;
 		}
+                isSortable=true;
 	    }
-	    else if(this.uniqueKey){
-		var type = this.cols[this.getColIndex(this.uniqueKey)].type;
-                var col_num=this.getColIndex(this.uniqueKey);
-		var ar={ type: type,
-			 fn: function(a){ return a[col_num].value;}
-		       };
-
-	    }
-	    else{
-		isSortable=false;
-	    }
-	    if( isSortable){
-		for(var j=0;j<this.grids.length;j++){
-		    Harvey.sort(this.grids[j].rows,ar);
-		    if(this.uniqueKey){ // create the lookup table
-			this._mkRowLookUp(this.grids[j]);
-		    }
+	    if(isSortable){
+                if(grid){
+                    grids[0]=grid;
+                }
+                else{
+                    grids=this.grids;
+                }
+		for(var j=0;j<grids.length;j++){
+		    Harvey.sort(grids[j].rows,ar);
+                    grids[j].sorted=true;
 		}
-		this.sorted=true;
 	    }
-
 	},
         addGrid:function(grid){
             var div_container;
@@ -475,10 +484,10 @@ jsonishData={
             grid.element=div;
         },
         addCol:function(col){
-            var that=this,i;
+            var that=this,index,r,t,rows;
             if(Harvey.checkType["integer"](col)){
-                i=col;
-                col=this.cols[i];
+                index=col;
+                col=this.cols[index];
                 if(!col.name || !col.type){
                     throw new Error("column must have type and name");
                 }
@@ -487,23 +496,37 @@ jsonishData={
                 if(!col.name || !col.type){
                     throw new Error("column must have type and name");
                 }
-                i=this.getColIndex(col.name);
-                if(i<0){
-                    i=this.cols.length;
-                    this.cols[i]=col;
+                index=this.getColIndex(col.name);
+                if(index<0){
+                    index=this.cols.length;
+                    this.cols[index]=col;
                 }
                 else{
                     throw new Error("Columns must have unique names");
                 }
             }
-               
-	    if(this.cols[i].display !== false){
-		if(this.DEBUG) console.log("grid col " + this.cols[i].name);
-		var label=(this.cols[i].label)?this.cols[i].label:this.cols[i].name;
-		var h=$("<th class='ui-state-default " +  this.cols[i].type + "' type= '" + this.cols[i].type + "'> " + label + " </th>");
-		this.cols[i].element=h;
-		this.cols[i].sortable=Harvey.dbToHtml[this.cols[i].type].sort;
-		if(this.cols[i].sortable && this.userSortable){
+            col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
+            
+            if(this.grids){ // add the column rows
+                for(var i=0;i<this.grids.length;i++){
+                    rows=this.grids[i].rows;
+                    if(rows){
+                        for(var j=0;j<rows.length;j++){
+                            t=Object.keys(rows[j])[0];
+                            r=rows[j][t].element.parent();
+                            rows[j][col.name]=null;
+                            this._addCell(rows[j],col,r);
+                        }
+                    }
+                }
+            }
+	    if(this.cols[index].display !== false){
+		if(this.DEBUG) console.log("grid col " + this.cols[index].name);
+		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
+		var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
+		this.cols[index].element=h;
+		this.cols[index].sortable=Harvey.isSortable(this.cols[index].type);
+		if(this.cols[index].sortable && this.userSortable){
 		    var dec=$("<div class='arrows'></div>");
 		    var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
 		    var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
@@ -526,7 +549,7 @@ jsonishData={
                             console.log("got that.cols " + that.cols[col_num].name);
 			    sort_callback(col_num,that,"down");
 			};
-		    }(i,that),false);
+		    }(index,that),false);
 		    
 
 		    h[0].addEventListener("mouseover",function(e){
@@ -537,13 +560,13 @@ jsonishData={
                 
 		this.colElement.append(h);
                 
-		if(this.cols[i].hidden){
+		if(this.cols[index].hidden){
 		    h.hide();
 		}
 	    }
         },
 	execute:function(){
-            var rows,body,that=this;
+            var rows,body,r,that=this;
 // 	    var t0=performance.now();
 	    var headtable=$("<table class='ui-widget head'></table>");
 	    var head=$("<thead></thead>");
@@ -576,60 +599,56 @@ jsonishData={
                     body=this.grids[i].element.find("tbody");
                     rows=this.grids[i].rows;
                     for(var j=0;j<rows.length;j++){
-                        rows[j]=this._addRow(rows[j],body);
+                        r=$(document.createElement("tr"));
+                        for(var k=0;k<this.cols.length;k++){
+                            this._addCell(rows[j],this.cols[k],r);
+                        }
+                        body.append(r);
                     }
                 }
+            }
+            if(this.sortOrder){
+                console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
             }
 	   // var t1=performance.now();
 	   // console.log("grid load " + (t1-t0) + "milliseconds ");
 	},
-        _addRow:function(row,element){
-            var c,type,settings,col_name;
-	    var len=this.cols.length;
-	    var r=$(document.createElement("tr"));
-            var new_field,new_row={};
-	    for(var i=0;i<len;i++){
-		col_name=this.cols[i].name;
-		if(row[col_name] === undefined){  // row[col_name] can be null
-                    row.col_name="";
+        _addCell:function(row,col,r){
+            var c,type,settings;
+            
+	    settings=$.extend({},col.options);
+            if(row[col.name] === undefined){  // row[col_name] can be null
+                if(this.required === true){
+                    
+                    throw new Error("Field " + col.name + "is required");
                 }
-		settings=$.extend({},this.cols[i]);
-		//console.log("value is " + row[col_name]);
-		settings.value=row[col_name];
-		if(settings.label){
-		    delete settings.label;  // not needed for grid cells
-		}
-	        c=document.createElement("td");
-                c.className=this.cols[i].type;
-                c=$(c);
-                //console.log("c is " + JSON.stringify(c));
-                row[col_name]=Harvey.field[Harvey.dbToHtml[this.cols[i].type].field](settings,c);
-                
-                if(this.cols[i].display !== false){
-		    r.append(row[col_name].element);
-		    row[col_name].element.data('harvey',{name: col_name,"context": row[col_name],"type": this.cols[i].type});
-		}
-		if(this.cols[i].hidden){
-		    row[col_name].element.hide();
-		}
-	    }
-            if(element !== undefined){
-                element.append(r);
+                row[col.name]=null;
             }
-           
-            return r;
+	    //console.log("value is " + row[col_name]);
+	    settings.value=row[col.name];
+            
+	    c=document.createElement("td");
+            c.className=col.type;
+            c=$(c);
+            //console.log("c is " + JSON.stringify(c));
+            row[col.name]=Harvey.field[Harvey.dbToHtml[col.type].field](settings,c);
+               
+            if(col.display !== false){
+		r.append(row[col.name].element);
+		row[col.name].element.data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
+	    }
+	    if(col.hidden){
+		row[col.name].element.hide();
+	    }
         },
         addRow: function(row_data){
-	    var index=null,r,grid,t,name,l;
-	    if(this.subGrid){
-                if(!this.subGrid.groupBy){
-                    throw new Error("subGrid needs groupBy");
-                }
-            	t=this.subGrid.groupBy;
-		if(!row_data.t){
-		    throw new Error("no field in row data matches " + t);
+	    var row=null,r,grid,name,l,t,sortOrder=[];
+            var closest={val:-1};
+	    if(this.groupBy){
+                if(row_data[this.groupBy] === undefined){
+		    throw new Error("no field in row data matches " + this.groupBy);
 		}
-                name=row_data.t;
+                name=row_data[this.groupBy];
 	    }
 	    else{
                 name="all";
@@ -650,89 +669,124 @@ jsonishData={
                 grid=this.grids[l];
                 
             }
-
-	    if(this.sorted && this.sortOrder){
-                var closest={val:-1};
-		var p=Harvey.Utils.binarySearch(grid.rows,this.sortOrder,row_data,closest);
-		if(p !== null){
-		    throw new Error("this row already exists cannot insert again");
-		}
-                
-                index=(closest.val!==undefined)?closest.val:-1;
+	    if(grid.sorted ){
+               // console.log("addRow calling getRow length is " + this.sortOrder.length);
+                row=this.getRow(row_data,name,closest);
+                if(row!==null){
+                    throw new Error("row already exists");
+                }
 	    }
-	    else{
-		index=grid.rows.length-1;
-	    }
-	    r=this._addRow(row_data);
-            grid.rows.push(row_data);
             
-            console.log("index is " + index);
+            r=$(document.createElement("tr"));
             
-            if(index < 0){
+	    for(var i=0;i<this.cols.length;i++){
+                this._addCell(row_data,this.cols[i],r);
+            }
+         
+            if(!grid.sorted){
+                console.log("adding row to end");
+                grid.rows.push(row_data);
                 grid.element.find("tbody").append(r);
             }
             else{
-                console.log("grid element is %j ",grid.rows[index]);
-                t=Object.keys(grid.rows[index])[0];
-                console.log("t is " + t);
-	        grid.rows[index][t].element.parent().after(r); // insert the element
+              //  console.log("grid element is %j ", closest.val);//grid.rows[index]);
+              //  console.log("slosest index is " + closest.index);
+                t=Object.keys(grid.rows[closest.index])[0];
+              //  console.log("key is " + t);
+                if(closest.dir === "after"){
+                    closest.index++;
+                    grid.rows.splice(closest.index,0,row_data);
+                    grid.rows[closest.index][t].element.parent().after(r); // insert the element
+                }
+                else{
+                    grid.rows.splice(closest.index,0,row_data);
+                    grid.rows[closest.index][t].element.parent().before(r); // insert the element
+                }
             }
-	
-            // update the rowPos lookup table
-	    if(grid.rowPos && this.uniqueKey){
-		this._mkRowLookUp(grid);
-	    }
-            console.log("grids length is " + this.grids.length);
-
-	},
+            return row_data;
+        },
+        getRow:function(key,group,closest){
+            var grid=[],row,sortOrder=[];
+            if(!closest && this.sortOrderUnique !== true){
+                throw new Error("No unique key to find row");
+            }
+            if(group && group !== null){
+                grid[0]=this.getGrid(group);
+            }
+            else{
+                if(this.groupBy && key[this.groupBy] ){
+                    grid[0]=this.getGrid(key[this.groupBy]);
+                    if(!grid[0]){
+                        throw new Error("Cannot find grid " + this.groupBy);
+                    }
+                }
+                else{
+                    grid=this.grids;
+                }
+            }
+            //console.log("getRow this.sortOrder length is " + this.sortOrder.length);
+            for(var i=0;i<grid.length;i++){
+               // console.log("searching grid ",grid[i].name);
+                if(grid[i].sorted){
+                    if(this.closest){
+                        if(this.sortOrder === undefined){
+                            for(var k=0; k<this.cols.length;k++){
+                                if(this.cols[k].sorted=== true){
+                                    sortOrder.push(this.cols[k].name);
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        sortOrder=this.sortOrder;
+                        for(var j=0;j<sortOrder.length; j++){
+                            if(key[sortOrder[j]] === undefined || key[sortOrder[j]]===null){
+                                throw new Error("getRow: key is not unique needs " + this.sortOrder[j] );
+                            }
+                        }
+                        for(var j=0;j<grid[i].rows.length;j++){
+                            for(k=0;k<this.cols.length;k++){
+                                var v=this.cols[k].name;
+                                //console.log("val is " + grid[i].rows[j][v].getValue());
+                            }
+                        }
+                    }
+		    row=Harvey.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
+                    if(row){
+                        return row;
+                    }
+                }
+                else{
+                     throw new Error("grid is not sorted");
+                }
+            }
+            return null;
+        },
 	updateRow: function(cell_data){
 	    var row,subGrid,index,g;
-	    if(this.subGrid.groupBy){
-		g=cell_data[this.subGrid.groupBy];
+	    if(this.groupBy){
+		g=cell_data[this.groupBy];
 		if(!g){
 		    throw new Error("No subGrid in cell update data");
 		}
 	    }
-	    var grid=this.get_grid(g);
-
-	    if(this.uniqueKey && grid.rowPos){ // we have a list of the row position in the grid
-		if( !cell_data[this.uniqueKey] ){
-		    throw new Error("No unique Key in data for cell Update");
-		}
-		index=grid.rowPos[cell_data[this.uniqueKey]];
-	    }
-	    else if(this.sortOrder && this.sorted){  // grids have a sort order and have been sorted
-		index=Harvey.Utils.binarySearch(grid.rows,this.sortOrder,cell_data);
-                if(index>0){
-		    row=grid.rows[index];
-                }
-                else{
-                    throw new Error("UpdateRow: cannot find row");
+	    var grid=this.getGrid(g);
+            if(grid.sorted){  // grids have a sort order and have been sorted
+                row=this.getRow(cell_data,g);
+                if(row === null){
+	            throw new Error("UpdateRow: cannot find row");
                 }
 	    }
 	    else{
 		// use a dumb way of finding this....
-
 		throw new Error("No method available to find this cell");
 	    }
-	    //console.log("found row " + row);
+	    console.log("UpdateRow: found row %j" ,row);
 	    if(row){   // need to check that we are not overwritting a sortOrder key, making sort invalid
 		var to;
-		for(var k in cell_data){
-		  //  console.log("k is " + k + " uniqueKey is " + this.uniqueKey);
-		    for(var i=0;  this.sortOrder.length;i++){
-			if(this.sortOrder[i] === k){
-			    this.sorted=false;   // overwritten a sortby field
-			    this.cols[k].sorted=false;
-			}
-		    }
-                    if(row[k].setValue){
-		        row[k].setValue(cell_data[k]);
-                    }
-                    else{
-                        row[k].value=cell_data[k];
-                    }
-		    var cl="cell_updated";
+		for(var k in cell_data){               
+ 		    row[k].setValue(cell_data[k]);
+                    var cl="cell_updated";
 		    if(row[k].display !== false){
 			if(row[k].getElement().hasClass(cl)){  // add colours to the cells to show update frequency
 			    row[k].getElement().removeClass(cl).addClass("cell_updated_fast");
@@ -759,37 +813,19 @@ jsonishData={
 	    }
 	    return -1;
 	},
-	getCol: function(name,grid_name){
+	getCol: function(name){ //grid_name){
 	   // console.log("getting columns");
 	    var index=-1,col=new Array;
-	    for(var i=0;i< this.cols.length;i++){
-	//	console.log("col is " + this.cols[i].name);
-		if(this.cols[i].name == name){
-		    index=i;
-		    break;
-		}
-	    }
-	    if(index === -1){
-		throw new Error("can't find column " + name);
-		return null;
-	    }
-	  //  console.log("getCol found index " + index + " for " + name);
-	    if(grid_name && this.grids[grid_name]){
-		 col=this.grids[grid_name].rows.map(function(r){
-			return r[index];
-		    });
-		return col;
-	    }
-	    if(!this.grids){
-		throw new Error("Grid " + this.id + " has no grids");
-	    }
-	    for(var i in this.grids){
-	//	console.log("getting row from grid " + this.grids[i].name);
-		for(var j=0;j<this.grids[i].rows.length;j++){
-		    col.push(this.grids[i].rows[j][name]);
-		}
-	    }
-	    return col;
+            if(name !== undefined){
+	        for(var i=0;i< this.cols.length;i++){
+	            //	console.log("col is " + this.cols[i].name);
+		    if(this.cols[i].name == name){
+		        return(this.cols[i]);
+		    }
+	        }
+      	    }
+            return this.cols;
+           
 	},
 	getGrid: function(name){
             if(!this.grids){
@@ -880,10 +916,6 @@ jsonishData={
                     for(var k=0;k<this.cols.length;k++){
                         c=this.cols[k].name;
                         n.rows[t][c]=this.grids[i].rows[j][c].value;
-                      //  if(t<20){
-                      //      console.log("row " + j + " col " + c + " value " + n.rows[t][c]);
-                      //  }
-                     
                     }
                 }
             }

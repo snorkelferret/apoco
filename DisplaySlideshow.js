@@ -33,6 +33,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             f.values=this.values;
             this.promise=f.loadImages();
         }
+        this.execute();
     };
     var controls=function(that){
         var d=$("<div lass='slideshow_controls'></div>");

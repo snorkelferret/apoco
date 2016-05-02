@@ -11,8 +11,6 @@ String.prototype.trim = String.prototype.trim || function trim() {
     var DEBUG=true;
     'use strict';
 
-
-
     Harvey.Utils={
         getCssValue:function(css_class,rule){
             var stylesheets = document.stylesheets;
@@ -32,50 +30,74 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    // sort_order array -  1st then 2nd etc
 	    var mid,r;
             var len=arr.length;
-	    function compare(r){
-		var field,item,b=null;
+	    function compare(aa){
+		var field,item;
+                console.log("Compare: sort_order.length is " + sort_order.length);
 		for(var i=0;i<sort_order.length;i++){
 		    field=sort_order[i];
 		    item=data[field];
-		   // console.log("field is " + field);
-		    if(r[field].value > item){
-		//	console.log(r[field].value + " is greater than " + item);
+		    console.log("field is " + field);
+                    if(aa[field].value == item){ // && i === sort_order.length -1){
+			console.log(aa[field].value + " equals " + item);
+		        //found[i]=true;
+                        continue;
+		    }
+		    else if(aa[field].value > item){
+			console.log(aa[field].value + " is greater than " + item);
 			return 1;
 		    }
-		    else if(r[field].value < item){
-		//	console.log(r[field].value + " is less than " + item);
+		    else if(aa[field].value < item){
+			console.log(aa[field].value + " is less than " + item);
 			return -1;
 		    }
-		    else if(r[field].value === item && i === sort_order.length -1){
-		//	console.log(r[field].value + " equals " + item);
-			return 0;
-		    }
+	            else{
+                        throw new Error("binarySearch: should never get here");
+                    }
 		}
-		//console.log(" return value is  null ");
-		return null;
+                return 0;
+	//	console.log(" return value is  null ");
+	//	return null;
 	    }
-
 	    // perhaps should use localeCompare() e.g string1.localeCompare(string2)
 	    mid = Math.floor(arr.length / 2);
-	  //  console.log("mid is " + mid);
-	    r=compare(arr[mid]);
+	    console.log("mid is " + mid);
+            if(closest){
+                if(closest.index === undefined){
+                    closest.index=mid;
+                }
+                else{
+                    closest.index=(closest.dir==="after")?closest.index+mid:closest.index-Math.ceil(arr.length / 2);
+                }
+            }
+  	    r=compare(arr[mid]);
 	    if (r < 0  && arr.length > 1) {
-		return Harvey.utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
+                if(closest){
+                    closest.dir="after";
+                }
+            	return Harvey.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
 	    }
 	    else if (r > 0 && arr.length > 1) {
-		return Harvey.utils.binarySearch(arr.slice(0, mid),sort_order,data,closest);
+                if(closest){
+                    closest.dir="before";
+                }
+		return Harvey.Utils.binarySearch(arr.slice(0, mid),sort_order,data,closest);
 	    }
 	    else if (r  === 0) {
-		return mid;
+                return arr[mid];
 	    }
 	    else {
 		//console.log('not here');
 		if(closest){
-		    closest.val=Math.min(mid,len-1);
+		    closest.val=arr[mid];
+                    if(r<0){
+                        closest.dir="after";
+                    }
+                    else{
+                        closest.dir="before";
+                    }
 		}
 		return null;
 	    }
-
 	},
 	hashCode: function(str){
 	    var hash = 0;
@@ -88,32 +110,6 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    }
 	    return hash;
 	},
-/*	cloneKeys: function (opts,clone){   // clone just the key value pairs
-	    if(typeof clone !== "object"){ // remove anything that isn't a string or an array
-		throw new Error("clone is not an object");
-		return null;
-	    }
-	    if(typeof opts === "object"){
-		for(var k in opts){
-		    //console.log(" key in params is " + k);
-		    if(opts.hasOwnProperty(k)){
-			//    if(typeof opts[k] === "string"){
-			if(typeof opts[k] !== "object"  && typeof opts[k] != "function"){
-			    clone[k]=opts[k];
-			}
-			else if( opts[k] instanceof Array){
-			    clone[k]=[];
-			    clone[k]=opts[k].slice(0); // makes a copy of the array
-			}
-		    }
-		}
-	    }
-	    else{
-		throw new Error("clone_keys source is not an object");
-		return null;
-	    }
-	    return;
-	}, */
 	extend: function(subClass,superClass){   //class deep inheritance
 	    var F = function(){};
 	    F.prototype=superClass.prototype;
@@ -142,8 +138,6 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	    var months = ["January", "February", "March", "April", "May",
 		          "June", "July", "August", "September", "October", "November", "December"];
-
-
 
 	    var parts=d.split("-"); // because Safari does not understand the ISO8601 format
             //	var date=new Date(d);

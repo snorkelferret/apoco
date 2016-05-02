@@ -221,7 +221,7 @@ require("./node_modules/jquery-ui").autocomplete;
         float: function(that){
             var val,p=[];
             if(that.value){
-                val=that.value.toFixed(this.precision);
+                val=parseFloat(that.value).toFixed(this.precision);
 	        p=val.toString().split("."); // align to decimal point
             }
             else{
@@ -311,6 +311,9 @@ require("./node_modules/jquery-ui").autocomplete;
 	getValue: function(){
 	    return this.value;
 	},
+        getElement:function(){
+            return this.element;
+        },
 	setValue: function(val){
 	    this.value=val;
             if(this.value !== null){

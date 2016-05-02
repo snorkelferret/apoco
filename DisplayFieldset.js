@@ -13,6 +13,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         this.nodes=[];
         this.fields=[];
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+        this.execute();
     };
 
 

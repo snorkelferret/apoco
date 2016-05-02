@@ -378,7 +378,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             var d;
 	    var doit=function(that,index){
               //  console.log("doit is here index is " + i);
-		d.execute();
+		//d.execute();
                 if(!d.hidden){ /// hmmmm
         	    d.show();
                 }
@@ -431,9 +431,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
      //       console.log("adding child length is " + this.components.length);
             display_object.parent=this;
-            if(!display_object.element || display_object.element.length==0){
-                display_object.execute();
-            }
+          //  if(!display_object.element || display_object.element.length==0){
+          //      display_object.execute();
+           // }
 	    this.components.push(display_object);
             if(display_object.hidden !== true){
                 display_object.show();
