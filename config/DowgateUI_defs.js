@@ -1,4 +1,6 @@
- var UI={};
+var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=require('../jquery');
+
+//var UI={};
 ;(function($){
     'use strict';
     // Business Logic

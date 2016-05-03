@@ -41,9 +41,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         else{
             t=$("#"+ this.id);
 	    this.DOM=$("#" + this.DOM);
-           // this.DOM=$("body").find("#test");
-            console.log("hpy  %j" , this.DOM);
-            console.log("length is " + this.DOM.length);
+            // console.log("hpy  %j" , this.DOM);
+            //console.log("length is " + this.DOM.length);
         }
 	if(this.DOM.length === 0){
 	    throw new Error("_HarveyDisplayBase DOM element does not exist " + this.DOM);

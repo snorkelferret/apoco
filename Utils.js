@@ -32,22 +32,22 @@ String.prototype.trim = String.prototype.trim || function trim() {
             var len=arr.length;
 	    function compare(aa){
 		var field,item;
-                console.log("Compare: sort_order.length is " + sort_order.length);
+              //  console.log("Compare: sort_order.length is " + sort_order.length);
 		for(var i=0;i<sort_order.length;i++){
 		    field=sort_order[i];
 		    item=data[field];
-		    console.log("field is " + field);
+		  //  console.log("field is " + field);
                     if(aa[field].value == item){ // && i === sort_order.length -1){
-			console.log(aa[field].value + " equals " + item);
+		//	console.log(aa[field].value + " equals " + item);
 		        //found[i]=true;
                         continue;
 		    }
 		    else if(aa[field].value > item){
-			console.log(aa[field].value + " is greater than " + item);
+		//	console.log(aa[field].value + " is greater than " + item);
 			return 1;
 		    }
 		    else if(aa[field].value < item){
-			console.log(aa[field].value + " is less than " + item);
+		//	console.log(aa[field].value + " is less than " + item);
 			return -1;
 		    }
 	            else{
@@ -60,7 +60,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    }
 	    // perhaps should use localeCompare() e.g string1.localeCompare(string2)
 	    mid = Math.floor(arr.length / 2);
-	    console.log("mid is " + mid);
+	  //  console.log("mid is " + mid);
             if(closest){
                 if(closest.index === undefined){
                     closest.index=mid;

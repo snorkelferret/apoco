@@ -30,6 +30,7 @@ require("./Utils.js");
 
 
     var sort_fn=function(type){
+        var a,b,aa,bb,c,d;
 	switch(type){
 	case "integer":
 	case "count":
@@ -46,12 +47,12 @@ require("./Utils.js");
 		a=fn(s);
 		b=fn(t);
 		if( a === b) return 0;
-		var aa = chunkify(a);
-		var bb = chunkify(b);
+		aa = chunkify(a);
+		bb = chunkify(b);
 		
-		for (x = 0; aa[x] && bb[x]; x++) {
+		for (var x = 0; aa[x] && bb[x]; x++) {
 		    if (aa[x] !== bb[x]) {
-			var c = Number(aa[x]), d = Number(bb[x]);
+			c = Number(aa[x]), d = Number(bb[x]);
 			if (c == aa[x] && d == bb[x]) {
 			    return c - d;
 			} else return (aa[x] > bb[x]) ? 1 : -1;
@@ -125,6 +126,9 @@ require("./Utils.js");
             }
             else if(Harvey.checkType["string"](type_data)){
                 compare=sort_fn(type_data);
+                if(compare === undefined){
+                    throw new Error("Sort: don't know how to sort " + type_data);
+                }
                 fn=default_compare;
             }
             else{

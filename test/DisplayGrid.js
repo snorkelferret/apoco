@@ -151,6 +151,13 @@ describe("DisplayGrid-(start with data)",function(){
         assert.notStrictEqual(b,null);
         assert.strictEqual(b["other"].getValue(),"something");
     });
-    
+    it("deletes a row",function(){
+        t.deleteRow({stock:"FG63",subclass: 1,bid:10,maturity:20200521});
+        
+    });
+    it("deletes a column",function(){
+        t.deleteCol("bid");
+        
+    });
     
 });

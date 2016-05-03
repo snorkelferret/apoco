@@ -20,5 +20,6 @@ require('./DisplayTabs');
 require('./IO');
 require('./Nodes');
 require('./Panel');
+require('./Sort');
 
 module.exports = dcl;

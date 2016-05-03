@@ -1,4 +1,8 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+require("./DisplayBase.js");
+require("./Fields.js");
+require("./Nodes.js");
+
 
 // requires HarveyDisplayBase.js
 
@@ -20,38 +24,54 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     HarveyMakeFieldset.prototype={
 	execute: function(){
-
 	    var el,p;
 	    this.element=$("<div id='" + this.id + "' class='field_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
-
-            for(var i=0;i<this.components.length;i++){
-
-                el=$("<div class='fieldset'></div>");
-                if(this.components[i].class){
-                    el.addClass(this.components[i].class);
+            if(this.components !== undefined){
+                for(var i=0;i<this.components.length;i++){
+                    el=$("<div class='fieldset'></div>");
+                    if(this.components[i].class){
+                        el.addClass(this.components[i].class);
+                    }
+ 	            if(this.components[i].node){
+                        this.addNode(this.components[i],el);
+		    }
+	            else if(this.components[i].field || this.components[i].type){
+	                p=this.addField(this.components[i],el);
+		    }
                 }
-
-
-	        if(this.components[i].node){
-                    this.addNode(this.components[i],el);
-		}
-	        else if(this.components[i].field || this.components[i].type){
-	            p=this.addField(this.components[i],el);
-		}
+                this.components.length=0; // delete
             }
-            this.components.length=0; // delete
 	},
-	getFields: function(){
+	getField: function(name){
+            if(name !== undefined){
+                for(var i=0;i<this.fields.length;i++){
+                    if(this.fields[i].name === name){
+                        return this.fields[i];
+                    }
+                }
+                return null;
+            }
 	    return this.fields;
 	},
-        getNodes:function(){
+        getNode:function(name){  //nodes don't have to have a name
+            if(name !== undefined){
+                for(var i=0;i<this.nodes.length;i++){
+                    if(this.nodes[i].name !== undefined && this.nodes[i].name === name){
+                        return this.nodes[i];
+                    }
+                }
+                return null;
+            }
             return this.nodes;
         },
         addNode:function(d,el){
             var n;
             // check that the node has not already been created
             // if(d.parent=== this){ // already in the list
-           // console.log("adding "+ d.node + " to parent " + this.id);
+            // console.log("adding "+ d.node + " to parent " + this.id);
+            if(d.name && this.getNode(d.name)!==null){
+                    throw new Error("Cannot add node with non-unique name");
+            }
             if(d.element && d.element.length>0){
                 if(!d.node){
                     throw new Error("Harvey.displayFieldset: addNode - object is not a node");
@@ -74,12 +94,32 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }
             return null;
         },
+        deleteNode: function(name){
+            var n,index=-1;
+            if(name === undefined){
+                throw new Error("DisplayFieldset: deleteNode - must supply a name");
+            }
+            for(var i=0;i<this.nodes.length;i++){
+                if(this.nodes[i].name === name){
+                    index=i;
+                    break;
+                }
+            }
+            if(index===-1){
+                throw new Error("DisplayFieldset: deleteNode cannot find " + name);
+            }
+            this.nodes[index].element.remove();
+            this.nodes.splice(index,1);
+        },
         addField: function(d,el){
             var p;
             if(!d.field && d.type){
-                d.field=Harvey.dbToHtml[d.type].html_field;
+                d.field=Harvey.dbToHtml[d.type].field;
             }
             console.log("making field " + d.field);
+            if(this.getField(d.name)!== null){
+                throw new Error("Cannot add field with non-unique name " + d.name);
+            }
             if(Harvey.field.exists(d.field)){
                 // check that the field has not already been created
                 if(d.element && d.element.length>0){
@@ -103,6 +143,23 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    this.element.append(p.element);
             return p;
         },
+        deleteField:function(name){
+            var n,index=-1;
+            if(name === undefined){
+                throw new Error("DisplayFieldset: deleteNode - must supply a name");
+            }
+            for(var i=0;i<this.fields.length;i++){
+                if(this.fields[i].name === name){
+                    index=i;
+                    break;
+                }
+            }
+            if(index===-1){
+                throw new Error("DisplayFieldset: deleteNode cannot find " + name);
+            }
+            this.fields[index].element.remove();
+            this.fields.splice(index,1);
+        },
         getJSON: function(){
             var js={};
 	    for(var i=0; i<this.fields.length; i++){
@@ -112,10 +169,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                         return null;
                     }
                 }
-		if(this.fields[i].editable && this.fields[i].getValue() !== null){
-                   // console.log("JSON key " + this.fields[i].getKey() + " value " + this.fields[i].getValue());
-		    js[ this.fields[i].getKey()]=this.fields[i].getValue();
-		}
+		js[ this.fields[i].getKey()]=this.fields[i].getValue();
 	    }
             return js;
         },

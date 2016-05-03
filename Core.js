@@ -1,6 +1,6 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
 
-function require_(script) {
+/*function require_(script) {
     $.ajax({
         url: script,
         dataType: "script",
@@ -12,7 +12,7 @@ function require_(script) {
             throw new Error("Could not load script " + script);
         }
     });
-}
+} */
 
 //You can then use it in your code as you'd usually use an include:
 
@@ -56,20 +56,11 @@ function require_(script) {
 
     $.extend(true,Harvey,{
 	start: function(options) {
-            /*  if(Harvey.Utils.detectMobile()){
-             $("body").width(360);
-             $("body").height(640);
-             } */
 	    // Harvey.popup.spinner(true);
             if(options){
 	        if(Harvey.checkType["object"](options)){
 		    var p=Harvey.display[options.display](options);
 		    if(p){
-		        //  console.log("calling execute");
-		        if(p.execute){
-			    p.execute();
-		        }
-		        else { throw new Error("p.execute does not exist");}
 		        p.show();
 		    }
 		    else {
@@ -87,5 +78,9 @@ function require_(script) {
         }
 
     });
+    
+    $(document).ready(function(){
+        Harvey.start();
+    }); 
 
 })(jQuery);

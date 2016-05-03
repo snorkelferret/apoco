@@ -7,7 +7,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 ;(function($){
 
     var _Node=function(d,element){
-
         if(!d){
             throw new Error("Harvey: node, No params");
         }
@@ -19,10 +18,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
   	for(var k in d){
 	    this[k]=d[k];
 	}
-
-        //if(d.node === "image"){
-        //    var promise=
-
         _getNode[d.node](this);
 
 	if(this.class){
@@ -51,11 +46,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return this.element;
 	},
 	setText: function(text){
-	   // if (this.text){
-	//	this.element.empty();
+            switch(this.node){
+            case "heading":
+            case "paragraph":
+            case "label":
+            case "anchor":
 		this.element.html(text);
 		this.text=text;
-	  //  }
+            default:
+                throw new Error("Cannot set text of " + this.node);
+            }
 	}
     };
 
@@ -127,8 +127,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                             that.element.append("<dt>" + that.items[i].labels[j] + "</dt>");
                         }
                     }
-
-
                 }
                 if (that.items[i].description){
                     that.element.append("<dd>" + that.items[i].description + "</dd>");
@@ -143,13 +141,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }
         },
         image: function(that){
-            //console.log("image node is here");
-            var imm=new Image();  // get the width and height - need to load in to image
+            console.log("image node is here");
+            var imm=window.document.createElement("img"); //new Image();  // get the width and height - need to load in to image
 	    imm.src=that.url;
           //  var d=$.Deferred;
             that.element=$("<div></div>");
 	    imm.onload=function(){
-	//	console.log("+++++ reader onload got width " + this.width + " " + this.height);
+		console.log("+++++ reader onload got width " + this.width + " " + this.height);
                 if(that.width){
                     this.width=that.width;
                 }
@@ -279,19 +277,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
         }
     };
-
-      /*          that.setValue=function(){
-                    //var that=this;
-                    for(var k in that){
-                        console.log("paginate this method " + k);
-                    }
-	        };
-                that.reset= function(){
-
-                };
-                that.init(that);
-            };
-            return  mkPaginator; */
 
     Harvey.node=function(options,el){
         if(options === "node_list"){ // return the list of nodes- internal use only

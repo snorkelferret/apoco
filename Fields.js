@@ -36,7 +36,7 @@ require("./node_modules/jquery-ui").autocomplete;
 	password: {html_type: "password", field:"InputField", check: "string",sort: null}
     };
 
-  /*  Harvey.HtmlToType=function(field){
+/*  Harvey.HtmlToType=function(field){
  	for(var k in  Harvey.dbToHtml){
 	    if(Harvey.dbToHtml[k].field == field){
 		return Harvey.dbToHtml[k].html_type;
@@ -323,17 +323,16 @@ require("./node_modules/jquery-ui").autocomplete;
                 else{
 		    this.element.text(val);
 	        }
-
             }
 	},
         checkValue: function(){
-            return true;
+           return Harvey.checkType[this.type](this.value);
+           // return true;
         },
 	popupEditor: null
 
     };
-  //  Harvey.Utils.extend(StaticField,_Field);
-
+ 
 
     var InputField=function(d,element){
 	//console.log("INPUT FIELD IS HERE with required " + d.required);
@@ -679,7 +678,12 @@ require("./node_modules/jquery-ui").autocomplete;
         if(!d.size && !d.value ){
             throw new Error("NumberArrayfield needs a size or value");
         }
-        d.field="NumberArrayField"; 
+        d.field="NumberArrayField";
+ //       if(d.type){
+//            if(d.type != "integerArray" || d.type != "floatArray"){
+//                throw new Error("NumberArrayField: type needs to be a floatArray or integerArray");
+//            }
+//        }
 	_Field.call(this,d,element);
         if(!this.size){
             this.size=this.value.length;

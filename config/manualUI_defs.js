@@ -1,7 +1,7 @@
 // WARNING this script contains evil eval !!!!!!
+var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=require('../jquery');
 
-
-var UI={};
+//var UI={};
 
 
 ;(function($){

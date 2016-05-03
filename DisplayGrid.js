@@ -506,8 +506,7 @@ jsonishData={
                 }
             }
             col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
-            
-            if(this.grids){ // add the column rows
+             if(this.grids){ // add the column rows
                 for(var i=0;i<this.grids.length;i++){
                     rows=this.grids[i].rows;
                     if(rows){
@@ -557,14 +556,57 @@ jsonishData={
 		    h[0].addEventListener("mouseout",function(e){
 			$(this).removeClass('ui-state-hover');}, false);
                 }
-                
-		this.colElement.append(h);
-                
+ 		this.colElement.append(h);
 		if(this.cols[index].hidden){
 		    h.hide();
 		}
 	    }
         },
+        deleteCol:function(name){
+            var el,index=this.getColIndex(name);
+            if(index>0){
+                //check that the col is not used as unique key or sortOrder
+                for(var i=0;i<this.sortOrder.length;i++){
+                    if(this.sortOrder[i] == name){
+                        throw new Error("Cannot delete col used for sorting");
+                    }
+                }
+                // remove the associated rows
+                for(var i=0;i<this.grids.length;i++){
+                    for(var j=0;j<this.grids[i].rows.length;j++){
+                        el=this.grids[i].rows[j][name].getElement();
+                        el.remove();
+                        delete this.grids[i].rows[j][name];
+                    }
+                }
+                // remove the original data copied into col.options
+                this.cols.splice(index,1);
+            }
+            else{
+                throw new Error("cannot find column " + name);
+            }
+        },
+	getColIndex: function(name){
+	    for(var i=0; i< this.cols.length;i++){
+		if (this.cols[i].name === name){
+		    return i;
+		}
+	    }
+	    return -1;
+	},
+	getCol: function(name){ //grid_name){
+	    // console.log("getting columns");
+	    var index=-1,col=new Array;
+            if(name !== undefined){
+	        for(var i=0;i< this.cols.length;i++){
+	            //	console.log("col is " + this.cols[i].name);
+		    if(this.cols[i].name == name){
+		        return(this.cols[i]);
+		    }
+	        }
+      	    }
+            return this.cols;
+ 	},
 	execute:function(){
             var rows,body,r,that=this;
 // 	    var t0=performance.now();
@@ -583,14 +625,11 @@ jsonishData={
 	        div_container.resizable(
                     {alsoResize: this.element});
 	    }
-            
             this.element.append(div_container);
             //body.selectable(this.select_data()); // allow multiple cells to be selected
- 
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
 	    }
-            
             if(this.rows !== undefined){
                 sort_into_subGrids(this);
                 this.sort();
@@ -632,7 +671,6 @@ jsonishData={
             c=$(c);
             //console.log("c is " + JSON.stringify(c));
             row[col.name]=Harvey.field[Harvey.dbToHtml[col.type].field](settings,c);
-               
             if(col.display !== false){
 		r.append(row[col.name].element);
 		row[col.name].element.data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
@@ -676,9 +714,7 @@ jsonishData={
                     throw new Error("row already exists");
                 }
 	    }
-            
             r=$(document.createElement("tr"));
-            
 	    for(var i=0;i<this.cols.length;i++){
                 this._addCell(row_data,this.cols[i],r);
             }
@@ -704,6 +740,37 @@ jsonishData={
                 }
             }
             return row_data;
+        },
+        deleteRow:function(key,group){
+            var closest={},g,parent,el;
+            var row=this.getRow(key,group,closest);
+            if(row === null){
+                throw new Error("deleteRow: cannot find row ");
+            }
+            if(group!==undefined){
+                g=this.getGrid(group);
+            }
+            else if(this.groupBy && key[this.groupBy]){
+                g=this.getGrid(key[this.groupBy]);
+            }
+            else{
+                g=this.grids[0];
+            }
+            if(g===null){
+                throw new Error("Cannot find group");
+            }
+            
+            // remove from dom
+            for(var i=0;i<this.cols.length;i++){
+                el=row[this.cols[i].name].getElement();
+                if(i===0){
+                    parent=el.parent();
+                    console.log("parent is " + parent);
+                }
+                el.remove();
+            }
+            parent.remove();
+            g.rows.splice(closest.index,1);
         },
         getRow:function(key,group,closest){
             var grid=[],row,sortOrder=[];
@@ -804,28 +871,6 @@ jsonishData={
 	    else{
 		throw new Error("No matching entry found in grid data");
 	    }
-	},
-	getColIndex: function(name){
-	    for(var i=0; i< this.cols.length;i++){
-		if (this.cols[i].name === name){
-		    return i;
-		}
-	    }
-	    return -1;
-	},
-	getCol: function(name){ //grid_name){
-	   // console.log("getting columns");
-	    var index=-1,col=new Array;
-            if(name !== undefined){
-	        for(var i=0;i< this.cols.length;i++){
-	            //	console.log("col is " + this.cols[i].name);
-		    if(this.cols[i].name == name){
-		        return(this.cols[i]);
-		    }
-	        }
-      	    }
-            return this.cols;
-           
 	},
 	getGrid: function(name){
             if(!this.grids){
