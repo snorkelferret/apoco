@@ -116,6 +116,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }
         },
         descriptionList: function(that){
+            if(that.items === undefined){
+                throw new Error("Node: descriptionList requires at least one item" + that.name);
+            }
             that.element=$("<dl></dl>");
             for(var i=0;i<that.items.length;i++){
                 if(that.items[i].label){
@@ -282,7 +285,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         if(options === "node_list"){ // return the list of nodes- internal use only
             var nl={};
             for(var k in _getNode){
-                console.log("k in getNode is " + k);
+              //  console.log("k in getNode is " + k);
                 nl[k]=k;
             }
             return nl;

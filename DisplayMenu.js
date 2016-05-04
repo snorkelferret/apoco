@@ -135,20 +135,22 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	}
     };
 
-    //Harvey.Utils.extend(HarveyMakeMenu,Harvey._DisplayBase);
+    Harvey.Utils.extend(HarveyMakeMenu,Harvey._DisplayBase);
 
     // Create the namespace
     // Harvey.display.tabs
     $.extend(true, Harvey, {
 	display: {
 	    menu: function(opts,win){
-                if(opts==="methods"){
-                    return HarveyMakeMenu.prototype._getMethods();
+                opts.display="menu";
+                return new HarveyMakeMenu(opts,win);
+            },
+            menuMethods:function(){
+                var ar=[];
+                for(var k in HarveyMakeMenu.prototype){
+                    ar.push(k);
                 }
-                else{
-                    opts.display="menu";
-                    return new HarveyMakeMenu(opts,win);
-                }
+                return ar;
             }
 	}
     });

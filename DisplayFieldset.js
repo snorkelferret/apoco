@@ -186,13 +186,15 @@ require("./Nodes.js");
     $.extend(true, Harvey, {
 	display: {
 	    fieldset: function(opts,win){
-                if(opts==="methods"){
-                    return HarveyMakeFieldset.prototype._getMethods();
+                opts.display="fieldset";
+                return new HarveyMakeFieldset(opts,win);
+            },
+            fieldsetMethods:function(){
+                var ar=[];
+                for(var k in HarveyMakeFieldset.prototype){
+                    ar.push(k);
                 }
-                else{
-                    opts.display="fieldset";
-                    return new HarveyMakeFieldset(opts,win);
-                }
+                return ar;
             },
             _fieldsetBase: HarveyMakeFieldset
 	}

@@ -1,5 +1,5 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
-
+//var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+require("./index.js");
 /*function require_(script) {
     $.ajax({
         url: script,
@@ -58,7 +58,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	start: function(options) {
 	    // Harvey.popup.spinner(true);
             if(options){
-	        if(Harvey.checkType["object"](options)){
+	        if(!Harvey.checkType["array"](options) && Harvey.checkType["object"](options)){
 		    var p=Harvey.display[options.display](options);
 		    if(p){
 		        p.show();
@@ -67,8 +67,14 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 		        throw new Error("could not execute " + k);
 		    }
 	        }
-            }
-	},
+                else if(Harvey.checkType["array"](options)){
+                    Harvey.Panel.UIStart(options);
+                }
+                else{
+                    throw new Error("Harvey.start: Unknown options");
+                }
+             }
+        },
         stop: function(){
             Harvey.Panel.deleteAll();
             if(Harvey.webSocket){
@@ -78,9 +84,5 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         }
 
     });
-    
-    $(document).ready(function(){
-        Harvey.start();
-    }); 
-
+ 
 })(jQuery);

@@ -294,6 +294,9 @@ require("./node_modules/jquery-ui").autocomplete;
 	//console.log("static field is here");
         // var settings=checkDefaultOptions("StaticField",d);
         d.field="StaticField";
+        if(d.type===undefined){
+            d.type="string";
+        }
 	_Field.call(this,d,element);
         if(_mkStatic[this.type]){
             //console.log("got a method for " + this.type);
@@ -605,7 +608,7 @@ require("./node_modules/jquery-ui").autocomplete;
         d.field="TimeField";
         d.type="time";
 
-	_Field.call(this,settings,element);
+	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
         s.className=this.type;
@@ -829,6 +832,7 @@ require("./node_modules/jquery-ui").autocomplete;
 	var i;
       //  var settings=checkDefaultOptions("SelectField",d);
         d.field="SelectField";
+        d.type="string";
 	_Field.call(this,d,element);
 
 	var options="<select>";
@@ -1073,6 +1077,7 @@ require("./node_modules/jquery-ui").autocomplete;
     var CounterField=function(d,element){
         //var settings=checkDefaultOptions("CounterField",d);
         d.field="CounterField";
+        d.type="integer";
 	_Field.call(this,d,element);
 
 	this.input=$("<input class='" + this.type + "' name='value' type= '" + this.html_type + "'/>");
@@ -1102,6 +1107,7 @@ require("./node_modules/jquery-ui").autocomplete;
     var SliderField=function(d,element){
         //var settings=checkDefaultOptions("SliderField",d);
         d.field="SliderField";
+        d.type="integer";
 	_Field.call(this,d,element);
 	this.popup=true;
 	this.input=$("<input class='" + d.type + "' type= '" + this.html_type + "'/>").css('display','none');
@@ -1486,6 +1492,7 @@ require("./node_modules/jquery-ui").autocomplete;
 
     var AutoCompleteField=function(d,element){
         d.field="AutoCompleteField";
+        d.type="string";
 	var that=this;
         //var settings=checkDefaultOptions("AutoCompleteField",d);
         _Field.call(this,d,element);

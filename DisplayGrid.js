@@ -1037,13 +1037,15 @@ jsonishData={
     $.extend(true, Harvey, {
 	display: {
 	    grid: function(opts,win){
-                if(opts === "methods"){
-                    return HarveyMakeGrid.prototype._getMethods();
-                }
-                else{
                     opts.display="grid";
                     return new HarveyMakeGrid(opts,win);
+            },
+            gridMethods:function(){
+                var ar=[];
+                for(var k in HarveyMakeGrid.prototype ){
+                    ar.push(k);
                 }
+                return ar;
             }
 	}
     });

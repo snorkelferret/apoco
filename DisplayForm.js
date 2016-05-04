@@ -1,4 +1,5 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+require("./DisplayFieldset");
 
 // create a form dynamically from json
 
@@ -127,15 +128,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 		}
 	    }
 	},
-/*
-	getField: function(name){
-	    for(var i=0;i<this.fields.length;i++){
-		if(this.fields[i].name == name){
-		    return this.fields[i];
-		}
-	    }
-	    return null;
-	}, */
 	after_submit: function(callback,use_default_dialog){
 	    var that=this;
 	    if(use_default_dialog === undefined){
@@ -205,13 +197,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     $.extend(true, Harvey, {
 	display: {
 	    form: function(opts,win){
-                if(opts === "methods"){
-                    return HarveyMakeForm.prototype._getMethods();
+                opts.display="form";
+                return new HarveyMakeForm(opts,win);
+            },
+            formMethods:function(){
+                var ar=[];
+                for(var k in HarveyMakeForm.prototype ){
+                    ar.push(k);
                 }
-                else{
-                    opts.display="form";
-                    return new HarveyMakeForm(opts,win);
-                }
+                return ar;
             }
 
 	}

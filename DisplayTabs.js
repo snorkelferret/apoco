@@ -124,14 +124,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     $.extend(true, Harvey, {
 	display: {
 	    tabs: function(opts,win){
-                if(opts === "methods"){
-                    return HarveyMakeTabs.prototype._getMethods();
+                opts.display="tabs";
+                // console.log("tabs: window is " + win);
+                return new HarveyMakeTabs(opts,win);
+            },
+            tabsMethods:function(){
+                var ar=[];
+                for(var k in HarveyMakeTabs.prototype){
+                    ar.push(k);
                 }
-                else{
-                    opts.display="tabs";
-                   // console.log("tabs: window is " + win);
-                    return new HarveyMakeTabs(opts,win);
-                }
+                return ar;
             }
 	}
     });

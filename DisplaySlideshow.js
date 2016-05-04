@@ -221,13 +221,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     $.extend(true, Harvey, {
 	display: {
 	    slideshow: function(opts,win){
-                if(opts==="methods"){
-                    return HarveyMakeSlideshow.prototype._getMethods();
-                }
-                else{
                     opts.display="slideshow";
                     return new HarveyMakeSlideshow(opts,win);
+            },
+            slideshowMethods:function(){
+                var ar=[];
+                for(var k in HarveyMakeSlideshow.prototype){
+                    ar.push(k);
                 }
+                return ar;
             }
 	}
     });

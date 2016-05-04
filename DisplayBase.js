@@ -24,13 +24,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 	for(var k in this.options){
 	    this[k]=this.options[k];
-	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
+	    console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
 	}
         if(this.DOM === null){
-            throw new Error("Must supply a DOM id for an existing node");
+            throw new Error(this.display + ": Must supply a DOM id for an existing node");
         }
         if(this.id === null){
-            throw new Error("Must supply a unique id string");
+            throw new Error(this.display + ": Must supply a unique id string");
         }
         
         if(win){

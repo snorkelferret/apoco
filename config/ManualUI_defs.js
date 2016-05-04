@@ -1,8 +1,9 @@
 // WARNING this script contains evil eval !!!!!!
-var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=require('../jquery');
+global.Harvey=require('../declare').Harvey;
+global.UI=require('../declare').UI;
+global.jQuery=require('jquery');
 
-//var UI={};
-
+require("../index.js");
 
 ;(function($){
     "use strict";
@@ -90,14 +91,22 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
                 
             }
             for(var n in thing){
-                if(k === "Fields"){
-                    if(n.indexOf("Field")> -1){
-                        HThings[k].push(n);
-                    }
-                }
-                else if(!n.startsWith("_")){
-                    HThings[k].push(n);
-                }
+               if(!n.startsWith("_")){
+                   if(k === "Fields"){
+                       if(n.indexOf("Field")> -1){
+                           HThings[k].push(n);
+                       }
+                   }
+                   else if(k==="Displays"){
+                       if(n.indexOf("Methods")<= -1){
+                           HThings[k].push(n);
+                       }
+                    
+                   }
+                   else{
+                       HThings[k].push(n);
+                   }
+               }
             }
             Harvey.sort(HThings[k],"string");
         }
@@ -106,10 +115,10 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
     mkArrays();
    
    
-    var get_types=function(html_field){
+    var get_types=function(field){
         var f=[];
         for(var k in Harvey.dbToHtml){
-            if(Harvey.dbToHtml[k].html_field == html_field){
+            if(Harvey.dbToHtml[k].field == field){
                 f.push(k);  
             }
         }
@@ -117,7 +126,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
     };
    
        
-    const field_options={
+    var field_options={
         required:{name:{type: "string",description:"tag used in Field methods"}},
         common: {required:{type:"boolean",default: false,description:"Is the cell allowed to be blank"},
                  editable:{type:"boolean",default:true,description: "If false some fields become a StaticField"},
@@ -316,14 +325,14 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
         return Options;
     };
 
-    const Options=mkDefaultOptions();
-    /*
+    var Options=mkDefaultOptions();
+    
     for(var k in Options){
         console.log("Field is " + k);
         console.log("with options " + JSON.stringify(Options[k]));
     }
     
-     */
+     
   /*  
     var checkDefaultOptions=function(f,d){
         var p=$.extend({},Options[f],d);
@@ -350,54 +359,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
     };
 
 */
-    
-    var select_menu=function(that,index){
-        var name=that.list[index].name;
-        var p=that.getSiblings();
-       // console.log("selecting menu for " + name);
-        if(!p){
-            throw new Error("Could not find siblings of " + that.parent.name);
-        }
-        for(var i=0;i<p.length;i++){
-            
-        /*    if(p[i].id.indexOf(name) > -1){
-                p[i].show();
-            } */
-           if(p[i].id == name){
-                p[i].show();
-            }
-            else if(p[i].id == (name + "Methods") ){
-                p[i].show();
-            }
-            else if(p[i].id === (name + "Display")){
-                   p[i].show();
-            }
-            else if(p[i].id ==("test" + name)){
-                p[i].show();
-            } 
-            else{
-                p[i].hide();
-            }
-        }
-    };
-
-    var mkMenu=function(AList,action){
-        var f=[];
-        for(var i=0;i<AList.length; i++){
-            f[i]={};
-            f[i].name=AList[i];
-            f[i].action=select_menu;
-        }
-        if(AList === HThings.Panels){
-            f.push({seperator: "Child methods"});
-            for(var i=0;i<HThings["PanelComponents"].length;i++){
-                f.push({name: HThings["PanelComponents"][i], action: select_menu });
-            }
-        }
-        
-        return f;
-    };
-
+  
     
     var mkFieldOptionsList=function(Options,Required){
         var HFields=HThings.Fields;
@@ -453,27 +415,35 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
             FloatField:["value"],
             NumberArrayField:["value"]
         };
+
+
+       // Harvey.field._getAllSettings=field_options;
+       // Harvey.field.getDefaultOptions=Options;
         
-        var field_options=Harvey.field._getAllSettings;
+      //  var field_options=Harvey.field._getAllSettings;
         for(var i=0;i<HFields.length;i++){
+            var c="";
+            console.log("Creating command for " + HFields[i]);
             //var c="var dataObject={name:'anyName', editable: true, field:'" + HFields[i] + "'";
             if(no_var_equals){
-                var c="{field:'" + HFields[i] + "'";
+                c="{field:'" + HFields[i] + "'";
             }
             else{
-                var c="var dataObject={field:'" + HFields[i] + "'";
+                c="var dataObject={field:'" + HFields[i] + "'";
             }
             
-            for(k in Options){
-                c=c.concat("," + k + ":" + JSON.stringify(Options[k]) );
+            for(k in Options[HFields[i]]){
+                c=c.concat("," + k + ":" + JSON.stringify(Options[HFields[i]][k]) );
             }
+           
+            console.log(" c is " + c);
             // get the globally required opts
             v=field_options["required"];
             for(k in v){
-             //   console.log("GETTING REQUIRED");
+              // console.log("GETTING REQUIRED");
                 c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
             }
-               // get the required for the specific field
+            // get the required for the specific field
             v=field_options[HFields[i]].required;
             for(k in v){
                 c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
@@ -485,9 +455,13 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
                 var fd=field_desirable[HFields[i]];
                 for(var j=0;j<fd.length;j++){
                     var n=field_options[HFields[i]].options[fd[j]];
+                    console.log("desirable field " + fd[j] + " type " + n.type );
+                    
                     if(n){
                         c=c.concat(","+ fd[j] + ":");
+                        console.log("adding desirable field " + fd[j] + " with type " + n.type);
                         if(n.default !== undefined){
+                            console.log("adding default " + n.default);
                             c=c.concat(n.default);
                         }
                         else if(n.type){
@@ -496,12 +470,14 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
                                     n.type=field_options[HFields[i]].options["type"].params[0];
                                 }
                             }
+                            console.log("getting value for " + n.type + " is " + getAType[n.type]);
                             c=c.concat(JSON.stringify(getAType[n.type]));
                         }
                     }
                 }
             }
             c=c.concat("};");
+            console.log("Made command index i " + i + " cmd " + c);
             Commands[i]=c;
         }
         return Commands;
@@ -516,7 +492,8 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
         var Commands=mkFieldCommands();
         var HFields=HThings.Fields;
         mkFieldOptionsList(Options,Required);
-        var des=Harvey.field._getAllSettings;
+        //var des=Harvey.field._getAllSettings;
+        var des=field_options;
         for(var i=0;i<HFields.length;i++){
            // console.log("mkFields making " + HFields[i]);
             var k={};
@@ -569,6 +546,53 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
             UI.Panels.Fields.components.push(k);
         }
        
+    };
+  
+    var select_menu=function(that,index){
+        var name=that.list[index].name;
+        var p=that.getSiblings();
+       // console.log("selecting menu for " + name);
+        if(!p){
+            throw new Error("Could not find siblings of " + that.parent.name);
+        }
+        for(var i=0;i<p.length;i++){
+            
+        /*    if(p[i].id.indexOf(name) > -1){
+                p[i].show();
+            } */
+           if(p[i].id == name){
+                p[i].show();
+            }
+            else if(p[i].id == (name + "Methods") ){
+                p[i].show();
+            }
+            else if(p[i].id === (name + "Display")){
+                   p[i].show();
+            }
+            else if(p[i].id ==("test" + name)){
+                p[i].show();
+            } 
+            else{
+                p[i].hide();
+            }
+        }
+    };
+
+    var mkMenu=function(AList,action){
+        var f=[];
+        for(var i=0;i<AList.length; i++){
+            f[i]={};
+            f[i].name=AList[i];
+            f[i].action=select_menu;
+        }
+        if(AList === HThings.Panels){
+            f.push({seperator: "Child methods"});
+            for(var i=0;i<HThings["PanelComponents"].length;i++){
+                f.push({name: HThings["PanelComponents"][i], action: select_menu });
+            }
+        }
+        
+        return f;
     };
 
 
@@ -739,7 +763,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
                                    that.parent.deleteChild("TESTNODE");
                                }
                                $.globalEval(f.getValue());
-                               //console.log("parms are " + dataObject);
+                               console.log("parms are " + dataObject);
                                if(Harvey.checkType["object"](node)){
                                    that.parent.addNode(node);
                                }
@@ -893,7 +917,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
      
 
         for(var i=0;i<HDisplays.length;i++){
-            // console.log("mkFieldMethods making " + HFields[i]);
+            console.log("mkDisplays making " + HDisplays[i]);
             var k={};
           
             k.display="fieldset";
@@ -958,7 +982,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
         for(var i=0;i<HDisplays.length;i++){
            // console.log("getting method for " + HDisplays[i]);
             Methods[HDisplays[i]]=[];
-            var p=Harvey.display[HDisplays[i]]("methods");
+            var p=Harvey.display[(HDisplays[i]+"Methods")];
             for(var j=0;j<p.length; j++){
              //   console.log("display " + HDisplays[i] + " has method " + p[j]);
                 if(p[j] !== "constructor" && !p[j].startsWith("_")){
@@ -967,7 +991,6 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
             }
         }
         var display_methods_list={
-            execute:["<code> my_display.execute()</code> ","return: none","add the display object.(and all it's children). to memory"],
             show:["<code> var v=my_display.show();)</code>","return: boolean","add the display to the DOM"],
             getElement:["<code> var v=my_display.getElement();</code>","return: jQuery object"," the root element of the display"],
             getChildren:["<code> var v=my_display.getChildren();</code>","return: object","where the object has keys fields, tabs,grids etc depending on the type of children the display object creates"],
@@ -1114,6 +1137,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
         var panel_methods={
             UIStart:[{label: "called by default if",description: "<code> UI,start=['MyPanel']; </code> <br> is defined"},{label: "<br><code>Harvey.Panel.UIStart(stringArray);</code>",descriptions:["<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
             add:[{label: "<code>Harvey.Panel.add(object|| string);</code>",descriptions:["return: nothing","parms: object or string","e.g from the above definition","<code>Harvey.Panel.add('MyPanel');</code>","or","<code> Harvey.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
+            clone:[{label:"<code></code>",description:"clone an object"}],
             delete:[{label:"<code>Harvey.Panel.delete(string);</code>",descriptions:["return: nothing","parms: string","the name of the window to be deleted"]}],
             deleteAll:[{label:"<code>Harvey.Panel.deleteAll();</code>",descriptions:["return: nothing","parms: none","delete all the windows"]}],
             get:[{label:"<code>var v=Harvey.Panel.get(string);</code>",descriptions:["return: panel object","parms: string",(" " + mk_spaces(7) + "The name of the panel")]}],
@@ -1134,11 +1158,12 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
         var HPanels=HThings["Panels"].concat(HThings["PanelComponents"]);
         
         for(var i=0;i<HPanels.length;i++){
-            // console.log("mkFieldMethods making " + HFields[i]);
+            console.log("mkPanelMethods making " + HPanels[i]);
             var cmd={
                 UIStart:"Harvey.Panel.UIStart();",
                 add:"Harvey.Panel.add({name: 'MyName', components:[{display:'tabs',DOM:'right',id:'TestTabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]});",
                 "delete":"Harvey.Panel.delete('MyName');",
+                clone:"Harvey.Panel.clone(child_display_object)",
                 deleteAll:"Harvey.Panel.deleteAll();",
                 get: "Harvey.Panel.get('MyName');",
                 getList:"var v=Harvey.Panel.getList();",
@@ -1158,6 +1183,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
             k.DOM="right";
             k.hidden=true;
             k.id=(HPanels[i] + "Methods").toString();
+            console.log("methods description is " + panel_methods[HPanels[i]]);
             k.components=[{node: "heading", size: "h3", text: "Methods"},
                           {node: "heading",size: "h4",text: HPanels[i]},
                           {node: "descriptionList", items:panel_methods[HPanels[i]]},

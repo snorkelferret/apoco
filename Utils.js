@@ -188,24 +188,47 @@ String.prototype.trim = String.prototype.trim || function trim() {
             create: function(){
                 var that=this;
                 var check=function(mutations){
-
                     if(that._list.length>0){
-                        for(var item in mutations){
-                            //console.log("this is mutation item " + item);
-                            for(var i=0; i< item.addedNodes.length;i++){
-                              //  console.log("Mutation observer added " + item.addedNodes[i].id);
-                                for(var j=0;j<that._list.length;j++){
-                                //    console.log("Observer trying to find " + that._list[j].id);
-                                    if(item.addedNodes[i].id == that._list[j].id && that._list[i].found === false){
-                                        console.log("Observer Found " + that._list[j].id);
-                                   //     console.log("Observer calling action function");
-                                        that._list[j].fn.call(that._list[j].context,that._list[j].context);
-                                        that._list[j].found=true;
-                                       // break;
-                                    };
+                     /*   for(var item of mutations){
+                            console.log("this is mutation item " + item);
+                            if(item.addedNodes){
+                                for(var i=0; i< item.addedNodes.length;i++){
+                                    //  console.log("Mutation observer added " + item.addedNodes[i].id);
+                                    for(var j=0;j<that._list.length;j++){
+                                        //    console.log("Observer trying to find " + that._list[j].id);
+                                        if(item.addedNodes[i].id == that._list[j].id && that._list[i].found === false){
+                                            console.log("Observer Found " + that._list[j].id);
+                                            //     console.log("Observer calling action function");
+                                            that._list[j].fn.call(that._list[j].context,that._list[j].context);
+                                            that._list[j].found=true;
+                                            // break;
+                                        };
+                                    }
                                 }
                             }
-                        }
+                      } */
+                        mutations.forEach(function(mutation){
+                            for(var k in mutation){
+                                console.log("mutation type is " + k);
+                                if(k === "addedNodes"){
+                                    for(var i=0; i< mutation.addedNodes.length;i++){
+                                        //  console.log("Mutation observer added " + item.addedNodes[i].id);
+                                        for(var j=0;j<that._list.length;j++){
+                                            //    console.log("Observer trying to find " + that._list[j].id);
+                                            if(mutation.addedNodes[i].id == that._list[j].id && that._list[i].found === false){
+                                                console.log("Observer Found " + that._list[j].id);
+                                                //     console.log("Observer calling action function");
+                                                that._list[j].fn.call(that._list[j].context,that._list[j].context);
+                                                that._list[j].found=true;
+                                                // break;
+                                            };
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        });  
+                        
                     }
                     var temp=[];
                     console.log("observer list is " + that._list.length);

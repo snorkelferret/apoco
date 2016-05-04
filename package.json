@@ -4,11 +4,12 @@
   "description": "harvey",
   "main": "index.js",
   "scripts": {
-    "eslint": "eslint -f compact --env browser *.js",
-    "eslint:test": "eslint -f compact --config test/eslint.conf --env mocha test/*.js",
-    "pretest": "npm run eslint && npm run eslint:test",
-    "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test",
-    "posttest": "rimraf .__browserify_string_empty.js"
+      "eslint": "eslint -f compact --env browser *.js",
+      "eslint:test": "eslint -f compact --config test/eslint.conf --env mocha test/*.js",
+      "pretest": "npm run eslint && npm run eslint:test",
+      "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test",
+      "posttest": "rimraf .__browserify_string_empty.js",
+      "manual": "browserify ./config/ManualUI_defs.js -o manual_bundle.js"
   },
   "author": "Val Wardlaw <val@perluceo.com>",
   "license": "ISC",
