@@ -548,10 +548,10 @@ require("../index.js");
        
     };
   
-    var select_menu=function(that,index){
-        var name=that.list[index].name;
-        var p=that.getSiblings();
-       // console.log("selecting menu for " + name);
+    var select_menu=function(that){
+        var name=that.name;
+        var p=that.parent.getSiblings();
+        console.log("selecting menu for " + name);
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
         }
@@ -1096,31 +1096,35 @@ require("../index.js");
         
     };
     
-    var select_tabs=function (that,index){
-        var name=that.tabs[index].name;
-      //  console.log("select_tabs: trying to show " + name);
+    var select_tabs=function (that){
+        var name=that.name;
+        console.log("select_tabs: trying to show " + name);
+        if(that.parent.selected){
+            Harvey.Panel.hide(that.parent.selected.name);
+        }
      //   if(name !== that.selected){
           //  console.log("select_tabs: trying to show " + that.selected);
-            Harvey.Panel.hide(that.selected);
-            Harvey.Panel.show(name);
-            var b=Harvey.Panel.get(name);
-            if(b){ // may or may not be loaded yet
-                var ar=b.getChildren();
-                for(var i=0; i< ar.length; i++){
-                    var n=ar[i].getKey();
-                   // console.log("select_tabs n is " +  n);
-                    if(n == "Blurb" ||  n == (name +"Menu")){
-                        ar[i].show();
-                    }
-                    else{
-                     //   console.log("select_tabs hiding " + n );
-                        ar[i].hide();
-                    }
-                    if(n === (name + "Menu")){
-                        ar[i].reset();
-                    }
+        //Harvey.Panel.hide(that.selected);
+        
+        Harvey.Panel.show(name);
+        var b=Harvey.Panel.get(name);
+        if(b){ // may or may not be loaded yet
+            var ar=b.getChildren();
+            for(var i=0; i< ar.length; i++){
+                var n=ar[i].getKey();
+                // console.log("select_tabs n is " +  n);
+                if(n == "Blurb" ||  n == (name +"Menu")){
+                    ar[i].show();
+                }
+                else{
+                    //   console.log("select_tabs hiding " + n );
+                    ar[i].hide();
+                }
+                if(n === (name + "Menu")){
+                    ar[i].reset();
                 }
             }
+        }
        // }
     };
 

@@ -23,6 +23,7 @@ require("./DisplayFieldset");
     HarveyMakeForm.prototype={
 	execute: function(){
 	    var that=this;
+            
 	    this.element=$("<div id='" + this.id + "' class='harvey_form ui-widget ui-widget-content ui-corner-all '></div>");
 
             if(!this.height){
@@ -69,48 +70,36 @@ require("./DisplayFieldset");
 	    }(this));
 	    close[0].addEventListener("click",c,false);
 
-            var fp=$("<ul></ul>");
+            var fp=$("<ul class='harvey_form_list'></ul>");
             var p;
-            for(var i=0;i<this.components.length;i++){
-                var ll=$("<li></li>");
-	        if(this.components[i].node){
-                    this.addNode(this.components[i],ll);
-		}
-	        else if(this.components[i].field || this.components[i].type){
-	            p=this.addField(this.components[i],ll);
-		}
-                fp.append(ll);
+            if(this.components){
+                for(var i=0;i<this.components.length;i++){
+   
+	            if(this.components[i].node){
+                        this.addNode(this.components[i]);
+		    }
+	            else if(this.components[i].field || this.components[i].type){
+	                p=this.addField(this.components[i]);
+		    }
+                  //  fp.append(ll);
+                }
+                this.components.length=0; // delete
             }
-            this.components.length=0; // delete
-
             container.append(fp);
-
 
 	    if(this.buttons){
 		var button_container=$("<div class='form_button_container ui-widget-content'></div>");
 		this.element.append(button_container);
-
 		for(var i=0;i<this.buttons.length;i++){
-
-		    var button= $("<button id='" + this.buttons[i].name + "' class='ui-widget  '> "+  this.buttons[i].text  + "</button></div>");
-		    var fn=this.buttons[i].action;
+                    this.buttons[i].node="button";
+                    this.buttons[i]=Harvey.node(this.buttons[i]);
                     this.buttons[i].parent=this;
-		   // console.log("got callback function");
-		    if(this.buttons[i].action){
-		        button[0].addEventListener("click",function(e){
-                            e.stopPropagation();
-                            e.preventDefault();
-                            //that.buttons[i].action(that);
-                            fn(that);
-                            //console.log("form button clicked");
-                        },false);
-                        //console.log("button has action");
-		    }
-		    button_container.append(button);
+		    button_container.append(this.buttons[i].element);
 		}
 	    }
-
-
+            else{
+                this.buttons=[];
+            }
 	    this.element.resizable( {
 		resize: function(e,ui){
 		    $(".form_content").height(that.element.height()*0.95);
@@ -121,6 +110,118 @@ require("./DisplayFieldset");
                 }
 	    });
 	},
+        addNode:function(d,el){
+            var n,parent_element;
+            var ll=$("<li></li>");
+            if(d.name && this.getNode(d.name)!==null){
+                    throw new Error("Cannot add node with non-unique name");
+            }
+            if(d.element && d.element.length>0){
+                if(!d.node){
+                    throw new Error("Harvey.displayFieldset: addNode - object is not a node");
+                }
+                n=d;
+            }
+            else{
+                n=Harvey.node(d,ll);
+            }
+            if(n){
+                this.element.find("ul.harvey_form_list").append(n.element);
+                n.parent=this;
+	        this.nodes.push(n);
+                return n;
+            }
+            else{
+                throw new Error("Harvey,fieldset, doesn't know how to make " + d.node);
+            }
+            return null;
+        },
+        addField: function(d,el){
+            var p,parent_element;
+            var ll=$("<li></li>");
+            if(!d.field){
+                if(d.type){
+                    d.field=Harvey.dbToHtml[d.type].field;
+                }
+                else{
+                    throw new Error("Must supply either a field or a type");
+                }
+            }
+           // console.log("making field " + d.field);
+            if(this.getField(d.name)!== null){
+                throw new Error("Cannot add field with non-unique name " + d.name);
+            }
+            if(Harvey.field.exists(d.field)){
+                // check that the field has not already been created
+                if(d.element && d.element.length>0){
+		    p=d;
+                }
+                else{
+                    p=Harvey.field[d.field](d,ll);
+                }
+		if(!p){
+		    throw new Error("Cannot make field " + d.field);
+		}
+            }
+            else{
+                throw new Error("no field of type " + d.field + " exists");
+            }
+            p.parent=this;
+	    this.fields.push(p);
+	    this.element.find("ul.harvey_form_list").append(p.element);
+            
+            return p;
+        },
+        addButton:function(d){
+            var index,r,b;
+            d.node="button";
+            b=Harvey.node(d);
+            index=this.buttons.length;
+            if(b){
+                this.buttons[index]=b;
+                this.buttons[index].parent=this;
+            }
+            if(index ===0){
+	        // no buttons so create button_container
+                r=$("<div class='form_button_container ui-widget-content'></div>");
+		this.element.append(r);
+            }
+            else{
+                r=this.element.find("div.form_button_container");
+            }
+            if(r.length === 0){
+                throw new Error("DisplayForm: addButton cannot find button container");
+            }
+            r.append(this.buttons[index].element);
+        },
+        getButton:function(name){
+            if(name !== undefined){
+                for(var i=0;i<this.buttons.length;i++){
+                    if(this.buttons[i].name === name){
+                        return this.buttons[i];
+                    }
+                }
+                return null;
+            }
+            return this.buttons;
+        },
+        deleteButton:function(name){
+            var n,index=-1;
+            if(name === undefined){
+                throw new Error("DisplayForm: deleteButton - must supply a name");
+            }
+            for(var i=0;i<this.buttons.length;i++){
+                if(this.buttons[i].name === name){
+                    index=i;
+                    break;
+                }
+            }
+            if(index===-1){
+                throw new Error("DisplayFieldset: deleteNode cannot find " + name);
+            }
+            this.buttons[index].element.remove();
+            this.buttons.splice(index,1);
+        },
 	resetInvalid: function(){
 	    for(var i=0;i< this.fields.length;i++){
 		if(this.fields[i].required){

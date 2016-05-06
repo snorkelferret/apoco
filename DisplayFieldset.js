@@ -17,10 +17,10 @@ require("./Nodes.js");
         this.nodes=[];
         this.fields=[];
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-        this.execute();
+        if(this.display=="fieldset"){
+            this.execute();
+        }
     };
-
-
 
     HarveyMakeFieldset.prototype={
 	execute: function(){
@@ -42,6 +42,27 @@ require("./Nodes.js");
                 this.components.length=0; // delete
             }
 	},
+	getChildren: function(){
+	    var comp;
+            var comp=this.getField();
+            var c=this.getNode();
+            comp.concat(c);
+            return comp;
+        },
+        getChild:function(name){
+            var k;
+            if(name !== undefined){
+                k=this.getField(name);
+                if(k !==null && !Harvey.checkType["array"](k)){
+                    return k;
+                }
+                k=this.getNode(name);
+                if(k !==null && !Harvey.checkType["array"](k)){
+                    return k;
+                }
+            }
+            return null;
+        },
 	getField: function(name){
             if(name !== undefined){
                 for(var i=0;i<this.fields.length;i++){
@@ -65,10 +86,7 @@ require("./Nodes.js");
             return this.nodes;
         },
         addNode:function(d,el){
-            var n;
-            // check that the node has not already been created
-            // if(d.parent=== this){ // already in the list
-            // console.log("adding "+ d.node + " to parent " + this.id);
+            var n,parent_element;
             if(d.name && this.getNode(d.name)!==null){
                     throw new Error("Cannot add node with non-unique name");
             }
@@ -77,14 +95,12 @@ require("./Nodes.js");
                     throw new Error("Harvey.displayFieldset: addNode - object is not a node");
                 }
                 n=d;
-                this.element.append(n.element);
             }
             else{
-              //  console.log("Fieldest calling Harvey.node " + d.node);
                 n=Harvey.node(d,el);
-                this.element.append(el);
             }
             if(n){
+                this.element.append(n.element);
                 n.parent=this;
 	        this.nodes.push(n);
                 return n;
@@ -112,11 +128,16 @@ require("./Nodes.js");
             this.nodes.splice(index,1);
         },
         addField: function(d,el){
-            var p;
-            if(!d.field && d.type){
-                d.field=Harvey.dbToHtml[d.type].field;
+            var p,parent_element;
+            if(!d.field){
+                if(d.type){
+                    d.field=Harvey.dbToHtml[d.type].field;
+                }
+                else{
+                    throw new Error("Must supply either a field or a type");
+                }
             }
-            console.log("making field " + d.field);
+           // console.log("making field " + d.field);
             if(this.getField(d.name)!== null){
                 throw new Error("Cannot add field with non-unique name " + d.name);
             }
@@ -137,11 +158,27 @@ require("./Nodes.js");
             }
             p.parent=this;
 	    this.fields.push(p);
-            if(!p.setValue){
-                console.log("method setValue does not exist for " + p.name);
-            }
 	    this.element.append(p.element);
+            
             return p;
+        },
+        deleteAll:function(){
+            for(var i=0;i<this.fields.length;i++){
+                if(this.fields[i].listen){
+                    Harvey.unsubscribe(this.fields[i]);
+                }
+                this.fields[i].element.empty();
+                this.fields[i].element.remove();
+            }
+            this.fields.length=0;
+            for(var i=0;i<this.nodes.length;i++){
+                if(this.nodes[i].listen){
+                    Harvey.unsubscribe(this.nodes[i]);
+                }
+                this.nodes[i].element.empty();
+                this.nodes[i].element.remove();
+            }
+            this.nodes.length=0;
         },
         deleteField:function(name){
             var n,index=-1;
@@ -153,6 +190,9 @@ require("./Nodes.js");
                     index=i;
                     break;
                 }
+            }
+            if(this.fields[index].listen){
+                    Harvey.unsubscribe(this.fields[i]);
             }
             if(index===-1){
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);

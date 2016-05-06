@@ -1,4 +1,5 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+require("./Utils");
 
 // Copyright (c) 2015 Pooka Ltd.
 // Name: HarveyDisplaySet.js
@@ -311,44 +312,75 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             return p;
 	},
         deleteAll: function(d){
-
+            var obj;
             var n=this._list.length;
             for(var i=0;i<n; i++){
                 console.log("window: removing panel " + this._list[i].name + " from list");
-               	var c=this._list[i].deleteChildren();
+               	obj=this._list[i];
+                obj.deleteChildren();
                 if(d){
                     if(i===(n-1)){
                         console.log("***********************************8delete is done");
                         d.resolve();
                     }
                 }
+                for(var k in obj){
+                    delete obj[k];
+                }
+                obj=null;
             }
             if(!d){
                 Harvey.Window.closeAll();
             }
             this._list.length=0;
         },
-	delete: function(k){
-	    var p=this.inList(k);
+        delete: function(name){
+   	    var p=this.inList(name);
 	    if(p !== null){
-		var c=this._list[p].deleteChildren();
-		console.log("panel: removing panel " + k + " from list");
+                var obj=this._list[p];
+                obj.deleteChildren();
+		console.log("panel: removing panel " + obj.name + " from list");
 		this._list.splice(p,1);
-	    }
-            else {
-                throw new Error(k + "is not in the list of Panels");
+                for(var k in obj){
+                  //  console.log("DELETING " + k);
+                    delete obj[k];
+                    
+                }
+               // for(var k in obj){
+               //     console.log("uiuyiuiyiuuyiiuyuyiyiuuyiuyiuiyyiuiyu " + k);
+               // }
+                obj=null;
             }
-	}
-
-
+            else {
+                throw new Error(obj.name + "is not in the list of Panels");
+            }
+	}//,
+/*	delete: function(obj){
+            if(!obj || !obj.name){
+                throw new Error("Harvey.Panel delete unknown object");
+            }
+	    var p=this.inList(obj.name);
+	    if(p !== null){
+                obj.deleteChildren();
+		console.log("panel: removing panel " + obj.name + " from list");
+		this._list.splice(p,1);
+                for(var k in obj){
+                  //  console.log("DELETING " + k);
+                    delete obj[k];
+                    
+                }
+               // for(var k in obj){
+               //     console.log("uiuyiuiyiuuyiiuyuyiyiuuyiuyiuiyyiuiyu " + k);
+               // }
+                obj=null;
+            }
+            else {
+                throw new Error(obj.name + "is not in the list of Panels");
+            }
+	} */
     };
-
-
-
     var _Components=function(obj){
-	this.DEBUG=true;
         var that=this;
-
 	for(var k in obj){
 	    this[k]=obj[k];
 	   //console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
@@ -411,7 +443,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 	},
 	addChild: function(display_object){ // to existing panel
-
+            var d;
 
             if(this.getChild(display_object.id)){
                 throw new Error("Harvey.Panel: already have a child with id " + display_object.id);
@@ -420,15 +452,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                 throw new Error("You can only add display objects to a window");
             }
 
-            if(!display_object.displayType()){ //has not been instantiated
-                var d=display_object;
+            if(!display_object.displayType){ //has not been instantiated
+                d=display_object;
                 display_object=Harvey.display[d.display](d,this.window);
                 if(!display_object){
                     throw new Error("Panel.addChild: could not create display object " + d.display);
                 }
             }
-
-
      //       console.log("adding child length is " + this.components.length);
             display_object.parent=this;
           //  if(!display_object.element || display_object.element.length==0){
@@ -441,6 +471,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
        //     console.log("after add adding child length is " + this.components.length);
 	},
         deleteChildren: function(){
+            if(!this.components){
+                throw new Error("Panel: has no children " + this.name);
+            }
             for(var i=0;i<this.components.length;i++){
                 console.log("panel_components.deleteChildren: " + this.components[i].display);
                 if(this.components[i].listen){
@@ -451,6 +484,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             this.components.length=0;
         },
 	deleteChild: function(obj){
+            var index=-1;
             //var obj=o;
             if(!obj){
                 throw new Error("Harvey.Panel: deleteChild obj is null");
@@ -467,11 +501,17 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    }
 	    for(var i=0;i<this.components.length;i++){
 		if(obj === this.components[i]){
-                    this.components[i].delete("message from parent");
-		    this.components.splice(i,1);
+                    index=i;
+                    break;
 		}
 	    }
-
+            if(index !== -1){
+                this.components[index].delete("message from parent");
+	        this.components.splice(index,1);
+            }
+            else{
+                throw new Error("Panel: deleteChild could not find child " + obj.id);
+            }
 	  //  if(this.components.length === 0){
 	//	console.log("No components left");
 	 //       Harvey.Panel.delete(this.name);
@@ -479,12 +519,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	  //  console.log("after delete child length is " + this.components.length);
 	},
 	getChildren: function(){
-	    if (this.components.length>0){
+	    if (this.components && this.components.length>0){
 		return this.components;
 	    }
 	    return null;
 	},
         getChild: function(id){
+            if(!this.components){
+                return null;
+            }
            // console.log("Panel.getChild Trying to find " + id);
             for(var i=0;i< this.components.length;i++){
              //   console.log("this is child " + this.components[i].id);
@@ -495,6 +538,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             return null;
         },
 	findChild: function(child){
+            if(!this.components){
+                return null;
+            }
 	    var found=null;
 	    for(var i=0;i<this.components.length; i++){
 	//	console.log("this is child " + i);

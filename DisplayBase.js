@@ -6,11 +6,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
     'use strict';
     // these are the components allowed in display objects
 
-    var _display_components=["fields","nodes","tabs","grids","list"];
+    var _display_components=["getField","getNode","getTab","getGrid","getMenu"];
 
     Harvey._DisplayBase=function(options,win){
-
-	this.DEBUG=true;
 	var defaults={
 	    parent: null,
 	    element: null,
@@ -21,10 +19,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         var that=this,t;
 	this.options = $.extend({}, defaults,options);
 
-
 	for(var k in this.options){
 	    this[k]=this.options[k];
-	    console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
+	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
 	}
         if(this.DOM === null){
             throw new Error(this.display + ": Must supply a DOM id for an existing node");
@@ -89,52 +86,30 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             for(var i=0; i< _display_components.length;i++){
                 k=_display_components[i];
 	        if(this[k]){
-		    for(var j=0;j<this[k].length;j++){
-                        comp.push(this[k][j]);
-                    }
+                    return this[k]();
 	        }
-            }
-            return comp;
-	},
-        getChild:function(name){
-            var k;
-            for(var i=0; i< _display_components.length;i++){
-                var k=_display_components[i];
-             //   console.log("get child of type " + k);
-                if(this[k]){
-           //         console.log("get child has component of type " + k);
-                    for(var j=0;j<this[k].length;j++){
-                        if(this[k].length===1 && k==="grids"){
-                            return this[k].grids("all");
-                        }
-         //               console.log("trying to find child " + this[k][j].name);
-                        if(this[k][j].name == name){
-                            return this[k][j];
-                        }
-                    }
-                }
             }
             return null;
         },
-        deleteChild:function(name,no_splice){
+        getChild:function(name){
+            var k;
+            if(name !== undefined){
+                for(var i=0; i< _display_components.length;i++){
+                    var k=_display_components[i];
+                    if(this[k]){
+                        return  this[k](name);
+                    }
+                }
+                return null;
+            }
+            return null;
+        },
+        deleteChild:function(name){
             var k;
             for(var i=0; i< _display_components.length;i++){
                 k=_display_components[i];
                 if(this[k]){
-                    for(var j=0;j<this[k].length;j++){
-                        if(this[k][j].name == name){
-	                    if(this[k][j].listen !== undefined){
-		                Harvey.unsubscribe(this[k][j]);
-		            }
-                            this[k][j].element.empty();
-                            this[k][j].element.remove();
-                            this[k][j].element=null;  // stop memory leak
-                            if(no_splice === undefined){
-                                this[k].splice(j,1);
-                            }
-                            return true;
-                        }
-                    }
+                    this[k](name);
                 }
             }
             return null;
@@ -242,23 +217,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             if(this.listen){
                 Harvey.IO.unsubscribe(this);
             }
-	    for(var k=0; k < _display_components.length; k++){
-                var c=_display_components[k];
-              //  console.log("test display_component " + c);
-                if(this[c]){
-                //    console.log("display has components " + c + " with length "+ this[c].length);
-                    for(var i=0;i<this[c].length;i++){
-                      //  console.log("display.delete: deleting " + this[c][i].name);
-                        this.deleteChild(this[c][i].name,"no_splice");
-                         if(this[c][i].listen !== undefined){
-		            Harvey.IO.unsubscribe(this[c][i]);
-		        }
-                    }
-                    this[c].length=0;
-                }
+            this.deleteAll();
+            if(this.element){
+                this.element.remove();  //removes events and data as well
             }
-
-	    this.element.remove();  //removes events and data as well
+	    else{
+                console.log("this element should not be null " + this.id);
+            }
             this.element=null;
 	    if(this.parent && msg_from_parent === undefined){
 		//console.log("WE have a parent");

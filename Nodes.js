@@ -34,7 +34,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    this.element.prop("title", d.tooltip);
 	    this.element.tooltip({tooltipClass: "tooltip"});
 	}
-        if(element){
+        if(element && element.length>0){
         //    console.log("Node appending to element");
             element.append(this.element);
         }
@@ -205,7 +205,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                 that.element.prop("disabled",that.disabled);
             }
             if(that.action){
-                that.element.on("click",function(){
+                that.element.on("click",function(e){
+                    e.stopPropagation();
+                    e.preventDefault();
                     that.action(that);
                 });
             }

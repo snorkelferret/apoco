@@ -85,6 +85,11 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	       });
 	   }*/
         },
+        deleteAll:function(){
+            this.element.detach();
+            this.element.empty();
+            this.element.remove();
+        },
         show_fullscreen: function(){
 	    // get the window width and height
 	    var that=this;

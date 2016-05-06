@@ -879,19 +879,36 @@ jsonishData={
 	    else if(this.grids.length === 1 ){
 		return this.grids[0];
 	    }
-	    for(var i=0;i<this.grids.length;i++){
-		if(this.grids[i].name == name){
-		    return this.grids[i];
-		}
-	    }
-	    return null;
+            if(name !== undefined){
+	        for(var i=0;i<this.grids.length;i++){
+		    if(this.grids[i].name == name){
+		        return this.grids[i];
+		    }
+	        }
+	        return null;
+            }
+            return this.grids;
 	},
-	getGrids: function(){
-	    if(this.grids){
-		return this.grids;
-	    }
-	    return null;
-	},
+	deleteAll:function(){
+            var el,parent,row;
+            for(var i=0;i<this.grids.length;i++){
+                this.grids[i].element.detach();
+                for(var j=0;j<this.grids[i].rows.length;j++){
+                    row=this.grids[i].rows[j];
+                    for(var k=0;k<this.cols.length;k++){
+                        el=row[this.cols[k].name].getElement();
+                        if(k===0){
+                            parent=el.parent();
+                        }
+                        el.empty();
+                        el.remove();
+                    }
+                    parent.remove();
+                }
+                this.grids[i].rows.length=0;
+            }
+            this.grids.length=0;
+        },
 	showGrid: function(name){
 	    if(this.grids.length === 1 || !name){
 		name="all";
