@@ -209,14 +209,14 @@ String.prototype.trim = String.prototype.trim || function trim() {
                       } */
                         mutations.forEach(function(mutation){
                             for(var k in mutation){
-                                console.log("mutation type is " + k);
+                             //   console.log("mutation type is " + k);
                                 if(k === "addedNodes"){
                                     for(var i=0; i< mutation.addedNodes.length;i++){
                                         //  console.log("Mutation observer added " + item.addedNodes[i].id);
                                         for(var j=0;j<that._list.length;j++){
                                             //    console.log("Observer trying to find " + that._list[j].id);
                                             if(mutation.addedNodes[i].id == that._list[j].id && that._list[i].found === false){
-                                                console.log("Observer Found " + that._list[j].id);
+                                            //    console.log("Observer Found " + that._list[j].id);
                                                 //     console.log("Observer calling action function");
                                                 that._list[j].fn.call(that._list[j].context,that._list[j].context);
                                                 that._list[j].found=true;
@@ -231,7 +231,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
                         
                     }
                     var temp=[];
-                    console.log("observer list is " + that._list.length);
+                  //  console.log("observer list is " + that._list.length);
                     for(var k=0;k<that._list.length;k++){
                         if(that._list[k].found !== true){
                             temp.push(that._list[k]);
@@ -246,7 +246,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
                         Harvey.Observer.disconnect(); //stop observing
                     }
 
-                    console.log("observer list is now " + that._list.length);
+                   // console.log("observer list is now " + that._list.length);
                 };
                 if(!Harvey.Observer){
                     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;

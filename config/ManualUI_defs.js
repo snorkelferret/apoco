@@ -56,7 +56,7 @@ require("../index.js");
     function mkArrays(){
         var thing;
         for(var k in HThings){
-            console.log("k is " + k);
+           // console.log("k is " + k);
             switch(k){
             case "Fields":
                 thing=Harvey.field;
@@ -98,10 +98,10 @@ require("../index.js");
                        }
                    }
                    else if(k==="Displays"){
+                      // console.log("got display " + n);
                        if(n.indexOf("Methods")<= -1){
                            HThings[k].push(n);
                        }
-                    
                    }
                    else{
                        HThings[k].push(n);
@@ -326,13 +326,13 @@ require("../index.js");
     };
 
     var Options=mkDefaultOptions();
-    
+  /*  
     for(var k in Options){
         console.log("Field is " + k);
         console.log("with options " + JSON.stringify(Options[k]));
     }
     
-     
+ */    
   /*  
     var checkDefaultOptions=function(f,d){
         var p=$.extend({},Options[f],d);
@@ -423,7 +423,7 @@ require("../index.js");
       //  var field_options=Harvey.field._getAllSettings;
         for(var i=0;i<HFields.length;i++){
             var c="";
-            console.log("Creating command for " + HFields[i]);
+            //console.log("Creating command for " + HFields[i]);
             //var c="var dataObject={name:'anyName', editable: true, field:'" + HFields[i] + "'";
             if(no_var_equals){
                 c="{field:'" + HFields[i] + "'";
@@ -436,7 +436,7 @@ require("../index.js");
                 c=c.concat("," + k + ":" + JSON.stringify(Options[HFields[i]][k]) );
             }
            
-            console.log(" c is " + c);
+            //console.log(" c is " + c);
             // get the globally required opts
             v=field_options["required"];
             for(k in v){
@@ -455,13 +455,13 @@ require("../index.js");
                 var fd=field_desirable[HFields[i]];
                 for(var j=0;j<fd.length;j++){
                     var n=field_options[HFields[i]].options[fd[j]];
-                    console.log("desirable field " + fd[j] + " type " + n.type );
+                    //console.log("desirable field " + fd[j] + " type " + n.type );
                     
                     if(n){
                         c=c.concat(","+ fd[j] + ":");
-                        console.log("adding desirable field " + fd[j] + " with type " + n.type);
+                      //  console.log("adding desirable field " + fd[j] + " with type " + n.type);
                         if(n.default !== undefined){
-                            console.log("adding default " + n.default);
+                        //    console.log("adding default " + n.default);
                             c=c.concat(n.default);
                         }
                         else if(n.type){
@@ -470,14 +470,14 @@ require("../index.js");
                                     n.type=field_options[HFields[i]].options["type"].params[0];
                                 }
                             }
-                            console.log("getting value for " + n.type + " is " + getAType[n.type]);
+                          //  console.log("getting value for " + n.type + " is " + getAType[n.type]);
                             c=c.concat(JSON.stringify(getAType[n.type]));
                         }
                     }
                 }
             }
             c=c.concat("};");
-            console.log("Made command index i " + i + " cmd " + c);
+           // console.log("Made command index i " + i + " cmd " + c);
             Commands[i]=c;
         }
         return Commands;
@@ -518,22 +518,22 @@ require("../index.js");
                           {name: "Input_params",field: "TextAreaField", value: Commands[i]}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
-                               console.log("button action is here");
+       //                        console.log("button action is here");
                                var f=that.parent.getChild("Input_params");
                                if(!f){
                                    throw new Error("can't get input params");
                                }
                                $.globalEval(f.getValue());
                                
-                               console.log("parms are " + dataObject);
+                      //         console.log("parms are " + dataObject);
                                if(Harvey.checkType["object"](dataObject)){
-                                   console.log("and it is an object");
+                      //             console.log("and it is an object");
                                    var name=dataObject.name;
                                    if(that.parent.getChild(name)){
-                                       console.log("deleting child");
+                     //                  console.log("deleting child");
                                        that.parent.deleteChild(name);
                                    }
-                                   console.log("adding child");
+                       //            console.log("adding child");
                                    that.parent.addField(dataObject);
                                }
                                else{
@@ -551,7 +551,7 @@ require("../index.js");
     var select_menu=function(that){
         var name=that.name;
         var p=that.parent.getSiblings();
-        console.log("selecting menu for " + name);
+       // console.log("selecting menu for " + name);
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
         }
@@ -889,7 +889,7 @@ require("../index.js");
                   options:[
                       {label:"userSortable",descriptions:["type: boolean","can the user sort the cols","userSortable and sortOrder are mutually exclusive"]},
                       {label:"sortOrder",descriptions:["type:stringArray","column names to sort the grid rows","example","<code>sortOrder:['colname1','colname2']<code","sort the rows first by colname1 and then colname2"]},
-                      {label:"subGrid",descriptions:["type: object","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if subGrid.name is supplied the heading on the subGrid is prefaced with subGrid.name"]},
+                      {label:"groupby",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a label it will be used as a the subgrid seperator"]},
                       {label:"uniqueKey",descriptions:["type: string","the column name of the uniqueKey if it exists"]},
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]}
                   ]}, 
@@ -926,7 +926,7 @@ require("../index.js");
             k.id=HDisplays[i];
             k.dependsOn=HDisplays[i];
             k.action=function(that){
-                console.log("triggering click");
+               // console.log("triggering click");
                 var p=that.getChild("doit");
                 $(p.element).trigger("click");
             },
@@ -1098,7 +1098,7 @@ require("../index.js");
     
     var select_tabs=function (that){
         var name=that.name;
-        console.log("select_tabs: trying to show " + name);
+      //  console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Harvey.Panel.hide(that.parent.selected.name);
         }
@@ -1162,14 +1162,14 @@ require("../index.js");
         var HPanels=HThings["Panels"].concat(HThings["PanelComponents"]);
         
         for(var i=0;i<HPanels.length;i++){
-            console.log("mkPanelMethods making " + HPanels[i]);
+          //  console.log("mkPanelMethods making " + HPanels[i]);
             var cmd={
                 UIStart:"Harvey.Panel.UIStart();",
                 add:"Harvey.Panel.add({name: 'MyName', components:[{display:'tabs',DOM:'right',id:'TestTabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]});",
                 "delete":"Harvey.Panel.delete('MyName');",
                 clone:"Harvey.Panel.clone(child_display_object)",
                 deleteAll:"Harvey.Panel.deleteAll();",
-                get: "Harvey.Panel.get('MyName');",
+                get: "var v=Harvey.Panel.get('MyName');",
                 getList:"var v=Harvey.Panel.getList();",
                 hide:"Harvey.Panel.hide('MyName');",
                 hideAll:"Harvey.Panel.hideAll();",
@@ -1187,7 +1187,7 @@ require("../index.js");
             k.DOM="right";
             k.hidden=true;
             k.id=(HPanels[i] + "Methods").toString();
-            console.log("methods description is " + panel_methods[HPanels[i]]);
+           // console.log("methods description is " + panel_methods[HPanels[i]]);
             k.components=[{node: "heading", size: "h3", text: "Methods"},
                           {node: "heading",size: "h4",text: HPanels[i]},
                           {node: "descriptionList", items:panel_methods[HPanels[i]]},
@@ -1200,13 +1200,28 @@ require("../index.js");
                               }
                               
                               var n=that.parent.id.split("Methods");
-                              console.log("got " + n[0]);
+                            //  console.log("got " + n[0]);
                               if(Harvey.Panel.get('Panels').getChild(("test"+ n[0]))){
                                   Harvey.Panel.get('Panels').deleteChild(("test"+n[0]));
                               }
+                              window.v=null;
+                              that.parent.getChild("Result").setValue("");
                               $.globalEval(f.getValue());
-                          }}
-                          
+                              var nf=that.parent.getChild("Result");
+                             // console.log("methods doit got " + v);
+                              if(v !== undefined){
+                                  if(Harvey.checkType["object"](v)){
+                                      nf.setValue("Object");
+                                  }
+                                  else{
+                                      nf.setValue(JSON.stringify(v));
+                                  }
+                              }
+                               
+                           }},
+                          {node:"paragraph",text:"Result"},
+                          {field:"StaticField",name:"Result",type:"string" }
+                                                    
                          ];
            UI.Panels.Panels.components.push(k);  
         }

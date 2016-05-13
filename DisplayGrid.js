@@ -297,14 +297,14 @@ jsonishData={
 			subgrid[n].name = that.rows[i][that.groupBy];
 			subgrid[n].rows = new Array;
 		    }
-		    subgrid[n]["rows"].push(that.rows[i]);
+		    subgrid[n]["rows"].push(that.rows[i]); 
 		}
+                that.rows.length=0; //
 	    }
 	    else{
                 subgrid["all"]=new Object;
 		subgrid["all"].rows=that.rows;
 	    }
-	   // that.rows.length=0; // delete rows array
 	    that.grids=new Array;
 	    var i=0;
 	    for(var k in subgrid){
@@ -312,7 +312,7 @@ jsonishData={
 		i++;
 	    }
 	}
-        that.rows.length=0; //
+       	// that.rows.length=0; // delete rows array
 	if(!that.grids){
 	    throw new Error("Harvey.display.grid: no rows or grids in " + that.id);
 	}
@@ -431,9 +431,9 @@ jsonishData={
             else if(this.uniqueKey){
                 sortOrder=this.uniqueKey;
             }
-	    if(sortOrder){
+	    if(sortOrder.length > 0){
 		var ar=[],t,s;
-		for(var i=0; i< this.sortOrder.length; i++){
+		for(var i=0; i< sortOrder.length; i++){
 		    t=this.getColIndex(sortOrder[i]);
 		    //		console.log("col index is " + t);
 		    s=this.sortOrder[i];  // name of the column in the row
@@ -634,12 +634,16 @@ jsonishData={
                 sort_into_subGrids(this);
                 this.sort();
 	        for(var i=0;i<this.grids.length;i++){
+                  //  console.log("this is grid " + i);
                     this.addGrid(this.grids[i]);
                     body=this.grids[i].element.find("tbody");
                     rows=this.grids[i].rows;
+                //    console.log("grid has " + rows.length + " number of rows");
                     for(var j=0;j<rows.length;j++){
+                      //  console.log("adding row");
                         r=$(document.createElement("tr"));
                         for(var k=0;k<this.cols.length;k++){
+                         //   console.log("adding cell");
                             this._addCell(rows[j],this.cols[k],r);
                         }
                         body.append(r);

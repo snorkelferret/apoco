@@ -53,6 +53,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             case "anchor":
 		this.element.html(text);
 		this.text=text;
+                return;
             default:
                 throw new Error("Cannot set text of " + this.node);
             }

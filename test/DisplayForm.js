@@ -102,6 +102,10 @@ describe("DisplayForm",function(){
         t.show();
         assert.notStrictEqual($("#test_form").length,0);
     });
+    it("has put the fields in the dom ",function(){
+        console.log("form added " + $("#test_form").html() );
+        assert.strictEqual($("#test_form").find("li").length,5);
+    });
     it("can add another node",function(){
         assert.strictEqual(t.getNode().length,3);
         t.addNode({node:"paragraph",name:"Blah",text:"Blah blah blah"});

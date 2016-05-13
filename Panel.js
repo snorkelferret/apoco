@@ -111,12 +111,12 @@ require("./Utils");
             if(this.inList(d.name)){
                 throw new Error("Harvey,Window: " + d.name + " already exists");
             }
-	    //console.log("creating new window");
-            //for(var k in d.opts){
-            //    console.log("option is " + k);
-            //}
+	  //  console.log("creating new window");
+            for(var k in d.opts){
+                console.log("option is " + k);
+            }
 	    if(!d.opts){
-               // console.log("NO OPTS FOR WINDOW");
+         //      console.log("NO OPTS FOR WINDOW");
 	        settings="_blank"; // open in new tab
 	    }
             else{
@@ -129,7 +129,7 @@ require("./Utils");
                         settings=settings.concat(("," + k + "=" + n[k]));
                     }
                 }
-               // console.log("settings are " + settings);
+            //   console.log("settings are " + settings);
             }
 	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
 	    var p=$.Deferred();
@@ -139,16 +139,16 @@ require("./Utils");
 	    window.addEventListener("childReady",function(){
 	        return function(e){
 		    if(e.data === win){
-		 //       console.log("window equals e.data");
+		        console.log("window equals e.data");
                         that._list[d.name]=win;
 		        p.resolve({"window":win,"name": d.name});
 		    }
-		   // console.log("Parent child is ready");
+		    console.log("Parent child is ready");
 		};
 	    }(d.name,win,p),false);
             p.done(function(d){
                 d.window.onunload=function(e){
-                    //console.log("got child closed " + d.name);
+                  //  console.log("got child closed " + d.name);
                     // delete the window from the list
                     var p=that._list[d.name];
 
@@ -173,6 +173,9 @@ require("./Utils");
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
         UIStart:function(w){
             var nv;
+            if(w === undefined){
+                throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
+            }
             for(var i=0;i<w.length;i++){
                 nv=$.extend( true,{},this._UIGet(w[i]));
                 if(nv !== null){
@@ -247,7 +250,7 @@ require("./Utils");
             var p=this.get(k);
           //  console.log("hiding window " + k);
             if(!p){
-                throw new Error("Cannot find window " + k);
+                throw new Error("Panel.hide Cannot find panel " + k);
             }
             var c=p.getChildren();
             for(var i=0;i<c.length;i++){
@@ -263,35 +266,36 @@ require("./Utils");
             return l;
         },
         clone: function(panel,win){ // clone an existing panel and put in new window
+            var stuff={},np,p,name,i=0;
+            
             if(!win){
                 throw new Error("Harvey,Panel.clone: needs a window parm");
             }
-            var p=this.get(panel);
-            if(p){
-                var stuff=this._UIGet(panel);
-                stuff.window=win;
-                stuff.name=(panel + "Clone");
-                    for(var i=0;i<p.components.length;i++){
-                        if(p.components[i].getJSON){
-                            var d=p.components[i].getJSON();
-                            if(d.rows){
-                                for(var i=0;i<20;i++){
-                                    console.log("clone got " + d.rows[i]['price']);
-                                }
-                            }
-                           $.extend(stuff.components[i],d);
-                        }
-                    }
-                var np=Harvey._panelComponents(stuff);
-                this._list.push(np);
+            p=this.get(panel);
+            if(p !== null){
+                name=panel;
+                np=this._UIGet(panel); //need to change the name
+                if(np == null){
+                    throw new Error("Panel can't find " + panel + " in UI.Panels");
+                }
+                while(this.get(name) !== null){
+                    i++;
+                    name=(name + i);
+                }
+                np.name=name;
+                console.log("name is " + name + " i is " + i);
+                for(var j=0;j<np.components.length;j++){
+                    np.components[j].id = ( np.components[j].id + i);
+                }
+                return np;
             }
             else{
                 throw new Error("Harvey.Panel.clone: No panel named " + panel + " found");
             }
         },
 	add: function(panel){
-	    //console.log("Panel.add is here");
-	    //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+	 //   console.log("Panel.add is here");
+	//    console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
             if(Harvey.checkType['string'](panel)){
                 var w=this._UIGet(panel);
                 panel=w;
@@ -301,9 +305,9 @@ require("./Utils");
 		check(panel.components);
 
 		var p=Harvey._panelComponents(panel);
-	//	 for(var k in p){
-	//	     console.log("panel base has keys " + k);
-	//	 }
+		 for(var k in p){
+		     console.log("panel base has keys " + k);
+		 }
 		this._list.push(p);
 	    }
 	    else{
@@ -315,12 +319,12 @@ require("./Utils");
             var obj;
             var n=this._list.length;
             for(var i=0;i<n; i++){
-                console.log("window: removing panel " + this._list[i].name + " from list");
+               // console.log("window: removing panel " + this._list[i].name + " from list");
                	obj=this._list[i];
                 obj.deleteChildren();
                 if(d){
                     if(i===(n-1)){
-                        console.log("***********************************8delete is done");
+                       // console.log("***********************************8delete is done");
                         d.resolve();
                     }
                 }
@@ -339,7 +343,7 @@ require("./Utils");
 	    if(p !== null){
                 var obj=this._list[p];
                 obj.deleteChildren();
-		console.log("panel: removing panel " + obj.name + " from list");
+	//	console.log("panel: removing panel " + obj.name + " from list");
 		this._list.splice(p,1);
                 for(var k in obj){
                   //  console.log("DELETING " + k);
@@ -352,48 +356,25 @@ require("./Utils");
                 obj=null;
             }
             else {
-                throw new Error(obj.name + "is not in the list of Panels");
+                throw new Error("Harvey.Panel delete -" + name + "is not in the list of Panels");
             }
-	}//,
-/*	delete: function(obj){
-            if(!obj || !obj.name){
-                throw new Error("Harvey.Panel delete unknown object");
-            }
-	    var p=this.inList(obj.name);
-	    if(p !== null){
-                obj.deleteChildren();
-		console.log("panel: removing panel " + obj.name + " from list");
-		this._list.splice(p,1);
-                for(var k in obj){
-                  //  console.log("DELETING " + k);
-                    delete obj[k];
-                    
-                }
-               // for(var k in obj){
-               //     console.log("uiuyiuiyiuuyiiuyuyiyiuuyiuyiuiyyiuiyu " + k);
-               // }
-                obj=null;
-            }
-            else {
-                throw new Error(obj.name + "is not in the list of Panels");
-            }
-	} */
+	}
     };
     var _Components=function(obj){
         var that=this;
 	for(var k in obj){
 	    this[k]=obj[k];
-	   //console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
+	     console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
 	}
 
 	if(this.window){
 	    var p=Harvey.Window.open(this.window);  // create a new browser window
 	    p.done(function(w){
 		w.window.focus();
-                console.log("got object from window.open.done");
-                for(var k in w){
-                    console.log("obj has parm " + k + " with value " + w[k]);
-                }
+            //    console.log("got object from window.open.done");
+          //      for(var k in w){
+          //          console.log("obj has parm " + k + " with value " + w[k]);
+           //     }
 		that.window=w.window;
 	        that._addComponents();
 	    } );
@@ -419,11 +400,11 @@ require("./Utils");
 
 	    for(var i=0;i<this.components.length;i++){
 		var p=this.components[i].display;
-                //console.log("adding component " + p);
+                console.log("adding component " + p);
 		this.components[i].parent=this;
                // console.log("addComponents window is " + that.window);
 	        var d=Harvey.display[p](this.components[i],that.window);
-                //var d=Harvey.display[p](this.components[i]);
+                var d=Harvey.display[p](this.components[i]);
 		if(d === null){
 		    throw new Error("could not create " + p);
 		    return;
@@ -475,7 +456,7 @@ require("./Utils");
                 throw new Error("Panel: has no children " + this.name);
             }
             for(var i=0;i<this.components.length;i++){
-                console.log("panel_components.deleteChildren: " + this.components[i].display);
+            //    console.log("panel_components.deleteChildren: " + this.components[i].display);
                 if(this.components[i].listen){
                     Harvey.IO.unsubscribe(this.components[i]);
                 }
@@ -490,7 +471,7 @@ require("./Utils");
                 throw new Error("Harvey.Panel: deleteChild obj is null");
             }
             if(Harvey.checkType['string'](obj)){
-                console.log("got string for delete child");
+              //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
 

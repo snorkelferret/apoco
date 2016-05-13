@@ -45,7 +45,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             this.tabs.length=0;  // so we can put them back in clean container
             this.element.append(tablist);
             for(var i=0;i<tt.length;i++){
-                console.log("add a tab with index " + i);
+            //    console.log("add a tab with index " + i);
                 this.addTab(tt[i],tablist);
 	    }
             if(this.selected){

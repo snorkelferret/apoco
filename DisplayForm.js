@@ -22,7 +22,7 @@ require("./DisplayFieldset");
     // overwrite methods from base class
     HarveyMakeForm.prototype={
 	execute: function(){
-	    var that=this;
+	    var that=this,fp,header,container,fc;
             
 	    this.element=$("<div id='" + this.id + "' class='harvey_form ui-widget ui-widget-content ui-corner-all '></div>");
 
@@ -35,7 +35,7 @@ require("./DisplayFieldset");
             this.element.height(this.height);
             this.element.width(this.width);
 
-	    var header=$("<div class='form_header ui-widget ui-state-default ui-widget-header ui-corner-all'></div>");
+	    header=$("<div class='form_header ui-widget ui-state-default ui-widget-header ui-corner-all'></div>");
 
 	    this.element.append(header);
 
@@ -43,8 +43,8 @@ require("./DisplayFieldset");
 		this.element.draggable({handle: ".form_header", containment: "window"});
 	    }
 
-	    var container=$("<div class='form_scroll'></div>");
-	    var fc=$("<div class='form_content'></div>");
+	    container=$("<div class='form_scroll'></div>");
+	    fc=$("<div class='form_content'></div>");
 
 	    this.element.append(fc);
             fc.append(container);
@@ -70,23 +70,21 @@ require("./DisplayFieldset");
 	    }(this));
 	    close[0].addEventListener("click",c,false);
 
-            var fp=$("<ul class='harvey_form_list'></ul>");
-            var p;
+            fp=$("<ul class='harvey_form_list'></ul>");
+            container.append(fp);
+            
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
-   
 	            if(this.components[i].node){
-                        this.addNode(this.components[i]);
+                        this.addNode(this.components[i],fp);
 		    }
 	            else if(this.components[i].field || this.components[i].type){
-	                p=this.addField(this.components[i]);
+	                this.addField(this.components[i],fp);
 		    }
-                  //  fp.append(ll);
-                }
+                }                   
                 this.components.length=0; // delete
             }
-            container.append(fp);
-
+        
 	    if(this.buttons){
 		var button_container=$("<div class='form_button_container ui-widget-content'></div>");
 		this.element.append(button_container);
@@ -110,13 +108,17 @@ require("./DisplayFieldset");
                 }
 	    });
 	},
-        addNode:function(d,el){
-            var n,parent_element;
+        addNode:function(d,parent_element){
+            var n;
             var ll=$("<li></li>");
+            if(parent_element === undefined){
+                parent_element=this.element.find("ul.harvey_form_list");
+            }
             if(d.name && this.getNode(d.name)!==null){
                     throw new Error("Cannot add node with non-unique name");
             }
             if(d.element && d.element.length>0){
+                //console.log("ELEMENT ALREADY EXISTS");
                 if(!d.node){
                     throw new Error("Harvey.displayFieldset: addNode - object is not a node");
                 }
@@ -126,7 +128,10 @@ require("./DisplayFieldset");
                 n=Harvey.node(d,ll);
             }
             if(n){
-                this.element.find("ul.harvey_form_list").append(n.element);
+                if(!n.element || n.element.length === 0){
+                    throw new Error("DisplayForm.addNode element is null");
+                }
+                parent_element.append(ll);
                 n.parent=this;
 	        this.nodes.push(n);
                 return n;
@@ -134,11 +139,14 @@ require("./DisplayFieldset");
             else{
                 throw new Error("Harvey,fieldset, doesn't know how to make " + d.node);
             }
-            return null;
+            return n;
         },
-        addField: function(d,el){
-            var p,parent_element;
+        addField: function(d,parent_element){
+            var p;
             var ll=$("<li></li>");
+            if(parent_element === undefined){
+                parent_element=this.element.find("ul.harvey_form_list");
+            }
             if(!d.field){
                 if(d.type){
                     d.field=Harvey.dbToHtml[d.type].field;
@@ -154,6 +162,7 @@ require("./DisplayFieldset");
             if(Harvey.field.exists(d.field)){
                 // check that the field has not already been created
                 if(d.element && d.element.length>0){
+                   // console.log("ELEMENT ALREADY EXISTS");
 		    p=d;
                 }
                 else{
@@ -168,7 +177,7 @@ require("./DisplayFieldset");
             }
             p.parent=this;
 	    this.fields.push(p);
-	    this.element.find("ul.harvey_form_list").append(p.element);
+	    parent_element.append(p.element);
             
             return p;
         },

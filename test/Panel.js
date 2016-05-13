@@ -88,6 +88,31 @@ describe("Panel",function(){
         console.log("t is %j", t);
         assert.strictEqual(Harvey.Panel.inList("test_panel"),null);
     });
+});
+
+
+describe("Panel - clone",function(){
+    var $= global.jQuery; 
+    var t;
   
+    require("../Panel.js");
+    require("./data/TestUI_defs.js");
+    it("creates a tab display object",function(){
+        $("body").append("<div id='test'></div>");
+        assert($("#test").length>0);
+        t=Harvey.Panel.add("TestPanel");
+        assert.isObject(t);
+    });
+    it("has put a node called AboutMenu in the dom",function(){
+        assert.strictEqual($("AboutMenu").length,0);
+    }); 
+    it("can clone a panel",function(){
+        var b=Harvey.Panel.clone("TestPanel",window);
+        assert.isObject(b);
+    });
+    it("has put a node called AboutMenu1 in the dom",function(){
+        assert.strictEqual($("AboutMenu1").length,0);
+    });
+    
     
 });

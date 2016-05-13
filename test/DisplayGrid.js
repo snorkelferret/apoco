@@ -93,7 +93,7 @@ describe("DisplayGrid-(start without rows)",function(){
 
 
 
-describe("DisplayGrid-(start with data)",function(){
+describe("DisplayGrid-(start with data and subgrids)",function(){
     var $= global.jQuery; 
     var t;
     require("../DisplayGrid.js");
@@ -158,6 +158,36 @@ describe("DisplayGrid-(start with data)",function(){
     it("deletes a column",function(){
         t.deleteCol("bid");
         
+    });
+    
+});
+
+describe("DisplayGrid-(start with data but no subgrids)",function(){
+    var $= global.jQuery; 
+    var t;
+    require("../DisplayGrid.js");
+    var data={ id:"test_grid",DOM:"test",
+               cols:[{name:"one",type: "integer" },
+                     {name: "two",type: "string"}],
+               rows:[{one: 20 ,two: "hat"},
+                     {one: 22, two: "big"}]
+             };
+    it("creates a grid display object",function(){
+        $("body").append("<div id='Content'></div>");
+        assert($("#test").length>0);
+        t=Harvey.display.grid(data);
+        assert.isObject(t);
+    });
+    it("creates a jquery container",function(){
+        assert.notStrictEqual($("#test_grid"),0); 
+    });
+    it("can add a row",function(){
+        var b=t.getGrid("all").rows.length;
+        b++;
+        var n=t.addRow({one: 33 , two: "fig"});
+        var c=t.getGrid("all").rows.length;
+        console.log("b is " + b +  " and c " + c);
+        assert.strictEqual(b,c);
     });
     
 });

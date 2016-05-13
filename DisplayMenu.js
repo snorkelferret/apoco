@@ -115,15 +115,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                 this.menu[index]=d;
                 
                 if(d.action !==undefined){
-                    console.log("menu has action " + this.menu[index].action);
+                    //console.log("menu has action " + this.menu[index].action);
 	          //  this.menu[index].element[0].addEventListener("click",
                     //  function(that,index){
                     d.element.on("click",
                                  function(t,that){
                                      return function(e){
                                          e.stopPropagation();
-                                         console.log("menu name is " + t.name);
-                                         console.log("menu has action " + t.action);
+                      //                   console.log("menu name is " + t.name);
+                      //                   console.log("menu has action " + t.action);
                                          t.action(t);
                                          that.select(t.name);
                                      };
