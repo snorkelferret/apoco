@@ -1,4 +1,5 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
+
 
 // check that we have the string methos to remove leading and trailing whitespace
 
@@ -10,8 +11,9 @@ String.prototype.trim = String.prototype.trim || function trim() {
 ;(function(){
     var DEBUG=true;
     'use strict';
-
-    Harvey.Utils={
+    Harvey.mixinDeep=require("mixin-deep");
+    Harvey.cloneDeep=require("clone-deep");
+    Harvey.Utils={  
         getCssValue:function(css_class,rule){
             var stylesheets = document.stylesheets;
             for(var j=0;j< stylesheets.length; j++){
@@ -133,7 +135,62 @@ String.prototype.trim = String.prototype.trim || function trim() {
 		}
 	    }
 	},
-        formatDate: function(d){
+  
+        draggable:function(source,destination){
+            if(destination === undefined){
+                destination=document.body;
+            }
+            
+            var allowDrag=function(e){
+              //  console.log("allow drag is here");
+                e.preventDefault();
+                return false;
+            };
+            var dragEnd=function(e){
+               // console.log("dragEnd is here");
+                e.stopPropagation();
+                console.log("dragend is here");
+                destination.removeEventListener("drop",drop);
+                destination.removeEventListener("dragover",allowDrag);
+                
+            };
+            var drop=function(e){
+               // return function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var data=e.dataTransfer.getData("text").split(",");
+                        
+                    console.log("drop is " + source.getElementsByTagName("p")[0].textContent);
+                    if(source.classList.contains("draggable")){
+                        source.style.left = (e.clientX + parseInt(data[0],10)) + 'px';
+                        source.style.top = (e.clientY + parseInt(data[1],10)) + 'px';
+                        source.classList.remove("draggable");
+                    }
+                    //  document.body.removeChild(document.getElementById("temp_clone"));
+                    return false;
+               // };
+            };
+            
+            var dragStart=function(e){
+              //  console.log("dragStart is here ");
+                e.target.classList.add("draggable");
+                destination.addEventListener("dragover",allowDrag,false);
+                destination.addEventListener("drop",drop,false);
+                var style=window.getComputedStyle(e.target, null);
+                    //e.dataTransfer.setData("text", e.target.id);
+                e.dataTransfer.setData("text",  (parseInt(style.getPropertyValue("left"),10) - e.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - e.clientY));
+            };
+            
+            //console.log("draggable is here draggable is " + source.draggable);
+            if(source.draggable=== false){
+               // console.log("dragable is false");
+                source.draggable=true;
+                source.addEventListener("dragstart",dragStart,false);
+                source.addEventListener("dragend",dragEnd,false);
+            }
+                        
+        },
+        formatDate: function(d){ //YYYY-MMM-DD to human
             //	console.log("date is " + d);
 	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	    var months = ["January", "February", "March", "April", "May",

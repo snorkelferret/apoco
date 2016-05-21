@@ -41,6 +41,27 @@ describe("CheckType(phoneNumber)",function() {
     });
 });
 
+describe("CheckType(number)",function() {
+    it("returns false on empty string",function(){
+        assert.strictEqual(Harvey.checkType["number"](""),false);
+    });
+    it("returns false on a string",function(){
+        assert.strictEqual(Harvey.checkType["number"]("rew"),false);
+    });
+    it("returns true on a positive integer",function(){
+        assert.strictEqual(Harvey.checkType["number"]("10"),true);
+    });
+    it("returns true on a negative integer",function(){
+        assert.strictEqual(Harvey.checkType["number"](-10),true);
+    });
+    it("returns true on a positive float",function(){
+        assert.strictEqual(Harvey.checkType["number"]("10.43"),true);
+    });
+    it("returns true on a negative float",function(){
+        assert.strictEqual(Harvey.checkType["number"]("-10.43"),true);
+    });
+    
+});
 describe("CheckType(negative integer)",function() {
     it("returns false on empty string",function(){
         assert.strictEqual(Harvey.checkType["negativeInteger"](""),false);

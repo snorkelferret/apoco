@@ -21,8 +21,11 @@ describe("DisplayForm-(start without fields)",function(){
     var t;
     require("../DisplayForm.js"); 
     it("creates a form display object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
+        var b=document.createElement("div");
+        b.id="test";
+        document.getElementsByTagName("body")[0].appendChild(b);
+        //$("body").append("<div id='test'></div>");
+        assert.strictEqual(document.contains(b),true);
         t=Harvey.display.form({id:"test_form",DOM:"test"});
         assert.isObject(t);
     });
@@ -37,9 +40,11 @@ describe("DisplayForm-(start without fields)",function(){
         assert.strictEqual(t.getNode().length,1);
     });
     it("has a show method which adds the root element to the DOM",function(){
-        assert.strictEqual($("#test_form").length,0);
+        var b=document.getElementById("test_form");
+        assert.strictEqual(document.contains(b),false);
         t.show();
-        assert.notStrictEqual($("#test_form").length,0);
+        b=document.getElementById("test_form");
+        assert.strictEqual(document.contains(b),true);
     });
     it("can add a button",function(){
         assert.strictEqual(t.getButton().length,0);
@@ -57,13 +62,15 @@ describe("DisplayForm-(start without fields)",function(){
         assert.strictEqual(t.getNode().length,2);
     });
     it("has added the node to the dom",function(){
-        assert.notStrictEqual(t.getElement().find("p[name='Blah']").length,0);
+        var b=t.getElement().querySelector("p[name='Blah']");
+        assert.strictEqual(document.contains(b),true);
     });
     it("can delete a node",function(){
         assert.strictEqual(t.getNode().length,2);
         t.deleteNode("Blah");
         assert.strictEqual(t.getNode().length,1);
-        assert.strictEqual(t.getElement().find("[name='Blah']").length,0);
+        var b=t.getElement().querySelector("p[name='Blah']");
+        assert.strictEqual(document.contains(b),false);
     });
     
     
@@ -74,8 +81,13 @@ describe("DisplayForm",function(){
     var t;
     require("../DisplayForm.js"); 
     it("creates a form display object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
+        var b=document.createElement("div");
+        b.id="test";
+        document.getElementsByTagName("body")[0].appendChild(b);
+        //$("body").append("<div id='test'></div>");
+        assert.strictEqual(document.contains(b),true);
+        //$("body").append("<div id='test'></div>");
+        //assert($("#test").length>0);
         t=Harvey.display.form({id:"test_form",DOM:"test",
                                components:[{node:"heading",size:"h2",text:"Start"},
                                            {node:"paragraph",text:"hullo people"},
@@ -98,31 +110,46 @@ describe("DisplayForm",function(){
         assert.strictEqual(t.getField().length,2);
     });
     it("has a show method which adds the root element to the DOM",function(){
-        assert.strictEqual($("#test_form").length,0);
+        var b=document.getElementById("test_form");
+        assert.strictEqual(document.contains(b),false);
         t.show();
-        assert.notStrictEqual($("#test_form").length,0);
+        b=document.getElementById("test_form");
+        assert.strictEqual(document.contains(b),true);
     });
     it("has put the fields in the dom ",function(){
-        console.log("form added " + $("#test_form").html() );
-        assert.strictEqual($("#test_form").find("li").length,5);
+        //console.log("form added " + $("#test_form").html() );
+        var b=document.getElementById("test_form").getElementsByTagName("li");
+        assert.strictEqual(b.length,5);
     });
     it("can add another node",function(){
         assert.strictEqual(t.getNode().length,3);
         t.addNode({node:"paragraph",name:"Blah",text:"Blah blah blah"});
         assert.strictEqual(t.getNode().length,4);
     });
-    it("has added the node to the dom",function(){
-        assert.notStrictEqual(t.getElement().find("p[name='Blah']").length,0);
+    it("has added the paragraph node to the dom",function(){
+        // var b=document.querySelector("#test_form p[name='Blah']");
+        var b=document.getElementById("test_form").querySelector("p[name='Blah']");
+        assert.strictEqual(document.body.contains(b),true);
     });
     it("can delete a node",function(){
         assert.strictEqual(t.getNode().length,4);
         t.deleteNode("Blah");
         assert.strictEqual(t.getNode().length,3);
-        assert.strictEqual(t.getElement().find("[name='Blah']").length,0);
+        var b=document.getElementById("test_form").querySelector("p[name='Blah']");
+        assert.strictEqual(document.body.contains(b),false);
+        //assert.strictEqual(t.getElement().find("[name='Blah']").length,0);
+    });
+    it("has added some buttons",function(){
+        assert.strictEqual(t.getButton().length,1);
+    });
+    it("has added the buttons to the DOM",function(){
+        var b=document.getElementById("test_form").getElementsByTagName("button");
+        assert.strictEqual(b.length,1);
     });
     it("has added a callback to the button",function(){
         assert.strictEqual(t.getField("ID").getValue(),"10");
-        t.getElement().find("button[name='OK']").trigger("click");
+        var b=document.getElementById("test_form").querySelector("button[name='OK']");
+        b.click();
         assert.strictEqual(t.getField("ID").getValue(),"342");
     });
     

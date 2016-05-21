@@ -21,14 +21,31 @@ describe("Nodes",function(){
     var t;
     require("../Nodes.js"); 
     it("creates a anchor",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
-        t=Harvey.node({node:"anchor",text:"test"});
+        var b=document.createElement("div");
+        b.id="test";
+        document.getElementsByTagName("body")[0].appendChild(b);
+       // $("body").append("<div id='test'></div>");
+        assert.strictEqual(document.contains(b),true);
+        t=Harvey.node({node:"anchor",text:"test"},b);
+        assert.isObject(t);
+        assert.isObject(t.getElement());
+    });
+    it("has appended the anchor to the DOM",function(){
+        var b=document.querySelector("#test a");
+        //var b=c.getElementsByTagName("a")[0];
+        //var c=t.getElement();
+        assert.isObject(b);
+        assert.strictEqual(document.contains(b),true);
+    });
+    
+    it("creates a heading",function(){
+        var b=document.getElementById("test");
+        t=Harvey.node({node:"heading",size:"h2",text:"test",name:"myHeading"},b);
         assert.isObject(t);
     });
-    it("creates a heading",function(){
-        t=Harvey.node({node:"heading",size:"h2",text:"test"});
-        assert.isObject(t);
+    it("has added a name attribute to the heading element",function(){
+        var b=document.querySelector("#test h2[name='myHeading']");
+        assert.isObject(b);
     });
     it("creates a label",function(){
         t=Harvey.node({node:"label",text:"test"});
@@ -60,9 +77,9 @@ describe("Nodes",function(){
         t=Harvey.node({node:"paginate",number:4});
         assert.isObject(t);
     });
-     it("creates a progressBar",function(){
+/*    it("creates a progressBar",function(){
         t=Harvey.node({node:"progressBar",value:10});
         assert.isObject(t);
-    }); 
+    }); */
     
 });

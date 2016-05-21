@@ -32,18 +32,24 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	execute: function(){
             var tt=[],tablist;
 	    // console.log("execute of DisplayTabs");
-	    this.element=$("<div id='" + this.id + "' class='tab_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
+	    //   this.element=$("<div id='" + this.id + "' class='tab_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
+            this.element=document.createElement("div");
+            this.element.id=this.id;
+            this.element.classList.add("tab_container","ui-tabs","ui-widget","ui-widget-content","ui-corner-all");
 	    if(!this.tabs){
 	        this.tabs=[];
 	    }
 	    //console.log("Tabs creating new element");
-	    tablist=$("<ul role='tablist' class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all tabs' > </ul>");
+	    //tablist=$("<ul role='tablist' class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all tabs' > </ul>");
+            tablist=document.createElement("ul");
+            tablist.role="tablist";
+            tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
             // make a copy of the tabs
             for(var i=0;i<this.tabs.length;i++){
                 tt[i]=this.tabs[i];
             }
             this.tabs.length=0;  // so we can put them back in clean container
-            this.element.append(tablist);
+            this.element.appendChild(tablist);
             for(var i=0;i<tt.length;i++){
             //    console.log("add a tab with index " + i);
                 this.addTab(tt[i],tablist);
@@ -54,17 +60,22 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return true;
 	},
         addTab:function(t,tablist){
-            var label,index;
+            var label,index,s;
             t.label?label=t.label: label=t.name;
             if(tablist === undefined){
-                tablist=this.element.find("ul.ui-tabs-nav");
+                tablist=this.element.querySelector("ul.ui-tabs-nav");
             }
             index=this.tabs.length;
 	    //if(this.DEBUG)console.log("tabs.execute creating tab  " );
-	    t.element=$("<li class='ui-state-default ui-corner-top'><span>" +  label + "</span> </li>");
+	    //t.element=$("<li class='ui-state-default ui-corner-top'><span>" +  label + "</span> </li>");
+            t.element=document.createElement("li");
+            t.element.classList.add("ui-state-default","ui-corner-top");
+            s=document.createElement("span");
+            s.textContent=label;
+            t.element.appendChild(s);
 	    t.parent=this;
             if(t.action){
-		t.element[0].addEventListener("click",
+		t.element.addEventListener("click",
 					      function(tab,that){
 						  return function(e){
 						      e.preventDefault();
@@ -82,7 +93,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                 }
             );
             this.tabs[index]=t;
-	    tablist.append(t.element);
+	    tablist.appendChild(t.element);
         },
         getTab:function(name){
             if(name !== undefined){
@@ -100,8 +111,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                 if(this.tabs[i].listen){
                     Harvey.unsubscribe(this.tabs[i]);
                 }
-                this.tabs[i].element.empty();
-                this.tabs[i].element.remove();
+                //this.tabs[i].element.empty();
+                this.tabs[i].element.parentNode.removeChild(this.tabs[i].element);
+                this.tabs[i].element=null;
             }
             this.tabs.length=0;
         },
@@ -122,7 +134,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             if(this.tabs[i].listen){
                     Harvey.unsubscribe(this.tabs[i]);
             }
-            this.tabs[index].element.remove();
+            this.tabs[index].element.parentNode.removeChild(this.tabs[index].element);
+            this.tabs[index].element=null;
             this.tabs.splice(index,1);
         },
 	update:function(name){
@@ -133,7 +146,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 		}
 	    }
 	    if(p){
-		p.element.trigger('click');
+		p.element.click();
 	    }
 	    else{
 		throw new Error("Harvey.tabs Could not find element " + name);
@@ -149,10 +162,10 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    for(var i=0;i<this.tabs.length;i++){
 		if(this.tabs[i].name == name){
                     this.selected=this.tabs[i];
-		    this.tabs[i].element.addClass("ui-state-active ui-tabs-active");
+		    this.tabs[i].element.classList.add("ui-state-active","ui-tabs-active");
 		}
 		else{
-		    this.tabs[i].element.removeClass("ui-state-active ui-tabs-active");
+		    this.tabs[i].element.classList.remove("ui-state-active","ui-tabs-active");
 		}
 	    }
 	}
@@ -162,7 +175,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     // Create the namespace
     // Harvey.display.tabs
-    $.extend(true, Harvey, {
+    // $.extend(true, Harvey, {
+    Harvey.mixinDeep(Harvey,{
 	display: {
 	    tabs: function(opts,win){
                 opts.display="tabs";

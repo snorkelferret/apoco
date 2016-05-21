@@ -168,8 +168,8 @@ require("../index.js");
                               },
                       description:""
                     },
-        RadioButtonSetField:{required:{labels:{type:"stringArray"}},
-                             options:{multiple_selection:{type:"boolean",
+        ButtonSetField:{required:{labels:{type:"stringArray"}},
+                             options:{checkbox:{type:"boolean",
                                                           default: false},
                                       value:{type:"booleanArray"}},
                              description:""
@@ -208,11 +208,6 @@ require("../index.js");
                           },
         CheckBoxField:{ options:{ value:{type: "boolean",default: false}},
                         description: ""},
-        CounterField:{options:{value:{type:"integer",default: 1},
-                               min:{type: "integer",default: 1},
-                               type:{type: "integer"}},
-                      description:"adds a spinner- wrapper for the jQuery.spinner"
-                     },
         DateField:{options:{value:{type:"any",default:undefined,params:["Date","string"] }},
                    description:"This is just a wrapper for the jQuery datepicker, to access the jQuery element use var jquery_dp=my_field.getInputElement().datepicker;"
                   },
@@ -530,7 +525,7 @@ require("../index.js");
                       //             console.log("and it is an object");
                                    var name=dataObject.name;
                                    if(that.parent.getChild(name)){
-                     //                  console.log("deleting child");
+                                       console.log("deleting child");
                                        that.parent.deleteChild(name);
                                    }
                        //            console.log("adding child");
@@ -619,10 +614,12 @@ require("../index.js");
             stringArray:{test:'[["6767",7878,"re"]]'},
             text:{test:'["yuyuyuy",898.99]'},
             time:{test:'[78,"10:02 PM","23:33:45","10:34"]'},
-            token:{test:'["7878","78fs-rte",65]'}
+            token:{test:'["7878","78fs-rte",65]'},
+            range:{test:'[42.55,"3wa",42,-10]'}
         };
       
         for(var i=0;i<HTypes.length;i++){
+            console.log("======== type is ++++++++++= " + HTypes[i]);
             var k={};
             k.display="fieldset";
             k.DOM="right";
@@ -817,6 +814,7 @@ require("../index.js");
                 "return:jQueryObject",
                 "The input node"
             ]},
+            delete:{descriptions:[]},
             deleteValue:{ descriptions:[]},
             addValue:{ descriptions:[]},
             popupEditor:{descriptions:[]},
@@ -1059,11 +1057,12 @@ require("../index.js");
             alert:  function(c){ return c.concat('("Hi, An alert");');},
             clock:function(c){ return c.concat('("clock");');},
             dialog:function(c){return c.concat('("title","my message");');},
+            error:function(c){return c.concat('("title","my message");');},
             paginate:function(c){return c.concat('({DOM:"right",values:[{text:"1",action:function(that){alert("got a click");}},{text:"2",action:function(that){alert("got a click");}}]});');},
             progressBar:function(c){return c.concat( '(4);');},
             spinner: function(c){return c.concat('(true);');},
             statusCode:function(c){return c.concat( '[204]("");');},
-            trouble:function(c){return c.concat('("TEST TROUBLE");');}
+            trouble:function(c){return c.concat('("TEST TROUBLE","something horrible text")');}
         };
         
         for(var i=0;i<HPopups.length;i++){
@@ -1555,6 +1554,6 @@ require("../index.js");
     mkTypes();
     
     UI.start=["Tabs","About"];
-
+    console.log("Manual UI defs is %j " ,UI.Panels);
     
 })(jQuery);

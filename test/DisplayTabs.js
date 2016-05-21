@@ -21,8 +21,11 @@ describe("DisplayTabs-(start without tab items)",function(){
     var t;
     require("../DisplayTabs.js"); 
     it("creates a tab display object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
+        var b=document.createElement("div");
+        b.id="test";
+        //$("body").append("<div id='test'></div>");
+        document.getElementsByTagName("body")[0].appendChild(b);
+        assert.strictEqual(document.body.contains(b),true);
         t=Harvey.display.tabs({id:"test_tabs",DOM:"test"});
         assert.isObject(t);
     });
@@ -35,12 +38,16 @@ describe("DisplayTabs-(start without tab items)",function(){
         assert.strictEqual(t.getTab().length,2);
     });
     it("has a show method that puts the root element into the dom",function(){
-        assert.strictEqual($("#test_tabs").length,0);
+        var b=document.getElementById("test_tabs");
+        assert.strictEqual(document.body.contains(b),false);
         t.show();
-        assert.strictEqual($("#test_tabs").length,1);
+        var b=document.getElementById("test_tabs");
+        assert.strictEqual(document.body.contains(b),true);
+        
     });
     it("has put the tabs into the dom",function(){
-        assert.strictEqual($("#test_tabs").find("li").length,2);
+        var b=document.querySelectorAll("#test_tabs li");
+        assert.strictEqual(b.length,2);
     });
     it("can delete a tab",function(){
         t.deleteTab("tabOne");
@@ -53,11 +60,14 @@ describe("DisplayTabs",function(){
     var t;
     require("../DisplayTabs.js"); 
     it("creates a tab display object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
-        t=Harvey.display.tabs({id:"test_tabs",DOM:"test",
+        var b=document.createElement("div");
+        b.id="test2";
+        //$("body").append("<div id='test'></div>");
+        document.getElementsByTagName("body")[0].appendChild(b);
+        assert.strictEqual(document.body.contains(b),true);
+        t=Harvey.display.tabs({id:"test_tabs2",DOM:"test2",
                                tabs:[{name:"tabOne",action:function(that){
-                                   that.element.text("clicked");
+                                   that.element.textContent="clicked";
                                }},
                                      {name:"tabTwo"},
                                      {name:"tabThree"}
@@ -65,34 +75,45 @@ describe("DisplayTabs",function(){
         assert.isObject(t);
     });
     it("has a show method which puts the root element into the dom ",function(){
-        assert.strictEqual($("#test_tabs").length,0);
+        var b=document.getElementById("test_tabs2");
+        assert.strictEqual(document.body.contains(b),false);
         t.show();
-        assert.strictEqual($("#test_tabs").length,1);
+        var b=document.getElementById("test_tabs2");
+        assert.strictEqual(document.body.contains(b),true);         
     });
     it("has put the tabs into the dom",function(){
-        assert.strictEqual($("#test_tabs").find("li").length,3);
+        var b=document.getElementById("test_tabs2").getElementsByTagName("li");
+        assert.strictEqual(b.length,3);
     });
     it("executes the action function when clicked",function(){
-        var b=$("#test_tabs").find("li").first();
-        assert.notStrictEqual(b.length,0);
-        console.log("text in b is " + b.html());
-        b.trigger("click");
-        assert.strictEqual(b.text(),"clicked");
+        var b=document.getElementById("test_tabs2").getElementsByTagName("li")[0];
+        //var b=$("#test_tabs").find("li").first();
+        assert.isObject(b);
+        //console.log("text in b is " + b.html());
+        b.click();
+        assert.strictEqual(b.textContent,"clicked");
     });
     it("can add a tab",function(){
         t.addTab({name:"tabFour"});
         assert.strictEqual(t.getTab().length,4);
-        assert.strictEqual($("#test_tabs").find("li").length,4);
+        var b=document.getElementById("test_tabs2").getElementsByTagName("li");
+        assert.strictEqual(b.length,4);
     });
     it("can delete a tab",function(){
         t.deleteTab("tabTwo");
         assert.strictEqual(t.getTab().length,3);
     });
     it("can still execute the action function when clicked",function(){
-        var b=$("#test_tabs").find("li").first();
-        assert.notStrictEqual(b.length,0);
-        console.log("text in b is " + b.html());
-        b.trigger("click");
-        assert.strictEqual(b.text(),"clicked");
+        var b=document.getElementById("test_tabs2").getElementsByTagName("li")[0];
+        //var b=$("#test_tabs").find("li").first();
+        assert.isObject(b);
+        //console.log("text in b is " + b.html());
+        b.click();
+       // assert.strictEqual(b.textContent,"clicked");
+       // var b=$("#test_tabs").find("li").first();
+       // assert.notStrictEqual(b.length,0);
+        //console.log("text in b is " + b.html());
+        //b.trigger("click");
+        assert.strictEqual(b.textContent,"clicked");
     });
 });

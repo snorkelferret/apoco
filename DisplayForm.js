@@ -1,11 +1,11 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI;//,jQuery=require('jquery');
 require("./DisplayFieldset");
 
 // create a form dynamically from json
 
 
 
-;(function($) {
+;(function() {
     "use strict";
 
     var DEBUG=true;
@@ -22,43 +22,57 @@ require("./DisplayFieldset");
     // overwrite methods from base class
     HarveyMakeForm.prototype={
 	execute: function(){
-	    var that=this,fp,header,container,fc;
+	    var that=this,fp,header,container,fc,h;
             
-	    this.element=$("<div id='" + this.id + "' class='harvey_form ui-widget ui-widget-content ui-corner-all '></div>");
-
+	    //this.element=$("<div id='" + this.id + "' class='harvey_form ui-widget ui-widget-content ui-corner-all '></div>");
+            this.element=document.createElement("div");
+            this.element.id=this.id;
+            this.element.classList.add("harvey_form","resizable","ui-widget","ui-widget-content","ui-corner-all");
+            if(this.class !== undefined){
+                this.element.classList.add(this.class);
+            }
             if(!this.height){
                 this.height=400;
             }
             if(!this.width){
                 this.width=Math.floor(this.height*0.75);
             }
-            this.element.height(this.height);
-            this.element.width(this.width);
+            this.element.innerHeight=this.height;
+            this.element.innerWidth=this.width;
 
-	    header=$("<div class='form_header ui-widget ui-state-default ui-widget-header ui-corner-all'></div>");
-
-	    this.element.append(header);
+	   // header=$("<div class='form_header ui-widget ui-state-default ui-widget-header ui-corner-all'></div>");
+            header=document.createElement("div");
+            header.classList.add("form_header","ui-widget", "ui-state-default", "ui-widget-header","ui-corner-all");
+	    this.element.appendChild(header);
 
 	    if(this.draggable !== false){
-		this.element.draggable({handle: ".form_header", containment: "window"});
+	        //	$(this.element).draggable({handle: ".form_header", containment: "window"});
+                this.draggable=Harvey.Utils.draggable(this.element);
 	    }
-
-	    container=$("<div class='form_scroll'></div>");
-	    fc=$("<div class='form_content'></div>");
-
-	    this.element.append(fc);
-            fc.append(container);
-
-	    if(this.label){
-	    	$("<h5> " + this.label + "</h5>").appendTo(header);
+ 	    //container=$("<div class='form_scroll'></div>");
+            container=document.createElement("div");
+            container.classList.add("form_scroll");
+            
+	    //fc=$("<div class='form_content'></div>");
+            fc=document.createElement("div");
+            fc.classList.add("form_content");
+	    this.element.appendChild(fc);
+            fc.appendChild(container);
+            h=document.createElement("h5");
+            if(this.label){
+	    	//$("<h5> " + this.label + "</h5>");
+                h.text=this.label;
 	    }
 	    else{
-		$("<h5> " + this.id + "</h5>").appendTo(header);
+                h.text=this.label;
+		//$("<h5> " + this.id + "</h5>").appendTo(header);
 	    }
-	    var close=$("<span  class=' ui-icon ui-icon-close'> </span>");
-
-	    close.appendTo(header);
-
+            header.appendChild(h);
+	    //var close=$("<span  class=' ui-icon ui-icon-close'> </span>");
+            var close=document.createElement("span");
+            close.classList.add("ui-icon","ui-icon-close");
+	    //close.appendTo(header);
+            header.appendChild(close);
 	    var c=(function(cmd){
 		return function(e){
 		    e.stopPropagation();
@@ -68,10 +82,12 @@ require("./DisplayFieldset");
 		    cmd.delete();
 		};
 	    }(this));
-	    close[0].addEventListener("click",c,false);
+	    close.addEventListener("click",c,false);
 
-            fp=$("<ul class='harvey_form_list'></ul>");
-            container.append(fp);
+           // fp=$("<ul class='harvey_form_list'></ul>");
+            fp=document.createElement("ul");
+            fp.classList.add("harvey_form_list");
+            container.appendChild(fp);
             
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
@@ -86,33 +102,36 @@ require("./DisplayFieldset");
             }
         
 	    if(this.buttons){
-		var button_container=$("<div class='form_button_container ui-widget-content'></div>");
-		this.element.append(button_container);
+		//var button_container=$("<div class='form_button_container ui-widget-content'></div>");
+                var button_container=document.createElement("div");
+                button_container.classList.add("form_button","container","ui-widget-content");
+		this.element.appendChild(button_container);
 		for(var i=0;i<this.buttons.length;i++){
                     this.buttons[i].node="button";
                     this.buttons[i]=Harvey.node(this.buttons[i]);
                     this.buttons[i].parent=this;
-		    button_container.append(this.buttons[i].element);
+		    button_container.appendChild(this.buttons[i].element);
 		}
 	    }
             else{
                 this.buttons=[];
             }
-	    this.element.resizable( {
+/*	    $(this.element).resizable( {
 		resize: function(e,ui){
-		    $(".form_content").height(that.element.height()*0.95);
+		    $(".form_content").height($(that.element).height()*0.95);
                 },
 		create: function(e,ui){
 		    $(".harvey_form").height(400);
-		    $(".form_content").height(that.element.height()*0.95);
+		    $(".form_content").height($(that.element).height()*0.95);
                 }
-	    });
+ }); */
+           
 	},
         addNode:function(d,parent_element){
             var n;
-            var ll=$("<li></li>");
+            var ll=document.createElement("li");//$("<li></li>");
             if(parent_element === undefined){
-                parent_element=this.element.find("ul.harvey_form_list");
+                parent_element=this.element.querySelector("ul.harvey_form_list");
             }
             if(d.name && this.getNode(d.name)!==null){
                     throw new Error("Cannot add node with non-unique name");
@@ -128,10 +147,10 @@ require("./DisplayFieldset");
                 n=Harvey.node(d,ll);
             }
             if(n){
-                if(!n.element || n.element.length === 0){
+                if(!n.element){
                     throw new Error("DisplayForm.addNode element is null");
                 }
-                parent_element.append(ll);
+                parent_element.appendChild(ll);
                 n.parent=this;
 	        this.nodes.push(n);
                 return n;
@@ -143,9 +162,9 @@ require("./DisplayFieldset");
         },
         addField: function(d,parent_element){
             var p;
-            var ll=$("<li></li>");
+            var ll=document.createElement("li");//$("<li></li>");
             if(parent_element === undefined){
-                parent_element=this.element.find("ul.harvey_form_list");
+                parent_element=this.element.querySelector("ul.harvey_form_list");
             }
             if(!d.field){
                 if(d.type){
@@ -161,7 +180,7 @@ require("./DisplayFieldset");
             }
             if(Harvey.field.exists(d.field)){
                 // check that the field has not already been created
-                if(d.element && d.element.length>0){
+                if(d.element){
                    // console.log("ELEMENT ALREADY EXISTS");
 		    p=d;
                 }
@@ -177,7 +196,7 @@ require("./DisplayFieldset");
             }
             p.parent=this;
 	    this.fields.push(p);
-	    parent_element.append(p.element);
+	    parent_element.appendChild(p.element);
             
             return p;
         },
@@ -190,18 +209,22 @@ require("./DisplayFieldset");
                 this.buttons[index]=b;
                 this.buttons[index].parent=this;
             }
+            else{
+                throw new Error("DisplayForm: Could not make button");
+            }
             if(index ===0){
 	        // no buttons so create button_container
-                r=$("<div class='form_button_container ui-widget-content'></div>");
-		this.element.append(r);
+                r=document.createElement("div");//$("<div class='form_button_container ui-widget-content'></div>");
+		r.classList.add("form_button_container","ui-widget-content");
+                this.element.appendChild(r);
             }
             else{
-                r=this.element.find("div.form_button_container");
+                r=this.element.querySelector("div.form_button_container");
             }
             if(r.length === 0){
                 throw new Error("DisplayForm: addButton cannot find button container");
             }
-            r.append(this.buttons[index].element);
+            r.appendChild(this.buttons[index].element);
         },
         getButton:function(name){
             if(name !== undefined){
@@ -228,7 +251,8 @@ require("./DisplayFieldset");
             if(index===-1){
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
-            this.buttons[index].element.remove();
+            this.buttons[index].element.parentNode.removeChild();
+            this.buttons[index].element=null;
             this.buttons.splice(index,1);
         },
 	resetInvalid: function(){
@@ -245,7 +269,7 @@ require("./DisplayFieldset");
 	    }
 	    var old_submit=this.submit;
 	    that.submit=function(){
-		that.element.css("display","none");
+		that.element.visibility="hidden";
 		var promise=old_submit.call(that);
 		Harvey.display.dialog("Submitting","Waiting confirmation from server",true);  //need to override the dialog options
 
@@ -304,7 +328,8 @@ require("./DisplayFieldset");
 
     //Harvey.Utils.extend(HarveyMakeForm,Harvey._DisplayBase);
     Harvey.Utils.extend(HarveyMakeForm,Harvey.display._fieldsetBase);
-    $.extend(true, Harvey, {
+    //$.extend(true, Harvey, {
+    Harvey.mixinDeep(Harvey,{
 	display: {
 	    form: function(opts,win){
                 opts.display="form";
@@ -325,4 +350,4 @@ require("./DisplayFieldset");
 
 
 
-})(jQuery);
+})();

@@ -22,14 +22,17 @@ describe("DisplayFieldset-(no initial data)",function(){
     var t;
     require("../DisplayFieldset.js"); 
     it("creates a fieldset display object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
+        // $("body").append("<div id='test'></div>");
+        var b=document.createElement("div");
+        b.id="test";
+        document.getElementsByTagName("body")[0].appendChild(b);
+       // assert($("#test").length>0);
         t=Harvey.display.fieldset({id:"test_fieldset",DOM:"test"});
         assert.isObject(t);
     });
-    it("creates a jquery container",function(){
+    it("creates a DOM  container",function(){
         t.getElement();
-        assert.notStrictEqual(t.length,0); //$("#test_fieldset").length,0); 
+        assert.isObject(t); //$("#test_fieldset").length,0); 
     });
     it("can add a field",function(){
         t.addField({type: "string", name: "title"});
@@ -55,22 +58,29 @@ describe("DisplayFieldset-(no initial data)",function(){
         assert.strictEqual(b,"Robert");
     });
     it("has a show method which puts the root element into the dom",function(){
-        assert.strictEqual($("#test_fieldset").length,0);
+        var b=document.contains(document.getElementById("test_fieldset"));
+        assert.strictEqual(b,false);
         t.show();
-        assert.notStrictEqual($("#test_fieldset").length,0);
+        b=document.contains(document.getElementById("test_fieldset"));
+        assert.strictEqual(b,true);
     });
     it("has put the fields into the dom",function(){
-        var b=$("#test_fieldset").find("div[name='title'] input").val();
-        assert.strictEqual(b,"Robert");
+        //var b=$("#test_fieldset").find("div[name='title'] input").val();
+        var b=document.querySelector("#test_fieldset div[name='title'] input"); 
+        var c=b.value;
+        assert.strictEqual(c,"Robert");
     });
     it("has put the nodes into the dom",function(){
-        var b=$("#test_fieldset").find("div[name='blurb'] p").text();
-        assert.strictEqual(b,"");
+        //var b=$("#test_fieldset").find("div[name='blurb'] p").text();
+        var b=document.querySelector("#test_fieldset p[name='blurb']");
+        assert.isObject(b);
+        assert.strictEqual(b.textContent,"");
     });
     it("can delete a node",function(){
         t.deleteNode("blurb");
-        var b=$("#test_fieldset").find("div[name='blurb']");
-        assert.strictEqual(b.length,0);
+        //var b=$("#test_fieldset").find("div[name='blurb']");
+        var b=document.querySelector("#test_fieldset div[name='blurb']"); 
+        assert.strictEqual(document.contains(b),false);
     });
     it("returns null if you try to get non-existant node",function(){
         var b=t.getNode("blurb");
@@ -104,7 +114,7 @@ describe("DisplayFieldset-(start with data)",function(){
     });
     it("writes out json for all the fields",function(){
         var b=t.getJSON();
-        expect(b).to.eql({ia:["1","3","4"],howmany:"10"});
+        expect(b).to.eql({ia:[1,3,4],howmany:"10"});
     });
     it("throws an error if you try to add a field with the same name",function(){
         var fn=function(){

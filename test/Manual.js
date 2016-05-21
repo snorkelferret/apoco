@@ -7,7 +7,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+//const Harvey=require('../declare').Harvey;
 var webdriver = require('selenium-webdriver');
 var By=webdriver.By;
 var until=webdriver.until;
@@ -21,7 +21,7 @@ var promise=require("selenium-webdriver/lib/promise");
 //global.navigator=global.window.navigator;
 global.jQuery = require('jquery');
 
-
+/*
 describe("Manual",function(){
     var $= global.jQuery; 
     var driver;
@@ -47,11 +47,11 @@ describe("Manual",function(){
          });
     });
     test.it("has loaded a node called Content",function(done){
-        this.timeout(15000);
-        /*
-         driver.wait(function(){
-            return driver.isElementPresent(By.id("Content"));
-        },15000); */
+        this.timeout(1500);
+        
+       //  driver.wait(function(){
+      //      return driver.isElementPresent(By.id("Content"));
+      //  },15000); 
         var b=driver.findElement(By.id("Content"));
         console.log("Got content node " + b);
         assert.notStrictEqual(b,undefined);
@@ -59,16 +59,7 @@ describe("Manual",function(){
         done();
         
     });
-  /*  test.it("has made the tabs",function(done){
-        
-        tabs=driver.findElement(By.id("Tabs")).then(function(e){
-            return e.findElements(By.tagName("li")).then(function(b){
-                //console.log("b in stupid construction is " + b );
-                assert.strictEqual(b.length,9);
-                done();
-            });
-        });
-    }); */
+ 
     test.it("we have some poxy tabs",function(done){
         assert.strictEqual(tabs.length,9);
         console.log("we have poxy tabs " + tabs.length);
@@ -161,7 +152,7 @@ describe("Manual",function(){
 });
 
 
-
+/*
 describe("Manual About Page",function(){
     var $= global.jQuery; 
     var driver;
@@ -201,3 +192,49 @@ describe("Manual About Page",function(){
         });
     }); 
 });
+    
+describe("Manual Fields Page",function(){
+    var $= global.jQuery; 
+    var driver;
+       
+    driver = new webdriver.Builder()
+        .forBrowser('firefox')
+        .build();
+    
+    driver.get("file:///home/val/harvey/manual.html");
+    after(function() {
+        driver.quit();
+    });
+    
+    test.it("has loaded a node called Blurb",function(done){
+        this.timeout(1500);
+        driver.wait(function(){
+            return driver.isElementPresent(By.id("Content"));
+        },15000); 
+        var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Harvey')]")).then(function(b){
+            assert.isObject(b);
+            done();
+        //});
+    });
+    test.it("has loaded the lhs menus",function(done){
+        this.timeout(15000);
+        driver.findElements(By.xpath(".//div[@id='FieldsMenu']/ul/li")).then(function(m){
+            console.log("got menu items " + m.length);   
+            m.forEach(function(nextElement) {
+                console.log("in span array " + nextElement);
+                nextElement.getText().then(function(p){
+                    console.log("text is " + p);
+                    nextElement.click();
+                    //assert.isObject(driver.findElement(By.id(p)));
+                    driver.findElement(By.id(p)).findElement(By.name("doit")).then(function(v){
+                        v.click();
+                        assert.isObject(driver.findElement(By.name("SomeString")));
+                    });
+                });
+             });
+            done();
+        });
+    });
+    
+});
+*/

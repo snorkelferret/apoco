@@ -1,10 +1,6 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare'); //UI,jQuery=require('jquery');
 
 ;(function(){
-
-
-
-
 
     Harvey.checkType={
 	blank: function(s){
@@ -28,6 +24,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    return true;
 
 	},
+        number:function(s){
+            s=String(s);
+	    if(this.blank(s) || isNaN(s)){
+		return false;
+	    }
+            return true;
+        },
 	phoneNumber: function(s){
 	    //console.log("checking phone number " + s);
 	    var pn_re=/^[\s()+-]*([0-9][\s()+-]*){6,20}$/;                    // /^(?:\+?\d{2}[ -]?\d{3}[ -]?\d{5}|\d{4})$/;

@@ -1,10 +1,10 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare');//.UI,jQuery=require('jquery');
 
 // Node class for static elements like headings and text etc
 // No callbacks or publish or listeners for these elements
 // if you need callbacks use Harvey.fields
 
-;(function($){
+;(function(){
 
     var _Node=function(d,element){
         if(!d){
@@ -21,24 +21,18 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         _getNode[d.node](this);
 
 	if(this.class){
-	    this.element.addClass(this.class);
+	    this.element.classList.add(this.class);
 	}
 	if(this.id){
-	    this.element.attr('id', this.id);
+	    this.element.id=this.id;
 	}
         if(this.name){
-            this.element.attr('name',this.name);
+            console.log("++++++++++++++++Node adding name " + this.name);
+            this.element.setAttribute("name",this.name);
         }
-
-	if(this.tooltip){
-	    this.element.prop("title", d.tooltip);
-	    this.element.tooltip({tooltipClass: "tooltip"});
-	}
-        if(element && element.length>0){
-        //    console.log("Node appending to element");
-            element.append(this.element);
+        if(element){
+            element.appendChild(this.element);
         }
-
     };
 
     _Node.prototype={
@@ -51,7 +45,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             case "paragraph":
             case "label":
             case "anchor":
-		this.element.html(text);
+		this.element.textContent=text;
 		this.text=text;
                 return;
             default:
@@ -62,83 +56,116 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     var _getNode={
 	anchor: function(that){
-            that.element=$("<a href='" + that.href + "'> " + that.text + "</a>");
+            that.element=document.createElement("a"); //$("<a href='" + that.href + "'> " + that.text + "</a>");
+            that.element.href=that.href;
+            that.element.textContent=that.text;
             if(that.target){
-                that.element.prop('target','_blank');
+                //that.element.prop('target','_blank');
+                that.element.target="_blank";
             }
 	},
 	heading: function(that){
 	    switch(that.size){
 	    case "h1":
 	    case "H1":
-		that.element=$("<h1>" + that.text + "</h1>");
+		that.element=document.createElement("h1");
+                that.element.textContent=that.text;
 		return;
 	    case "h2":
 	    case "H2":
-		that.element=$("<h2>" + that.text + "</h2>");
+                that.element=document.createElement("h2");
+                that.element.textContent=that.text;
+//		that.element=$("<h2>" + that.text + "</h2>");
 		return;
 	    case "h3":
 	    case "H3":
-		that.element=$("<h3>" + that.text + "</h3>");
+                that.element=document.createElement("h3");
+                that.element.textContent=that.text;
+//		that.element=$("<h3>" + that.text + "</h3>");
 		return;
 	    case "h4":
 	    case "H4":
-		that.element=$("<h4>" + that.text + "</h4>");
+                that.element=document.createElement("h4");
+                that.element.textContent=that.text;
+		//that.element=$("<h4>" + that.text + "</h4>");
 		return;
 	    case "h5":
 	    case "H5":
-		that.element=$("<h5>" + that.text + "</h5>");
+                that.element=document.createElement("h5");
+                that.element.textContent=that.text;
+		//that.element=$("<h5>" + that.text + "</h5>");
 		return;
 	    case "h6":
-	    case "H6":
-		that.element=$("<h6>" + that.text + "</h6>");
+            case "H6":
+                that.element=document.createElement("h6");
+                that.element.textContent=that.text;
+//		that.element=$("<h6>" + that.text + "</h6>");
 		return;
 	    default:
 		throw new Error("invalid arg for header " + that.size);
 	    };
 	},
 	label: function(that){
+            that.element=document.createElement("label");
+            that.element.textContent=that.text;
 	    if(that.for){
-		that.element=$("<label for='" + that.for + "'>" + that.text + "</label>");
-	    }
-	    else{
-		that.element=$("<label>" + that.text + "</label>");
+		//that.element=$("<label for='" + that.for + "'>" + that.text + "</label>");
+                that.element.htmlFor=that.for;
 	    }
 	},
 	paragraph: function(that){
-	    that.element=$("<p>" + that.text + "</p>");
+	    // that.element=$("<p>" + that.text + "</p>");
+            that.element=document.createElement("p");
+            if(that.text!==undefined){
+                that.element.textContent=that.text;
+            }
 	},
         list: function(that){
-	    that.element=$("<ul class='list'></ul>");
+	    that.element=document.createElement("ul");//$("<ul class='list'></ul>");
+            that.element.classList.add("list");
 	    for(var i=0;i<that.list.length;i++){
                 var l=that.list[i];
-	        var el=$("<li>" + l + "</li>");
-	        that.element.append(el);
+	        var el=document.createElement("li");//$("<li>" + l + "</li>");
+                el.textContent=l;
+	        that.element.appendChild(el);
             }
         },
         descriptionList: function(that){
+            var d;
             if(that.items === undefined){
                 throw new Error("Node: descriptionList requires at least one item" + that.name);
             }
-            that.element=$("<dl></dl>");
+            that.element=document.createElement("dl"); //$("<dl></dl>");
             for(var i=0;i<that.items.length;i++){
                 if(that.items[i].label){
-                    that.element.append("<dt>" + that.items[i].label + "</dt>");
+                    d=document.createElement("dt");
+                    d.textContent=that.items[i].label;
+                    that.element.appendChild(d);
+                    // that.element.append("<dt>" + that.items[i].label + "</dt>");
                 }
                 else  if(that.items[i].labels){
                     if(Harvey.checkType['array'](that.items[i].labels)){
                         for(var j=0;j<that.items[i].labels.length;j++){
-                            that.element.append("<dt>" + that.items[i].labels[j] + "</dt>");
+                            d=document.createElement("dt");
+                            d.textContent=that.items[i].labels[j];
+                            that.element.appendChild(d);
+                            //that.element.append("<dt>" + that.items[i].labels[j] + "</dt>");
                         }
                     }
                 }
                 if (that.items[i].description){
-                    that.element.append("<dd>" + that.items[i].description + "</dd>");
+                    d=document.createElement("dd");
+                    d.textContent=that.items[i].description;
+                    that.element.appendChild(d);
+                    //that.element.append("<dd>" + that.items[i].description + "</dd>");
                 }
                 else if (that.items[i].descriptions){
                     if(Harvey.checkType['array'](that.items[i].descriptions)){
                         for(var j=0;j<that.items[i].descriptions.length;j++){
-                            that.element.append("<dd>" + that.items[i].descriptions[j] + "</dd>");
+                            d=document.createElement("dd");
+                            d.textContent=that.items[i].descriptions[j];
+                            that.element.appendChild(d);
+//                            that.element.append("<dd>" + that.items[i].descriptions[j] + "</dd>");
                         }
                     }
                 }
@@ -149,7 +176,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             var imm=window.document.createElement("img"); //new Image();  // get the width and height - need to load in to image
 	    imm.src=that.url;
           //  var d=$.Deferred;
-            that.element=$("<div></div>");
+            that.element=document.createElement("div");  //$("<div></div>");
 	    imm.onload=function(){
 		console.log("+++++ reader onload got width " + this.width + " " + this.height);
                 if(that.width){
@@ -164,7 +191,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
                 else{
                     that.element.height(this.height);
                 }
-                that.element.append(imm);
+                that.element.appendChild(imm);
             //    d.resolve();
             };
             //return d;
@@ -190,31 +217,35 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }*/
         },
 	clock: function(that){  // this needs to be changed to get the time from the server- shows server alive
-            that.element=$("<div class='Harvey_clock'> </div>");
-
+            that.element=document.createElement("div");  //$("<div class='Harvey_clock'> </div>");
+            that.element.classList.add("Harvey_clock");
             var cb=function(t){
                 var d=new Date();
-                that.element.html(d.toLocaleTimeString());
+                that.element.textContent=d.toLocaleTimeString();
 		//t.html(d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds());
             };
 	    window.setInterval(function(){cb(that);},1000);
 	},
         button:function(that){
             var t=that.text?that.text: that.name;
-	    that.element=$("<button type='button'>" + t + "</button>");
-            if(that.disabled){
-                that.element.prop("disabled",that.disabled);
+            
+	    //that.element=$("<button type='button'>" + t + "</button>");
+            that.element=document.createElement("button");
+            that.element.type="button";
+            that.element.textContent=t;
+            if(that.disabled === true){
+                that.element.setAttribute("disabled","disabled");//prop("disabled",that.disabled);
             }
             if(that.action){
-                that.element.on("click",function(e){
+                that.element.addEventListener("click",function(e){
                     e.stopPropagation();
                     e.preventDefault();
                     that.action(that);
-                });
+                },false);
             }
 	},
         paginate:function(that){
-
+            var n;
             if(!that.number){
                 throw new Error("paginate needs a number");
             }
@@ -222,66 +253,78 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    that.current_num=0;
             //console.log("paginator init with number " + that.number);
 	    // var that=this;
-            that.element=$("<div class='Harvey_paginate'></<div>");
-
+            that.element=document.createElement("div");//$("<div class='Harvey_paginate'></<div>");
+            that.element.classList.add("Harvey.paginate");
             var cb=function(index,el){
               //  console.log("index is " + index);
-                el.addClass("ui-state-active");
-                el.siblings().removeClass("ui-state-active");
+                n=el.parentNode.childNodes;
+                for(var i=0;i<n.length;i++){
+                    n[i].classList.remove("ui-state-active");
+                }
+                el.classList.add("ui-state-active");   
                 that.current_num=index;
                 that.action(that);
             };
             if(this.prevNext){
                 var n;
-                var b=("<button> previous </button>");
-                this.element.append(b);
-                b.on("click",function(){
+                var b=document.createElement("button");   //("<button> previous </button>");
+                b.textContent="previous";
+                this.element.appendChild(b);
+                b.addEventListener("click",function(e){
+                    e.stopPropagation();
                     if(that.current_num === 0){
                         n=that.number-1;
                     }
                     else{
                         n=that.current_num-1;
                     }
-                    var t=this.element.find('button[name="' + n + '"]');
-                    t.trigger("click");
-                });
+                    var t=this.element.getElementsByName(n)[0];//.find('button[name="' + n + '"]');
+                    //t.trigger("click");
+                    t.click();
+                },false);
 
             }
             for(var i=0;i<that.number;i++){
                 //console.log("making button number " + i);
-                var b=$("<button name='" + i + "'>" + (i+1) + "</button>");
-                that.element.append(b);
-                b.on("click", function(){
+                var b=document.createElement("button");//$("<button name='" + i + "'>" + (i+1) + "</button>");
+                b.name=i;
+                b.textContent=(i+1);
+                that.element.appendChild(b);
+                b.addEventListener("click", function(){
                     var index=i;
-                    return function(){
-                        cb(index,$(this));
+                   
+                    return function(e){
+                        e.stopPropagation();     
+                        cb(index,e.target);
                   //      console.log("got a click for " + index);
                     };
 
-                }(i));
+                }(i),false);
             }
             if(this.prevNext){
-                var b=("<button> next </button>");
-                this.element.append(b);
-                b.on("click",function(){
+                var b=document.createElement("button"); //("<button> next </button>");
+                b.textContent="next";
+                this.element.appendChild(b);
+                b.addEventListener("click",function(e){
                     var n=(that.current_num+1)%that.number;
-                    var t=this.element.find('button[name="' + n + '"]');
-                    t.trigger("click");
-                });
+                    var t=this.element.getElementsByName(n);  //find('button[name="' + n + '"]');
+                    t.click();
+                },false);
             }
-        },
+        }/*,
         progressBar:function(that){
             var max=100;
-            if($("#Harvey_progressBar").length === 0 ){
+            if(!document.contains(document.getElementById("Harvey_progressBar"))){
                 if(!that.element){
-                    that.element=$("<div id='Harvey_progressBar'></div>");
-                    that.element.progressbar({ value: that.value, max: max,min:0});
+                    that.element=document.createElement("div");//$("<div id='Harvey_progressBar'></div>");
+                    that.element.id="Harvey.progressBar";
+                    $(that.element).progressbar({ value: that.value, max: max,min:0});
                     //element.append(pb);
                     //return pb;
                 }
             }
 
-        }
+        }*/
     };
 
     Harvey.node=function(options,el){
@@ -298,4 +341,4 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             return new _Node(options,el);
         }
     };
-})(jQuery);
+})();

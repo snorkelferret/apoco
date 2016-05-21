@@ -5,9 +5,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     'use strict';
     // these are the components allowed in display objects
-
-    var _display_components=["getField","getNode","getTab","getGrid","getMenu"];
-
+  
+    var _display_components=["Field","Node","Tab","Grid","Menu"];
+    var dp;
     Harvey._DisplayBase=function(options,win){
 	var defaults={
 	    parent: null,
@@ -32,21 +32,27 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         
         if(win){
             console.log("Adding display to child window");
-	    this.DOM=$(win.document).find("#" + this.DOM);
-            t=$(win.document).find("#"+ this.id);
+	    this.DOM=win.document.getElementById(this.DOM);
+            t=win.document.getElementById(this.id);
+            if(this.dependsOn){
+                dp=win.document.getElementById(this.dependsOn);
+            }
         }
         else{
-            t=$("#"+ this.id);
-	    this.DOM=$("#" + this.DOM);
+            t=document.getElementById(this.id); 
+	    this.DOM=document.getElementById(this.DOM);
+            if(this.dependsOn){
+                dp=document.getElementById(this.dependsOn);
+            }
             // console.log("hpy  %j" , this.DOM);
             //console.log("length is " + this.DOM.length);
         }
-	if(this.DOM.length === 0){
+	if(!this.DOM){
 	    throw new Error("_HarveyDisplayBase DOM element does not exist " + this.DOM);
 	}
 
-	if($(t)){
-	    $(t).remove();
+	if(t){
+	   t.parentNode.removeChild(t);
 	}
 
         var doit=function(context){
@@ -56,13 +62,14 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    }
         };
         // if the execution depends on another node
-        if(this.dependsOn && $("#" + this.dependsOn).length === 0){ // watch for node
+        if(this.dependsOn && !dp){
+            //this.dependsOn).length === 0){ // watch for node
             //console.log("in displayBase id is " + this.dependsOn);
             Harvey.Utils.observer.add(this.dependsOn, doit,this);
             if(!Harvey.Observer){
                 throw new Error("Np observer found");
             }
-            Harvey.Observer.observe((this.DOM)[0],{childList: true,attributeFilter:["id"]});
+            Harvey.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
         }
         else if(this.action){
             this.action(this);
@@ -84,9 +91,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    var comp=[];
             var k;
             for(var i=0; i< _display_components.length;i++){
-                k=_display_components[i];
+                k=("get" + _display_components[i]);
 	        if(this[k]){
-                    return this[k]();
+                    if(comp.length === 0){
+                        comp=this[k]();
+                    }
+                    else{
+                        comp.concat(this[k]());
+                    }
+                    console.log("getChildren got " + comp.length);
+                    return comp; //this[k];
 	        }
             }
             return null;
@@ -95,7 +109,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             var k;
             if(name !== undefined){
                 for(var i=0; i< _display_components.length;i++){
-                    var k=_display_components[i];
+                    var k=("get" + _display_components[i]);
                     if(this[k]){
                         return  this[k](name);
                     }
@@ -104,15 +118,20 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             }
             return null;
         },
-        deleteChild:function(name){
+        deleteChild:function(name,no_splice){
             var k;
-            for(var i=0; i< _display_components.length;i++){
-                k=_display_components[i];
-                if(this[k]){
-                    this[k](name);
+            if(name !== undefined){
+                for(var i=0; i< _display_components.length;i++){
+                    k=("delete"+_display_components[i]); 
+                    if(this[k]){
+                        this[k](name);
+                    }
                 }
+               
             }
-            return null;
+            else{
+                throw new Error("deleteChild- needs a name");
+            }
         },
         _getMethods:function(){
             var m=[];
@@ -171,22 +190,24 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Harvey.IO.publish(this);
 	    }
-            if(!$.contains(this.DOM[0],this.element[0])){
-              //  console.log("Showing element that is not in DOM");
-	        if(this.element && this.element.length>0){
-		//    console.log("show found non null element");
+            //if(!$.contains(this.DOM[0],this.element[0])){
+            if(!document.body.contains(this.element)){
+                 console.log("Showing element that is not in DOM");
+	        if(this.element){
+		    console.log("show found non null element");
                     if(this.after){
-                        var a=$("#" + this.after);
-                        if(a.length>0){    // && $.contains(this.DOM[0],a[0])){
-                            $("#" + this.after).after(this.element);
+                        var a=document.getElementById(this.after);
+                        if(a){    // && $.contains(this.DOM[0],a[0])){ //insert after
+                            a.parentNode.insertBefore(this.element,a.nextSibling);
+                            //$("#" + this.after).after(this.element);
                         }
                         else{
-                            this.DOM.append(this.element);
+                            this.DOM.appendChild(this.element);
                             //throw new Error("Harvey.display.show: cannot find element " + this.after );
                         }
                     }
                     else{
-                        this.DOM.append(this.element);
+                        this.DOM.appendChild(this.element);
                     }
 		}
 	        else {
@@ -202,9 +223,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         },
         hide:function(){
           // console.log("trying to hide " + this.id);
-            if($.contains(this.DOM[0],this.element[0])){
+            if(document.body.contains(this.element)){
             //    console.log("Hiding element that is in dom");
-                this.element.detach();
+                this.element.parentNode.removeChild(this.element);
                 return;
             }
 //           console.log("Can't hide element that is NOT in dom");
@@ -216,6 +237,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    //console.log("delete display object is here");
             if(this.listen){
                 Harvey.IO.unsubscribe(this);
+            }
+            if(this.draggable){
+                this.draggable.delete();
             }
             this.deleteAll();
             if(this.element){

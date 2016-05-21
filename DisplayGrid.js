@@ -464,23 +464,28 @@ jsonishData={
 	    }
 	},
         addGrid:function(grid){
-            var div_container;
+            var div_container,div,h;
 	    var name=grid.name;
 	    var rows=grid.rows;
+            div=document.createElement("div");
+            div.classList.add("inner_table");
 	    if(name !== undefined){
-		var div=$("<div class='inner_table' id='" + name + "'> </div>");
-		div.append("<h4 class='ui-widget ui-widget-header'>" + name + "</h4>");
+	        //	var div=$("<div class='inner_table' id='" + name + "'> </div>");
+                div.id=name;
+                h=document.createElement("h4");
+                h.classList.add("ui-widget","ui-widget-header");
+                h.text=name;
+                div.appendChild(h);
+	//	div.append("<h4 class='ui-widget ui-widget-header'>" + name + "</h4>");
 	    }
-	    else{
-		var div=$("<div class='inner_table'> </div>");
-	    }
-	    var table=$("<table></table>");
-	    div.append(table);
+	    
+	    var table=document.createElement("table");
+	    div.appendChild(table);
 	    //var body=$("<tbody class='selectable'></tbody>");
-	    var body=$("<tbody class=''></tbody>");
-	    table.append(body);
-            div_container=this.element.find("div.grid_content");
-	    div_container.append(div);
+	    var body=document.createElement("tbody");//$("<tbody class=''></tbody>");
+	    table.appendChild(body);
+            div_container=this.element.getElementsByClassName("grid_content")[0];
+	    div_container.appendChild(div);
             grid.element=div;
         },
         addCol:function(col){
@@ -512,7 +517,7 @@ jsonishData={
                     if(rows){
                         for(var j=0;j<rows.length;j++){
                             t=Object.keys(rows[j])[0];
-                            r=rows[j][t].element.parent();
+                            r=rows[j][t].element.parentNode;
                             rows[j][col.name]=null;
                             this._addCell(rows[j],col,r);
                         }
@@ -522,18 +527,28 @@ jsonishData={
 	    if(this.cols[index].display !== false){
 		if(this.DEBUG) console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
-		var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
+	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
+                var h=document.createElement("th");
+                h.classList.add("ui-state-default",this.cols[index].type);
+                h.type=this.cols[index].type;
+                h.textContent=label;
 		this.cols[index].element=h;
 		this.cols[index].sortable=Harvey.isSortable(this.cols[index].type);
 		if(this.cols[index].sortable && this.userSortable){
-		    var dec=$("<div class='arrows'></div>");
-		    var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
-		    var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
-		    dec.append(up);
-		    dec.append(down);
-		    h.append(dec);
+		    //  var dec=$("<div class='arrows'></div>");
+                    var dec=document.createElement("div");
+                    dec.classList.add("arrows");
+		    //  var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
+                    var up=document.createElement("span");
+                    up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
+		    //  var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
+                    var down=document.createElement("span");
+                    down.classList.add("down","ui-icon","ui-icon-triangle-1-n");
+		    dec.appendChild(up);
+		    dec.appendChild(down);
+		    h.appendChild(dec);
 
-		    up[0].addEventListener("click",function(col_num,that){
+		    up.addEventListener("click",function(col_num,that){
 			return function(e){
                             e.stopPropagation();
                             e.preventDefault();
@@ -541,7 +556,7 @@ jsonishData={
 			    sort_callback(col_num,that,"up");
 			};
 		    }(i,that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
-		    down[0].addEventListener("click",function(col_num,that){
+		    down.addEventListener("click",function(col_num,that){
 			return function(e){
                             e.stopPropagation();
                             e.preventDefault();
@@ -550,15 +565,18 @@ jsonishData={
 			};
 		    }(index,that),false);
 		    
-
-		    h[0].addEventListener("mouseover",function(e){
-			$(this).addClass('ui-state-hover'); }, false);
-		    h[0].addEventListener("mouseout",function(e){
-			$(this).removeClass('ui-state-hover');}, false);
+		    h.addEventListener("mouseover",function(e){
+                        e.stopPropagation();
+		        e.target.classList.add('ui-state-hover');
+                    }, false);
+		    h.addEventListener("mouseout",function(e){
+                        e.stopPropagation();
+			e.target.classList.remove('ui-state-hover');
+                    }, false);
                 }
- 		this.colElement.append(h);
+ 		this.colElement.appendChild(h);
 		if(this.cols[index].hidden){
-		    h.hide();
+		    h.visibility="hidden";
 		}
 	    }
         },
@@ -575,7 +593,8 @@ jsonishData={
                 for(var i=0;i<this.grids.length;i++){
                     for(var j=0;j<this.grids[i].rows.length;j++){
                         el=this.grids[i].rows[j][name].getElement();
-                        el.remove();
+                        el.parentNode.removeChild(el);
+                        el=null;
                         delete this.grids[i].rows[j][name];
                     }
                 }
@@ -610,22 +629,25 @@ jsonishData={
 	execute:function(){
             var rows,body,r,that=this;
 // 	    var t0=performance.now();
-	    var headtable=$("<table class='ui-widget head'></table>");
-	    var head=$("<thead></thead>");
-            
-            this.element=$("<div id='" + this.id + "' class='grid htable'></div>");  
-	    headtable.append(head);
-	    this.element.append(headtable);
+	    var headtable=document.createElement("table"); //$("<table class='ui-widget head'></table>");
+            var head=document.createElement("thead"); //$("<thead></thead>");
+            headtable.classList.add("ui-widget","head");
+            this.element=document.createElement("div"); //$("<div id='" + this.id + "' class='grid htable'></div>");
+            this.element.id=this.id;
+            this.element.classList.add("grid","htable");
+	    headtable.appendChild(head);
+	    this.element.appendChild(headtable);
 
-	    this.colElement=$("<tr></tr>");
+	    this.colElement=document.createElement("tr");//$("<tr></tr>");
 	    // setup the grid columns
-            head.append(this.colElement); // put the head row into the dom
-            var div_container=$("<div class='grid_content' </div>");
+            head.appendChild(this.colElement); // put the head row into the dom
+            var div_container=document.createElement("div");//$("<div class='grid_content' </div>");
+            div_container.classList.add("grid_content");
             if(this.resizable){
 	        div_container.resizable(
                     {alsoResize: this.element});
 	    }
-            this.element.append(div_container);
+            this.element.appendChild(div_container);
             //body.selectable(this.select_data()); // allow multiple cells to be selected
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
@@ -636,17 +658,17 @@ jsonishData={
 	        for(var i=0;i<this.grids.length;i++){
                   //  console.log("this is grid " + i);
                     this.addGrid(this.grids[i]);
-                    body=this.grids[i].element.find("tbody");
+                    body=this.grids[i].element.getElementsByTagName("tbody")[0]; //.find("tbody");
                     rows=this.grids[i].rows;
                 //    console.log("grid has " + rows.length + " number of rows");
                     for(var j=0;j<rows.length;j++){
                       //  console.log("adding row");
-                        r=$(document.createElement("tr"));
+                        r=document.createElement("tr");
                         for(var k=0;k<this.cols.length;k++){
                          //   console.log("adding cell");
                             this._addCell(rows[j],this.cols[k],r);
                         }
-                        body.append(r);
+                        body.appendChild(r);
                     }
                 }
             }
@@ -672,19 +694,19 @@ jsonishData={
             
 	    c=document.createElement("td");
             c.className=col.type;
-            c=$(c);
+            //c=$(c);
             //console.log("c is " + JSON.stringify(c));
             row[col.name]=Harvey.field[Harvey.dbToHtml[col.type].field](settings,c);
             if(col.display !== false){
-		r.append(row[col.name].element);
-		row[col.name].element.data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
+		r.appendChild(row[col.name].element);
+		$(row[col.name].element).data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
 	    }
 	    if(col.hidden){
-		row[col.name].element.hide();
+		row[col.name].element.visibility="hidden";
 	    }
         },
         addRow: function(row_data){
-	    var row=null,r,grid,name,l,t,sortOrder=[];
+	    var row=null,r,grid,name,l,t,sortOrder=[],e;
             var closest={val:-1};
 	    if(this.groupBy){
                 if(row_data[this.groupBy] === undefined){
@@ -718,7 +740,7 @@ jsonishData={
                     throw new Error("row already exists");
                 }
 	    }
-            r=$(document.createElement("tr"));
+            r=document.createElement("tr");
 	    for(var i=0;i<this.cols.length;i++){
                 this._addCell(row_data,this.cols[i],r);
             }
@@ -726,7 +748,7 @@ jsonishData={
             if(!grid.sorted){
                 console.log("adding row to end");
                 grid.rows.push(row_data);
-                grid.element.find("tbody").append(r);
+                grid.element.getElementsByTagName("tbody")[0].appendChild(r);//.find("tbody").append(r);
             }
             else{
               //  console.log("grid element is %j ", closest.val);//grid.rows[index]);
@@ -735,12 +757,16 @@ jsonishData={
               //  console.log("key is " + t);
                 if(closest.dir === "after"){
                     closest.index++;
-                    grid.rows.splice(closest.index,0,row_data);
-                    grid.rows[closest.index][t].element.parent().after(r); // insert the element
+                    grid.rows.splice(closest.index,0,row_data); //insert row
+                    // grid.rows[closest.index][t].element.parent().after(r); // insert the element
+                    e= grid.rows[closest.index][t].element;
+                    
+                    e.parentNode.insertBefore(e,r.nextSibling); // insert after r
                 }
                 else{
                     grid.rows.splice(closest.index,0,row_data);
-                    grid.rows[closest.index][t].element.parent().before(r); // insert the element
+                    e= grid.rows[closest.index][t].element;
+                    e.parentNode.insertBefore(r,e); // insert the element
                 }
             }
             return row_data;
@@ -766,14 +792,15 @@ jsonishData={
             
             // remove from dom
             for(var i=0;i<this.cols.length;i++){
-                el=row[this.cols[i].name].getElement();
-                if(i===0){
-                    parent=el.parent();
-                    console.log("parent is " + parent);
+                console.log("deleting col " + this.cols[i].name);
+                if(!row[this.cols[i].name]){
+                    throw new Error("row is undefined");
                 }
-                el.remove();
+                el=row[this.cols[i].name].getElement();
+                el.parentNode.removeChild(el);
+                el=null;
             }
-            parent.remove();
+            parent.parentNode.removeChild(parent);
             g.rows.splice(closest.index,1);
         },
         getRow:function(key,group,closest){
@@ -859,16 +886,16 @@ jsonishData={
  		    row[k].setValue(cell_data[k]);
                     var cl="cell_updated";
 		    if(row[k].display !== false){
-			if(row[k].getElement().hasClass(cl)){  // add colours to the cells to show update frequency
+			if(row[k].getElement().classList.contains(cl)){  // add colours to the cells to show update frequency
 			    row[k].getElement().removeClass(cl).addClass("cell_updated_fast");
 			    cl="cell_updated_fast";
 			}
 			else{
-			    row[k].getElement().addClass(cl);
+			    row[k].getElement().classList.add(cl);
 			}
 			if(to){ clearTimeout(to);}
 			to=setTimeout(function(){
-			    row[k].getElement().removeClass(cl);},15000);
+			    row[k].getElement().classList.remove(cl);},15000);
 		    }
 		}
 	    }
@@ -896,18 +923,19 @@ jsonishData={
 	deleteAll:function(){
             var el,parent,row;
             for(var i=0;i<this.grids.length;i++){
-                this.grids[i].element.detach();
+                this.grids[i].element.parentNode.removeChild(this.grids[i].element);
                 for(var j=0;j<this.grids[i].rows.length;j++){
                     row=this.grids[i].rows[j];
                     for(var k=0;k<this.cols.length;k++){
                         el=row[this.cols[k].name].getElement();
                         if(k===0){
-                            parent=el.parent();
+                            parent=el.parentNode;
                         }
-                        el.empty();
-                        el.remove();
+                        //el.empty();
+                        //el.remove();
+                        parent.removeChild(el);
                     }
-                    parent.remove();
+                    parent.parentNode.removeChild(parent);
                 }
                 this.grids[i].rows.length=0;
             }
@@ -920,10 +948,10 @@ jsonishData={
 	//    console.log("show grid is here");
 	    for(var i=0; i< this.grids.length;i++){
 		if(this.grids[i].name == name || name == "all"){
-		    this.grids[i].element.show();
+		    this.grids[i].element.visibility="visible";
 		}
 		else{
-		    this.grids[i].element.hide();
+		    this.grids[i].element.visibility="hidden";
 		}
 	    }
 	},
@@ -933,11 +961,10 @@ jsonishData={
 	    }
 	    for(var i=0; i< this.grids.length;i++){
 		if(this.grids[i].name == name || name == "all"){
-		    this.grids[i].element.hide();
+		    this.grids[i].element.visibility="hidden";
 		}
 	    }
 	},
-
 	redrawRows: function(grid_name){
 	    if(!grid_name){
 		if(this.grids.length === 1){
@@ -948,21 +975,20 @@ jsonishData={
 		    return null;
 		}
 	    }
-	    var b=this.grids[grid_name].element.find("tbody");
-	    b.empty();
+	    var b=this.grids[grid_name].element.getElementsByTagName("tbody")[0];
+	    b.innerHTML="";
 
 	    for(var i=0; i<this.grids[grid_name].rows.length; i++){
-		b.append(this.grids[grid_name].rows[i].element);
+		b.appendChild(this.grids[grid_name].rows[i].element);
 	    }
 	},
-
-        getRowFromElement: function(element){
+        getRowFromElement: function(element){  
             var s,row=[];
             var c=element.data("harvey");
             row.push({context:c.context,name: c.name,
                           value:c.context.value });
-            s=element.siblings();
-            console.log("got siblings " + s.length);
+            s=$(element).siblings();
+            console.log("got siblings " + s.length);   //still in jquery
             for(var i=0;i<s.length;i++){
                 c= $(s[i]).data("harvey");
                 console.log( "sib " + c.name + " value " + c.context.value);
@@ -970,7 +996,7 @@ jsonishData={
                           value: c.context.value });
             }
             return row;
-        },
+        }, 
         getJSON: function(){
             var c,t,m;
             var n={rows:[]};

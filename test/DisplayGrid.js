@@ -21,22 +21,29 @@ describe("DisplayGrid-(start without rows)",function(){
     var t;
     require("../DisplayGrid.js"); 
     it("creates a grid display object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
+        var b=document.createElement("div");
+        b.id="test";
+        document.getElementsByTagName("body")[0].appendChild(b);
+        //$("body").append("<div id='test'></div>");
         t=Harvey.display.grid({id:"test_grid",DOM:"test",cols:[{name: "name",type:"string"}]});
         assert.isObject(t);
     });
-    it("creates a jquery container",function(){
-        assert.notStrictEqual($("#test_grid"),0); 
+    it("has a getElement method",function(){
+        var b=t.getElement();
+        assert.isObject(b); 
+    });
+    it("has a show method which adds the root element to the DOM",function(){
+        var b=document.getElementById("test_grid");
+        assert.isNotObject(b);
+        t.show();
+        var b=document.getElementById("test_grid");
+        assert.isObject(b);
     });
     it("cannot add column if it does not have a unique name",function(){
         var fn=function(){
             t.addCol({name: "name",type:"string"});     
         };
         assert.throws(fn,"Columns must have unique names");
-    });
-    it("creates a div with id",function(){
-        assert.notStrictEqual($("#test_grid"),0);
     });
     it("can add a column ",function(){
         t.addCol({name: "index",type:"integer"});     
@@ -67,11 +74,7 @@ describe("DisplayGrid-(start without rows)",function(){
     it("can add yet another row",function(){
         t.addRow({name:"Sam",job:"Manager"});
     });
-    it("has a show method which adds the root element to the DOM",function(){
-        assert.strictEqual($("#test_grid").length,0);
-        t.show();
-        assert.notStrictEqual($("#test_grid").length,0);
-    });
+  
     it("dumps the contents of the grid as a JSON object",function(){
         var b=t.getJSON();
         assert.isObject(b);
@@ -85,9 +88,9 @@ describe("DisplayGrid-(start without rows)",function(){
     });
     it("has a delete method",function(){
         t.delete();
-        assert.strictEqual($("#test_grid").length,0);
-        var b=t.getChildren();
-        assert.lengthOf(b,0);
+        var b=document.getElementById("test_grid");
+        assert.strictEqual(document.body.contains(b),false);
+        console.log("t is now " + t);
     });
 });
 
@@ -100,15 +103,15 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     
     var data=require("./data/data.js");
     it("creates a grid display object",function(){
-        $("body").append("<div id='Content'></div>");
-        assert($("#test").length>0);
+        //$("body").append("<div id='Content'></div>");
+        var b=document.createElement("div");
+        b.id="Content";
+        document.body.appendChild(b);
+        assert.strictEqual(document.body.contains(b),true);
         t=Harvey.display.grid(data);
         assert.isObject(t);
     });
-    it("creates a jquery container",function(){
-        assert.notStrictEqual($("#test_grid"),0); 
-    });
-    it("can add a row",function(){
+     it("can add a row",function(){
         var b=t.getGrid("1").rows.length;
         b++;
         var n=t.addRow({stock:"FG63",subclass: 1,bid:10,maturity:20200521});
@@ -124,14 +127,17 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         assert.notStrictEqual(b,null);
     });
     it("has a show method which adds the root element to the DOM",function(){
-        assert.strictEqual($("#Blotter").length,0);
+        var b=document.getElementById("Blotter");
+        assert.strictEqual(document.body.contains(b),false);
         t.show();
-        assert.notStrictEqual($("#Blotter").length,0);
+        var b=document.getElementById("Blotter");
+        assert.strictEqual(document.body.contains(b),true);
     });
+    
     it("has added a row to the dom",function(){
-        var b=$("#1").find("tr:first").find("td:first");
-        assert.notStrictEqual(b.length,0);
-        var c=b.html();
+        var b=document.getElementById("1").getElementsByTagName("tr")[0].getElementsByTagName("td")[0];//querySelector("#1 tr:first td:first");
+        assert.isObject(b);
+        var c=b.textContent;
         console.log("td is " + c);
     });
     it("can add a column",function(){

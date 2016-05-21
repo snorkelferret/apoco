@@ -34,9 +34,9 @@ require("./Utils");
 		    }
                     break;
 		case "DOM": // does this object exist ?
-		    var d=$("#" + (ar[i][k])).toString();
+		    var d=document.getElementById(ar[i][k]);
 		  // console.log("switch case DOM ", d);
-		    if(d.length === 0){
+		    if(!d){
 			msg=msg.concat("No Dom object called " + d);
 		    }
 		    else{
@@ -120,7 +120,7 @@ require("./Utils");
 	        settings="_blank"; // open in new tab
 	    }
             else{
-                var n=$.extend({},defaults,d.opts);
+                var n=$.extend({},defaults,d.opts);//Harvey.mixinDeep(d.opts,defaults);
                 for(var k in n){
                     if(settings === ""){
                         settings=settings.concat((k + "=" + n[k]));
@@ -133,19 +133,24 @@ require("./Utils");
             }
 	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
 	    var p=$.Deferred();
-	    if(!win){
-	        p.reject();
-	    }
-	    window.addEventListener("childReady",function(){
-	        return function(e){
-		    if(e.data === win){
-		        console.log("window equals e.data");
-                        that._list[d.name]=win;
-		        p.resolve({"window":win,"name": d.name});
-		    }
-		    console.log("Parent child is ready");
-		};
-	    }(d.name,win,p),false);
+           // var p=new Promise(function(resolve,reject){
+	        if(!win){
+	            //p.reject();
+            //        reject("Could not open window");
+	        }
+	        window.addEventListener("childReady",function(){
+	            return function(e){
+		        if(e.data === win){
+		            console.log("window equals e.data");
+                            that._list[d.name]=win;
+		            p.resolve({"window":win,"name": d.name});
+              //              resolve({"window":win,"name": d.name});
+		        }
+		        console.log("Parent child is ready");
+		    };
+	        }(d.name,win,p),false);
+            //});
+            // p.done(function(d){
             p.done(function(d){
                 d.window.onunload=function(e){
                   //  console.log("got child closed " + d.name);
@@ -160,7 +165,10 @@ require("./Utils");
                         throw new Error("Could not find window to remove");
                     }
                 };
+            //}).catch(function(reason){
+            //    Harvey.error("Window Open Error",reason);
             });
+                                        
 
 	    return p;
         }
@@ -177,22 +185,31 @@ require("./Utils");
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
             for(var i=0;i<w.length;i++){
-                nv=$.extend( true,{},this._UIGet(w[i]));
+               // nv=$.extend( true,{},this._UIGet(w[i]));
+                console.log("trying to clone " + w[i]);
+                nv=this._UIGet(w[i]);
                 if(nv !== null){
                     this.add(nv);
                 }
                 else{
-                    throw new Error("Harvey.Panel: No panel called " + w[i] + "was found in UI.Panels");
+                    throw new Error("Harvey.Panel: No panel called " + w[i] + " was found in UI.Panels");
                 }
             }
 
         },
         _UIGet:function(name){
+            console.log("UIGet trying to find " + name);
+            console.log("UI Panels " + UI.Panels);
             for(var k in UI.Panels){
-              // console.log("trying to get panel " + name + " from " + k);
+                console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
-                    var newW=$.extend(true,{},UI.Panels[k]);
-                    return newW;
+                     //var newW=$.extend(true,{},UI.Panels[k]);
+                    //console.log("found " + name);
+                    var cd=Harvey.cloneDeep(UI.Panels[k]);
+                  //  var newW= 10 ; 
+                   // console.log("clone deep is " + cd);
+                    
+                    return cd;
                 }
             }
             return null;
@@ -229,8 +246,10 @@ require("./Utils");
                     throw new Error("Cannot find panel " + k);
                 }
                 else{
-                    this.add(w);
-                    return;
+                    p=this.add(w);
+                    if(p === null){
+                         throw new Error("Cannot find panel " + k);
+                    }
                 }
             }
             var c=p.getChildren();
@@ -254,7 +273,8 @@ require("./Utils");
             }
             var c=p.getChildren();
             for(var i=0;i<c.length;i++){
-                c[i].element.detach();
+                //c[i].element.detach();
+                c[i].hide();
             }
         },
         getList: function(){
@@ -403,12 +423,12 @@ require("./Utils");
                 console.log("adding component " + p);
 		this.components[i].parent=this;
                // console.log("addComponents window is " + that.window);
-	        var d=Harvey.display[p](this.components[i],that.window);
-                var d=Harvey.display[p](this.components[i]);
+	        d=Harvey.display[p](this.components[i],that.window);
+                
 		if(d === null){
 		    throw new Error("could not create " + p);
 		    return;
-		}
+	        }
 		if(d.deferred){
                     Harvey.popup.spinner(true);
 		    d.deferred.done(function(that){
@@ -555,19 +575,21 @@ require("./Utils");
 	}
     };
 
-    $.extend(true, Harvey, { _panelComponents:
-                             function(t){
-                                 if(t === "methods"){
-                                     var f={};
-                                     for(var k in _Components.prototype ){
-                                         f[k]=k;
-                                     }
-                                     return f;
-                                 }else{
-                                     return new _Components(t);
-                                 }
-                             }
-                           });
-
+    //$.extend(true, Harvey,
+    Harvey.mixinDeep(Harvey,
+                     { _panelComponents:
+                       function(t){
+                           if(t === "methods"){
+                               var f={};
+                               for(var k in _Components.prototype ){
+                                   f[k]=k;
+                               }
+                               return f;
+                           }else{
+                               return new _Components(t);
+                           }
+                       }
+                     });
+    
 
 })(jQuery);

@@ -72,25 +72,39 @@ describe("InputField",function(){
         assert(t.getElement() !== null); 
     });
     it("creates a div element",function(){
-       // var n=Harvey.field["InputField"]({name: "inputNode",type: "integer",value: 10});
-        //assert(n);
         var b=t.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+        console.log("8888888888888888899999999999999 name is " + b.getAttribute("name"));
+        document.getElementsByTagName("body")[0].appendChild(b);
+        
     });
     
     it("creates an input node",function(){
-        var b=$("body").find("div[name='inputNode']").find("input");
-        assert.strictEqual(b.length,1);
+        var b;
+        //var c=document.getElementsByTagName("div";
+        var b=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];    
+       // b=c.
+        
+        
+
+        //var b=document.getElementsByTagName("div").getElementsByTagName("input")[0];
+     //   var b=$("body").find("div[title='inputNode']").find("input");
+        console.log("iiiiiiiiiiiiiiiiiinput node is %j " , b);
+        assert.notStrictEqual($(b).length,0);
+        assert.isObject(b);
     });
     
     it("adds a name attribute",function(){
-        var element=$("body").find("div[name='inputNode']");
-        assert.strictEqual($(element).attr("name"),"inputNode");
+        //var b=$("body").find("div[title='inputNode']");
+        var b= document.getElementsByName("inputNode")[0];
+        console.log("b is %j " , b);
+        console.log("CCCCCCCCCCCCCCCC name is " + b.getAttribute("name"));
+        assert.strictEqual(b.getAttribute("name"),"inputNode");
     });
     it("sets the value",function(){
         t.setValue(10);
-        assert.strictEqual($("body").find("div[name='inputNode']").find("input").val(),'10');
+        var b=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];
+        assert.strictEqual(b.value,'10');
     });
  
     it("checks the type of the value",function(){
@@ -134,24 +148,27 @@ describe("FloatField",function(){
     });
     it("creates a div element",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates two input elements",function(){
-        var e=$("body").find("div[name='floatField']").find("input");
+        // var e=$("body").find("div[name='floatField']").find("input");
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,2);
     });
     
     it("sets a float value with precision 3",function(){
         f.setValue(12.124234);
-        var e=$("body").find("div[name='floatField']").find("input");
+        //var e=$("body").find("div[name='floatField']").find("input");
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
         console.log("first fields value is " + $(e[0]).val());
-        assert.strictEqual($(e[0]).val(),'12');
-        assert.strictEqual($(e[1]).val(),'124');
+        assert.strictEqual(e[0].value,'12');
+        assert.strictEqual(e[1].value,'124');
     });
     it("accepts a negative value",function(){
         f.setValue(-23.4678);
-        var e=$("body").find("div[name='floatField']").find("input");
+        //var e=$("body").find("div[name='floatField']").find("input");
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
         console.log("first fields value is " + $(e[0]).val());
         assert.strictEqual($(e[0]).val(),'-23');
         assert.strictEqual($(e[1]).val(),'468');
@@ -171,7 +188,54 @@ describe("FloatField",function(){
         var fn=function(){
             f.setValue("dog");
         };
-        assert.throws(fn,"setValue: this value is not a float dog");
+        assert.throws(fn, "FloatField: setValue this value is not a float");
+        
+    });
+    it("can delete itself",function(){
+        f.delete();
+    });
+    
+});
+
+describe("FloatField- with spinner",function(){
+    var $;
+    $= global.jQuery = require('jquery');
+    require("../Fields.js");
+  //  require("../node_modules/jquery-ui");
+   
+ 
+    var f=Harvey.field["FloatField"]({name:"floatField",spinner: true,type: "float",value: 10,precision: 3});
+  
+    it("creates a div element",function(){
+        var b=f.getElement();
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+    it("creates two input elements",function(){
+        // var e=$("body").find("div[name='floatField']").find("input");
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
+        assert.strictEqual(e.length,2);
+    });
+    
+    it("has a spinner which increments the value",function(){
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("li")[1];
+        assert.isObject(e);
+        var up=e.querySelector("span.up");
+       // var down=e.getElemenstByClassName("down")[0];
+        assert.isObject(up);
+        up.focus();
+        up.click();
+    /*    var ce=document.createEvent("MouseEvents");
+        ce.initEvent("mousedown",true,true);
+        up.dispatchEvent(ce);
+        var ne=document.createEvent("MouseEvents");
+        ne.initEvent("mouseup",true,true);
+        up.dispatchEvent(ne);
+        */
+        
+        var b=f.getValue();
+        //var b=document.getElementsByName("floatField")[0].getElementsByTagName("input")[0];
+        assert.strictEqual(b,"10.100"); 
     });
 });
 
@@ -193,25 +257,27 @@ describe("DateField",function(){
     var f=Harvey.field["DateField"]({name:"dateField",type: "date"});
     it("creates a div element",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates an input node",function(){
-        var e=$("body").find("div[name='dateField']").find("input");
-        assert(e.length>0);
+        var e=document.getElementsByName("dateField")[0].getElementsByTagName("input")[0];
+        //var e=$("body").find("div[name='dateField']").find("input");
+        assert.isObject(e);
     });
-    it("creates a jquery datepicker",function(){
+    it("creates a datepicker",function(){
        // var e=$("body").find("div[name='dateField']").find("#ui-datepicker-div");
-        var e=$("body").find("#ui-datepicker-div");
-        assert(e.length>0);
+        var e=document.getElementsByClassName("pika-lendar")[0];
+        assert.strictEqual(document.contains(e),true);
     });
     it("sets a date",function(){
         f.setValue(20160824);
-        var e=$("body").find("div[name='dateField']").find("input");
-        assert.strictEqual(e.val(),"20160824");
+        //var e=$("body").find("div[name='dateField']").find("input");
+        var e=document.getElementsByName("dateField")[0].getElementsByTagName("input")[0];
+        assert.strictEqual(e.value,20160824);
     });
     it("gets a date",function(){
-        assert.strictEqual(f.getValue(),"20160824"); 
+        assert.strictEqual(f.getValue(),20160824); 
     });
     it("rejects a value of the wrong type",function(){
         f.setValue("dog");
@@ -229,27 +295,36 @@ describe("CheckBoxField",function(){
     var f=Harvey.field["CheckBoxField"]({name:"checkBoxField",type: "boolean"});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+       document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates an input node",function(){
-        var e=$("body").find("div[name='checkBoxField']").find("input");
-        assert(e.length>0);
+        var e=document.getElementsByName("checkBoxField")[0].getElementsByTagName("input")[0];
+        //var e=$("body").find("div[name='checkBoxField']").find("input");
+        assert.isObject(e);
     });
     it("has a setter for value",function(){
         f.setValue(true);
-        var e=$("body").find("div[name='checkBoxField']").find("input");
-        assert.strictEqual(e.prop("checked"),true);
+        var e=document.getElementsByName("checkBoxField")[0].getElementsByTagName("input")[0];
+        //var e=$("body").find("div[name='checkBoxField']").find("input");
+        assert.strictEqual(e.getAttribute("checked"),"checked");
     });
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),true); 
     });
     it("clicking toggles value",function(){
-        var e=$("body").find("div[name='checkBoxField']").find("input");
-        e.trigger("click");
+        var e=document.getElementsByName("checkBoxField")[0].getElementsByTagName("input")[0];
+        //var e=$("body").find("div[name='checkBoxField']").find("input");
+        //e.focus();
+        //e.click();
+        assert.strictEqual(e.checked,true);
+        e.focus();
+        e.click();
+        assert.strictEqual(e.checked,false);
+        
         assert.strictEqual(f.getValue(),false); 
-        e.trigger("click");
-        assert.strictEqual(f.getValue(),true); 
+      //  e.click();
+      //  assert.strictEqual(f.getValue(),"true"); 
     });
     
 });
@@ -263,31 +338,25 @@ describe("NumberArrayField-Integer",function(){
     var f=Harvey.field["NumberArrayField"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates an array of input nodes",function(){
-        var e=$("body").find("div[name='numberArrayField']").find("input");
+        //var e=$("body").find("div[name='numberArrayField']").find("input");
+        var e=document.getElementsByName("numberArrayField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,4);
     });
-    it("can set a max value",function(){
-        var w=f.getInputElement();
-        w[0].prop("max",10);
-        var e=$("body").find("div[name='numberArrayField']").find("input");
-        assert.strictEqual($(e[0]).prop("max"),"10");
-    });
-    
     it("has a value getter",function(){
         var r=f.getValue();
-        assert.sameMembers(r,["1","2","",""]);
+        assert.sameMembers(r,[1,2,"",""]);
     });
     it("sets the values",function(){
         f.setValue([2,5,7]);
-        var e=$("body").find("div[name='numberArrayField']").find("input");
-        assert.strictEqual($(e[0]).val(),"2");
-        assert.strictEqual($(e[1]).val(),"5");
-        assert.strictEqual($(e[2]).val(),"7");
-        assert.strictEqual($(e[3]).val(),"");
+        var e=document.getElementsByName("numberArrayField")[0].getElementsByTagName("input");
+        assert.strictEqual(e[0].value,"2");
+        assert.strictEqual(e[1].value,"5");
+        assert.strictEqual(e[2].value,"7");
+        assert.strictEqual(e[3].value,"");
     });  
 });
 
@@ -301,22 +370,26 @@ describe("TextAreaField",function(){
     var f=Harvey.field["TextAreaField"]({name:"textAreaField",type: "text"});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates a textarea node",function(){
-        var e=$("body").find("div[name='textAreaField']").find("textarea");
+        //  var e=$("body").find("div[name='textAreaField']").find("textarea");
+        var e=document.getElementsByName("textAreaField")[0].getElementsByTagName("textarea")[0];
         assert.notStrictEqual(e.length,0);
     });
     it("adds text",function(){
-        var e=$("body").find("div[name='textAreaField']").find("textarea").val("blah blah blah");
+        var e=document.getElementsByName("textAreaField")[0].getElementsByTagName("textarea")[0];
+        //var e=$("body").find("div[name='textAreaField']").find("textarea").val("blah blah blah");
+        e.value="blah blah blah";
         var b=f.getValue();
         assert.equal(b,"blah blah blah");
     });
     it("has a value setter",function(){
         f.setValue("some other text");
-        var e=$("body").find("div[name='textAreaField']").find("textarea").val();
-        assert.equal(e,"some other text");
+        var e=document.getElementsByName("textAreaField")[0].getElementsByTagName("textarea")[0];
+       // var e=$("body").find("div[name='textAreaField']").find("textarea").val();
+        assert.equal(e.value,"some other text");
     });
 });
                                        
@@ -328,24 +401,32 @@ describe("SelectField",function(){
   
     
     var f=Harvey.field["SelectField"]({name:"selectField",type: "string",options:["one","two","three"]});
-     it("creates a div",function(){
+    it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
-     });
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
     it("creates a select node",function(){
-        var e=$("body").find("div[name='selectField']").find("select");
-        assert.notStrictEqual(e.length,0);
+        var e=document.getElementsByName("selectField")[0].getElementsByTagName("select")[0];
+        //var e=$("body").find("div[name='selectField']").find("select");
+        assert.isObject(e);
     });
     it("creates option nodes",function(){
-        var e=$("body").find("div[name='selectField']").find("option");
+        //var e=$("body").find("div[name='selectField']").find("option");
+        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
         assert.strictEqual(e.length,3);
        
     });
     it("sets a value",function(){
-        var e=$("body").find("div[name='selectField']").find("option:contains('two')");
+        //var e=$("body").find("div[name='selectField']").find("option:contains('two')");
+        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
+        for(var i=0;i<e.length;i++){
+            if(e[i].textContent === "two"){
+                break;
+            }
+        }
         //var e=$("body").find("div[name='selectField']").find("select");
-        e[0].selected=true;
+        e[i].selected=true;
  
         $(e).trigger("change");
         var b=f.getValue();
@@ -353,45 +434,69 @@ describe("SelectField",function(){
     });
     it("has a method to set a value",function(){
         f.setValue("three");
-        var b=$("body").find("div[name='selectField']").find("select").val();
-        
+        //var b=$("body").find("div[name='selectField']").find("select").val();
+        var b=document.getElementsByName("selectField")[0].getElementsByTagName("select")[0].value;;
         assert.equal(b,"three");
     });
     
 });
 
-describe("RadioButtonSetField",function(){
+describe("ButtonSetField",function(){
     var $;
     $= global.jQuery = require('jquery');
  
     require("../Fields.js");
  
     
-    var f=Harvey.field["RadioButtonSetField"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
+    var f=Harvey.field["ButtonSetField"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0);
-        $("body").append(b);
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates an array of input nodes",function(){
-        var e=$("body").find("div[name='radioButtonSetField']").find("input");
+        // var e=$("body").find("div[name='radioButtonSetField']").find("input");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,3);
     }); 
     it("creates an array of label nodes",function(){
-        var e=$("body").find("div[name='radioButtonSetField']").find("li");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
+    //    var e=$("body").find("div[name='radioButtonSetField']").find("li");
         assert.strictEqual(e.length,3);
     });
     it("sets a value",function(){
-        var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('two')");
-        $(e).find("input").trigger("click");
-        var b=$(e).find('input').prop("checked");
-        assert.strictEqual(b,true);
+        var index=-1;
+        //var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('two')");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
+        for(var i=0;i<e.length;i++){
+            if(e[i].textContent === "two"){
+                index=i;
+                break;
+            }
+        }
+        if(index > -1){
+            var b=e[index].getElementsByTagName("input")[0];  //find("input").trigger("click");
+            //var b=$(e[index]).find('input').prop("checked");
+            b.click();
+            assert.strictEqual(b.checked,true);
+        }
+        else{
+            throw new Error("cannot find two");
+        }
     });
     it("uses a setter method for value",function(){
+        var index=-1;
         f.setValue("one");
-        var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('one')").find("input");
-        var b=$(e).prop("checked");
-        assert.strictEqual(b,true);
+        //var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('one')").find("input");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
+        for(var i=0;i<e.length;i++){
+            if(e[i].textContent === "one"){
+                break;
+            }
+        }
+        var b=e[i].getElementsByTagName("input")[0];
+        //var s=$(e).prop("checked");
+        assert.strictEqual(b.checked,true);
     });
     it("has a getter method which returns an array",function(){
         var b=f.getValue();
@@ -403,89 +508,97 @@ describe("RadioButtonSetField",function(){
     });
     it("can add a new entry",function(){
         f.addValue("four");
-        var e=$("body").find("div[name='radioButtonSetField']").find("li");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
+       // var e=$("body").find("div[name='radioButtonSetField']").find("li");
         assert.strictEqual(e.length,4);
-        var e=$("body").find("div[name='radioButtonSetField']").find("input");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
+        //var e=$("body").find("div[name='radioButtonSetField']").find("input");
         assert.strictEqual(e.length,4);
     });
     it("can set the new entry",function(){
-        var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('four')");
-        $(e).find("input").trigger("click");
-        var b=$(e).find('input').prop("checked");
-        assert.strictEqual(b,true);
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
+        for(var i=0;i<e.length;i++){
+            if(e[i].textContent === "four"){
+                break;
+            }
+        }
+       // var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('four')");
+        //$(e[i]).find("input").trigger("click");
+        var b=e[i].getElementsByTagName("input")[0];
+        b.click();
+        //var b=$(e).find('input').prop("checked");
+        assert.strictEqual(b.checked,true);
     });
     it("rejects a value of the wrong type",function(){
         var fn=function(){
             f.setValue("dog");
         };
-        assert.throws(fn,"RadioButtonsetfield: setValue has no member called dog");
+        assert.throws(fn,"Buttonsetfield: setValue has no member called dog");
+    });
+    it("can remove itself",function(){
+        f.delete();
     });
 });
 
-describe("CounterField",function(){
+describe("ButtonSetField - as checkboxes",function(){
     var $;
     $= global.jQuery = require('jquery');
-  
-    require("../Fields.js");
  
-    
-    var f=Harvey.field["CounterField"]({name:"counterField",type: "integer",min:0,max:16});
+    require("../Fields.js");
+    var f=Harvey.field["ButtonSetField"]({name:"radioButtonSetField",checkbox:true,type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0); 
-        $("body").append(b);
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
-    it("has a method to set a value",function(){
-        f.setValue(10);
-        var e=$("body").find("div[name='counterField']").find("input").val();
-        assert.strictEqual(e,"10");
+    it("creates an array of input nodes",function(){
+        // var e=$("body").find("div[name='radioButtonSetField']").find("input");
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
+        assert.strictEqual(e.length,3);
     });
-    it("has a method to get a value",function(){
-        var e=f.getValue();
-        assert.strictEqual(e,"10");
+    it("sets a value on click",function(){
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
+        e[0].click();
+        //e[2].click(); 
+        var b=f.getValue();
+        assert.strictEqual(b.length,3);
+        assert.strictEqual(b[0].one,true);
+        assert.strictEqual(b[1].two,false);
+        assert.strictEqual(b[2].three,false);
     });
-    it("has a spinner which increments the value",function(){
-        var e=$("body").find("div[name='counterField']").find("a");
-        assert.strictEqual(e.length,2);
-        var r= $(e[0]).find("span.ui-icon-triangle-1-n"); //
-        assert.strictEqual(r.length,1);
-        var r=$("body").find("div[name='counterField']").find("a").first().trigger("mousedown");
-        var r=$("body").find("div[name='counterField']").find("a").first().trigger("mouseup");
-        $("body").find("div[name='counterField']").find("input").blur();
-        var b=$("body").find("div[name='counterField']").find("input").val();
-        assert.strictEqual(b,"11");
+      it("allows multiple selects",function(){
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
+        //e[0].click();
+        e[2].click(); 
+        var b=f.getValue();
+        assert.strictEqual(b.length,3);
+        assert.strictEqual(b[0].one,true);
+        assert.strictEqual(b[1].two,false);
+        assert.strictEqual(b[2].three,true);
     });
-    it("rejects a value of the wrong type",function(){
-        var fn=function(){
-            f.setValue("dog");
-        };
-        assert.throws(fn, "CounterField: setValue wrong type for value");
-        
-    });
-    
 });
+
 
 describe("SliderField",function(){
     var $;
     $= global.jQuery = require('jquery');
- 
     require("../Fields.js");
- 
-    
+     
     var f=Harvey.field["SliderField"]({name:"sliderField",type: "integer",min: 0,max:10});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0); 
-        $("body").append(b);
+        assert.isObject(b); 
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates a slider",function(){
-        var r=$("body").find("div[name='sliderField']").find(".ui-slider");
-        assert.strictEqual(r.length,1);
+        //var r=$("body").find("div[name='sliderField']").find(".ui-slider");
+        var r=document.getElementsByName("sliderField")[0].getElementsByTagName("input")[0];
+        assert.isObject(r);
     });
     it("has a set value method",function(){
         f.setValue(5);
-        var r=$("body").find("div[name='sliderField']").find("input").val();
-        assert.strictEqual(r,"5");
+        var r=document.getElementsByName("sliderField")[0].getElementsByTagName("input")[0];
+        assert.strictEqual(r.value,"5");
     });
     it("rejects non-numeric values",function(){
         f.setValue("dog");
@@ -503,19 +616,21 @@ describe("StringArrayField",function(){
     var f=Harvey.field["StringArrayField"]({name:"stringArrayField",value:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0); 
-        $("body").append(b);
+        assert.isObject(b); 
+        document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates a list",function(){
-        var e=$("body").find("div[name='stringArrayField']").find("li");
+        //var e=$("body").find("div[name='stringArrayField']").find("li");
+        var e=document.getElementsByName("stringArrayField")[0].getElementsByTagName("li");
         assert.strictEqual(e.length,3);
     });
     it("sets the values",function(){
-        var e=$("body").find("div[name='stringArrayField']").find("input");
+        //var e=$("body").find("div[name='stringArrayField']").find("input");
+        var e=document.getElementsByName("stringArrayField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,3);
-        assert.strictEqual($(e[0]).val(),"one");
-        assert.strictEqual($(e[1]).val(),"two");
-        assert.strictEqual($(e[2]).val(),"three");
+        assert.strictEqual(e[0].value,"one");
+        assert.strictEqual(e[1].value,"two");
+        assert.strictEqual(e[2].value,"three");
         
     });
     it("has a method to get value array",function(){
@@ -523,10 +638,13 @@ describe("StringArrayField",function(){
         assert.sameMembers(r,["one","two","three"]);
     });
     it("can add an empty field",function(){
-        var r=$("body").find("div[name='stringArrayField']").find('span.plus');
-        assert.strictEqual(r.length,1);
-        $(r).trigger("click");
-        var e=$("body").find("div[name='stringArrayField']").find("input");
+        var r=document.getElementsByName("stringArrayField")[0].getElementsByTagName("span")[0];
+        //$("body").find("div[name='stringArrayField']").find('span.plus');
+        assert.isObject(r);
+        //$(r).trigger("click");
+        r.click();
+        //var e=$("body").find("div[name='stringArrayField']").find("input");
+        var e=document.getElementsByName("stringArrayField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,4);
     });
     it("rejects a value of the wrong type",function(){
@@ -534,7 +652,7 @@ describe("StringArrayField",function(){
             f.setValue(10);
         };
         assert.throws(fn,"StringArrayField: setValue not an array"); 
-        f.setValue(["big","small"]);
+        //f.setValue(["big","small"]);
     });
 });
 
@@ -548,8 +666,8 @@ describe("ImageArrayField",function(){
     var f=Harvey.field["ImageArrayField"]({name:"imageArrayField"});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0); 
-        $("body").append(b);
+        assert.isObject(b); 
+       document.getElementsByTagName("body")[0].appendChild(b);
     });
 
 });
@@ -563,8 +681,8 @@ describe("AutoCompleteField",function(){
     var f=Harvey.field["AutoCompleteField"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
-        assert(b.length>0); 
-        $("body").append(b);
+        assert.isObject(b); 
+       document.getElementsByTagName("body")[0].appendChild(b);
     });
 
 });

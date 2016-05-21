@@ -25,10 +25,15 @@ require("./Nodes.js");
     HarveyMakeFieldset.prototype={
 	execute: function(){
 	    var el,p;
-	    this.element=$("<div id='" + this.id + "' class='field_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
+	    //this.element=$("<div id='" + this.id + "' class='field_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
+            this.element=document.createElement("div");
+            this.element.id=this.id;
+            this.element.classList.add("field_container","ui-widget","ui-widget-content","ui-corner-all");
+            
             if(this.components !== undefined){
                 for(var i=0;i<this.components.length;i++){
-                    el=$("<div class='fieldset'></div>");
+                    el=document.createElement("div");//$("<div class='fieldset'></div>");
+                    el.classList.add("fieldset");
                     if(this.components[i].class){
                         el.addClass(this.components[i].class);
                     }
@@ -85,12 +90,30 @@ require("./Nodes.js");
             }
             return this.nodes;
         },
+        deleteChild:function(name){
+            if(name !== undefined){
+                //is it a node or a field?
+                if(this.getNode(name)!== null){
+                    this.deleteNode(name);
+                }
+                else if(this.getField(name)!== null){
+                    this.deleteField(name);
+                }
+                else {
+                    throw new Error("DisplayFieldset: deleteChild cannot find " + name);
+                }
+            }
+            else{
+                throw new Error("deleteChild- needs a name");
+            }              
+
+        },
         addNode:function(d,el){
             var n,parent_element;
             if(d.name && this.getNode(d.name)!==null){
-                    throw new Error("Cannot add node with non-unique name");
+                throw new Error("Cannot add node with non-unique name");
             }
-            if(d.element && d.element.length>0){
+            if(d.element){
                 if(!d.node){
                     throw new Error("Harvey.displayFieldset: addNode - object is not a node");
                 }
@@ -100,7 +123,7 @@ require("./Nodes.js");
                 n=Harvey.node(d,el);
             }
             if(n){
-                this.element.append(n.element);
+                this.element.appendChild(n.element);
                 n.parent=this;
 	        this.nodes.push(n);
                 return n;
@@ -124,7 +147,8 @@ require("./Nodes.js");
             if(index===-1){
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
-            this.nodes[index].element.remove();
+            this.nodes[index].element.parentNode.removeChild(this.nodes[index].element);
+            this.nodes[index].element=null;
             this.nodes.splice(index,1);
         },
         addField: function(d,el){
@@ -158,7 +182,7 @@ require("./Nodes.js");
             }
             p.parent=this;
 	    this.fields.push(p);
-	    this.element.append(p.element);
+	    this.element.appendChild(p.element);
             
             return p;
         },
@@ -167,16 +191,17 @@ require("./Nodes.js");
                 if(this.fields[i].listen){
                     Harvey.unsubscribe(this.fields[i]);
                 }
-                this.fields[i].element.empty();
-                this.fields[i].element.remove();
+                //this.fields[i].element.empty();
+                this.fields[i].element.parentNode.removeChild(this.fields[i].element);
             }
             this.fields.length=0;
             for(var i=0;i<this.nodes.length;i++){
                 if(this.nodes[i].listen){
                     Harvey.unsubscribe(this.nodes[i]);
                 }
-                this.nodes[i].element.empty();
-                this.nodes[i].element.remove();
+                //this.nodes[i].element.empty();
+                //this.nodes[i].element.remove();
+                this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
             }
             this.nodes.length=0;
         },
@@ -197,7 +222,9 @@ require("./Nodes.js");
             if(index===-1){
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
-            this.fields[index].element.remove();
+            //this.fields[index].element.remove();
+            this.fields[index].element.parentNode.removeChild(this.fields[index].element);
+            this.fields[index].element=null;
             this.fields.splice(index,1);
         },
         getJSON: function(){

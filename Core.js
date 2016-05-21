@@ -1,4 +1,4 @@
-//var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
 require("./index.js");
 /*function require_(script) {
     $.ajax({
@@ -31,16 +31,17 @@ require("./index.js");
     var that=this;
 
     // set all instances of the datepicker to these default values
-    $.datepicker.setDefaults({
+    /*  $.datepicker.setDefaults({
         // showOn: 'both',
         dateFormat: 'yymmdd' //'yy-mm-dd'   //'IS0_8601'   // yyyy-mm-dd
         // buttonImageOnly: true,
 	// buttonImage: 'calendar.gif',
 	// buttonText: 'Calendar'
-    });
+    }); */
 
     window.onerror=function(msg,url,lineno){
-	Harvey.popup.dialog(url, ("line number " + lineno + " " + msg));
+        //Harvey.Error=Harvey.popup.dialog({id:"Harvey_Error"});
+	Harvey.popup.error(url, ("line number " + lineno + " " + msg));
     };
 
 /*
@@ -53,6 +54,8 @@ require("./index.js");
         var t=window.setTimeout(function(){ Harvey.Panel.deleteAll(d); },500000);
         d.done( function(){  window.clearTimeout(t);});
     });
+    console.log("UI.Panels is " + UI.Panels);
+    console.log("UI is " + UI);
 
     $.extend(true,Harvey,{
 	start: function(options) {
