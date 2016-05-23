@@ -1,7 +1,7 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare'); //UI,jQuery=require('jquery');
 require('./Utils');
 require('./Types');
-
+require("./datepicker");
 
 // editable: true by default
 // required: false by default
@@ -597,30 +597,25 @@ require('./Types');
         _Field.call(this,d,element);
         var s=document.createElement("input");
         s.type=this.html_type;
-        
         s.className=this.type;
         this.input=s;
         this.element.appendChild(s);
-	if(this.editable !== false){
-            //<datepicker type="grid" value="2007-03-26"/>
-            this.picker=document.createElement("datepicker");
-            this.picker.setAttribute("type","grid");
-            this.picker.value="20150623";
-            this.input.appendChild(this.picker);
-        }
-            
         if(this.value){
-            
-                this.input.value=this.value;
-	       // $(this.input).datepicker("setDate",this.value);
+            this.input.value=this.value;
+	}
+	if(this.editable !== false){
+            if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
+                console.log("Making datepicker for Mozilla");
+                this.input.type="text";
+                Harvey.datepicker.init(this.input);
+            }
+            else{
+                this.picker=document.createElement("datepicker");
+                this.picker.setAttribute("type","grid");
+                this.input.appendChild(this.picker);
+            }
         }
-           // else{
-              //  $(this.input).datepicker();
-           // }
-	    var that=this;
-	    //$(this.input).datepicker('option','onSelect',function(date,object_inst){ that.value=date;}); // not tested
-	
-	return this;
+ 	return this;
     };
   
     Harvey.Utils.extend(DateField,_Field);
