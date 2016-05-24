@@ -265,19 +265,14 @@ describe("DateField",function(){
         //var e=$("body").find("div[name='dateField']").find("input");
         assert.isObject(e);
     });
-    it("creates a datepicker",function(){
-       // var e=$("body").find("div[name='dateField']").find("#ui-datepicker-div");
-        var e=document.getElementsByClassName("pika-lendar")[0];
-        assert.strictEqual(document.contains(e),true);
-    });
     it("sets a date",function(){
-        f.setValue(20160824);
+        f.setValue("20160824");
         //var e=$("body").find("div[name='dateField']").find("input");
         var e=document.getElementsByName("dateField")[0].getElementsByTagName("input")[0];
-        assert.strictEqual(e.value,20160824);
+        assert.strictEqual(e.value,"20160824");
     });
     it("gets a date",function(){
-        assert.strictEqual(f.getValue(),20160824); 
+        assert.strictEqual(f.getValue(),"20160824"); 
     });
     it("rejects a value of the wrong type",function(){
         f.setValue("dog");

@@ -589,7 +589,6 @@ require("./datepicker");
 
     Harvey.Utils.extend(FloatField,_Field);
 
-
     var DateField=function(d,element){
         var that=this;
         d.field="DateEield";
@@ -607,6 +606,7 @@ require("./datepicker");
             if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
                 console.log("Making datepicker for Mozilla");
                 this.input.type="text";
+                this.input.setAttribute("placeholder","YYYY-MM-DD");
                 Harvey.datepicker.init(this.input);
             }
             else{
