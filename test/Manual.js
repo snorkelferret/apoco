@@ -19,11 +19,11 @@ var promise=require("selenium-webdriver/lib/promise");
  //                                          {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 //global.window=document.defaultView;
 //global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
+//global.jQuery = require('jquery');
 
-/*
+
 describe("Manual",function(){
-    var $= global.jQuery; 
+//    var $= global.jQuery; 
     var driver;
     var tabs;
     //test.before(function(){
@@ -33,33 +33,35 @@ describe("Manual",function(){
     
     //});
     driver.get("file:///home/val/harvey/manual.html");
+   
+    
     test.after(function() {
         driver.quit();
     });
-    
-    before(function(done){
+  
+    test.it("has loaded a node called Content",function(done){
+        this.timeout(15000);
+        driver.wait(function(){
+           return driver.isElementPresent(By.id("Content"));
+       },15000); 
+       var b=driver.findElement(By.id("Content"));
+        //driver.findElement(By.id("Content")).then(function(b){
+        console.log("Got content node " + b);
+        assert.notStrictEqual(b,undefined);
+        assert.notStrictEqual(b,null);
+        done();
+       // });
+    });
+    // before(function(done){
+    test.it("can find some tabs ",function(done){
         driver.findElement(By.id("Tabs")).then(function(e){
             e.findElements(By.tagName("li")).then(function(b){
                 console.log("before got tabs length " + b.length);
                 tabs=b;
                 done();
-             });
-         });
+            });
+        });
     });
-    test.it("has loaded a node called Content",function(done){
-        this.timeout(1500);
-        
-       //  driver.wait(function(){
-      //      return driver.isElementPresent(By.id("Content"));
-      //  },15000); 
-        var b=driver.findElement(By.id("Content"));
-        console.log("Got content node " + b);
-        assert.notStrictEqual(b,undefined);
-        assert.notStrictEqual(b,null);
-        done();
-        
-    });
- 
     test.it("we have some poxy tabs",function(done){
         assert.strictEqual(tabs.length,9);
         console.log("we have poxy tabs " + tabs.length);
@@ -147,12 +149,12 @@ describe("Manual",function(){
         tab.click();
         assert.isObject(driver.findElement(By.id("UtilsMenu")));
         done();
-    });
+    }); 
     
 });
 
-
 /*
+
 describe("Manual About Page",function(){
     var $= global.jQuery; 
     var driver;
@@ -172,8 +174,8 @@ describe("Manual About Page",function(){
             return driver.isElementPresent(By.id("Content"));
         },15000); 
         var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Harvey')]")).then(function(b){
-            assert.isObject(b);
-            done();
+        assert.isObject(b);
+        done();
         //});
     });
     test.it("has loaded the lhs menus",function(done){
@@ -190,7 +192,7 @@ describe("Manual About Page",function(){
              });
             done();
         });
-    }); 
+    });  
 });
     
 describe("Manual Fields Page",function(){
@@ -237,4 +239,5 @@ describe("Manual Fields Page",function(){
     });
     
 });
+
 */

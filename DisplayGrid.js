@@ -757,16 +757,18 @@ jsonishData={
               //  console.log("key is " + t);
                 if(closest.dir === "after"){
                     closest.index++;
-                    grid.rows.splice(closest.index,0,row_data); //insert row
+                    //grid.rows.splice(closest.index,0,row_data); //insert row
                     // grid.rows[closest.index][t].element.parent().after(r); // insert the element
                     e= grid.rows[closest.index][t].element;
                     
                     e.parentNode.insertBefore(e,r.nextSibling); // insert after r
+                    grid.rows.splice(closest.index,0,row_data); //insert row
                 }
                 else{
-                    grid.rows.splice(closest.index,0,row_data);
-                    e= grid.rows[closest.index][t].element;
+                    // grid.rows.splice(closest.index,0,row_data);
+                    e=grid.rows[closest.index][t].element;
                     e.parentNode.insertBefore(r,e); // insert the element
+                    grid.rows.splice(closest.index,0,row_data);
                 }
             }
             return row_data;
@@ -789,16 +791,20 @@ jsonishData={
             if(g===null){
                 throw new Error("Cannot find group");
             }
-            
             // remove from dom
             for(var i=0;i<this.cols.length;i++){
                 console.log("deleting col " + this.cols[i].name);
                 if(!row[this.cols[i].name]){
                     throw new Error("row is undefined");
                 }
-                el=row[this.cols[i].name].getElement();
-                el.parentNode.removeChild(el);
-                el=null;
+                if(!parent){
+                    parent=row[this.cols[i].name].getElement().parentNode;
+                }
+                if(this.cols[i].display !== false){
+                    el=row[this.cols[i].name].getElement();
+                    el.parentNode.removeChild(el);
+                    el=null;
+                }
             }
             parent.parentNode.removeChild(parent);
             g.rows.splice(closest.index,1);
