@@ -149,31 +149,35 @@ String.prototype.trim = String.prototype.trim || function trim() {
             var dragEnd=function(e){
                // console.log("dragEnd is here");
                 e.stopPropagation();
-                console.log("dragend is here");
+                //console.log("dragend is here");
+                e.currentTarget.classList.remove("draggable");
                 destination.removeEventListener("drop",drop);
                 destination.removeEventListener("dragover",allowDrag);
                 
             };
             var drop=function(e){
-               // return function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var data=e.dataTransfer.getData("text").split(",");
-                        
-                    console.log("drop is " + source.getElementsByTagName("p")[0].textContent);
-                    if(source.classList.contains("draggable")){
-                        source.style.left = (e.clientX + parseInt(data[0],10)) + 'px';
-                        source.style.top = (e.clientY + parseInt(data[1],10)) + 'px';
-                        source.classList.remove("draggable");
-                    }
-                    //  document.body.removeChild(document.getElementById("temp_clone"));
-                    return false;
+                // return function(e){
+                console.log("drop is here");
+                e.preventDefault();
+                e.stopPropagation();
+                var data=e.dataTransfer.getData("text").split(",");
+                if(!source){
+                    throw new Error("source is undefined");
+                }
+                if(source.classList.contains("draggable")){
+                   // console.log("source has class");
+                    source.style.left = (e.clientX + parseInt(data[0],10)) + 'px';
+                    source.style.top = (e.clientY + parseInt(data[1],10)) + 'px';
+                    source.classList.remove("draggable");
+                }
+                //  document.body.removeChild(document.getElementById("temp_clone"));
+                return false;
                // };
             };
             
             var dragStart=function(e){
               //  console.log("dragStart is here ");
-                e.target.classList.add("draggable");
+                e.currentTarget.classList.add("draggable");
                 destination.addEventListener("dragover",allowDrag,false);
                 destination.addEventListener("drop",drop,false);
                 var style=window.getComputedStyle(e.target, null);

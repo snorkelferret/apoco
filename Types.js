@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare'); //UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
 
 ;(function(){
 

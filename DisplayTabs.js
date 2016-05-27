@@ -1,11 +1,12 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey; //,UI=require('./declare').UI; //jQuery=require('jquery');
 
+require("./DisplayBase.js");
 // Menu display object
 //  requires HarveyDisplayBase.js
 //
 
 
-;(function($){
+;(function(){
 
   "use strict";
 
@@ -85,13 +86,20 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 						  };
 					      }(t,this),false);
             }
-            $(t.element).hover(
-                function() {
-                    $( this ).addClass( "ui-state-hover" );
-                }, function() {
-                    $( this ).removeClass( "ui-state-hover" );
-                }
-            );
+            t.element.addEventListener("mouseover",function(e){
+               // if(e.currentTarget.tagName === "LI"){
+                    e.stopPropagation();
+                    e.preventDefault();
+                    e.currentTarget.classList.add("ui-state-hover");
+                //}
+            },false);
+            t.element.addEventListener("mouseout",function(e){
+               // if(e.target.tagName === "LI"){
+                    e.stopPropagation();
+                    e.preventDefault();
+                    e.currentTarget.classList.remove("ui-state-hover");
+                //}
+            },false);
             this.tabs[index]=t;
 	    tablist.appendChild(t.element);
         },
@@ -195,4 +203,4 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 
 
-})(jQuery);
+})();

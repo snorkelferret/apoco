@@ -1,11 +1,11 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
 require("./Utils");
 
 // Copyright (c) 2015 Pooka Ltd.
 // Name: HarveyDisplaySet.js
 // Function: maintains a reference to  all commands that are currently displayed in _DisplayObjects
 
-;(function($) {
+;(function() {
     'use strict';
     var DEBUG=true;
 
@@ -120,38 +120,39 @@ require("./Utils");
 	        settings="_blank"; // open in new tab
 	    }
             else{
-                var n=$.extend({},defaults,d.opts);//Harvey.mixinDeep(d.opts,defaults);
-                for(var k in n){
+                //var n=$.extend({},defaults,d.opts);//
+                Harvey.mixinDeep(d.opts,defaults);
+                for(var k in d.opts){
                     if(settings === ""){
-                        settings=settings.concat((k + "=" + n[k]));
+                        settings=settings.concat((k + "=" + d.opts[k]));
                     }
                     else{
-                        settings=settings.concat(("," + k + "=" + n[k]));
+                        settings=settings.concat(("," + k + "=" + d.opts[k]));
                     }
                 }
             //   console.log("settings are " + settings);
             }
 	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
-	    var p=$.Deferred();
-           // var p=new Promise(function(resolve,reject){
+	    //var p=$.Deferred();
+            var p=new Promise(function(resolve,reject){
 	        if(!win){
 	            //p.reject();
-            //        reject("Could not open window");
+                    reject("Could not open window");
 	        }
 	        window.addEventListener("childReady",function(){
 	            return function(e){
 		        if(e.data === win){
 		            console.log("window equals e.data");
                             that._list[d.name]=win;
-		            p.resolve({"window":win,"name": d.name});
-              //              resolve({"window":win,"name": d.name});
+	//	            p.resolve({"window":win,"name": d.name});
+                           resolve({"window":win,"name": d.name});
 		        }
 		        console.log("Parent child is ready");
 		    };
 	        }(d.name,win,p),false);
-            //});
+            });
             // p.done(function(d){
-            p.done(function(d){
+            p.then(function(d){
                 d.window.onunload=function(e){
                   //  console.log("got child closed " + d.name);
                     // delete the window from the list
@@ -165,11 +166,10 @@ require("./Utils");
                         throw new Error("Could not find window to remove");
                     }
                 };
-            //}).catch(function(reason){
-            //    Harvey.error("Window Open Error",reason);
+            }).catch(function(reason){
+                Harvey.error("Window Open Error",reason);
             });
                                         
-
 	    return p;
         }
     };
@@ -389,7 +389,7 @@ require("./Utils");
 
 	if(this.window){
 	    var p=Harvey.Window.open(this.window);  // create a new browser window
-	    p.done(function(w){
+	    p.then(function(w){
 		w.window.focus();
             //    console.log("got object from window.open.done");
           //      for(var k in w){
@@ -397,7 +397,9 @@ require("./Utils");
            //     }
 		that.window=w.window;
 	        that._addComponents();
-	    } );
+	    } ).catch(function(reason){
+                throw new Error("Panel: cannot open window " + reason);
+            });
 	}
         else{
 	    that._addComponents();
@@ -592,4 +594,4 @@ require("./Utils");
                      });
     
 
-})(jQuery);
+})();

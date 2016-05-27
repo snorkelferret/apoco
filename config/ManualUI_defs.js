@@ -1,12 +1,37 @@
 // WARNING this script contains evil eval !!!!!!
 global.Harvey=require('../declare').Harvey;
 global.UI=require('../declare').UI;
-global.jQuery=require('jquery');
+//global.jQuery=require('jquery');
 
 require("../index.js");
 
-;(function($){
+;(function(){
     "use strict";
+    var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
+    var globalEval=function( code ) {
+	var script,indirect = eval;
+	var trim=function( text ) {
+	    return text == null ?
+		"" :
+		( text + "" ).replace( rtrim, "" );
+	};
+	code = trim( code );
+	if ( code ) {
+	    // If the code includes a valid, prologue position
+	    // strict mode pragma, execute code by injecting a
+	    // script tag into the document.
+	    if ( code.indexOf( "use strict" ) === 1 ) {
+		script = document.createElement( "script" );
+		script.text = code;
+		document.head.appendChild( script ).parentNode.removeChild( script );
+	    } else {
+		// Otherwise, avoid the DOM node creation, insertion
+		// and removal by using an indirect global eval
+		indirect( code );
+	    }
+	}
+    };
+    
     UI.URL="/home/val";
     UI.webSocketURL="home/val";
     
@@ -191,9 +216,9 @@ require("../index.js");
         ImageArrayField:{options:{value:{type:"imageArray",
                                          default: undefined,
                                          description: "key value javascript object"},
-                                  thumbnails:{type:"boolean",default: false,description:"Display the images as thumbnails" },
-                                  width:{type:"integer",default: 100,description:"width of the thumbnails"},
-                                  height:{type:"integer",default: 100,description:"height of the thumbnails"}
+                                  thumbnails:{type:"boolean",default: true,description:"Display the images as thumbnails" },
+                                  width:{type:"integer",default: 120,description:"width of the thumbnails"},
+                                  height:{type:"integer",default: 90,description:"height of the thumbnails"}
                                  },
                          description:""
                         },
@@ -499,7 +524,8 @@ require("../index.js");
             k.dependsOn=HFields[i];
             k.action=function(that){
                 var p=that.getChild("doit");
-                $(p.element).trigger("click");
+                // $(p.element).trigger("click");
+                p.element.click();
             },
             k.components=[{node: "heading",size: "h3", text: HFields[i]},
                           {node:"paragraph", text: "<code>var f=Harvey.field['" +HFields[i] +"'](dataObject,element);</code>"},
@@ -518,8 +544,8 @@ require("../index.js");
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                               $.globalEval(f.getValue());
-                               
+                              // $.globalEval(f.getValue());
+                               globalEval(f.getValue());
                       //         console.log("parms are " + dataObject);
                                if(Harvey.checkType["object"](dataObject)){
                       //             console.log("and it is an object");
@@ -636,7 +662,8 @@ require("../index.js");
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                               $.globalEval(f.getValue());
+                               //$.globalEval(f.getValue());
+                               globalEval(f.getValue());
                                console.log("got " + JSON.stringify(results));
                                var c=this.parent.getChild("result");
                                if(!c){
@@ -681,7 +708,7 @@ require("../index.js");
                 items:[{label:"size",descriptions: ["type: string","size param: one of the following sizes","'h1'","'h2'","'h3'","'h4'","'h5'" ]}]
             },
             image:{ 
-                parms:{src:"path",width:"integer",height:"integer"},
+                parms:{src:"path"},
                 items:[{label:"width",description:"integer width of the html image node"},
                        {label: "height",description:"integer height of the html image node"}]
             },
@@ -692,6 +719,10 @@ require("../index.js");
             list:{
                 parms:{list:"stringArray"},
                 items:[{label: "stringArray",description:"example: ['one','two'.'three']"}]
+            },
+            code:{
+                parms:{text:"text"},
+                items:[{label: "text",description:"text will be displayed as code"}]
             },
             paragraph:{
                 parms:{text:"text"},
@@ -737,11 +768,13 @@ require("../index.js");
             k.dependsOn=HNodes[i];
             k.action=function(that){
                 var p=that.getChild("doit");
-                $(p.element).trigger("click");
+                //$(p.element).trigger("click");
+                p.element.click();
             }, 
             k.hidden=true;
             k.components=[{node: "heading",size: "h3", text: HNodes[i]},
-                          {node:"paragraph", text: "<code>var node=Harvey.node({node:'" + HNodes[i] + "'" + t_opts + "});</code>"},
+                          // {node:"paragraph", text: "<code>var node=Harvey.node({node:'" + HNodes[i] + "'" + t_opts + "});</code>"},
+                          {node:"code", text: "var node=Harvey.node({node:'" + HNodes[i] + "'" + t_opts + "});"},
                           {node: "heading",size: "h5",text: "Paraneters"},
                           {node: "descriptionList",items:opts[HNodes[i]].items},
                           {node: "heading",size: "h5",text:"Options"},
@@ -759,7 +792,8 @@ require("../index.js");
                                if(that.parent.getChild("TESTNODE")){
                                    that.parent.deleteChild("TESTNODE");
                                }
-                               $.globalEval(f.getValue());
+                               //$.globalEval(f.getValue());
+                               globalEval(f.getValue());
                                console.log("parms are " + dataObject);
                                if(Harvey.checkType["object"](node)){
                                    that.parent.addNode(node);
@@ -851,7 +885,8 @@ require("../index.js");
                                    throw new Error("can't get input params");
                                }
                                window.field=that.parent.getChild("SomeString");
-                               $.globalEval(f.getValue());
+                               //$.globalEval(f.getValue());
+                               globalEval(f.getValue());
                                var nf=that.parent.getChild("Result");
                                console.log("methods doit got " + value);
                                nf.setValue(JSON.stringify(value));
@@ -862,7 +897,8 @@ require("../index.js");
                           
                          ];
    
-            $.globalEval(Commands[i]);
+            //$.globalEval(Commands[i]);
+            globalEval(Commands[i]);
             k.components.push(dataObject);
             
             UI.Panels.Fields.components.push(k);
@@ -926,7 +962,8 @@ require("../index.js");
             k.action=function(that){
                // console.log("triggering click");
                 var p=that.getChild("doit");
-                $(p.element).trigger("click");
+                // $(p.element).trigger("click");
+                p.element.click();
             },
             k.components=[{node: "heading",size: "h3", text: HDisplays[i]},
                           {node:"paragraph", text: "<code>var node=Harvey.display['" + HDisplays[i] + "'](dataObject);</code>"},
@@ -953,8 +990,8 @@ require("../index.js");
                                    throw new Error("can't get input params");
                                }
                                var n=that.parent.id;
-                               $.globalEval(f.getValue());
-                               
+                               //$.globalEval(f.getValue());
+                               globalEval(f.getValue());
                                var d=Harvey.Panel.get("Displays").getChild((n+"Display"));
                                if( d!== null){
                                    Harvey.Panel.get("Displays").deleteChild((n+"Display"));
@@ -1083,7 +1120,8 @@ require("../index.js");
                               if(!f){
                                   throw new Error("can't get input params");
                               }
-                              $.globalEval(f.getValue());
+                              //$.globalEval(f.getValue());
+                              globalEval(f.getValue());
                               if(that.parent.id === "spinner"){
                                   
                                   window.setTimeout(function(){Harvey.popup["spinner"](false);},3000);
@@ -1205,7 +1243,8 @@ require("../index.js");
                               }
                               window.v=null;
                               that.parent.getChild("Result").setValue("");
-                              $.globalEval(f.getValue());
+                              //$.globalEval(f.getValue());
+                              globalEval(f.getValue());
                               var nf=that.parent.getChild("Result");
                              // console.log("methods doit got " + v);
                               if(v !== undefined){
@@ -1283,7 +1322,7 @@ require("../index.js");
                                              {node: "heading",size: "h5", text:"fieldData"},
                                              {node: "paragraph", text: "A javascript object that will be passed to the field"},
                                              {node: "heading",size:"h5", text: "parentNode"},
-                                             {node:"paragraph", text: "A jQuery node that is used as the parent of the field,typically a div or li node. DO NOT supply an input node!"}
+                                             {node:"paragraph", text: "A HTML node that is used as the parent of the field,typically a div or li node. DO NOT supply an input node!"}
                                             ]
                                },
                              ] 
@@ -1303,20 +1342,19 @@ require("../index.js");
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "About Harvey"},
-                          {node: "paragraph",text: "This site is made exclusively with Harvey Components, with a lot of help from jQuery, if you don't like jQuery then you can still use Harvey, but it will be a bit more difficult since all the elements used as inputs and those returned are all jQuery objects"},
+                          {node: "paragraph",text: "This site is made exclusively with Harvey Components, written in vanilla javascript. Harvey is a data-driven enterprise level SPA library. The components can be used together or individually"},
                           {node: "paragraph",text:"Harvey is arranged hierarchically."},
-                          {node: "descriptionList",items:[{label: "Panels",description:"Panels contain"},
+                          {node: "descriptionList",items:[{label: "Windows",description:"Windows contain"},
+                                                          {label: "Panels",description:"Panels contain"},
                                                           {label: "displays",description:"displays contain"},
                                                           {label: "fields or nodes",description: "which contain"},
                                                           {label: "types",description: ""}
                                                          ]},
       
                           {node:"paragraph",text:"You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) "},
-                          {node: "heading",size: "h4",text:"Required"},
-                          {node: "paragraph", text:"HarveyCore.js <br> jquery.js" },
-                          {node:"paragraph", text:"Include in the head of your html file with <br><code> &#60script type='text/javascript' src='HarveyCore.js' &#62 &#60/script></code> <br> or use <br> <code> require(HarveyCore.js); </code> <br> within your javascript"} 
-                      ]
-                    },
+                          {node: "heading",size: "h4",text:"Required"}
+           
+                      ]},
                     {display:"fieldset",
                      id: "start",
                      hidden:true,
@@ -1359,7 +1397,7 @@ require("../index.js");
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "Harvey Nodes"},
-                          {node:"paragraph", text:"HarveyNodes.js  Include in the head of your html file with <br> &#60 script type='text/javascript' src='HarveyNodess.js' &#62 &#60/script> <br> or use require(HarveyNodes.js) within your javascript <br> Depends on HarveyUtils.js jquery.js and HarveyTypes.js"} ,
+                          {node:"paragraph", text:"HarveyNodes.js  Include in the head of your html file with <br> &#60 script type='text/javascript' src='HarveyNodess.js' &#62 &#60/script> <br> or use require(HarveyNodes.js) within your javascript <br> Depends on HarveyUtils.js  and HarveyTypes.js"} ,
                           {node: "heading", size: "h3", text: "Usage" },
                           {node: "paragraph", text: "<code>var node=Harvey.node(nodeObject[,parentElement]);</code>"},
                           {node: "paragraph", text: "Returns a HarveyNode object"},
@@ -1368,9 +1406,9 @@ require("../index.js");
                           {node: "heading",size: "h5", text:"nodeObject"},
                           {node: "paragraph", text: "A javascript object that will be passed to the field"},
                           {node: "heading",size:"h5", text: "parentElement"},
-                          {node:"paragraph", text: "An Optional jQuery node that is used as the parent of the field,typically a div or li node, if this is not provided the new node is not appended to anything"},
+                          {node:"paragraph", text: "An Optional HTML node that is used as the parent of the field,typically a div or li node, if this is not provided the new node is not appended to anything"},
                           {node:"heading",size:"h3",text: "Methods"},
-                          {node: "descriptionList",items:[{label:"getElement",descriptions:["<code> var v=myNode.getElement();</code","returns the created jQuery element"] },{label:"setText",descriptions:["<code> myNode.setText('some string');</code>","No return value","only applies if the node has a text option"]}]}
+                          {node: "descriptionList",items:[{label:"getElement",descriptions:["<code> var v=myNode.getElement();</code","returns the created HTML element"] },{label:"setText",descriptions:["<code> myNode.setText('some string');</code>","No return value","only applies if the node has a text option"]}]}
                       ]
                       
                     }
@@ -1390,7 +1428,7 @@ require("../index.js");
                          DOM: "right",
                          components:[
                              {node: "heading",size:"h2",text: "Harvey Displays"},
-                             {node:"paragraph", text:"HarveyDisplay.'TemplateName'.js Where 'TemplateName' is one of the display templates.<br> e.g HarveyDisplayMenu.js  <br> Include in the head of your html file with <br> &#60 script type='text/javascript' src='HarveyDisplay.'Templatename'.js' &#62 &#60/script> <br> or use require(HarveyDisplay.'Templatename'.js) within your javascript <br> Depends on HarveyUtils.js jquery.js and HarveyTypes.js and HarveyDisplayBase.js"} ,
+                             {node:"paragraph", text:"HarveyDisplay.'TemplateName'.js Where 'TemplateName' is one of the display templates.<br> e.g HarveyDisplayMenu.js  <br> Include in the head of your html file with <br> &#60 script type='text/javascript' src='HarveyDisplay.'Templatename'.js' &#62 &#60/script> <br> or use require(HarveyDisplay.'Templatename'.js) within your javascript <br> Depends on HarveyUtils.js and HarveyTypes.js and HarveyDisplayBase.js"} ,
                              {node: "heading", size: "h4", text: "Usage" },
                              {node: "paragraph", text: "<code>var display=Harvey.display['templateName'](templateData);</code>"},
                              {node: "paragraph", text: "Returns a HarveyDisplay object"},
@@ -1423,7 +1461,7 @@ require("../index.js");
                           {node: "heading",size: "h5",text:"options"},
                           {node: "descriptionList",items:[{label: "window",descriptions:["type:'object'","defult: uses the current browser window","e.g","<code> var win_object={url:'string',name: 'string', opts:'width=600',height=600'}","The html file designated in the url must contain <code>HarveyCoreChild.js</code>","and when the document is loaded call <code>Harvey.childReady();</code>"]}]},
                           {node: "anchor", href: "https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features",target:'_blank',text: "click here for window options"},
-                          {node: "heading",size:"h4",text:"<br>Live Example"},
+                          {node: "heading",size:"h4",text:"Live Example"},
                           {name: "Input_params",field: "TextAreaField",
                            value: "Harvey.Panel.add({name:'TestPanel',window:{url:'child_window.html',name: 'TestWindow',opts:{width:600}},components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})"}, 
                           {name: "doit", node: "button", text: "Go",
@@ -1436,7 +1474,8 @@ require("../index.js");
                                if(Harvey.Panel.inList('TestPanel')){
                                    Harvey.Panel.delete('TestPanel');
                                }
-                               $.globalEval(f.getValue());   
+                               // $.globalEval(f.getValue());
+                               globalEval(f.getValue());
                            }
                           }
                       ]
@@ -1556,4 +1595,4 @@ require("../index.js");
     UI.start=["Tabs","About"];
     console.log("Manual UI defs is %j " ,UI.Panels);
     
-})(jQuery);
+})();

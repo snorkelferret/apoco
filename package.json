@@ -9,7 +9,7 @@
     "pretest": "npm run eslint && npm run eslint:test",
     "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test",
     "posttest": "rimraf .__browserify_string_empty.js",
-    "manual": "browserify ./config/ManualUI_defs.js -o manual_bundle.js"
+    "manual": "browserify ./config/ManualUI_defs.js  -o manual_bundle.js"
   },
   "author": "Val Wardlaw <val@perluceo.com>",
   "license": "ISC",
@@ -27,8 +27,6 @@
   },
   "dependencies": {
     "clone-deep": "^0.2.4",
-    "jquery": "^2.2.3",
-    "mixin-deep": "^1.1.3",
-    "pikaday": "^1.4.0"
+    "mixin-deep": "^1.1.3"
   }
 }

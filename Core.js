@@ -1,5 +1,9 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
 require("./index.js");
+require("./Utils.js");
+require("./Panel.js");
+require("./Popups.js");
+
 /*function require_(script) {
     $.ajax({
         url: script,
@@ -24,21 +28,11 @@ require("./index.js");
 
 // Harvey is a singleton for each window session
 
-(function($){
+(function(){
     'use strict';
 
     var DEBUG=false;
     var that=this;
-
-    // set all instances of the datepicker to these default values
-    /*  $.datepicker.setDefaults({
-        // showOn: 'both',
-        dateFormat: 'yymmdd' //'yy-mm-dd'   //'IS0_8601'   // yyyy-mm-dd
-        // buttonImageOnly: true,
-	// buttonImage: 'calendar.gif',
-	// buttonText: 'Calendar'
-    }); */
-
     window.onerror=function(msg,url,lineno){
         //Harvey.Error=Harvey.popup.dialog({id:"Harvey_Error"});
 	Harvey.popup.error(url, ("line number " + lineno + " " + msg));
@@ -49,15 +43,16 @@ require("./index.js");
 	Harvey.display.dialog(url, ("line number " + lineno + " " + msg + " stack trace " + error.stack ));
     };  */
     window.addEventListener('beforeunload',function(e){  // 5 seconds to delete everything
-        var d=$.Deferred();
+     /*  var d=$.Deferred();
         $(window.document.body).hide();
         var t=window.setTimeout(function(){ Harvey.Panel.deleteAll(d); },500000);
-        d.done( function(){  window.clearTimeout(t);});
+        d.done( function(){  window.clearTimeout(t);}); */
     });
     console.log("UI.Panels is " + UI.Panels);
     console.log("UI is " + UI);
 
-    $.extend(true,Harvey,{
+    //$.extend(true,Harvey,{
+    Harvey.mixinDeep(Harvey,{
 	start: function(options) {
 	    // Harvey.popup.spinner(true);
             if(options){
@@ -88,4 +83,4 @@ require("./index.js");
 
     });
  
-})(jQuery);
+})();

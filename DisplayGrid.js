@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
 require("./DisplayBase.js");
 require("./Fields.js");
 require("./Sort.js");
@@ -41,7 +41,7 @@ jsonishData={
 */
 
 
-;(function($){
+;(function(){
     "use strict";
     
     // special functions for aligning the decimal points in non-editable cells
@@ -146,14 +146,14 @@ jsonishData={
 	    console.log("undo_cellEDIT: text in restore is " + val);
 	    if(that.selection_list){
 		for(var i=0;i< that.selection_list.length;i++){
-		    console.log("value was " + $(that.selection_list[i]).text());
+		    console.log("value was " + that.selection_list[i].textContent);
 		    if(update){
-			p=$(that.selection_list[i]).data("harvey");
+			p=that.selection_list[i].data["harvey"];
 			cell=that.rows[p.row][that.cols[p.col].name];
 			cell.setValue(val);
 		    }
 		     // just remove the class
-		    $(that.selection_list[i]).removeClass("ui-selected");
+		    that.selection_list[i].classList.remove("ui-selected");
 		}
 	    }
 	    else{
@@ -176,7 +176,7 @@ jsonishData={
 	    return;
 	}
 	// select the last in the column and make it active
-	var cell=$(that.selection_list[that.selection_list.length-1]);
+	var cell=that.selection_list[that.selection_list.length-1];
 	if(!cell){
 	    throw new Error("grid cell is null");
 	}
@@ -218,7 +218,7 @@ jsonishData={
 	if(that.cellEdit.popup){
 	    console.log("popup is here for " + n);
 	    var d=$("<div class='popup' id='grid_popup'> </div>");
-	    that.field=Harvey.field[n](that.cellEdit.data("harvey"),d);
+	    that.field=Harvey.field[n](that.cellEdit.data["harvey"],d);
 	    that.cellEdit.getEelement().append(d);
 	    var ok=$("<button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
 	    var cancel=$("<button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
@@ -254,7 +254,7 @@ jsonishData={
 
     function sort_callback(col_num,that,dir){ //user sort
 	// turn it into an array
-	$.fn.reverse=[].reverse;
+	//$.fn.reverse=[].reverse;
 
 	var type=that.cols[col_num].type;
 	if(that.DEBUG) console.log("START SORT =======================  got sort type " + type);
@@ -371,7 +371,7 @@ jsonishData={
 
 	select_data: function(){
 	    var that=this;
-	    return{
+	 /*   return{
 		selected: function(event,ui){
 		    console.log("selected is here");
 		    for(var k in ui){
@@ -421,7 +421,7 @@ jsonishData={
 		},
 		filter: ".editable"
 		// filter: 'td:not(:first-child)'
-	    };
+	    }; */
 	},
 	sort: function(grid){
 	    var isSortable=false,grids=[],sortOrder=[];
@@ -510,7 +510,11 @@ jsonishData={
                     throw new Error("Columns must have unique names");
                 }
             }
-            col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
+            // col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
+            col.options={};
+            for(var k in col){
+                col.options[k]=col[k];
+            }
              if(this.grids){ // add the column rows
                 for(var i=0;i<this.grids.length;i++){
                     rows=this.grids[i].rows;
@@ -679,9 +683,12 @@ jsonishData={
 	   // console.log("grid load " + (t1-t0) + "milliseconds ");
 	},
         _addCell:function(row,col,r){
-            var c,type,settings;
+            var c,type,settings={};
             
-	    settings=$.extend({},col.options);
+	    //settings=$.extend({},col.options);
+            for(var k in col.options){
+                settings[k]=col.options[k];
+            }
             if(row[col.name] === undefined){  // row[col_name] can be null
                 if(this.required === true){
                     
@@ -699,7 +706,10 @@ jsonishData={
             row[col.name]=Harvey.field[Harvey.dbToHtml[col.type].field](settings,c);
             if(col.display !== false){
 		r.appendChild(row[col.name].element);
-		$(row[col.name].element).data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
+                
+	        //	$(row[col.name].element).data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
+                row[col.name].element.data={};
+                row[col.name].element.data.harvey={name: col.name,"context": row[col.name],"type": col.type};
 	    }
 	    if(col.hidden){
 		row[col.name].element.visibility="hidden";
@@ -992,14 +1002,18 @@ jsonishData={
             var s,row=[];
             var c=element.data("harvey");
             row.push({context:c.context,name: c.name,
-                          value:c.context.value });
-            s=$(element).siblings();
-            console.log("got siblings " + s.length);   //still in jquery
+                      value:c.context.value });
+            //s=$(element).siblings();
+            s=element.parentNode.childNodes;
+            console.log("got siblings " + s.length);   
             for(var i=0;i<s.length;i++){
-                c= $(s[i]).data("harvey");
-                console.log( "sib " + c.name + " value " + c.context.value);
-                row.push({context: c.context,name: c.name,
-                          value: c.context.value });
+                if(s[i] !== element){
+                    //c= $(s[i]).data("harvey");
+                    s[i].data("harvey");
+                    console.log( "sib " + c.name + " value " + c.context.value);
+                    row.push({context: c.context,name: c.name,
+                              value: c.context.value });
+                }
             }
             return row;
         }, 
@@ -1087,7 +1101,8 @@ jsonishData={
 
     Harvey.Utils.extend(HarveyMakeGrid,Harvey._DisplayBase);
 
-    $.extend(true, Harvey, {
+    //  $.extend(true, Harvey, {
+    Harvey.mixinDeep( Harvey,{
 	display: {
 	    grid: function(opts,win){
                     opts.display="grid";
@@ -1103,4 +1118,4 @@ jsonishData={
 	}
     });
 
-})(jQuery);
+})();

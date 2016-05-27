@@ -1,6 +1,6 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=require('jquery');
 
-;(function($){
+;(function(){
 
     Harvey.IO={
         _subscribers:{},
@@ -75,8 +75,14 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
         webSocket:function(options,data){
             var that=this;
             var defaults={url: UI.webSocketURL};
-
-            var settings=$.extend({},defaults,options);
+            
+            //var settings=$.extend({},defaults,options);
+            var settings={};
+            settings.url=defaults.url;
+            for(var k in options){
+                settings[k]=options[k];
+            }
+            
             if(!Harvey.webSocket){
                 var a={'http:':'ws:','https:':'wss:'}[window.location.protocol];
                 //console.log("a is " + a + " protocol " + window.location.protocol);
@@ -113,7 +119,14 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             else{
                 throw new Error("Harvey.REST only knows about get or post");
             }
-	    var settings=$.extend({},defaults,options);
+	    //    var settings=$.extend({},defaults,options);
+            var settings={};
+            for(var k in defaults){
+                settings[k]=defaults[k];
+            }
+            for(var k in options){
+                settings[k]=options[k];
+            }
             if(settings.url === ""){
                 throw new Error("Harvey.REST Must have a url");
             }
@@ -132,4 +145,4 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
             return promise;
         }
     };
-})(jQuery);
+})();

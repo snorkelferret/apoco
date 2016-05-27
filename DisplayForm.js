@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI;//,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
 require("./DisplayFieldset");
 
 // create a form dynamically from json
@@ -13,7 +13,6 @@ require("./DisplayFieldset");
     var HarveyMakeForm=function(options,win){
 	this.DEBUG=true;
 	var that=this;
-        //	Harvey._DisplayBase.call(this,options);  //use class inheritance - base Class
         Harvey.display._fieldsetBase.call(this,options,win);
         this.execute();
     };
@@ -23,9 +22,7 @@ require("./DisplayFieldset");
     HarveyMakeForm.prototype={
 	execute: function(){
 	    var that=this,fp,header,container,fc,h;
-            
-	    //this.element=$("<div id='" + this.id + "' class='harvey_form ui-widget ui-widget-content ui-corner-all '></div>");
-            this.element=document.createElement("div");
+             this.element=document.createElement("div");
             this.element.id=this.id;
             this.element.classList.add("harvey_form","resizable","ui-widget","ui-widget-content","ui-corner-all");
             if(this.class !== undefined){
@@ -39,39 +36,28 @@ require("./DisplayFieldset");
             }
             this.element.innerHeight=this.height;
             this.element.innerWidth=this.width;
-
-	   // header=$("<div class='form_header ui-widget ui-state-default ui-widget-header ui-corner-all'></div>");
             header=document.createElement("div");
             header.classList.add("form_header","ui-widget", "ui-state-default", "ui-widget-header","ui-corner-all");
 	    this.element.appendChild(header);
-
 	    if(this.draggable !== false){
-	        //	$(this.element).draggable({handle: ".form_header", containment: "window"});
                 this.draggable=Harvey.Utils.draggable(this.element);
 	    }
- 	    //container=$("<div class='form_scroll'></div>");
             container=document.createElement("div");
             container.classList.add("form_scroll");
-            
-	    //fc=$("<div class='form_content'></div>");
             fc=document.createElement("div");
             fc.classList.add("form_content");
 	    this.element.appendChild(fc);
             fc.appendChild(container);
             h=document.createElement("h5");
             if(this.label){
-	    	//$("<h5> " + this.label + "</h5>");
                 h.text=this.label;
 	    }
 	    else{
                 h.text=this.label;
-		//$("<h5> " + this.id + "</h5>").appendTo(header);
 	    }
             header.appendChild(h);
-	    //var close=$("<span  class=' ui-icon ui-icon-close'> </span>");
             var close=document.createElement("span");
             close.classList.add("ui-icon","ui-icon-close");
-	    //close.appendTo(header);
             header.appendChild(close);
 	    var c=(function(cmd){
 		return function(e){
@@ -84,7 +70,6 @@ require("./DisplayFieldset");
 	    }(this));
 	    close.addEventListener("click",c,false);
 
-           // fp=$("<ul class='harvey_form_list'></ul>");
             fp=document.createElement("ul");
             fp.classList.add("harvey_form_list");
             container.appendChild(fp);
@@ -102,9 +87,8 @@ require("./DisplayFieldset");
             }
         
 	    if(this.buttons){
-		//var button_container=$("<div class='form_button_container ui-widget-content'></div>");
                 var button_container=document.createElement("div");
-                button_container.classList.add("form_button","container","ui-widget-content");
+                button_container.classList.add("form_button_container","ui-widget-content");
 		this.element.appendChild(button_container);
 		for(var i=0;i<this.buttons.length;i++){
                     this.buttons[i].node="button";
@@ -116,20 +100,10 @@ require("./DisplayFieldset");
             else{
                 this.buttons=[];
             }
-/*	    $(this.element).resizable( {
-		resize: function(e,ui){
-		    $(".form_content").height($(that.element).height()*0.95);
-                },
-		create: function(e,ui){
-		    $(".harvey_form").height(400);
-		    $(".form_content").height($(that.element).height()*0.95);
-                }
- }); */
-           
 	},
         addNode:function(d,parent_element){
             var n;
-            var ll=document.createElement("li");//$("<li></li>");
+            var ll=document.createElement("li");
             if(parent_element === undefined){
                 parent_element=this.element.querySelector("ul.harvey_form_list");
             }
@@ -162,7 +136,7 @@ require("./DisplayFieldset");
         },
         addField: function(d,parent_element){
             var p;
-            var ll=document.createElement("li");//$("<li></li>");
+            var ll=document.createElement("li");
             if(parent_element === undefined){
                 parent_element=this.element.querySelector("ul.harvey_form_list");
             }
@@ -214,7 +188,7 @@ require("./DisplayFieldset");
             }
             if(index ===0){
 	        // no buttons so create button_container
-                r=document.createElement("div");//$("<div class='form_button_container ui-widget-content'></div>");
+                r=document.createElement("div");
 		r.classList.add("form_button_container","ui-widget-content");
                 this.element.appendChild(r);
             }
@@ -326,9 +300,9 @@ require("./DisplayFieldset");
 	}
     };
 
-    //Harvey.Utils.extend(HarveyMakeForm,Harvey._DisplayBase);
+   
     Harvey.Utils.extend(HarveyMakeForm,Harvey.display._fieldsetBase);
-    //$.extend(true, Harvey, {
+   
     Harvey.mixinDeep(Harvey,{
 	display: {
 	    form: function(opts,win){

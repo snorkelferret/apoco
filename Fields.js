@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare'); //UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
 require('./Utils');
 require('./Types');
 require("./datepicker");
@@ -6,7 +6,7 @@ require("./datepicker");
 // editable: true by default
 // required: false by default
 
-;(function($){
+;(function(){
     "use strict";
 
     Harvey.dbToHtml={
@@ -53,20 +53,21 @@ require("./datepicker");
         if(!d.type){
             throw new Error("Harvey.field: must have a type");
 	}
-        $.extend(this,d);
+       // $.extend(this,d);
+        for(var k in d){
+            this[k]=d[k];
+        }
 	this.html_type=Harvey.dbToHtml[this.type].html_type;
 
         if(element === undefined){
             this.element=document.createElement("div");
         }
-	else if(element instanceof jQuery){
-            if(element.length === 0){
-	        throw new Error("external element for field is null");
-	    }
-            this.element=element[0];
+	else if(element){
+           this.element=element;
         }
 	else {
-            this.element=element;
+            throw new Error("not a html element");
+            //this.element=element;
         }
    
 	this.element.setAttribute("name",this.name);
@@ -341,44 +342,30 @@ require("./datepicker");
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
-
         s.className=this.type;
 
-        //this.input=$(s);
         this.input=s;
-        //this.input=$("<input class='" + this.type + "' type= '" + this.html_type +  "'/>");
-
         if(this.min){
-            //this.input.prop("min", this.min);
             this.input.setAttribute("min",this.min);
         }
         if(this.max){
-            //this.input.prop("max", this.max);
             this.input.setAttribute("min",this.max);
         }
         if(this.step){
             this.input.setAttribute("step",this.step);
-           // this.input.prop("step", this.step);
         }
         if(this.precision){
-            //this.input.prop("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
             this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
         }
 
         if(this.required && !this.value ){
           //  console.log("REQUIRED is TRUE, value is " + this.required);
             if(this.field !== "CheckBoxField"){
-                //  this.input.prop("required",true);
                 this.input.setAttribute("required","required");
-               // this.input.className="required";
-              //  this.input.addClass("required");
             }
         }
-
-        //this.element.append(this.input);
         this.element.appendChild(this.input);
 	if(this.value !== null && this.value !== undefined){
-	    // this.input.val(this.value);
             this.input.value=this.value;
 	}
 	return this;
@@ -391,18 +378,16 @@ require("./datepicker");
     var FloatField=function(d,element){
         var inp;
 	//console.log("FLOAT FIELD IS HERE");
-        //var settings=checkDefaultOptions("FloatField",d);
         d.field="FloatField";
         d.type="float";
 	_Field.call(this,d,element);
 
 	this.input=new Array(2);
 	var that=this;
-//	this.element.empty();
         this.element.classList.add("float");
 
-	var list=document.createElement("ul"); //" class='aligned_float'></ul>");
-        list.className='aligned_float';
+	var list=document.createElement("ul"); 
+        list.classList.add('aligned_float');
 	var el=document.createElement("li");
 	var dec=document.createElement("div");
         dec.className='values';
@@ -467,25 +452,23 @@ require("./datepicker");
 	    };
 
 	    var dispatch_change=function(){
-	        //if(!that.input[0]) console.log("No input[0]");
 	        var e=new Event("change");
-	        //that.element[0].dispatchEvent(e);
                 that.element.dispatchEvent(e);
 	    };
 
 	    var eObj={
 	        mouseover: function(e) {
                     e.stopPropagation();
-		    e.target.classList.add('ui-state-hover');
+		    e.currentTarget.classList.add('ui-state-hover');
 	        },
 	        mouseout: function(e) {
                     e.stopPropagation();
-		    e.target.classList.remove('ui-state-hover');
+		    e.currentTarget.classList.remove('ui-state-hover');
 	        },
                 click:function(e){
                     e.preventDefault();
 		    e.stopPropagation();
-		    if(e.target === down){
+		    if(e.currentTarget === down){
 		       step_fn("down");
 		    }
 		    else{
@@ -495,7 +478,7 @@ require("./datepicker");
 	        mousedown: function(e){
 		    e.preventDefault();
 		    e.stopPropagation();
-		    if(e.target === down){
+		    if(e.currentTarget === down){
 		        timer=setInterval(function(){step_fn("down");},100);
 		    }
 		    else{
@@ -524,8 +507,6 @@ require("./datepicker");
 
     FloatField.prototype={
 	getValue: function(){
-	   // var a=this.input[0].val();
-	    //var b=this.input[1].val();
             var a=this.input[0].value;
             var b=this.input[1].value;
 	    if(Harvey.checkType.blank(a)) {
@@ -556,13 +537,10 @@ require("./datepicker");
 		return null;
 	    }
 	    return this.value;
-
 	},
 	setValue: function(v){
            // console.log("float setValue " + v);
 	    if(Harvey.checkType.blank(v)){
-		//this.input[0].val("");
-		//this.input[1].val("");
                 this.input[0].value="";
                 this.input[1].value="";
 		this.value="";
@@ -578,8 +556,6 @@ require("./datepicker");
 		return null;
 	    }
             //console.log("setValue: value is " + p[0]);	  
-//	    this.input[0].val(p[0]);
-            //	    this.input[1].val(p[1]);
             this.input[0].value=p[0];
             this.input[1].value=p[1];
 	    this.value=v;
@@ -657,31 +633,19 @@ require("./datepicker");
 	getValue:function(){
 	    console.log("value of checkbox is " + this.input.value + " and prop is " + this.input.getAttribute('checked') + " value is " + this.value);
 	    console.log("this input.checked is " + this.input.checked);
-            // return this.input.prop('checked');
             return this.input.checked;
 	},
         setValue:function(val){
-            
             if(val === "true" || val === true || val === 1){
 	        console.log("setting checkbox value to true");
-	        // this.input.prop("checked",true);
                 this.input.setAttribute("checked","checked");
-	        //this.input.val(true);
-                //this.input.value="true";
-                //this.value=true;
 	    }
 	    else {
 	        console.log("setting checkbox value to false");
                 if(this.input.hasAttribute("checked")){
                     this.input.removeAttribute("checked");
                 }
-	        // this.input.val(false);
-                //this.input.value="false";
-	        //this.input.prop("checked",false);
-          //      this.input.setAttribute("checked","");
-                //this.value=false;
 	    }
-            
         },
 	popupEditor:function(func){
 	    //console.log("checkbox editor is here");
@@ -710,13 +674,10 @@ require("./datepicker");
             this.size=this.value.length;
         }
 	this.input=new Array(this.size);
-
 	this.popup=true;
-
         if(this.type === "floatArray" && this.step === undefined){
             this.step=0.1;
         }
-
 	if(this.value && !Harvey.checkType.array(this.value)){
 	    throw new Error("NumberArrayField: value is not an array");
 	}
@@ -729,7 +690,6 @@ require("./datepicker");
    	}
 	return this;
     };
-
 
     NumberArrayField.prototype={
         addValue:function(i,internal){
@@ -802,14 +762,13 @@ require("./datepicker");
 	popupEditor:function(func){
 	    if(this.input.length>0){
 		var r=this.getValue();
-		$(this.element).keypress(function(event){
+		this.element.addEventListener("keypress",function(event){
 		    event.stopPropagation();
 		    if(event.which === 13){
-			//var v=this.input.val();
 			//console.log("got value " + this.input.val());
 			func(r);
 		    }
-		});
+		},false);
 	    }
 	    throw new Error("no input element for this type " + this.type);
 	}
@@ -823,12 +782,9 @@ require("./datepicker");
         d.type="text";
 	_Field.call(this,d,element);
 	this.popup=true;
-	//this.input=$("<textarea ></textarea>");
         this.input=document.createElement("textarea");
 	this.element.appendChild(this.input);
-
 	if(this.value){
-	    //this.input.val(this.value);
             this.input.value=this.value;
 	}
 	return this;
@@ -851,8 +807,8 @@ require("./datepicker");
 			func(null);
 		};
 		}(this);
-		ok.on("click",cb);
-		cancel.on("click",bb);
+		ok.addEventListener("click",cb,false);
+		cancel.addEventListener("click",bb,false);
 	    }
 	    else{
 		throw new Error("no input element for this type " + this.type);
@@ -865,16 +821,13 @@ require("./datepicker");
 
     var SelectField=function(d,element){
 	var i,o;
-      //  var settings=checkDefaultOptions("SelectField",d);
         d.field="SelectField";
         d.type="string";
 	_Field.call(this,d,element);
 
-	//var options="<select>";
         var options=document.createElement("select");
 	for(i=0; i<this.options.length; i++){
 	    if(i===0 && this.blank_option !== undefined && this.blank_option === true){ // add a blank option at the head of the list
-		//options=options.concat("<option value=\"\"></option>");
                 o=document.createElement("option");
                 o.value="";
                 options.appendChild(o);
@@ -883,19 +836,14 @@ require("./datepicker");
             o.value=this.options[i];
             o.textContent=this.options[i];
             options.appendChild(o);
-	    //options=options.concat("<option value='" + this.options[i] + "'>" + this.options[i] + "</option>");
 	}
-	//options=options.concat("</select>");
-        //this.select=$(options);
         this.select=options;
 	var cd=function(that){
 		return function(e){
 		    e.stopPropagation();
 		    if(that.input.style.visibility === "visible"){ //}("visible")){
 			that.input.style.visibility= "hidden"; //hide();
-			//that.span.hide();
                         that.span.style.visibility="hidden";
-			//that.element.show();
                         that.element.style.visibility="visible";
 		    }
 		};
@@ -903,11 +851,6 @@ require("./datepicker");
 
 
         var mk_input=function(){
-	    //this.input=$("<input class='" + this.type + "' type= '" + this.html_type + "'/>").css('display','none');
-	   // this.span=$("<span class='ui-icon ui-icon-triangle-1-s'>").css('display','none');
-	    //this.element.append(this.input);
-	   // this.element.append(this.span);
-	    // this.span.on("click",cd);
             this.input=document.createElement("input");
             this.input.className=this.type;
             this.input.setAttribute("type",this.html_type);
@@ -918,18 +861,14 @@ require("./datepicker");
             this.element.appendChild(this.input);
             this.element.appendChild(this.span);
             this.span.addEventListener("click",cd);
-            
         };
-        
 
         var that=this;
 	// if selection option is "Other" add a new input field
-        //	this.select.change(function(){
         this.select.addEventListener("change",function(){
 	    //console.log("select option has changed");
-	  //  if (that.select.val() === "Other"){
             if(that.select.value === "Other"){      
-		if(!this.input){ // || this.input.length === 0){
+		if(!this.input){ 
                     mk_input();
                 }
                 that.element.getElementsByTagName("select").style.visibility="hidden";
@@ -950,14 +889,10 @@ require("./datepicker");
 	});
 
 	if(this.value){
-	    // this.select.val(this.value);
             this.select.value=this.value;
 	}
-
-	//this.element.append(this.select);
         this.element.appendChild(this.select);
 	return this;
-
     };
 
 
@@ -965,13 +900,11 @@ require("./datepicker");
         setValue: function(v){
             for(var i=0;i<this.options.length;i++){
                 if(this.options[i] == v){
-                 //   this.select.val(v);
                     this.select.value=v;
                     return;
                 }
             }
             if(this.input){
-                // this.input.val(v);
                 this.input.value=v;
                 return;
             }
@@ -1000,7 +933,6 @@ require("./datepicker");
    Harvey.Utils.extend(SelectField,_Field);
 
     var ButtonSetField=function(d,element){   // like select field - but not in a dropdown and not editable
-        //var settings=checkDefaultOptions("RadioButtonSetField",d);
         d.field="ButtonSetField";
         d.type="boolean";
         if(!d.labels || d.labels.length ===0){
@@ -1015,8 +947,6 @@ require("./datepicker");
         }
         this.labels.length=0;
 	this.popup=true;
-        
-	//var u=$("<ul class='choice'></ul>"); // add the selection list
         var u=document.createElement("ul");
         u.className="choice";
 	this.element.appendChild(u);
@@ -1038,7 +968,6 @@ require("./datepicker");
                 this.input[index]={};
                 this.input[index].label=label;
             }
-	    //var l=$("<li>" + label + "</li>");
             var l=document.createElement("li");
             l.textContent=this.input[index].label;
 	    
@@ -1047,11 +976,9 @@ require("./datepicker");
 	    //console.log("buttonSet adding field " + p + " label " + this.labels[p]);
             this.input[index].input=document.createElement("input");
             if(this.checkbox === true ){
-                //this.input[p]=$("<input type='checkbox' >");
                 this.input[index].input.type="checkbox"; //setAttribute("type","checkbox");
             }
             else{
-	        //this.input[p]=$("<input type='radio' >");
                 this.input[index].input.type="radio"; //setAttribute("type","radio"); 
             }
             
@@ -1063,31 +990,13 @@ require("./datepicker");
 		        e.stopPropagation();
                         console.log("click for " + node.parentNode.text);
                         console.log("current checked is " + node.checked);
-                        /*  if(node.checked === true && val !== "true" ){
-                         console.log("==================checked is true - setting val to true");
-                         val = "true";
-                         }
-                         else {
-                         console.log("================checked is false - setting val to false");
-                         val = "false"; //node.checked;
-                         } 
-                         */
-                        //  if(node.checked !== val){
-                        //      val=node.checked;
-                        // }
-                        
-                       
                         console.log("radio buttons");
                         for(var i=0;i<that.input.length;i++){
                             if(that.input[i].input !== node){
                                 console.log("setting checked for  " + that.input[i].input.parentNode.text);
                                 console.log("from  " + that.input[i].checked + " to false ");
                                 that.input[i].input.checked=false;
-                                // that.value[i]="false";
                             }
-                            //else{
-                            //     that.value[i]="true";
-                            // }
                         }
 		    };
 	        }(this,this.input[index].input)); 
@@ -1124,9 +1033,7 @@ require("./datepicker");
 	    if(index !== null){
 		var p=this.input[index].input.parentNode;
                 p.removeChild(this.input[index].input);
-		//this.input[index].remove();
 		this.input.splice(index,1);
-		//p.remove();
                 p.parentNode.removeChild(p);
 	    }
 	    else{
@@ -1161,7 +1068,6 @@ require("./datepicker");
     Harvey.Utils.extend(ButtonSetField,_Field);
 
     var SliderField=function(d,element){
-        //var settings=checkDefaultOptions("SliderField",d);
         d.field="SliderField";
         d.type="range";
         d.html_type="range";
@@ -1188,23 +1094,18 @@ require("./datepicker");
     Harvey.Utils.extend(SliderField,_Field);
 
     var StringArrayField=function(d,element){
-        //var settings=checkDefaultOptions("StringArrayField",d);
         d.field="StringArrayField";
         d.type="stringArray";
 	_Field.call(this,d,element);
 	this.popup=true;
 	var that=this;
 	var array_length=0;
-	//this.element.addClass("stringArray");
         this.element.className="stringArray";
 	this.input=[];
-	//var dv=$("<div class='list_container'></div>");
         var dv=document.createElement("div");
         dv.className="list_container";
-	//this.element.append(dv);
         this.element.appendChild(dv);
         var u=document.createElement("ul");
-	//dv.append($("<ul class='fieldset'></ul>"));
         u.className="string_fieldset";
         dv.appendChild(u);
 	if(this.value && this.value.length>0){
@@ -1234,12 +1135,8 @@ require("./datepicker");
             var sm=document.createElement("span");
             sm.classList.add("minus","ui-icon","ui-icon-minusthick");
             p.appendChild(sm);
-	    //this.element.find('li').last().append("<span class='plus ui-icon ui-icon-plusthick stringArray_plus' style='float: right; margin-left: 5px; border: 1px solid #000'></span>");
-            //this.element.find('li').last().append("<span class='minus ui-icon ui-icon-minusthick stringArray_minus' style='float: right; margin-left: 5px; border: 1px solid #000'></span>");
             var addremove=function(add){
                 var l=that.input.length,n;
-	       // var sp=that.element.find('li').last().find('span');
-                //sp.detach();
                 sp.parentNode.removeChild(sp);
                 sm.parentNode.removeChild(sm);
                 if(add=== "add"){
@@ -1250,7 +1147,6 @@ require("./datepicker");
                 }
                 n=parseInt(that.element.getElementsByTagName("li").length-1,10);
                 var last_element=that.element.getElementsByTagName("li")[n];
-		//var last_element=that.element.find('li').last();
 		last_element.appendChild(sp);
                 last_element.appendChild(sm);
             };
@@ -1305,29 +1201,20 @@ require("./datepicker");
         deleteValue:function(i){
             var t;
             if(this.input.length>1){
-                //this.input[i].input.parent().remove();
                 t=this.input[i].input.parentNode;
                 this.input.splice(i,1);
                 this.value.splice(i,1);
                 t.parentNode.removeChild(t);
             }
-           // else{
-             //   Harvey.popup.alert("StringArrayField: Cannot remove the last value");
-            //}
         },
 	addValue:function(i){
 	    this.input[i]={};
 	   // console.log("trying to add a string field");
-	    // var element=$("<li type='string' class='string'></li>");
             var element=document.createElement("li");
             element.className="string";
-           // element.setAttribute("type","string");
-            // this.input[i].input=$("<input type='string'>");
             this.input[i].input=document.createElement("input");
             this.input[i].input.setAttribute("type","string");
-	    //element.append(this.input[i].input);
             element.appendChild(this.input[i].input);
-            //this.element.find(".string_fieldset").append(element);
             this.element.getElementsByClassName("string_fieldset")[0].appendChild(element);
 	    if(this.value[i]){
 		this.input[i].input.value=this.value[i];
@@ -1346,7 +1233,7 @@ require("./datepicker");
 			valid=true;   // at least one non blank value
 		    }
 		}
-		if(!Harvey.checkType["string"](v[i])){   //this.inputs[i].checkValue()){
+		if(!Harvey.checkType["string"](v[i])){  
 		    valid=false;
 		    break;
 		}
@@ -1363,16 +1250,13 @@ require("./datepicker");
 
     var ImageArrayField=function(d,element){
         var that=this;
-        var promise,new_values=[];
-        //var settings=checkDefaultOptions("ImageArrayField",d);
+        var new_values=[];
         d.field="ImageArrayField";
         d.type="imageArray";
 	_Field.call(this,d,element);
 	this.popup=true;
-        this.width=this.width?this.width:100;
-        this.height=this.height?this.height:100;
-
-       // this.thumbnails=true;
+        this.width=this.width?this.width:120;
+        this.height=this.height?this.height:90;
         if(!this.value){
             this.value=[];
         }
@@ -1381,172 +1265,164 @@ require("./datepicker");
 	        Harvey.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
 	        throw new Error("No FileReader");
 	    }
-            // this.input=$("<input type='file' id='files' size='6' name='files[]' multiple />");
             this.input=document.createElement("input");
-            this.input.setAttribute("type","file");
+            this.input.type="file";
             this.input.setAttribute("name","files");
             this.input.setAttribute("multiple","multiple");
 	    this.element.appendChild(this.input);
-	    this.input.addEventListener("change",function(){
-                return function (e){
-	            //Harvey.popup.alert("Uploading Files in progress");
-	            promise=that._getImageFileSelect(e,new_values);
-                    promise.fail(function(){
-                        throw new Error("Could not get images to upload");
-                    });
-	            promise.done(function(){
-		        // Harvey.display.alert("Uploading done");
-                        //                  console.log("Upload got " + new_values.length + " files");
-                        //for(var i=0;i<new_values.length;i++){
-                        that.value=that.value.concat(new_values);
-                        //                                console.log("got new values " + that.value.length);
-		        if(that.thumbnails){
-    //                                  console.log("going to make thumbnails");
-		            that.mkThumbnails();
-		        }
-	            });
-                };
-	    }(new_values));
+	    this.input.addEventListener("change",function(e){
+	        var file_promise=that._getImageFileSelect(e,new_values);
+	        file_promise.then(function(v){
+		    // Harvey.display.alert("Uploading done");
+                    console.log("ImageArray: Upload got " + new_values.length + " files");
+                    //for(var i=0;i<new_values.length;i++){
+                    that.value=that.value.concat(new_values);
+                    console.log("ImageArray: got new values " + that.value.length);
+		    if(that.thumbnails !== undefined){
+                        console.log("going to make thumbnails");
+		        that.mkThumbnails();
+		    }
+                    else{
+                        console.log("not making thumbnails");
+                    }
+	        }).catch(function(reason){
+                    console.log("could not load images " + reason);
+                });
+            });
         }
-
         if(this.value && this.value.length>0){  // start pre-loading
-            promise=this.loadImages(this.value);
-            if(this.thumbnails){
-                promise.done( this.mkThumbnails());
-            }
+            var promise=this.loadImages(this.value);
+            promise.then(function(){
+                if(this.thumbnails !== undefined){
+                   this.mkThumbnails();
+                }
+            }).catch(function(reason){
+                console.log("mkthumbnails failed " + reason); 
+            });
         }
-
     };
 
-
-
     ImageArrayField.prototype={
-        _getImage: function(o,last,promise){
+        _getImage: function(o){
             var that=this;
             var imm=new Image();  // get the width and height - need to load in to image
-	    imm.src=o.src; //e.target.result;
-            console.log("getImage last is " + last);
-            console.log("getImages");
-
-	    imm.onload=function(){
-	//	console.log("+++++ reader onload got width " + this.width + " " + this.height + " count " + that.count);
-                o.width=this.width;
-                o.height=this.height;
-                o.title=o.name;
-                o.aspect_ratio=this.width/this.height;
-                if(last === that.count){
-                    promise.resolve();
-                }
-                that.count++;
-            };
+	    imm.src=o.src;
+          
+            console.log("getImage");
+            var promise=new Promise(function(resolve,reject){
+	        imm.onload=function(){
+	            console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
+                    o.width=this.width;
+                    o.height=this.height;
+                    o.title=o.name;
+                    o.aspect_ratio=this.width/this.height;
+                    o.image=imm;
+                    resolve(o);
+                };
+            });
+            return promise;
          },
         _getImageFileSelect: function(evt,new_values){
-            var that=this;
-            var promise=$.Deferred();
-	    new_values.length=0; // reset array
+            var p,that=this;
+   	    new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = evt.target.files;
-	    //  console.log("got " + files.length + " number of files");
+	    console.log("got " + files.length + " number of files");
 	    var last=files.length;
 	    var count=0,finished=false;
-	    for (var i=0; i<files.length; i++) {
-		//console.log("found file num " + i);
-		if (!files[i].type.match('image.*')) {
-		    last--;
-		    continue;
-		}
-		var reader = new FileReader();
-		reader.onload = (function(f,last,new_values) {
-		    return function(e) {
-			e.stopPropagation();
-	//	        console.log(" reader got file " + JSON.stringify(e.target));
-	//	        console.log("goind to load " + f.name);
-        //                console.log("last is " + last + " and count is " + count);
-                        if(count=== (last-1)){
-        //                    console.log("finished true");
-                            finished=true;
-	                }
-                        new_values[count]={src: e.target.result,name:f.name};
-                        that._getImage(new_values[count],finished,promise);
-        //                console.log("getImageFiles: new values has " + new_values.length);
-			count++;
-		    };
-		})(files[i],last,new_values);
-		reader.readAsDataURL(files[i]);
-	    }
+            var promise=new Promise(function(resolve,reject){
+	        for (var i=0; i<files.length; i++) {
+		    //console.log("found file num " + i);
+		    if (!files[i].type.match('image.*')) {
+		        last--;
+		        continue;
+		    }
+		    var reader = new FileReader();
+		    reader.onload = (function(f,last,new_values) {
+		        return function(e) {
+			    e.stopPropagation();
+	                    //	console.log(" reader got file " + JSON.stringify(e.target));
+	                    console.log("FileSelect: going to load " + f.name);
+                            console.log("FileSelect: last is " + last + " and count is " + count);
+                        
+                            new_values[count]={src: e.target.result,name:f.name};
+                            p=that._getImage(new_values[count]);
+                            p.then(function(v){
+                                console.log("getFileSelect: assigned value");
+                                new_values[count]=v;
+                                count++;
+                                if(count===last){
+                                    console.log("FileSelect: finished true");
+                                    resolve(last);
+	                        } 
+                            }).catch(function(reason){
+                                console.log("could not load image " + reason); 
+                            });
+                            //console.log("getImageFiles: new values has " + new_values.length);
+ 		        };
+		    })(files[i],last,new_values);
+		    reader.readAsDataURL(files[i]);
+	        }
+            });
 	    return promise;
-
         },
         loadImages: function(){
-            var deferred=$.Deferred();
-            var last=(this.value.length-1);
+            var i=0,p;
+            var last=this.value.length;
             this.count=0;
-            for(var i=0;i<this.value.length;i++){
-                this._getImage(this.value[i],last,deferred);
-            }
-            return deferred;
+            // for(var i=0;i<this.value.length;i++){
+            var promise=new Promise(function(reject,resolve){
+                while(i<last){
+                    p=this._getImage(this.value[i],last);
+                    p.then(function(v){
+                        if(v==last){
+                            resolve(last);
+                        } 
+                    }).catch(function(reason){
+                        console.log("could not load image " + reason);
+                    });
+                    i++;
+                }
+            });   
+            return promise;
         },
         mkThumbnails: function(){
-            var that=this;
-	  //  console.log("mk_thumbnails got " + this.value.length + " number of files");
-            var td=this.element(".image_gallery");
+            var that=this,el;
+	    console.log("mk_thumbnails got " + this.value.length + " number of files");
+            var td=this.element.querySelector("div.imageArray");
 
-            if (td.length > 0){
-		td.empty();
-		if(td.hasClass("ui-selectable")){
-		    td.selectable("destroy");
-		}
+            if(!td){
+                console.log("making a new image gallery");
+                td=document.createElement("div");//"<div class='image_gallery'></div");
+   
+                td.className="imageArray";
+                this.element.appendChild(td);
 	    }
-	    else{
-                td=$("<div class='image_gallery'></div");
-	//	throw new Error("image gallery is null");
-	    }
-	    $(this.element).append(td);
 
-	    var cb=function(e,s){
-		for(var i=0;i<this.selected.length; i++){
-	//	    console.log("got selected " + this.selected[i]);
-                    for(var j=0;j<this.value.length;j++){
-                        if(this.selected[i].data(index) === j){
-                            this.value[j].selected=true;
-                        }
-                        else{
-                            this.value[j].selected=false;
-                        }
-                    }
-		}
-	    };
 	    for(var i=0;i<this.value.length;i++){ // each image
-	//	console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
+	        console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
 		var t=this.value[i].title || "";
-		var div=$("<div title='" + t + "'></div>");
-		div.data("index",i);
-		var b= new Image(100,100);
-		if(this.value[i].url && this.value[i].url != ""){
-	//	    console.log("using the url");
-		    b.src=this.value[i].url;
-		}
-		else{
-	//	    console.log("using the src component - images are already loaded");
-		    b.src=this.value[i].src;
-		}
-		div.append(b);
-		td.append(div);
-	    }
-            if(this.editable){
-                this.selected=[];
-	        td.selectable({stop:
-                               function(e,ui){
-                                   that.selected=$("ui-selected");
-                                   that.cb(e,that);
-                               }
-                              }); // make the thumbnails multi-select
-	    }
+                el=td.querySelector("div[title='" + t + "']");
+                if(!el){
+		    var div=document.createElement("div");  
+                    div.title=t;
+                    if(this.width){
+                        div.style.width=(this.width.toString() + "px");
+                    }
+                    if(this.height){
+                        div.style.height=(this.height.toString() + "px");
+                    }
+                    if(!this.value[i].image){
+                        throw new Error("mkThumbnails: image does not exist");
+                    }
+		    div.appendChild(this.value[i].image);
+		    td.appendChild(div);
+	        }
+            }
+   
 	},
 	getValue:function(){
-
 	    return this.value;
-
 	},
 	checkValue:function(){
 	    return true;
@@ -1574,7 +1450,6 @@ require("./datepicker");
         d.field="AutoCompleteField";
         d.type="string";
 	var that=this;
-        //var settings=checkDefaultOptions("AutoCompleteField",d);
         _Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
@@ -1669,4 +1544,4 @@ require("./datepicker");
      };
 
 
-})(jQuery);
+})();

@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
 require("./DisplayBase.js");
 require("./Fields.js");
 require("./Nodes.js");
@@ -6,7 +6,7 @@ require("./Nodes.js");
 
 // requires HarveyDisplayBase.js
 
-;(function($){
+;(function(){
 
     "use strict";
 
@@ -250,7 +250,8 @@ require("./Nodes.js");
 
     Harvey.Utils.extend(HarveyMakeFieldset,Harvey._DisplayBase);
 
-    $.extend(true, Harvey, {
+    //$.extend(true, Harvey, {
+    Harvey.mixinDeep( Harvey,{    
 	display: {
 	    fieldset: function(opts,win){
                 opts.display="fieldset";
@@ -269,4 +270,4 @@ require("./Nodes.js");
 
 
 
-})(jQuery);
+})();

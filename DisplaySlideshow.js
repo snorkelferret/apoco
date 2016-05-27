@@ -1,11 +1,11 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
 
 // Menu display object
 //  requires HarveyDisplayBase.js
 //
 
 
-;(function($){
+;(function(){
 
   "use strict";
 
@@ -21,8 +21,14 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	    element: null,
             thumbnails:false
 	};
-
-        var settings=$.extend({},defaults,options);
+        var settings;
+        //var settings=$.extend({},defaults,options);
+        for(var k in defaults){
+            settings[k]=defaults[k];
+        }
+        for(var k in options){
+            settings[k]=options[k];
+        }
 	this.DEBUG=true;
 	var that=this;
 	Harvey._DisplayBase.call(this,settings,win);  //use class inheritance - base Class
@@ -223,7 +229,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
     // Create the namespace
     // Harvey.display.tabs
-    $.extend(true, Harvey, {
+    // $.extend(true, Harvey, {
+    Harvey.mixinDeep(Harvey,{
 	display: {
 	    slideshow: function(opts,win){
                     opts.display="slideshow";
@@ -241,4 +248,4 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 
 
 
-})(jQuery);
+})();

@@ -1,7 +1,7 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
 
 
-;(function($){
+;(function(){
 
     'use strict';
     // these are the components allowed in display objects
@@ -17,8 +17,12 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	};
        // var observer=null;
         var that=this,t;
-	this.options = $.extend({}, defaults,options);
-
+        this.options={};
+        //this.options = $.extend({}, defaults,options);
+        for(var k in defaults){
+            this.options[k]=defaults[k];
+        }
+        Harvey.mixinDeep(this.options,options);
 	for(var k in this.options){
 	    this[k]=this.options[k];
 	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
@@ -256,4 +260,4 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI,jQuery=require
 	}
     };
 
-})(jQuery);
+})();
