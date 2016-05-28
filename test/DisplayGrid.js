@@ -13,11 +13,11 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
+
 
 
 describe("DisplayGrid-(start without rows)",function(){
-    var $= global.jQuery; 
+
     var t;
     require("../DisplayGrid.js"); 
     it("creates a grid display object",function(){
@@ -97,7 +97,6 @@ describe("DisplayGrid-(start without rows)",function(){
 
 
 describe("DisplayGrid-(start with data and subgrids)",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayGrid.js");
     
@@ -146,9 +145,6 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         t.addCol({name:"other",type:"string",editable:false});
         var c=t.getCol().length;
         assert.strictEqual(b,c);
-        var b=$("#1").find("tr:first").find("td:last");
-        var c=b.html();
-        console.log("td is " + c);
     });
     it("updates an existing row",function(){
         //  t.updateRow({stock:"XXX",subclass:1,maturity:20160830,other:"something"});
@@ -169,7 +165,6 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
 });
 
 describe("DisplayGrid-(start with data but no subgrids)",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayGrid.js");
     var data={ id:"test_grid",DOM:"test",
@@ -179,13 +174,17 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
                      {one: 22, two: "big"}]
              };
     it("creates a grid display object",function(){
-        $("body").append("<div id='Content'></div>");
-        assert($("#test").length>0);
+        var b=document.createElement("div");
+        b.id="test";
+        document.body.appendChild(b);
+        assert.strictEqual(document.contains(b),true);
         t=Harvey.display.grid(data);
         assert.isObject(t);
+        t.show();
     });
     it("creates a jquery container",function(){
-        assert.notStrictEqual($("#test_grid"),0); 
+        var b=document.getElementById("test_grid");
+        assert.strictEqual(document.contains(b),true);
     });
     it("can add a row",function(){
         var b=t.getGrid("all").rows.length;

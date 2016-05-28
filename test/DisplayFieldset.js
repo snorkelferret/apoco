@@ -14,11 +14,9 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
-
 
 describe("DisplayFieldset-(no initial data)",function(){
-    var $= global.jQuery; 
+   
     var t;
     require("../DisplayFieldset.js"); 
     it("creates a fieldset display object",function(){
@@ -90,12 +88,13 @@ describe("DisplayFieldset-(no initial data)",function(){
 });
 
 describe("DisplayFieldset-(start with data)",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayFieldset.js"); 
     it("creates a fieldset object",function(){
-        $("body").append("<div id='test'></div>");
-        assert($("#test").length>0);
+        var b=document.createElement("div");
+        b.id="test";
+        document.body.appendChild(b);
+        assert.strictEqual(document.body.contains(b),true);
         t=Harvey.display.fieldset({id:"test_fieldset",
                                    DOM:"test",
                                    components:[{node:"paragraph",name:"stuff",text:"hullo people"},

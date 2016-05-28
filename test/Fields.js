@@ -9,31 +9,24 @@ const           fs = require('fs');
 const Harvey=require('../declare').Harvey;
 
 
-    global.document=require("jsdom").jsdom(undefined,
+global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
-    global.window=document.defaultView;
-    global.navigator=global.window.navigator;
-   global.jQuery = require('jquery');
+global.window=document.defaultView;
+global.navigator=global.window.navigator;
+ 
 
 
 
 describe("setup",function(){
-    var $;
-
-  /*  global.document=require("jsdom").jsdom(undefined,
+    /*  global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
     global.window=document.defaultView;
     global.navigator=global.window.navigator; */
-    $= global.jQuery; // = require('jquery');
-  
-    it('uses jquery', function () {
-        var dom = $("#banner");
-        
-        assert(dom);
-    });
+   
     it("appends a node to the dom",function(){
-        $("body").append("<div id='thing'></div>");
-        assert($("#thing").length>0);
+        var b=document.createElement("div");
+        document.body.appendChild(b);
+        assert.strictEqual(document.contains(b),true);
     });
     it('defines Harvey',function(){
         assert(Harvey); 
@@ -46,18 +39,16 @@ describe("setup",function(){
 });
 
 describe("InputField",function(){
-    var $;
-   
+     
   //  require("../Utils.js");
   //  require("../Types.js");
     require("../Fields.js");
  //   require("../node_modules/jquery-ui");
-    $= global.jQuery = require('jquery');
-  
+    
     it("defines Harvey.field",function(){
         console.log("here is Harvey.field " + Harvey.field);
        // assert(Harvey.popup !== undefined);
-        assert($.isEmptyObject(Harvey.field)!==true);
+        assert.isObject(Harvey.field,true);
         
     });
     var t=Harvey.field["InputField"]({name: "inputNode",type: "integer"});
@@ -80,17 +71,13 @@ describe("InputField",function(){
     });
     
     it("creates an input node",function(){
-        var b;
         //var c=document.getElementsByTagName("div";
         var b=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];    
        // b=c.
-        
-        
-
+  
         //var b=document.getElementsByTagName("div").getElementsByTagName("input")[0];
      //   var b=$("body").find("div[title='inputNode']").find("input");
         console.log("iiiiiiiiiiiiiiiiiinput node is %j " , b);
-        assert.notStrictEqual($(b).length,0);
         assert.isObject(b);
     });
     
@@ -128,8 +115,7 @@ describe("InputField",function(){
 });
 
 describe("FloatField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
+
     require("../Fields.js");
   //  require("../node_modules/jquery-ui");
    
@@ -139,7 +125,7 @@ describe("FloatField",function(){
     it("defines Harvey.field",function(){
         console.log("here is Harvey.field " + Harvey.field);
        // assert(Harvey.popup !== undefined);
-        assert($.isEmptyObject(Harvey.field)!==true);
+        assert.isObject(Harvey.field);
         
     });
     var f=Harvey.field["FloatField"]({name:"floatField",type: "float",precision: 3});
@@ -161,7 +147,7 @@ describe("FloatField",function(){
         f.setValue(12.124234);
         //var e=$("body").find("div[name='floatField']").find("input");
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
-        console.log("first fields value is " + $(e[0]).val());
+        console.log("first fields value is " + e[0].value);
         assert.strictEqual(e[0].value,'12');
         assert.strictEqual(e[1].value,'124');
     });
@@ -169,9 +155,9 @@ describe("FloatField",function(){
         f.setValue(-23.4678);
         //var e=$("body").find("div[name='floatField']").find("input");
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
-        console.log("first fields value is " + $(e[0]).val());
-        assert.strictEqual($(e[0]).val(),'-23');
-        assert.strictEqual($(e[1]).val(),'468');
+        console.log("first fields value is " + e[0].value);
+        assert.strictEqual(e[0].value,'-23');
+        assert.strictEqual(e[1].value,'468');
     });
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),"-23.468"); 
@@ -198,8 +184,7 @@ describe("FloatField",function(){
 });
 
 describe("FloatField- with spinner",function(){
-    var $;
-    $= global.jQuery = require('jquery');
+  
     require("../Fields.js");
   //  require("../node_modules/jquery-ui");
    
@@ -240,19 +225,17 @@ describe("FloatField- with spinner",function(){
 });
 
 describe("DateField",function(){
-    var  $;
-  
+   
     require("../Fields.js");
     //require("../node_modules/jquery-ui").datepicker;
-    $= global.jQuery = require('jquery');
-    
+     
     it("defines Harvey",function(){
         assert(Harvey !== undefined); 
     });
     it("defines Harvey.field",function(){
         console.log("here is Harvey.field " + Harvey.field);
        // assert(Harvey.popup !== undefined);
-        assert($.isEmptyObject(Harvey.field)!==true);
+        assert.isObject(Harvey.field,true);
     });
     var f=Harvey.field["DateField"]({name:"dateField",type: "date"});
     it("creates a div element",function(){
@@ -282,9 +265,6 @@ describe("DateField",function(){
 });
 
 describe("CheckBoxField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
- 
     require("../Fields.js");
    
     var f=Harvey.field["CheckBoxField"]({name:"checkBoxField",type: "boolean"});
@@ -326,8 +306,7 @@ describe("CheckBoxField",function(){
 
 
 describe("NumberArrayField-Integer",function(){
-    var $;
-    $= global.jQuery = require('jquery');
+
     require("../Fields.js");
       
     var f=Harvey.field["NumberArrayField"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
@@ -356,9 +335,6 @@ describe("NumberArrayField-Integer",function(){
 });
 
 describe("TextAreaField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
-  
     require("../Fields.js");
   
     
@@ -389,12 +365,9 @@ describe("TextAreaField",function(){
 });
                                        
 describe("SelectField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
- 
-    require("../Fields.js");
   
-    
+    require("../Fields.js");
+     
     var f=Harvey.field["SelectField"]({name:"selectField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
@@ -422,8 +395,9 @@ describe("SelectField",function(){
         }
         //var e=$("body").find("div[name='selectField']").find("select");
         e[i].selected=true;
- 
-        $(e).trigger("change");
+        //var ev=new Event("change");
+        //e[i].dispatchEvent(ev);
+        e[i].click();
         var b=f.getValue();
         assert.strictEqual(b,"two");
     });
@@ -437,9 +411,7 @@ describe("SelectField",function(){
 });
 
 describe("ButtonSetField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
- 
+  
     require("../Fields.js");
  
     
@@ -536,9 +508,6 @@ describe("ButtonSetField",function(){
 });
 
 describe("ButtonSetField - as checkboxes",function(){
-    var $;
-    $= global.jQuery = require('jquery');
- 
     require("../Fields.js");
     var f=Harvey.field["ButtonSetField"]({name:"radioButtonSetField",checkbox:true,type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
@@ -575,8 +544,7 @@ describe("ButtonSetField - as checkboxes",function(){
 
 
 describe("SliderField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
+
     require("../Fields.js");
      
     var f=Harvey.field["SliderField"]({name:"sliderField",type: "integer",min: 0,max:10});
@@ -602,9 +570,7 @@ describe("SliderField",function(){
 });
 
 describe("StringArrayField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
-
+ 
     require("../Fields.js");
  
     
@@ -652,9 +618,7 @@ describe("StringArrayField",function(){
 });
 
 describe("ImageArrayField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
- 
+  
     require("../Fields.js");
  
     
@@ -668,9 +632,7 @@ describe("ImageArrayField",function(){
 });
 
 describe("AutoCompleteField",function(){
-    var $;
-    $= global.jQuery = require('jquery');
- 
+  
     require("../Fields.js");
         
     var f=Harvey.field["AutoCompleteField"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});

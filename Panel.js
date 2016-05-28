@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
+var Harvey=require('./declare').Harvey,UI=require('./declare').UI; 
 require("./Utils");
 
 // Copyright (c) 2015 Pooka Ltd.
@@ -120,7 +120,6 @@ require("./Utils");
 	        settings="_blank"; // open in new tab
 	    }
             else{
-                //var n=$.extend({},defaults,d.opts);//
                 Harvey.mixinDeep(d.opts,defaults);
                 for(var k in d.opts){
                     if(settings === ""){
@@ -133,10 +132,8 @@ require("./Utils");
             //   console.log("settings are " + settings);
             }
 	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
-	    //var p=$.Deferred();
             var p=new Promise(function(resolve,reject){
 	        if(!win){
-	            //p.reject();
                     reject("Could not open window");
 	        }
 	        window.addEventListener("childReady",function(){
@@ -144,17 +141,16 @@ require("./Utils");
 		        if(e.data === win){
 		            console.log("window equals e.data");
                             that._list[d.name]=win;
-	//	            p.resolve({"window":win,"name": d.name});
-                           resolve({"window":win,"name": d.name});
+                            resolve({"window":win,"name": d.name});
 		        }
 		        console.log("Parent child is ready");
 		    };
 	        }(d.name,win,p),false);
             });
-            // p.done(function(d){
+            
             p.then(function(d){
                 d.window.onunload=function(e){
-                  //  console.log("got child closed " + d.name);
+                    console.log("got child closed " + d.name);
                     // delete the window from the list
                     var p=that._list[d.name];
 
@@ -174,10 +170,7 @@ require("./Utils");
         }
     };
 
-
-
     Harvey.Panel={
-
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
         UIStart:function(w){
             var nv;
@@ -185,7 +178,6 @@ require("./Utils");
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
             for(var i=0;i<w.length;i++){
-               // nv=$.extend( true,{},this._UIGet(w[i]));
                 console.log("trying to clone " + w[i]);
                 nv=this._UIGet(w[i]);
                 if(nv !== null){
@@ -203,12 +195,9 @@ require("./Utils");
             for(var k in UI.Panels){
                 console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
-                     //var newW=$.extend(true,{},UI.Panels[k]);
                     //console.log("found " + name);
                     var cd=Harvey.cloneDeep(UI.Panels[k]);
-                  //  var newW= 10 ; 
                    // console.log("clone deep is " + cd);
-                    
                     return cd;
                 }
             }
@@ -370,9 +359,6 @@ require("./Utils");
                     delete obj[k];
                     
                 }
-               // for(var k in obj){
-               //     console.log("uiuyiuiyiuuyiiuyuyiyiuuyiuyiuiyyiuiyu " + k);
-               // }
                 obj=null;
             }
             else {
@@ -413,7 +399,6 @@ require("./Utils");
             var d;
 	    var doit=function(that,index){
               //  console.log("doit is here index is " + i);
-		//d.execute();
                 if(!d.hidden){ /// hmmmm
         	    d.show();
                 }
@@ -464,10 +449,7 @@ require("./Utils");
             }
      //       console.log("adding child length is " + this.components.length);
             display_object.parent=this;
-          //  if(!display_object.element || display_object.element.length==0){
-          //      display_object.execute();
-           // }
-	    this.components.push(display_object);
+ 	    this.components.push(display_object);
             if(display_object.hidden !== true){
                 display_object.show();
             }
@@ -496,7 +478,6 @@ require("./Utils");
               //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
-
            // console.log("deleteing child length is " + this.components.length);
 	   // console.log("Panel delete child is here");
             if(obj.listen){ // remove the listener
@@ -577,7 +558,6 @@ require("./Utils");
 	}
     };
 
-    //$.extend(true, Harvey,
     Harvey.mixinDeep(Harvey,
                      { _panelComponents:
                        function(t){
@@ -592,6 +572,4 @@ require("./Utils");
                            }
                        }
                      });
-    
-
 })();

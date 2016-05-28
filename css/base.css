@@ -1,0 +1,348 @@
+/* Copyright (c) Pooka Ltd 2012-16
+
+Author: Val Wardlaw
+Type: css stylesheet
+History: 1st Feb 2012 creation
+
+*/
+
+
+/*html{ height: 100% }*/
+body{ margin: 1em;/* -webkit-font-smoothing: antialiased;*/ font-family: "Arial"; font-size: 10pt}
+
+.hide{ display: none }
+
+.bannertop {width: 100%; height: 3em; position: fixed; top: 0; z-index: 10}
+
+#Tail{position: fixed; bottom: 0; z-index: 100 }
+#Main { /*margin-left: 4em; margin-right: 4em;  */ height: auto}
+
+
+.tab_container{background-color: #ddeeff}
+
+.draggable{ opacity:0.5}
+.resizable{resize:both;overflow:auto}
+/* selectable */
+
+
+.selectable .ui-selecting{ background: #444 }
+.selectable .ui-selected{ background: #555  }
+
+
+/* fieldSet */
+.field_container{padding: 1em}
+.fieldset {margin: 0.5em 0}
+/* slideshow */
+/* .Harvey_slideshow{width: inherit; height: 400px; overflow: hidden} */
+.Harvey_slideshow div.pic_area{width: inherit; position: relative; height: 400px; overflow: hidden}
+
+.Harvey_slideshow ul.carousel{padding: 0}
+.Harvey_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat; width: 48px; height: 48px; }
+.Harvey_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat; width: 48px; height: 48px}
+.Harvey_slideshow span.hover{background-color:#555; opacity: 0.5 }
+
+
+/* tabs */
+.tab_container{width: 100%; margin-right: 2em; padding-right: 2em}
+.tab_container li{ height: 2em ; cursor: pointer }
+.tab_container li span{ height: 2em; padding: 0em 1em; text-align: center; vertical-align: middle }
+/*.tab_container li:hover{
+    
+} */
+
+
+/* menus */
+.menu {padding-top: 1em;}
+.menu span{font-weight: bolder; padding-left: 0.5em }
+.menu ul{margin: 1em 0 0 0;}
+.menu ul li:not(.seperator):hover{font-weight: bolder }
+.menu ul li.seperator{border-bottom: inherit; padding: 1em 0em}
+.menu ul li span.seperator{}
+
+
+
+/* default for tables */
+
+/* grid table */
+.grid {min-width: 4em; font-size: inherit; overflow-x: hidden;  overflow-y: hidden; }/* padding-bottom: 12em; padding-right: 12em} /* overflow:  visible} */
+.grid .label{margin: 1em 0 1em 1em;   display: table-row}
+.grid_content { min-width: 8em; min-height: 6em;padding-top: 4em }
+/* this is a div NOT the tfoot html object */
+.grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
+.grid_footer div{ background-color: #888}
+.grid button{ height: 2em}  
+/* .grid table{ display: block; table-layout: fixed } */
+.grid table{ overflow: hidden }
+
+
+.popup { position: absolute; width: 40em; height: 14em; z-index: 1000; background: #101010 }
+
+#grid_popup{ }
+#grid_popup textarea{  width: 40em; height: 10em; }
+
+
+.htable table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555}
+
+.htable table {table-layout: fixed; border-collapse: collapse}
+/* border round the cells in the grid */
+ /* .htable table td{border: 1px solid #73bdf6}   */
+
+.htable table th, td {padding: 0em 1em; margin: 0em; font-size: 8pt; height: 1.5em;} /* border-bottom-width: 0em !important; padding: 0em 10em} */
+.htable table th span{ display: inline-block; float: right; margin-left: 1em; }
+/* hovered-row cells should show bottom border (will be highlighted) */
+/*table tbody tr:hover th,
+table tbody tr:hover td { border-bottom-width: 1px !important; }
+
+*/
+/* remove top border if the above row is being hovered to prevent double horizontal borders */
+/*table tbody tr:hover + tr th,
+table  tbody tr:hover + tr td{ border-top-width: 0em !important;  background: #333}
+*/
+/* .htable table tbody tr:hover td{ background: #444 } */
+.htable .hover { background: #aabbcc }
+/* last-row cells should always show bottom border (not necessarily highlighted if not hovered) */
+/* IE7, IE8: selector dependent on CSS classes because of no support for :last-child */
+.htable table tbody tr.last-child th,
+.htable table tbody tr.last-child td { border-bottom-width: 1px !important; }
+
+/* last-row cells should always show bottom border (not necessarily highlighted if not hovered) */
+/* IE8 BUG: if these (unsupported) selectors are added to a rule, other selectors for that rule will stop working as well! */
+/* IE9+, FF, Chrome: make sure the visuals are working even without the CSS classes crutch */
+ 
+.htable table label{ }
+.htable table td{ text-align: right }
+.htable table td input {box-sizing: border-box; font-size: inherit}
+/* .htable table button {background-color: #202020; color: #bbbbbb; border: 1px solid dimgrey;}  */
+.htable table tr td textarea{}
+.htable table textarea,select{}
+
+.htable table td span{ display: inline} /*float: right } */
+/* table with only col names */
+.htable table.head {min-width: 8em;  overflow-x: hidden; z-index: 100; position: fixed;  top: 3em;  height: 2em }
+.htable .inner_table h4{ padding-left: 1em; height: 1em; color: #0000ff}
+.htable .inner_table table{ overflow: auto; height: 100%    }
+.htable .inner_table table td.cell_updated{background: #fbec88}
+.htable .inner_table table td.cell_updated_fast{background: #fb8866}
+.htable .inner_table table td input{ background: inherit; text-align: inherit}
+.htable .inner_table table td th { word-wrap: break-word }
+/* set the row colours */
+.htable .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
+
+/* padding: top right bottom left */
+
+.first{width: 2em; }
+.slider{width: 15em; margin:  0.5em 0 0.5em 0} 
+.integer {width: 5em }
+.positiveInteger {width: 5em}
+.negativeInteger {width: 5em}
+.date {width: 8em}
+.time {width: 8em}
+.string {width: 6em}
+.token {width: 6em}
+.alphaNum {width: 6em}
+.image {width: 10em}
+.currency {width: 8em}
+.email {width: 8em}
+.float {width: 8em }
+.container {width: 10em}
+.integerArray {width: 8em}
+.integerArray input,
+.integerArray span.integerArray{width: 3.5em}
+.floatArray {width: 12em}
+.boolean {width: 4em, margin: 0em}
+.text { width: 12em}
+.imageArray{display:block;margin-top:1em; margin-bottom: 1em}
+.imageArray div{display: inline; width: 120px;height: 90px;}
+.imageArray img{width: inherit; height:inherit; border: 2px solid #999}
+
+.field_container textarea {font-family: monospace}
+
+.stringArray li.plus{float: right; margin-left: .4em; border: 1px solid #000 }
+.stringArray li.minus{float: right; margin-left: .4em; border: 1px solid #000 }
+/* remove the spinners on number inputs */
+/*input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+*/
+
+div.harvey_autocomplete ul{z-index:10; padding: 0; margin: 0.2em}
+div.harvey_autocomplete ul li{display: block; z-index:10; width: inherit}
+div.harvey_autocomplete input{margin-bottom: 0.2em}
+
+ul.choice {list-style-type: none  }
+/* floats not using the input default */
+/* .form_style_div ul.aligned_float, */
+.float ul.aligned_float{display: flex; 
+                        list-style-type: none;
+                      /*  height:32px; */
+                        border: 1px solid #333333;
+                        box-sizing: border-box;
+                        border-collapse: collapse;
+                        width: 100%; height: 100%; 
+                        margin: 0em; padding: 0em; flex-flow: row}
+/* .form_style_div ul.aligned_float, */
+.float ul.aligned_float li{ display: flex; flex-flow: row}
+/* .htable table td.float div{display: inline  } */
+/* .form_style_div ul.aligned_float, */
+.float ul.aligned_float li input{ border: 0 none}
+
+.float ul.aligned_float li div.values .float_right,
+td span.float_right{ float: right; text-align:left; width: 50%}
+.float ul.aligned_float li div.values .float_left,
+td span.float_left{ float: left; text-align:right;width: 50% }
+
+.float ul.aligned_float div.arrows{display:flex;
+                                   flex-flow: column;
+                                   background-color: #ffffff;
+                                   height: inherit}
+float ul.aligned_float div.arrows span{height: 50%} 
+
+.float ul.aligned_float div.values{ display:flex; 
+                                   flex-flow: row; } 
+
+/*
+a {color: #777777; font-size: 8pt; margin: 0.5em 0.5em 1em 0 }
+a:active { color: #ffffff}
+a:hover { color: #aaaaaa}
+*/
+
+textarea{width: 40em; margin: 0.5em 0 0.5em 0}
+
+h1 {margin-top: 3em; font-size: 24pt; color: #bbb; text-align: left} 
+
+h2 { font-size: 18pt;  color: #444444 ,text-align: left; margin-top: 0em; margin-bottom: 0em; height: 2em}
+
+h2 a {  color: #333333; text-decoration: none}
+h2 a:hover { color: #444444; text-decoration: none}
+
+h3 { font-size: 16pt ; font-weight: bold; color: #666666; text-align: left; text-decoration: none}
+
+
+h4 {margin: 0em;  color: #404040; text-decoration: none; font-size: 12pt;
+text-align: left;  padding: 0em 0em .5em 0em}
+
+h5{color: #202020; font-size: 10pt}
+
+.disabled{ /*display: none;
+           position: absolute;
+           cursor: auto;
+           background-color: gray;  */
+           opacity: 0.4;
+ }  /* use <div class='disabled'></div> $(.disabled).show() or .hide()  */
+
+#Harvey_modal {
+    position: fixed; /* Stay in place */
+    z-index: 900; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgb(0,0,0);
+    background-color: rgba(255,255,255,0.25);
+   
+}
+
+p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 2em; font-size: 10pt}
+p a{text-decoration: none; outline: none}
+p a:hover{outline: none; text-decoration: none}
+
+.Harvey_dialog{position: fixed; top: 50%; left: 50%; z-index: 1000; width: 20em; height: 12em}
+#Harvey_datepicker{
+    display: block;
+    left: 36px;
+    position: absolute;
+    top: 32px;
+    z-index: 20;
+}
+#Harvey_datepicker td.Harvey_date{
+    cursor: pointer
+}
+#Harvey_datepicker_title{
+    color: #222;
+}
+#Harvey_datepicker td{
+    text-align:center;
+}
+#Harvey_datepicker_controls td.arrows{
+    display: block;
+    height: 32px ; /* in pixels because icons are 2 X 16px plus margin */
+    width: 16px;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+}
+#Harvey_datepicker_controls td.arrows span{
+    padding: 0;
+}
+#Harvey_datepicker_grid td.Harvey_date:hover{
+    border: 1px solid #aaa; 
+}
+
+
+#Harvey_alert{ width: 20em; height: 12em;margin: auto; z-index: 100; position: absolute; top: 50%;left: 50%}
+#Harvey_trouble{position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.5;  background-color: #800; padding: 30px; z-index: 100}
+#Harvey_trouble h1{font-size: 70pt; position: fixed; top: 20%; left: 30%;  margin: auto; color: #fff ; background-color: inherit; opacity:1.0}
+#Harvey_trouble h2{position:fixed;font-size: 50pt; color: #fff; top: 33%; left:30%; margin:auto; opacity: 1.0}
+
+#Harvey_spinner
+{/* background:url('images/ajax-loader.gif');  */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: auto;
+  z-index: 400;
+  background: transparent url('images/ajax-loader.gif');
+  width: 32px;
+  height: 32px;
+}
+
+.Harvey_clock{border: 1px solid ;border-color: inherit; padding: 0.5em; width: 5em; margin-top:1em}
+div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
+#login_name { margin-right: 1em} 
+
+
+.doing_things{cursor: wait}
+
+.inline{ display: inline;}
+
+
+.hidden{ visibility: hidden}
+
+.tooltip{ font-size: 8pt;} 
+
+.bold{font-weight: bold; color: #cccccc}
+.red{background: #aa0000 }
+.yellow{background: #fbec88}
+.orange{background: #fb8866}
+.smallgap {position: relative; margin-top: 2em;}
+.mediumgap {position: relative; margin-top: 4em;}
+.biggap {position: relative; margin-top: 6em;}
+.hugegap{position: relative; margin-top: 12em;}
+
+.required{border: 1px solid #dd2222}
+
+
+
+
+
+
+#Footer {
+    width: 100%;
+    padding-top: 4em;
+    margin-top: 2em;
+    height: 4em; position: absolute; bottom: 0em; left: 0em}
+
+.footer_text{position: relative; margin: 0em; padding: 0em;margin-right: 2em;text-align: right;}  
+
+/* tree */
+#control_panel{ position: absolute; top: 20em; left: 12em; width: 26em; height: 14em; z-index: 2000; background: #101010; border: 1px solid #777 }
+#control_panel button{ width: 8em; height: 3em; overflow: hidden; background-color: #888; margin-bottom: 1em }
+#control_panel div{ padding: 1em; border: 1px solid #777 }
+#control_panel h3{ color: #777; padding-left: 1em; cursor: move }
+
+/* .harvey_grid {position: relative; width: 100%; min-height: 600em; font-size: 10pt;  float: left; }  */
+

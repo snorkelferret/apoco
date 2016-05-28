@@ -14,11 +14,10 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
 
 
 describe("Panel",function(){
-    var $= global.jQuery; 
+  
     var t;
     var MO=stub(Harvey.Utils.observer,"create");
     MO.returns(true);

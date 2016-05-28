@@ -13,11 +13,8 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-//global.jQuery = require('jquery');
-
 
 describe("DisplayMenu-(start without menu items)",function(){
-   // var $= global.jQuery; 
     var t;
     require("../DisplayMenu.js"); 
     it("creates a manu display object",function(){
@@ -60,7 +57,6 @@ describe("DisplayMenu-(start without menu items)",function(){
 });
 
 describe("DisplayMenu",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayMenu.js"); 
     it("creates a manu display object",function(){

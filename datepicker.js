@@ -16,6 +16,7 @@ var Harvey=require('./declare').Harvey;
             if(element){
                 console.log("got a paramenter");
             }
+       
             var  click=function(e){
                 console.log("click is here");
                 var pos=[];

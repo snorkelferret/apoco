@@ -36,7 +36,6 @@ describe("JSDOM",function(){
 });
 
 describe("Popups",function(){
-    var $;
 
     global.navigator=global.window.navigator;
 

@@ -30,36 +30,59 @@ String.prototype.trim = String.prototype.trim || function trim() {
         },
 	binarySearch: function(arr,sort_order,data,closest){ // sorted list on an array of key value objects
 	    // sort_order array -  1st then 2nd etc
-	    var mid,r;
+	    var mid,r,compare;
             var len=arr.length;
-	    function compare(aa){
-		var field,item;
-              //  console.log("Compare: sort_order.length is " + sort_order.length);
-		for(var i=0;i<sort_order.length;i++){
-		    field=sort_order[i];
-		    item=data[field];
-		  //  console.log("field is " + field);
-                    if(aa[field].value == item){ // && i === sort_order.length -1){
-		//	console.log(aa[field].value + " equals " + item);
-		        //found[i]=true;
-                        continue;
+            console.log("array len is " + len);
+            if(sort_order === null){
+                compare=function(aa){
+                    console.log("testing " + aa + " with " + data);
+                    if(aa == data){
+                        console.log(aa + " is equal to " + data);
+                        return 0;
 		    }
-		    else if(aa[field].value > item){
-		//	console.log(aa[field].value + " is greater than " + item);
+		    else if(aa > data){
+		       	console.log(aa + " is greater than " + data);
 			return 1;
 		    }
-		    else if(aa[field].value < item){
-		//	console.log(aa[field].value + " is less than " + item);
+		    else if(aa < data){
+		        console.log(aa + " is less than " + data);
 			return -1;
 		    }
 	            else{
                         throw new Error("binarySearch: should never get here");
                     }
-		}
-                return 0;
-	//	console.log(" return value is  null ");
-	//	return null;
-	    }
+                };
+            }
+            else{
+	        compare=function(aa){
+		    var field,item;
+                    //  console.log("Compare: sort_order.length is " + sort_order.length);
+		    for(var i=0;i<sort_order.length;i++){
+		        field=sort_order[i];
+		        item=data[field];
+		        //  console.log("field is " + field);
+                        if(aa[field].value == item){ // && i === sort_order.length -1){
+		            //	console.log(aa[field].value + " equals " + item);
+		            //found[i]=true;
+                            continue;
+		        }
+		        else if(aa[field].value > item){
+		            //	console.log(aa[field].value + " is greater than " + item);
+			    return 1;
+		        }
+		        else if(aa[field].value < item){
+		            //	console.log(aa[field].value + " is less than " + item);
+			    return -1;
+		        }
+	                else{
+                            throw new Error("binarySearch: should never get here");
+                        }
+		    }
+                    return 0;
+	            //	console.log(" return value is  null ");
+	            //	return null;
+	        };
+            }
 	    // perhaps should use localeCompare() e.g string1.localeCompare(string2)
 	    mid = Math.floor(arr.length / 2);
 	  //  console.log("mid is " + mid);

@@ -1,5 +1,6 @@
 var Harvey=require('./declare').Harvey;
 require('./Utils');
+require("./Sort.js");
 require('./Types');
 require("./datepicker");
 
@@ -42,14 +43,10 @@ require("./datepicker");
 	return "";
     };
 */
-
-
     var _Field=function(d,element){
-
         if(!d.name){
             throw new Error("Harvey.field: Field must have a name");
         }
-
         if(!d.type){
             throw new Error("Harvey.field: must have a type");
 	}
@@ -144,6 +141,13 @@ require("./datepicker");
                 this.element.removeChild(this.element.lastChild);
             }
             this.element.parentNode.removeChild(this.element);
+            if(this.action){
+                this.element.removeEventListener(this.action);
+            }
+            if(this.listen){
+                Harvey.IO.unsubscribe(this);
+            }
+            this.element=null;
             this.input=null;
             this.value=null;
         },
@@ -243,14 +247,10 @@ require("./datepicker");
         },
         integerArray:function(that){
             var r,s,len=that.value.length;
-
 	    for(var i=0;i<len;i++){
-               // console.log("i is " + i);
-                //   this.input[i]=$("<input class='" + this.type + "' type='" + this.html_type + "'/>");
                 r=document.createElement("span");
                 r.setAttribute("type", that.html_type);
                 r.className=that.type;
-
                 if( that.delimiter !== undefined){
                     if(i>0 && i<len){
                         s=document.createElement("span");
@@ -1326,33 +1326,33 @@ require("./datepicker");
             var p,that=this;
    	    new_values.length=0; // reset array
 	    evt.stopPropagation();
-	    var files = evt.target.files;
+	    var files = new Array; //evt.target.files;
 	    console.log("got " + files.length + " number of files");
+            //check that the files are images
+            for(var i=0;i<evt.target.files.length;i++){
+                if (evt.target.files[i].type.match('image.*')) {
+                    files.push(evt.target.files[i]);
+                }
+            }
 	    var last=files.length;
 	    var count=0,finished=false;
             var promise=new Promise(function(resolve,reject){
 	        for (var i=0; i<files.length; i++) {
-		    //console.log("found file num " + i);
-		    if (!files[i].type.match('image.*')) {
-		        last--;
-		        continue;
-		    }
+		    console.log("found file num " + i);
 		    var reader = new FileReader();
 		    reader.onload = (function(f,last,new_values) {
 		        return function(e) {
 			    e.stopPropagation();
-	                    //	console.log(" reader got file " + JSON.stringify(e.target));
-	                    console.log("FileSelect: going to load " + f.name);
-                            console.log("FileSelect: last is " + last + " and count is " + count);
-                        
+	                   // console.log("FileSelect: going to load " + f.name);
+                           // console.log("FileSelect: last is " + last + " and count is " + count);
                             new_values[count]={src: e.target.result,name:f.name};
                             p=that._getImage(new_values[count]);
                             p.then(function(v){
-                                console.log("getFileSelect: assigned value");
+                                //console.log("getFileSelect: assigned value");
                                 new_values[count]=v;
                                 count++;
                                 if(count===last){
-                                    console.log("FileSelect: finished true");
+                                    //console.log("FileSelect: finished true");
                                     resolve(last);
 	                        } 
                             }).catch(function(reason){
@@ -1390,15 +1390,12 @@ require("./datepicker");
             var that=this,el;
 	    console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.querySelector("div.imageArray");
-
             if(!td){
                 console.log("making a new image gallery");
                 td=document.createElement("div");//"<div class='image_gallery'></div");
-   
                 td.className="imageArray";
                 this.element.appendChild(td);
 	    }
-
 	    for(var i=0;i<this.value.length;i++){ // each image
 	        console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
 		var t=this.value[i].title || "";
@@ -1419,8 +1416,7 @@ require("./datepicker");
 		    td.appendChild(div);
 	        }
             }
-   
-	},
+  	},
 	getValue:function(){
 	    return this.value;
 	},
@@ -1447,19 +1443,115 @@ require("./datepicker");
     Harvey.Utils.extend(ImageArrayField,_Field);
 
     var AutoCompleteField=function(d,element){
+        var v,rect,offset={};
+        var box,that=this;
+        var contains=function(arr,item){
+            var count=0,a,n=[];
+            // make it case insensitive
+            item=item.toLowerCase();
+            for(var i=0;i<arr.length;i++){
+                a=arr[i].toLowerCase();
+                console.log("arr " + a + " item " + item);
+                if((a).indexOf(item) !== -1){
+                    console.log("Found one");
+                    n[count]=arr[i];
+                    count++;
+                }
+                if(count ===4){
+                    return n;
+                }
+            }
+            return n;
+        };
+        function getOffset (object, offset) {
+            if (!object){
+                return;
+            }
+            offset.x += object.offsetLeft;
+            offset.y += object.offsetTop;
+            getOffset (object.offsetParent, offset);
+        }
+
         d.field="AutoCompleteField";
         d.type="string";
-	var that=this;
+
         _Field.call(this,d,element);
-        var s=document.createElement("input");
-        s.setAttribute("type",this.html_type);
-        s.className=this.type;
-        this.input=s;
-        this.element.appendChild(this.input);
-	
-/*	this.input.autocomplete({
-	    source: this.options
-	}); */
+        box=document.createElement("div");
+        box.classList.add(this.type,"harvey_autocomplete","ui-widget");
+        this.element.appendChild(box);
+        this.input=document.createElement("input");
+        this.input.setAttribute("type",this.html_type);
+        this.input.className=this.type;
+        box.appendChild(this.input);  
+        //sort the options
+        Harvey.sort(this.options,"string");
+        for(var i=0;i<this.options.length;i++){
+            console.log("sort to " + this.options[i]);
+        }
+      
+        var select=document.createElement("ul");
+        select.classList.add("string","choice","ui-autocomplete","ui-menu","ui-widget","ui-front","ui-widget-content");
+        select.style.visibility="hidden";
+        select.addEventListener("click",function(e){
+            if(e.target.tagName === "LI"){
+                e.stopPropagation();
+                e.preventDefault();
+               // console.log("clicked " + e.target.textContent);
+                that.input.value=e.target.textContent;
+                select.style.visibility="hidden";
+                //console.log("setting select to hidden");
+            }
+        });
+        select.addEventListener("mouseover",function(e){
+            if(e.target.tagName === "LI"){
+                e.stopPropagation();
+                e.preventDefault();
+                e.target.classList.add("ui-state-hover");
+            }
+        });
+        
+        select.addEventListener("mouseout",function(e){
+            if(e.target.tagName === "LI"){
+                e.stopPropagation();
+                e.preventDefault();
+                e.target.classList.remove("ui-state-hover");
+            }
+        });
+        
+        box.appendChild(select);
+        var options=[];
+        for(var i=0;i<4;i++){
+            options[i]=document.createElement("li");
+            select.appendChild(options[i]);
+        }
+
+        this.input.addEventListener("keyup",function(e){
+            var r;
+            e.stopPropagation();
+            //  var v=e.currentTarget.value;
+            v=that.input.value;
+            offset={x:0,y:0};
+            rect=that.input.getBoundingClientRect();
+            //select.style.left = e.clientX + 'px';
+            //select.style.top = e.clientY +  'px';
+            getOffset(select,offset);
+            //  console.log("console getOffset " + offset.x + " " + offset.y);
+            select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
+            select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
+            // console.log("rect left " + rect.left + " bottom " + rect.bottom);
+            // console.log("rect right " + rect.right + " top " + rect.top);
+            // console.log("scroll is "+ window.scrollX  + " " + window.scrollY);
+            //  console.log("keypress is here with value " + v);
+            //console.log("this options length is " + that.options.length);
+            //console.log("keyup setting visibility to hidden");
+            select.style.visibility="hidden";
+            r=contains(that.options,v);
+            for(var i=0;i<r.length;i++){
+                options[i].textContent=r[i];
+            }
+            //console.log("keyup setting visibility to visible");
+            select.style.visibility="visible";
+        });
     };
 
     AutoCompleteField.prototype={

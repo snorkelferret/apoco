@@ -13,11 +13,9 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
 
 
 describe("DisplayTabs-(start without tab items)",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayTabs.js"); 
     it("creates a tab display object",function(){
@@ -56,7 +54,6 @@ describe("DisplayTabs-(start without tab items)",function(){
 });
 
 describe("DisplayTabs",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayTabs.js"); 
     it("creates a tab display object",function(){

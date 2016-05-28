@@ -13,11 +13,10 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
 
 
 describe("DisplayForm-(start without fields)",function(){
-    var $= global.jQuery; 
+ 
     var t;
     require("../DisplayForm.js"); 
     it("creates a form display object",function(){
@@ -77,7 +76,6 @@ describe("DisplayForm-(start without fields)",function(){
 });
 
 describe("DisplayForm",function(){
-    var $= global.jQuery; 
     var t;
     require("../DisplayForm.js"); 
     it("creates a form display object",function(){

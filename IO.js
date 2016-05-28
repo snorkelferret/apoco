@@ -109,16 +109,10 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 
         },
         REST:function(type,options,data){
-            var defaults;
-            if(type == "GET"){
-                defaults={url: UI.URL,type: 'GET' ,dataType: 'json',headers: {Accept: 'application/json'}};
-            }
-            else if (type == "POST"){
-                defaults={ type:"POST", url: UI.url, dataType:"json",contentType: "application/json" };
-            }
-            else{
-                throw new Error("Harvey.REST only knows about get or post");
-            }
+            var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};
+            if(type !== "GET" || type !== "POST"){
+                throw new Error("REST: only knows about GET and POST not " + type);
+            }         
 	    //    var settings=$.extend({},defaults,options);
             var settings={};
             for(var k in defaults){
@@ -130,18 +124,39 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             if(settings.url === ""){
                 throw new Error("Harvey.REST Must have a url");
             }
-            settings.data=JSON.stringify(data);
-
-            var promise=$.ajax(settings);
-            //console.log("sending ", settings);
-
-	    promise.fail(function(jqXHR, textStatus){
-                if(!jqXHR){
-                    throw new Error("REST failed with no return from server");
+            data=JSON.stringify(data);
+            //var promise=$.ajax(settings);
+            
+            var promise=new Promise(function(resolve,reject){
+                var request=new XMLHttpRequest();
+                var stateChange=function(){
+                    if(request.readyState === XMLHttpRequest.DONE){
+                        if(request.status === 200){ //success
+                            console.log("return from server is " + request.responseText);
+                            resolve(JSON.parse(request.responseText));
+                        }
+                        else{
+                            reject(request.status);
+                            if(!request){
+                                throw new Error("REST failed with no return from server");
+                            }
+                            Harvey.display.statusCode[request.status]((request.statusText + " " + request.responseText));
+                        }
+                    }  
+                };
+               
+                request.onreadystatechange=stateChange;
+                request.open(type,settings.url);
+                if(type === "POST"){
+                    request.setRequestHeader("Content-Type", settings.mimeType);
+                    request.send(data);
                 }
-	        Harvey.display.statusCode[jqXHR.status]((jqXHR.statusText + " " + jqXHR.responseText));
-	    });
-
+                else{
+                    request.responseType=settings.mimeType;
+                    request.send();
+                }
+            });            
+           
             return promise;
         }
     };

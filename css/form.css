@@ -1,0 +1,116 @@
+/* css for Harvey.display.form */
+
+
+.harvey_form{position: fixed; top: 50%; left: 50%; 
+                font-size: 8pt; font-weight: normal; /*width: 60em; */
+                /*min-height: 40em !important;  min-width: 43em !important; */
+                z-index:600;
+                min-width: 12em;
+                min-height:18em;
+               /* width: 30em;
+                height: 25em; */
+                /* padding:1em 25px 1em 2em; */
+                 max-height: 80em;
+                overflow: hidden;
+                 display: inline-block}
+.form_header{cursor: move; height: 2em  }
+.harvey_form .form_header h5{display:inline; margin: 0;position: absolute; top:0.2em; left:0.2em  }
+
+/* .form_drag{ height: 100%; width: 100%;  } */
+.form_content{  /*width: 100%;  */
+                margin: 1em;
+               overflow: hidden;
+               z-index:600; }
+
+.form_content div.nodes{ margin: 2em ; top: 3em  }
+.form_scroll{  
+              overflow-y: auto;
+              }
+
+
+.harvey_form h2 { display: inline;}
+.harvey_form ul{list-style: none; display: table; padding: 0.3em; float: left; top: 0px; }
+.harvey_form .float ul.aligned_float{ width: 8em; height: 25px}
+
+.harvey_form ul li{display: table-row; height: 3em; }
+
+/*
+.harvey_form{position: absolute; top: 16em; left: 24em; 
+                 font-size: 12pt; font-weight: normal; width: 60em; min-height: 40em !important;  min-width: 40em !important; 
+                 z-index:600; padding:1em 0em 0em 2em;
+                 border: 1px solid #555;
+                 overflow: hidden;
+                 display: inline-block}
+.harvey_form .form_content{ height: 100%; width: 100%;  overflow: auto; z-index:600; }
+*/
+
+
+.harvey_form li.invalid_input{ color: #cc0000 /*border: 2px solid #cc0000 */ }
+
+/* padding: top right bottom left */
+
+.harvey_form .form_list {overflow-y: auto; overflow-x: hidden;  margin: 0 0 1em 0; font-size: 10pt; border: 1px solid #777; width: 20em; height: 10em; padding: 0; }
+.harvey_form .form_list ul{margin: 0 ;padding: 0em; list-style: none;}
+.harvey_form .form_list li{float: left; clear: both; width: 100%; padding: 5px 0em 5px 1em; cursor: pointer ; height:15px }
+.harvey_form .form_list li.selected{ background: #666; }
+.harvey_form .form_list li.seperator{width: 100%; background: #222; border-bottom: 1px solid #777; cursor: auto }
+
+
+.harvey_form .form_header span{display: inline; cursor: pointer; vertical-align: middle; float: right;
+                                    width: 2em; height: 2em; margin:0em}
+
+
+.harvey_form h4 {text-align: center;  }
+/*
+.harvey_form ul{ margin: auto; 
+                    list-style: none; 
+                    padding: 0em;  top: em; }
+.harvey_form ul li{height: 35px; display: inline-block}
+*/
+.harvey_form ul li label { height: 1.5em; margin: 0 1em 0 0; display: inline;
+                              text-align: right;
+                              
+                              float: left;
+                              width: 4em} /*display: table-cell; text-align: right} */
+/*.harvey_form ul li input{ width: 23em; } */
+.harvey_form ul li ul.fieldset{display: inline-block; }
+
+.harvey_form ul li.count input,
+.harvey_form div.count input{ display: inline-block; 
+                                  width: 10em; }
+/*.harvey_form ul li.text{display: block  } */
+.harvey_form ul li input::-webkit-inner-spin-button{
+    webkit-appearance: none;
+    margin: 0; }  /* for chrome to stop up/down arrows */
+
+.harvey_form ul li input:hover{ border-color: #999 }
+.harvey_form ul li.stringArray{width: 42em; display: inline-table;  }
+
+.harvey_form ul li.stringArray ul.fieldset li:first{ margin-left: 155px; display: table-row }
+.harvey_form ul li.stringArray ul.fieldset li{ margin-left: 16em; display: table-row } 
+.harvey_form div.list_container{ display: inline-block; margin-left: 16em; position: relative; }
+
+.harvey_form ul li.imageArray{ display: inline }
+
+.harvey_form ul li.imageArray input{margin-left: 5px}
+
+.harvey_form ul li.imageArray div.image_list{   }
+.harvey_form ul li.imageArray div.thumbnail{ width: 104px; height: 104px; 
+                                                border: 4px solid #000;
+                                                margin: 4px; padding: 2px;
+                                                display: inline-block;}
+.harvey_form ul li.imageArray div.thumbnail image{padding: 0.2em  }
+.harvey_form ul li textarea { display: inline;
+                                 width: 14em; height: 12em;  
+                                 margin-bottom: 1em}
+.harvey_form li.form_array input{ display: inline-block; float: left;  }
+
+
+.harvey_form ul li p{  display: table-cell; float: left }
+.harvey_form .form_button_container{width: 100%; position: absolute; bottom: -3px; height: 5em; display: block; }  /* container for buttons */ 
+.harvey_form button.print_button { float: right; } 
+.harvey_form button { float: left;  display: block; margin: 1em 3em} 
+.harvey_form li p.required{ color: #aa2222; display: inline; font-size: 8pt; float: right;
+                               vertical-align: middle}
+.harvey_form p.required span{ background-image: url(images/ui-icons_cd0a0a_256x240.png);}
+.harvey_form .form_footer{position: absolute; bottom: 12px; height: 3em; width: 100%;}

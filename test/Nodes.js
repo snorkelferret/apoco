@@ -13,11 +13,10 @@ global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
 global.window=document.defaultView;
 global.navigator=global.window.navigator;
-global.jQuery = require('jquery');
 
 
 describe("Nodes",function(){
-    var $= global.jQuery; 
+
     var t;
     require("../Nodes.js"); 
     it("creates a anchor",function(){

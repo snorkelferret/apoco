@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
 
 
 ;(function(){
@@ -243,11 +243,11 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=requ
                 Harvey.IO.unsubscribe(this);
             }
             if(this.draggable){
-                this.draggable.delete();
+                this.draggable.delete(); // FIX THIS 
             }
             this.deleteAll();
             if(this.element){
-                this.element.remove();  //removes events and data as well
+                this.element.parentNode.removeChild(this.element);  //removes events and data as well
             }
 	    else{
                 console.log("this element should not be null " + this.id);
