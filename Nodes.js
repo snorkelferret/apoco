@@ -151,14 +151,14 @@ require("./Types.js");
                 }
                 if (that.items[i].description){
                     d=document.createElement("dd");
-                    d.textContent=that.items[i].description;
+                    d.innerHTML=that.items[i].description;
                     that.element.appendChild(d);
                 }
                 else if (that.items[i].descriptions){
                     if(Harvey.checkType['array'](that.items[i].descriptions)){
                         for(var j=0;j<that.items[i].descriptions.length;j++){
                             d=document.createElement("dd");
-                            d.textContent=that.items[i].descriptions[j];
+                            d.innerHTML=that.items[i].descriptions[j];
                             that.element.appendChild(d);
                         }
                     }

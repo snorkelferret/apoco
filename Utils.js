@@ -273,37 +273,23 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 var that=this;
                 var check=function(mutations){
                     if(that._list.length>0){
-                     /*   for(var item of mutations){
-                            console.log("this is mutation item " + item);
-                            if(item.addedNodes){
-                                for(var i=0; i< item.addedNodes.length;i++){
-                                    //  console.log("Mutation observer added " + item.addedNodes[i].id);
-                                    for(var j=0;j<that._list.length;j++){
-                                        //    console.log("Observer trying to find " + that._list[j].id);
-                                        if(item.addedNodes[i].id == that._list[j].id && that._list[i].found === false){
-                                            console.log("Observer Found " + that._list[j].id);
-                                            //     console.log("Observer calling action function");
-                                            that._list[j].fn.call(that._list[j].context,that._list[j].context);
-                                            that._list[j].found=true;
-                                            // break;
-                                        };
-                                    }
-                                }
-                            }
-                      } */
                         mutations.forEach(function(mutation){
                             for(var k in mutation){
-                             //   console.log("mutation type is " + k);
+                                //console.log("mutation is " + k);
                                 if(k === "addedNodes"){
+                                  //  for(var n in mutation.addedNodes){
+                                  //      console.log("mutation.addNodes key is " + n);
+                                  //  }
                                     for(var i=0; i< mutation.addedNodes.length;i++){
-                                        //  console.log("Mutation observer added " + item.addedNodes[i].id);
+                                        console.log("Mutation observer addedNodes " + mutation.addedNodes[i].id);
                                         for(var j=0;j<that._list.length;j++){
-                                            //    console.log("Observer trying to find " + that._list[j].id);
-                                            if(mutation.addedNodes[i].id == that._list[j].id && that._list[i].found === false){
-                                            //    console.log("Observer Found " + that._list[j].id);
-                                                //     console.log("Observer calling action function");
-                                                that._list[j].fn.call(that._list[j].context,that._list[j].context);
+                                            console.log("Observer trying to find " + that._list[j].id);
+                                            if(mutation.addedNodes[i].id == that._list[j].id && that._list[j].found === false){
+                                                console.log(" really found ????? " + document.getElementById(that._list[j].id));
+                                                console.log("+++++++++++++++++++++++++++++++++++++++++==Observer Found " + that._list[j].id);
+                                                console.log("!!!!!!!!!!!!!!!!!!!!!!!!Observer calling action function");
                                                 that._list[j].found=true;
+                                                that._list[j].fn.call(that._list[j].context,that._list[j].context);
                                                 // break;
                                             };
                                         }
@@ -315,9 +301,10 @@ String.prototype.trim = String.prototype.trim || function trim() {
                         
                     }
                     var temp=[];
-                  //  console.log("observer list is " + that._list.length);
+                    console.log("observer list is " + that._list.length);
                     for(var k=0;k<that._list.length;k++){
-                        if(that._list[k].found !== true){
+                        console.log("that_list " + k + " found is " + that._list[k].id + " found " + that._list[k].found);
+                        if(that._list[k].found === false){
                             temp.push(that._list[k]);
                         }
                         else{
@@ -328,12 +315,14 @@ String.prototype.trim = String.prototype.trim || function trim() {
                     if(that._list.length==0){ // all fullfilled so reset
                         Harvey.Observer.takeRecords(); //empty the list
                         Harvey.Observer.disconnect(); //stop observing
+                        console.log("OBSERVER DISCONNECT");
                     }
 
                    // console.log("observer list is now " + that._list.length);
                 };
                 if(!Harvey.Observer){
                     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+                    console.log("MAKING NEW OBSERVER");
                     Harvey.Observer=new MutationObserver(function(mutations){
                         check(mutations);
                     });
@@ -341,7 +330,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             },
             add:  function(id,fn,context){
 
-                console.log("Observer adding ____________- id is " + id);
+                console.log("Observer adding ____________- id to list  " + id);
                 if(id !== undefined){
                     this._list.push({id:id,fn:fn,context:context,found:false});
                 }

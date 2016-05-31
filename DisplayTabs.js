@@ -68,7 +68,6 @@ require("./DisplayBase.js");
             }
             index=this.tabs.length;
 	    //if(this.DEBUG)console.log("tabs.execute creating tab  " );
-	    //t.element=$("<li class='ui-state-default ui-corner-top'><span>" +  label + "</span> </li>");
             t.element=document.createElement("li");
             t.element.classList.add("ui-state-default","ui-corner-top");
             s=document.createElement("span");
@@ -119,7 +118,6 @@ require("./DisplayBase.js");
                 if(this.tabs[i].listen){
                     Harvey.unsubscribe(this.tabs[i]);
                 }
-                //this.tabs[i].element.empty();
                 this.tabs[i].element.parentNode.removeChild(this.tabs[i].element);
                 this.tabs[i].element=null;
             }

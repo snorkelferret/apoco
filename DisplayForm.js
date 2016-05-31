@@ -59,15 +59,15 @@ require("./DisplayFieldset");
             var close=document.createElement("span");
             close.classList.add("ui-icon","ui-icon-close");
             header.appendChild(close);
-	    var c=(function(cmd){
-		return function(e){
-		    e.stopPropagation();
-		    if(!cmd){
-			throw new Error("command for " +  this.getKey + " does not exist");
-		    }
-		    cmd.delete();
-		};
-	    }(this));
+	    var c=function(e){
+	        //	return function(e){
+		e.stopPropagation();
+		   // if(!cmd){
+	//		throw new Error("command for " +  this.getKey + " does not exist");
+	        //	    }
+		that.delete();
+	    };
+	    //}(this));
 	    close.addEventListener("click",c,false);
 
             fp=document.createElement("ul");
@@ -211,6 +211,24 @@ require("./DisplayFieldset");
             }
             return this.buttons;
         },
+        deleteAll:function(){
+            for(var i=0;i<this.fields.length;i++){
+                this.fields[i].delete();
+            }
+            this.fields.length=0;
+            for(var i=0;i<this.nodes.length;i++){
+                if(this.nodes[i].element.parentNode){
+                    this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
+                }
+            }
+            this.nodes.length=0;
+	    for(var i=0;i<this.buttons.length;i++){
+                if(this.buttons[i].element.parentNode){
+                    this.buttons[i].element.parentNode.removeChild(this.buttons[i].element);
+                }
+            }
+            this.buttons.length=0;
+        },
         deleteButton:function(name){
             var n,index=-1;
             if(name === undefined){
@@ -225,7 +243,7 @@ require("./DisplayFieldset");
             if(index===-1){
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
-            this.buttons[index].element.parentNode.removeChild();
+            this.buttons[index].element.parentNode.removeChild(this.buttons[index].element);
             this.buttons[index].element=null;
             this.buttons.splice(index,1);
         },

@@ -1,29 +1,8 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
 require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
-
-/*function require_(script) {
-    $.ajax({
-        url: script,
-        dataType: "script",
-        async: false,           // <-- This is the key
-        success: function () {
-            // all good...
-        },
-        error: function () {
-            throw new Error("Could not load script " + script);
-        }
-    });
-} */
-
-//You can then use it in your code as you'd usually use an include:
-
-//require_("/scripts/subscript.js");
-
-// enable tooltips on everything
-//$(document).tooltip({tooltipClass: "tooltip"});
 
 
 // Harvey is a singleton for each window session
@@ -43,13 +22,18 @@ require("./Popups.js");
 	Harvey.display.dialog(url, ("line number " + lineno + " " + msg + " stack trace " + error.stack ));
     };  */
     window.addEventListener('beforeunload',function(e){  // 5 seconds to delete everything
-     /*  var d=$.Deferred();
-        $(window.document.body).hide();
-        var t=window.setTimeout(function(){ Harvey.Panel.deleteAll(d); },500000);
-        d.done( function(){  window.clearTimeout(t);}); */
+        window.document.body.style.visibility="hidden";
+        var t;
+        var d=new Promise(function(resolve,reject){
+            t=window.setTimeout(function(){Harvey.Panel.deleteAll(resolve); },50000);
+        });
+        d.then( function(){
+            window.clearTimeout(t);
+        }).catch(function(result){
+            
+        });
     });
-    console.log("UI.Panels is " + UI.Panels);
-    console.log("UI is " + UI);
+   
 
     //$.extend(true,Harvey,{
     Harvey.mixinDeep(Harvey,{
@@ -62,7 +46,7 @@ require("./Popups.js");
 		        p.show();
 		    }
 		    else {
-		        throw new Error("could not execute " + k);
+		        throw new Error("could not execute " + options.display);
 		    }
 	        }
                 else if(Harvey.checkType["array"](options)){
@@ -71,7 +55,7 @@ require("./Popups.js");
                 else{
                     throw new Error("Harvey.start: Unknown options");
                 }
-             }
+            }
         },
         stop: function(){
             Harvey.Panel.deleteAll();

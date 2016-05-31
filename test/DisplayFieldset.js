@@ -99,7 +99,7 @@ describe("DisplayFieldset-(start with data)",function(){
                                    DOM:"test",
                                    components:[{node:"paragraph",name:"stuff",text:"hullo people"},
                                                {type:"integer",value: 10,name:"howmany"},
-                                               {field:"NumberArrayField",type:"integerArray",value:[1,3,4],name:"ia"},
+                                               {field:"numberArray",type:"integerArray",value:[1,3,4],name:"ia"},
                                                {node:"heading",size:"h3",text:"Extra"}
                                    ]});
         assert.isObject(t);

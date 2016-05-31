@@ -1,5 +1,5 @@
 var Harvey=require('./declare').Harvey;
-
+require("./Utils");
 
 ;(function(){
 
@@ -35,11 +35,16 @@ var Harvey=require('./declare').Harvey;
         }
         
         if(win){
-            console.log("Adding display to child window");
+          //  console.log("Adding display to child window");
 	    this.DOM=win.document.getElementById(this.DOM);
             t=win.document.getElementById(this.id);
             if(this.dependsOn){
-                dp=win.document.getElementById(this.dependsOn);
+                if(this.dependsOn === this.id){
+                    
+                }
+                else{
+                    dp=win.document.getElementById(this.dependsOn);
+                }
             }
         }
         else{
@@ -66,28 +71,32 @@ var Harvey=require('./declare').Harvey;
 	    }
         };
         // if the execution depends on another node
-        if(this.dependsOn && !dp){
-            //this.dependsOn).length === 0){ // watch for node
-            //console.log("in displayBase id is " + this.dependsOn);
-            Harvey.Utils.observer.add(this.dependsOn, doit,this);
-            if(!Harvey.Observer){
-                throw new Error("Np observer found");
+        if(this.action){
+            if(this.dependsOn && !dp){
+                //this.dependsOn).length === 0){ // watch for node
+                //console.log("in displayBase id is " + this.dependsOn);
+                if(!Harvey.Observer){    // create an observer- only need one
+                    Harvey.Utils.observer.create();
+                    if(!Harvey.Observer){ 
+                        throw new Error("Np observer found");
+                    }
+                }
+                var b=document.getElementsByTagName("body")[0];
+                Harvey.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
+                Harvey.Utils.observer.add(this.dependsOn, doit,this);
+                // Harvey.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
             }
-            Harvey.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
-        }
-        else if(this.action){
-            this.action(this);
+            else{ 
+                this.action(this);
+            }
         }
 
 	if(this.listen !== undefined){
             //console.log("listen listen listen");
 	    Harvey.IO.listen(this);  // needs to be here cause listener needs element.
 	}
-
     	//console.log("end of libbase");
     };
-
-
 
     // var methods= {
     Harvey._DisplayBase.prototype={
@@ -198,7 +207,7 @@ var Harvey=require('./declare').Harvey;
             if(!document.body.contains(this.element)){
                  console.log("Showing element that is not in DOM");
 	        if(this.element){
-		    console.log("show found non null element");
+		  //  console.log("show found non null element");
                     if(this.after){
                         var a=document.getElementById(this.after);
                         if(a){    // && $.contains(this.DOM[0],a[0])){ //insert after
@@ -246,17 +255,19 @@ var Harvey=require('./declare').Harvey;
                 this.draggable.delete(); // FIX THIS 
             }
             this.deleteAll();
-            if(this.element){
+            if(this.element && this.element.parentNode){
                 this.element.parentNode.removeChild(this.element);  //removes events and data as well
+                this.element=null;
             }
 	    else{
                 console.log("this element should not be null " + this.id);
             }
-            this.element=null;
+          
 	    if(this.parent && msg_from_parent === undefined){
 		//console.log("WE have a parent");
 		this.parent.deleteChild(this);
 	    }
+            //this.element=null;
 	}
     };
 

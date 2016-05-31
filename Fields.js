@@ -11,27 +11,27 @@ require("./datepicker");
     "use strict";
 
     Harvey.dbToHtml={
-	integer:{html_type: "number", field: "InputField",check: "integer",sort:"integer"},
-	positiveInteger: {html_type:"number", field: "InputField",check:"positiveInteger",sort:"positiveInteger"},
-	negativeInteger:{html_type:"number", field: "InputField",check:"negativeInteger",sort:"negativeInteger" },
-	date: {html_type:"date", field: "DateField",check:"date",sort:"date"},
-	time: {html_type:"time",field: "TimeField",check:"time",sort: "time"},
-	string: {html_type: "text", field: "InputField",check:"string",sort: "string"},
-	token: {html_type:"text", field: "InputField",check:"token",sort: "token"},
-	alphaNum: {html_type:"text", field: "InputField",check:"alphaNum",sort:"alphaNum" },
-	image: {html_type:"file", field: "InputField",check:"image",sort: null},
-	currency: {html_type:"number", field: "InputField",check:"currency",sort: "currency"},
-	email: {html_type:"email", field: "InputField",check:"email",sort:"email"},
-	float: {html_type:"number", field: "FloatField",check:"float",sort:"float"},
-	integerArray: {html_type:"number", field: "NumberArrayField",check:"integerArray",sort: null},
-	phoneNumber: {html_type:"tel", field: "InputField",check:"phoneNumber",sort:null},
-	floatArray: {html_type:"number", field: "NumberArrayField",check:"floatArray",sort: null},
-	boolean: {html_type: "checkbox",field: "CheckBoxField",check:"boolean",sort:"boolean"},
-	text: { html_type:"text",field: "TextAreaField",check:"text",sort:null},
-	stringArray: {html_type: "text",field: "StringArrayField",check:null,sort: null},
-	imageArray: {html_type: "image", field: "ImageArrayField",check:null,sort: null},
-	password: {html_type: "password", field:"InputField", check: "string",sort: null},
-        range:{html_type:"range",field: "SliderField",check: "number",sort:null}
+	integer:{html_type: "number", field: "input",check: "integer",sort:"integer"},
+	positiveInteger: {html_type:"number", field: "input",check:"positiveInteger",sort:"positiveInteger"},
+	negativeInteger:{html_type:"number", field: "input",check:"negativeInteger",sort:"negativeInteger" },
+	date: {html_type:"date", field: "date",check:"date",sort:"date"},
+	time: {html_type:"time",field: "time",check:"time",sort: "time"},
+	string: {html_type: "text", field: "input",check:"string",sort: "string"},
+	token: {html_type:"text", field: "input",check:"token",sort: "token"},
+	alphaNum: {html_type:"text", field: "input",check:"alphaNum",sort:"alphaNum" },
+	image: {html_type:"file", field: "input",check:"image",sort: null},
+	currency: {html_type:"number", field: "input",check:"currency",sort: "currency"},
+	email: {html_type:"email", field: "input",check:"email",sort:"email"},
+	float: {html_type:"number", field: "float",check:"float",sort:"float"},
+	integerArray: {html_type:"number", field: "numberArray",check:"integerArray",sort: null},
+	phoneNumber: {html_type:"tel", field: "input",check:"phoneNumber",sort:null},
+	floatArray: {html_type:"number", field: "numberArray",check:"floatArray",sort: null},
+	boolean: {html_type: "checkbox",field: "checkBox",check:"boolean",sort:"boolean"},
+	text: { html_type:"text",field: "textArea",check:"text",sort:null},
+	stringArray: {html_type: "text",field: "stringArray",check:null,sort: null},
+	imageArray: {html_type: "image", field: "imageArray",check:null,sort: null},
+	password: {html_type: "password", field:"input", check: "string",sort: null},
+        range:{html_type:"range",field: "slider",check: "number",sort:null}
     };
 
 /*  Harvey.HtmlToType=function(field){
@@ -140,7 +140,9 @@ require("./datepicker");
             while (this.element.lastChild) {
                 this.element.removeChild(this.element.lastChild);
             }
-            this.element.parentNode.removeChild(this.element);
+            if(this.element.parentNode){
+                this.element.parentNode.removeChild(this.element);
+            }
             if(this.action){
                 this.element.removeEventListener(this.action);
             }
@@ -165,7 +167,7 @@ require("./datepicker");
 		    };
 		}(this);
 
-		this.input.keypress(cb);
+	//	this.input.keypress(cb);
 
 	    //this.input.blur(func(this.input.val()));
 	    }
@@ -290,7 +292,7 @@ require("./datepicker");
     var StaticField=function(d,element){
 	//console.log("static field is here");
         // var settings=checkDefaultOptions("StaticField",d);
-        d.field="StaticField";
+        d.field="static";
         if(d.type===undefined){
             d.type="string";
         }
@@ -338,7 +340,7 @@ require("./datepicker");
     var InputField=function(d,element){
 	//console.log("INPUT FIELD IS HERE with required " + d.required);
        // var settings=checkDefaultOptions("InputField",d);
-        d.field="InputField";
+        d.field="input";
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
@@ -378,7 +380,7 @@ require("./datepicker");
     var FloatField=function(d,element){
         var inp;
 	//console.log("FLOAT FIELD IS HERE");
-        d.field="FloatField";
+        d.field="float";
         d.type="float";
 	_Field.call(this,d,element);
 
@@ -567,7 +569,7 @@ require("./datepicker");
 
     var DateField=function(d,element){
         var that=this;
-        d.field="DateEield";
+        d.field="date";
         d.type="date";
         _Field.call(this,d,element);
         var s=document.createElement("input");
@@ -597,7 +599,7 @@ require("./datepicker");
     Harvey.Utils.extend(DateField,_Field);
 
     var TimeField=function(d,element){
-        d.field="TimeField";
+        d.field="time";
         d.type="time";
 
 	_Field.call(this,d,element);
@@ -611,7 +613,7 @@ require("./datepicker");
     Harvey.Utils.extend(TimeField,_Field);
 
     var CheckBoxField=function(d,element){
-        d.field="CheckBoxField";
+        d.field="checkBox";
         d.type="boolean";
   	_Field.call(this,d,element);
         var s=document.createElement("input");
@@ -663,12 +665,11 @@ require("./datepicker");
 
     Harvey.Utils.extend(CheckBoxField,_Field);
 
-
     var NumberArrayField=function(d,element){
         if(!d.size && !d.value ){
             throw new Error("NumberArrayfield needs a size or value");
         }
-        d.field="NumberArrayField";
+        d.field="numberArray";
 	_Field.call(this,d,element);
         if(!this.size){
             this.size=this.value.length;
@@ -683,7 +684,7 @@ require("./datepicker");
 	}
 	for(var i=0;i<this.input.length;i++){
             this.input[i]={};
-            if(this.value){
+            if(this.value){ 
 	        this.input[i].value=(this.value[i] || "");
             }
             this.addValue(i,"internal");
@@ -703,6 +704,7 @@ require("./datepicker");
             this.input[i].input=document.createElement("input");
             this.input[i].input.setAttribute("type", this.html_type);
             this.input[i].input.className=this.type;
+            this.input[i].input.value=this.input[i].value;
             if( this.delimiter !== undefined){
                 if(i>0 && i<(this.input.length-1)){
                     s=document.createElement("span");
@@ -778,7 +780,7 @@ require("./datepicker");
 
     var TextAreaField=function(d,element){
         //var settings=checkDefaultOptions("TextAreaField",d);
-        d.field="TextAreaField";
+        d.field="textArea";
         d.type="text";
 	_Field.call(this,d,element);
 	this.popup=true;
@@ -821,7 +823,7 @@ require("./datepicker");
 
     var SelectField=function(d,element){
 	var i,o;
-        d.field="SelectField";
+        d.field="select";
         d.type="string";
 	_Field.call(this,d,element);
 
@@ -1579,23 +1581,23 @@ require("./datepicker");
                 }
                 return false;
             },
-	    StaticField: function(options,element) { // readonly for users , writeable by machine
+	    static: function(options,element) { // readonly for users , writeable by machine
 		return new StaticField(options,element);
 	    },
-	    InputField: make_field_or_static(InputField),
-	    FloatField: make_field_or_static(FloatField),
-	    DateField: make_field_or_static(DateField),
-            TimeField: make_field_or_static(TimeField),
-            NumberArrayField: make_field_or_static(NumberArrayField),
+	    input: make_field_or_static(InputField),
+	    float: make_field_or_static(FloatField),
+	    date: make_field_or_static(DateField),
+            time: make_field_or_static(TimeField),
+            numberArray: make_field_or_static(NumberArrayField),
 	  //  NumberArrayField:function(options,element){return new  NumberArrayField(options,element);},
-	    TextAreaField:function(options,element){ return new  TextAreaField(options,element);},
-	    SelectField:function(options,element){ return new  SelectField(options,element);},
-	    CheckBoxField: function(options,element){return new CheckBoxField(options,element);},
-            SliderField:function(options,element){ return new  SliderField(options,element);},
-	    ButtonSetField:function(options,element){ return new  ButtonSetField(options,element);},
-	    StringArrayField:function(options,element){ return new  StringArrayField(options,element);},
-	    ImageArrayField:function(options,element){ return new  ImageArrayField(options,element);},
-	    AutoCompleteField: function(options,element){ return new AutoCompleteField(options,element);}
+	    textArea:function(options,element){ return new  TextAreaField(options,element);},
+	    select:function(options,element){ return new  SelectField(options,element);},
+	    checkBox: function(options,element){return new CheckBoxField(options,element);},
+            slider:function(options,element){ return new  SliderField(options,element);},
+	    buttonSet:function(options,element){ return new  ButtonSetField(options,element);},
+	    stringArray:function(options,element){ return new  StringArrayField(options,element);},
+	    imageArray:function(options,element){ return new  ImageArrayField(options,element);},
+	    autoComplete: function(options,element){ return new AutoCompleteField(options,element);}
 	};
 	return r;
     })();
@@ -1603,20 +1605,20 @@ require("./datepicker");
        // get all the methods on the Fields
     Harvey.field._getMethods=function(){
         var Methods={};
-        var ar={"StaticField":StaticField,
-                "InputField":InputField,
-                "FloatField":FloatField,
-                "DateField":DateField,
-                "TimeField":TimeField,
-                "NumberArrayField":NumberArrayField,
-                "TextAreaField":TextAreaField,
-                "SelectField":SelectField,
-                "CheckBoxField":CheckBoxField,
-                "SliderField":SliderField,
-                "ButtonSetField":ButtonSetField,
-                "StringArrayField":StringArrayField,
-                "ImageArrayField":ImageArrayField,
-                "AutoCompleteField":AutoCompleteField
+        var ar={"static":StaticField,
+                "input":InputField,
+                "float":FloatField,
+                "date":DateField,
+                "time":TimeField,
+                "numberArray":NumberArrayField,
+                "textArea":TextAreaField,
+                "select":SelectField,
+                "checkBox":CheckBoxField,
+                "slider":SliderField,
+                "buttonSet":ButtonSetField,
+                "stringArray":StringArrayField,
+                "imageArray":ImageArrayField,
+                "autoComplete":AutoCompleteField
                };
 
 

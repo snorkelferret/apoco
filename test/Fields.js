@@ -51,7 +51,7 @@ describe("InputField",function(){
         assert.isObject(Harvey.field,true);
         
     });
-    var t=Harvey.field["InputField"]({name: "inputNode",type: "integer"});
+    var t=Harvey.field["input"]({name: "inputNode",type: "integer"});
 
     it("creates an InputField",function(){
        // var t=Harvey.field["InputField"]({name: "inputNode",type: "integer",value: 10});
@@ -128,7 +128,7 @@ describe("FloatField",function(){
         assert.isObject(Harvey.field);
         
     });
-    var f=Harvey.field["FloatField"]({name:"floatField",type: "float",precision: 3});
+    var f=Harvey.field["float"]({name:"floatField",type: "float",precision: 3});
     it("has a getElement method",function(){
         assert(f.getElement() !== null); 
     });
@@ -189,7 +189,7 @@ describe("FloatField- with spinner",function(){
   //  require("../node_modules/jquery-ui");
    
  
-    var f=Harvey.field["FloatField"]({name:"floatField",spinner: true,type: "float",value: 10,precision: 3});
+    var f=Harvey.field["float"]({name:"floatField",spinner: true,type: "float",value: 10,precision: 3});
   
     it("creates a div element",function(){
         var b=f.getElement();
@@ -237,7 +237,7 @@ describe("DateField",function(){
        // assert(Harvey.popup !== undefined);
         assert.isObject(Harvey.field,true);
     });
-    var f=Harvey.field["DateField"]({name:"dateField",type: "date"});
+    var f=Harvey.field["date"]({name:"dateField",type: "date"});
     it("creates a div element",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -267,7 +267,7 @@ describe("DateField",function(){
 describe("CheckBoxField",function(){
     require("../Fields.js");
    
-    var f=Harvey.field["CheckBoxField"]({name:"checkBoxField",type: "boolean"});
+    var f=Harvey.field["checkBox"]({name:"checkBoxField",type: "boolean"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -309,14 +309,13 @@ describe("NumberArrayField-Integer",function(){
 
     require("../Fields.js");
       
-    var f=Harvey.field["NumberArrayField"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
+    var f=Harvey.field["numberArray"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
         document.getElementsByTagName("body")[0].appendChild(b);
     });
     it("creates an array of input nodes",function(){
-        //var e=$("body").find("div[name='numberArrayField']").find("input");
         var e=document.getElementsByName("numberArrayField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,4);
     });
@@ -338,7 +337,7 @@ describe("TextAreaField",function(){
     require("../Fields.js");
   
     
-    var f=Harvey.field["TextAreaField"]({name:"textAreaField",type: "text"});
+    var f=Harvey.field["textArea"]({name:"textAreaField",type: "text"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -368,7 +367,7 @@ describe("SelectField",function(){
   
     require("../Fields.js");
      
-    var f=Harvey.field["SelectField"]({name:"selectField",type: "string",options:["one","two","three"]});
+    var f=Harvey.field["select"]({name:"selectField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -415,7 +414,7 @@ describe("ButtonSetField",function(){
     require("../Fields.js");
  
     
-    var f=Harvey.field["ButtonSetField"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
+    var f=Harvey.field["buttonSet"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -509,7 +508,7 @@ describe("ButtonSetField",function(){
 
 describe("ButtonSetField - as checkboxes",function(){
     require("../Fields.js");
-    var f=Harvey.field["ButtonSetField"]({name:"radioButtonSetField",checkbox:true,type: "boolean",labels:["one","two","three"]});
+    var f=Harvey.field["buttonSet"]({name:"radioButtonSetField",checkbox:true,type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -547,7 +546,7 @@ describe("SliderField",function(){
 
     require("../Fields.js");
      
-    var f=Harvey.field["SliderField"]({name:"sliderField",type: "integer",min: 0,max:10});
+    var f=Harvey.field["slider"]({name:"sliderField",type: "integer",min: 0,max:10});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -574,7 +573,7 @@ describe("StringArrayField",function(){
     require("../Fields.js");
  
     
-    var f=Harvey.field["StringArrayField"]({name:"stringArrayField",value:["one","two","three"]});
+    var f=Harvey.field["stringArray"]({name:"stringArrayField",value:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -622,7 +621,7 @@ describe("ImageArrayField",function(){
     require("../Fields.js");
  
     
-    var f=Harvey.field["ImageArrayField"]({name:"imageArrayField"});
+    var f=Harvey.field["imageArray"]({name:"imageArrayField"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -635,7 +634,7 @@ describe("AutoCompleteField",function(){
   
     require("../Fields.js");
         
-    var f=Harvey.field["AutoCompleteField"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
+    var f=Harvey.field["autoComplete"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 

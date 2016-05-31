@@ -8,7 +8,7 @@ UI.Panels={
 	    {display: "fieldset",
 	     DOM: "test",
 	     id: "Create",
-	     components:[{ field: "SelectField", name: "selection_dropdown", options: [ "Blotter","Broker","Bigfig","Auction-control","Trades","robo-broker","knock-down-ginger","auction"]},
+	     components:[{ field: "select", name: "selection_dropdown", options: [ "Blotter","Broker","Bigfig","Auction-control","Trades","robo-broker","knock-down-ginger","auction"]},
                          { node: "button", name: "create_window",text: "new",
 			   action: function(that){
 			       var h=that.parent.getChild("selection_dropdown").getValue();

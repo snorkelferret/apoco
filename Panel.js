@@ -9,10 +9,7 @@ require("./Utils");
     'use strict';
     var DEBUG=true;
 
-    if(!Harvey.Obsever){ // create an observer- only need one
-        Harvey.Utils.observer.create();
-    }
-
+   
     function check(ar){
 	if(!Harvey.checkType["object"](ar)){
 	    throw new Error("This is not a window display object " + ar);
@@ -112,9 +109,9 @@ require("./Utils");
                 throw new Error("Harvey,Window: " + d.name + " already exists");
             }
 	  //  console.log("creating new window");
-            for(var k in d.opts){
-                console.log("option is " + k);
-            }
+          //  for(var k in d.opts){
+          //      console.log("option is " + k);
+         //   }
 	    if(!d.opts){
          //      console.log("NO OPTS FOR WINDOW");
 	        settings="_blank"; // open in new tab
@@ -143,14 +140,14 @@ require("./Utils");
                             that._list[d.name]=win;
                             resolve({"window":win,"name": d.name});
 		        }
-		        console.log("Parent child is ready");
+		      //  console.log("Parent child is ready");
 		    };
 	        }(d.name,win,p),false);
             });
             
             p.then(function(d){
                 d.window.onunload=function(e){
-                    console.log("got child closed " + d.name);
+                   // console.log("got child closed " + d.name);
                     // delete the window from the list
                     var p=that._list[d.name];
 
@@ -178,7 +175,7 @@ require("./Utils");
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
             for(var i=0;i<w.length;i++){
-                console.log("trying to clone " + w[i]);
+             //   console.log("trying to find " + w[i]);
                 nv=this._UIGet(w[i]);
                 if(nv !== null){
                     this.add(nv);
@@ -190,10 +187,10 @@ require("./Utils");
 
         },
         _UIGet:function(name){
-            console.log("UIGet trying to find " + name);
-            console.log("UI Panels " + UI.Panels);
+          //  console.log("UIGet trying to find " + name);
+          //  console.log("UI Panels " + UI.Panels);
             for(var k in UI.Panels){
-                console.log("trying to get panel " + name + " from " + k);
+             //  console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
                     //console.log("found " + name);
                     var cd=Harvey.cloneDeep(UI.Panels[k]);
@@ -292,7 +289,7 @@ require("./Utils");
                     name=(name + i);
                 }
                 np.name=name;
-                console.log("name is " + name + " i is " + i);
+            //    console.log("name is " + name + " i is " + i);
                 for(var j=0;j<np.components.length;j++){
                     np.components[j].id = ( np.components[j].id + i);
                 }
@@ -314,9 +311,9 @@ require("./Utils");
 		check(panel.components);
 
 		var p=Harvey._panelComponents(panel);
-		 for(var k in p){
-		     console.log("panel base has keys " + k);
-		 }
+		// for(var k in p){
+		//     console.log("panel base has keys " + k);
+		// }
 		this._list.push(p);
 	    }
 	    else{
@@ -324,17 +321,17 @@ require("./Utils");
 	    }
             return p;
 	},
-        deleteAll: function(d){
+        deleteAll: function(promise_resolve){
             var obj;
             var n=this._list.length;
             for(var i=0;i<n; i++){
                // console.log("window: removing panel " + this._list[i].name + " from list");
                	obj=this._list[i];
                 obj.deleteChildren();
-                if(d){
+                if(promise_resolve){
                     if(i===(n-1)){
                        // console.log("***********************************8delete is done");
-                        d.resolve();
+                        promise_resolve();
                     }
                 }
                 for(var k in obj){
@@ -342,7 +339,7 @@ require("./Utils");
                 }
                 obj=null;
             }
-            if(!d){
+            if(!promise_resolve){
                 Harvey.Window.closeAll();
             }
             this._list.length=0;
@@ -370,7 +367,7 @@ require("./Utils");
         var that=this;
 	for(var k in obj){
 	    this[k]=obj[k];
-	     console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
+	  //   console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
 	}
 
 	if(this.window){
@@ -407,7 +404,7 @@ require("./Utils");
 
 	    for(var i=0;i<this.components.length;i++){
 		var p=this.components[i].display;
-                console.log("adding component " + p);
+             //   console.log("adding component " + p);
 		this.components[i].parent=this;
                // console.log("addComponents window is " + that.window);
 	        d=Harvey.display[p](this.components[i],that.window);

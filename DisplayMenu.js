@@ -17,7 +17,7 @@ var Harvey=require('./declare').Harvey;
 	this.DEBUG=true;
 	var that=this;
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-	console.log("called display base");
+//	console.log("called display base");
         this.execute();
     };
 
@@ -45,7 +45,6 @@ var Harvey=require('./declare').Harvey;
 	    //console.log("execute of DisplayMenu");
             this.selected=undefined;
             this.menu=[];
-	    // this.element=$("<div id='" + this.id + "' class='menu ui-widget ui-widget-content ui-corner-all'></div>");
             this.element=document.createElement("div");
             this.element.id=this.id;
             this.element.classList.add("menu","ui-widget","ui-widget-content","ui-corner-all");
@@ -57,15 +56,14 @@ var Harvey=require('./declare').Harvey;
 	    if(this.list === undefined){
                 this.list=[];
 	    }
-	    console.log("Menus creating new element");
-	    //var u=$("<ul class='harvey_menu_list ui-menu ui-widget ui-widget-content' role='menubar'></ul>");
+//	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
             u.classList.add("harvey_menu_list","ui-menu","ui-widget","ui-widget-content");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){
-                console.log("Making menu item " + i);
+              //  console.log("Making menu item " + i);
                 this.addMenu(this.list[i],u);
             }
             this.list.length=0; // for garbage collection
@@ -88,7 +86,6 @@ var Harvey=require('./declare').Harvey;
         },
         reset: function(){
             this.selected=null;
-            //this.element.find("ul li").removeClass("ui-state-active");
             var p=this.element.getElementsByTagName("li");
             for(var i=0;i<p.length;i++){
                 p[i].classList.remove("ui-state-active");
@@ -111,15 +108,13 @@ var Harvey=require('./declare').Harvey;
                 parent_element=this.element.getElementsByClassName("harvey_menu_list")[0];
             }
             index=this.menu.length;
-            console.log("addMenu index is " + index);
+           // console.log("addMenu index is " + index);
             d.element=document.createElement("li");
             if(d.seperator !== undefined){
-                //d.element=$("<li  class='seperator'></li>");
                 d.element.classList.add("seperator");
                 s=document.createElement("span");
                 s.className="seperator";
                 s.textContent=d.seperator;
-                //d.element.append("<span class='seperator'>" + d.seperator + "</span>");
                 d.element.appendChild(s);
                 parent_element.appendChild(d.element);
             }
@@ -128,13 +123,10 @@ var Harvey=require('./declare').Harvey;
                 if(this.getMenu(l) !== null){
                     throw new Error("DisplayMenu: get Menu - menu already exists " + l);
                 }
-	       // d.element=$("<li  class='ui-menu-item' name='" + d.name + "' role='menuitem'>" + l + "</li>");
-                d.element.classList.add("ui-menu-item");
-                // d.element.role="menuitem";
+	        d.element.classList.add("ui-menu-item");
                 d.element.setAttribute("role","menuitem");
-                //d.element.setAttribute("name",d.name);
                 d.element.textContent=l;
-                console.log("menu text is "+ d.element.text);
+                //console.log("menu text is "+ d.element.textContent);
 	        d.parent=this;
                 parent_element.appendChild(d.element);
                 this.menu[index]=d;
@@ -142,9 +134,7 @@ var Harvey=require('./declare').Harvey;
                                
                 if(d.action !==undefined){
                     //console.log("menu has action " + this.menu[index].action);
-	          //  this.menu[index].element[0].addEventListener("click",
-                    //  function(that,index){
-                    d.element.addEventListener("click",
+	            d.element.addEventListener("click",
                                  function(t,that){
                                      return function(e){
                                          e.stopPropagation();
@@ -163,7 +153,6 @@ var Harvey=require('./declare').Harvey;
                 if(this.menu[i].listen){
                     Harvey.unsubscribe(this.menu[i]);
                 }
-                //this.menu[i].element.empty();
                 this.menu[i].element.parentNode.removeChild(this.menu[i].element);
             }
             this.menu.length=0;
@@ -176,7 +165,7 @@ var Harvey=require('./declare').Harvey;
             for(var i=0;i<this.menu.length;i++){
                 if(this.menu[i].name === name){
                     index=i;
-                    console.log("Found menu to delete " + name + " with index " + index);
+                  //  console.log("Found menu to delete " + name + " with index " + index);
                     break;
                 }
             }

@@ -143,12 +143,12 @@ var Harvey=require('./declare').Harvey,UI=require('./declare');//.UI,jQuery=requ
 	    }
 	    if(on){
 		//console.log("Harvey spinner on");
-                document.getElementById("Harvey_spinner").visibility="visible";
+                document.getElementById("Harvey_spinner").style.visibility="visible";
 		//$("#Harvey_spinner").show();
 	    }
 	    else{
 		console.log("Harvey spinner off");
-                document.getElementById("Harvey_spinner").visibility="hidden";
+                document.getElementById("Harvey_spinner").style.visibility="hidden";
 		//$("#Harvey_spinner").hide();
 	    }
             return spinner;

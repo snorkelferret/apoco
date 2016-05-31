@@ -23,7 +23,6 @@ describe("DisplayForm-(start without fields)",function(){
         var b=document.createElement("div");
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
-        //$("body").append("<div id='test'></div>");
         assert.strictEqual(document.contains(b),true);
         t=Harvey.display.form({id:"test_form",DOM:"test"});
         assert.isObject(t);
@@ -82,10 +81,7 @@ describe("DisplayForm",function(){
         var b=document.createElement("div");
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
-        //$("body").append("<div id='test'></div>");
         assert.strictEqual(document.contains(b),true);
-        //$("body").append("<div id='test'></div>");
-        //assert($("#test").length>0);
         t=Harvey.display.form({id:"test_form",DOM:"test",
                                components:[{node:"heading",size:"h2",text:"Start"},
                                            {node:"paragraph",text:"hullo people"},
@@ -125,7 +121,6 @@ describe("DisplayForm",function(){
         assert.strictEqual(t.getNode().length,4);
     });
     it("has added the paragraph node to the dom",function(){
-        // var b=document.querySelector("#test_form p[name='Blah']");
         var b=document.getElementById("test_form").querySelector("p[name='Blah']");
         assert.strictEqual(document.body.contains(b),true);
     });
@@ -135,7 +130,7 @@ describe("DisplayForm",function(){
         assert.strictEqual(t.getNode().length,3);
         var b=document.getElementById("test_form").querySelector("p[name='Blah']");
         assert.strictEqual(document.body.contains(b),false);
-        //assert.strictEqual(t.getElement().find("[name='Blah']").length,0);
+    
     });
     it("has added some buttons",function(){
         assert.strictEqual(t.getButton().length,1);

@@ -62,7 +62,6 @@ describe("DisplayMenu",function(){
     it("creates a manu display object",function(){
         var b=document.createElement("div");
         b.id="test";
-        //$("body").append("<div id='test'></div>");
         document.getElementsByTagName("body")[0].appendChild(b);
        
         t=Harvey.display.menu({id:"test_menu",DOM:"test",list:[{name:"one"},
@@ -110,10 +109,6 @@ describe("DisplayMenu",function(){
 
     
     it("has added menus to the dom",function(){
-        //var b=t.getElement().getElementsByClassName("ui-menu-item");
-        //var b=document.getElementById("test_menu").getElementsByTagName("li");
-        //var b=document.querySelector("#test_menu li.ui-menu-item");
-        //var b=document.getElementById("test_menu").getElementsByTagName("li");
         assert.strictEqual(t.getMenu().length,3);
         var b=document.getElementById("test_menu");
         assert.isObject(b);

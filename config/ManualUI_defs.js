@@ -118,9 +118,12 @@ require("../index.js");
             for(var n in thing){
                if(!n.startsWith("_")){
                    if(k === "Fields"){
-                       if(n.indexOf("Field")> -1){
+                     //  console.log("+++++++++++++++++++++++++++++++got field " + n);
+                       //  if(n.indexOf("Field")> -1){
+                       if(n !== "exists"){  // method  not a field
                            HThings[k].push(n);
                        }
+                      // }
                    }
                    else if(k==="Displays"){
                       // console.log("got display " + n);
@@ -162,9 +165,9 @@ require("../index.js");
                  listen:{type:"objectArray",default:undefined },
                  publish:{type: "objectArray",default: undefined,description:""}
                 },
-        InputField: { options:{type:{type:"string",
+        input: { options:{type:{type:"string",
                                      default:"string",
-                                     parms:get_types("InputField"),
+                                     parms:get_types("input"),
                                      dependsOn:{float:{min:{default: undefined},
                                                        max:{default: undefined},
                                                        step:{default: 0.01},
@@ -182,7 +185,7 @@ require("../index.js");
                               },
                       description:""
                     },
-        SelectField:{ required:{ options:{type:"stringArray",
+        select:{ required:{ options:{type:"stringArray",
                                           default: undefined,
                                           description: ""}
                                },
@@ -192,28 +195,28 @@ require("../index.js");
                                value:{type: "string",default: undefined,description: "An element from the options string Array"}
                               },
                       description:""
-                    },
-        ButtonSetField:{required:{labels:{type:"stringArray"}},
+               },
+        buttonSet:{required:{labels:{type:"stringArray"}},
                              options:{checkbox:{type:"boolean",
                                                           default: false},
                                       value:{type:"booleanArray"}},
                              description:""
                             },
-        SliderField:{ options:{ min:{type:"integer",default: 1},
+        slider:{ options:{ min:{type:"integer",default: 1},
                                 max:{type:"integer",default: 10},
                                 value:{type: "integer",default: undefined}
                               },
                       description: "This is a wrapper for the jQuery slider, to access the jQuery object use var slider=my_slider_field.getFlement().find('slider'); Please use the Harvey setValue and getValue methods "
                     },
-        NumberArrayField:{ options:{type:{type:"string",
+        numberArray:{ options:{type:{type:"string",
                                           default: "integerArray",
-                                          params:get_types("NumberArrayField")
+                                          params:get_types("numberArray")
                                          },
                                     value:{type:"any",default:undefined}
                                    },
                            description:""
                          },
-        ImageArrayField:{options:{value:{type:"imageArray",
+        imageArray:{options:{value:{type:"imageArray",
                                          default: undefined,
                                          description: "key value javascript object"},
                                   thumbnails:{type:"boolean",default: true,description:"Display the images as thumbnails" },
@@ -222,31 +225,31 @@ require("../index.js");
                                  },
                          description:""
                         },
-        FloatField:{options:{precision:{type:"integer",default: 2,description:"Number of places after the decimal point" },
+        float:{options:{precision:{type:"integer",default: 2,description:"Number of places after the decimal point" },
                              step:{type:"float",default: 0.1},
                              value:{type: "float",default: undefined}},
                     description:"Float field that aligns the decimal point"
                    },
-        AutoCompleteField:{options:{options:{type:"stringArray"},
+        autoComplete:{options:{options:{type:"stringArray"},
                                     value:{type: "string",default: undefined}},
                            description: "This is a wrapper for the jQuery autoComplete field. To access the jQuery Object, use <br> <code> var auto_comp=ac.getInputElement();</code> <br>  Please use the Harvey getValue and setValue methods "
                           },
-        CheckBoxField:{ options:{ value:{type: "boolean",default: false}},
+        checkBox:{ options:{ value:{type: "boolean",default: false}},
                         description: ""},
-        DateField:{options:{value:{type:"any",default:undefined,params:["Date","string"] }},
+        date:{options:{value:{type:"any",default:undefined,params:["Date","string"] }},
                    description:"This is just a wrapper for the jQuery datepicker, to access the jQuery element use var jquery_dp=my_field.getInputElement().datepicker;"
                   },
-        TimeField:{options:{value:{type:"time",default:undefined,
+        time:{options:{value:{type:"time",default:undefined,
                                    description:"A valid partial-time as defined in [RFC 3339]."}},
                    description:""
                   },
-        StaticField:{options:{value:{type:"any",params:["string","float","integer"]}},
+        static:{options:{value:{type:"any",params:["string","float","integer"]}},
                      description:""
                     },
-        TextAreaField:{options:{value:{type:"text",default: undefined}},
+        textArea:{options:{value:{type:"text",default: undefined}},
                        description:""
                       },
-        StringArrayField:{options:{ length:{type:"integer",
+        stringArray:{options:{ length:{type:"integer",
                                             default: 4,
                                             description:" Max of value array and length"},
                                     value:{type:"stringArray",default: undefined}
@@ -260,7 +263,8 @@ require("../index.js");
     function mk_default_types(){
         for(var k in field_options){
             var p;
-            if(k.indexOf("Field")> -1){
+            // if(k.indexOf("Field")> -1){
+            if(k!== "common" && k !== "special" && k !== "required"){
                 var t=get_types(k);
                 if(t && t.length > 0){
                     p=field_options[k].options;
@@ -288,7 +292,8 @@ require("../index.js");
         var r=[],dpo=[];
         
         for(var k in field_options){
-             if(k.indexOf("Field")> -1){
+           // if(k.indexOf("Field")> -1){
+            if(k!== "common" && k !== "special" && k !== "required"){
                 HFields.push(k);
             }
         }
@@ -429,11 +434,11 @@ require("../index.js");
         var HFields=HThings.Fields;
   
         var field_desirable={
-            AutoCompleteField:["options"],
-            StaticField:["value"],
-            StringArrayField:["value"],
-            FloatField:["value"],
-            NumberArrayField:["value"]
+            autoComplete:["options"],
+            static:["value"],
+            stringArray:["value"],
+            float:["value"],
+            numberArray:["value"]
         };
 
 
@@ -515,7 +520,7 @@ require("../index.js");
         //var des=Harvey.field._getAllSettings;
         var des=field_options;
         for(var i=0;i<HFields.length;i++){
-           // console.log("mkFields making " + HFields[i]);
+            //console.log("++++++++++++++++++== mkFields making " + HFields[i]);
             var k={};
             k.display="fieldset";
             k.DOM="right";
@@ -524,7 +529,7 @@ require("../index.js");
             k.dependsOn=HFields[i];
             k.action=function(that){
                 var p=that.getChild("doit");
-                // $(p.element).trigger("click");
+      
                 p.element.click();
             },
             k.components=[{node: "heading",size: "h3", text: HFields[i]},
@@ -536,7 +541,7 @@ require("../index.js");
                           {node: "heading", size: "h5", text: "Options"},
                           {node: "descriptionList", items:Options[i]},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "TextAreaField", value: Commands[i]}, 
+                          {name: "Input_params",field: "textArea", value: Commands[i]}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
        //                        console.log("button action is here");
@@ -572,12 +577,12 @@ require("../index.js");
     var select_menu=function(that){
         var name=that.name;
         var p=that.parent.getSiblings();
-       // console.log("selecting menu for " + name);
+     //   console.log("selecting menu for " + name);
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
         }
         for(var i=0;i<p.length;i++){
-            
+       //     console.log("siblings are " + p[i].id);
         /*    if(p[i].id.indexOf(name) > -1){
                 p[i].show();
             } */
@@ -645,7 +650,7 @@ require("../index.js");
         };
       
         for(var i=0;i<HTypes.length;i++){
-            console.log("======== type is ++++++++++= " + HTypes[i]);
+         //   console.log("======== type is ++++++++++= " + HTypes[i]);
             var k={};
             k.display="fieldset";
             k.DOM="right";
@@ -654,17 +659,17 @@ require("../index.js");
             var c=" var results=[]; var test= " + tests[HTypes[i]].test + ";  for(var i=0;i<test.length;i++){ results[i]=Harvey.checkType['" +  HTypes[i] + "'](test[i]);  }";
             k.components=[{node: "heading",size: "h3", text: HTypes[i]},
                           {node:"paragraph", text: ""},
-                          {name: "Input_params",field: "TextAreaField", value: c}, 
+                          {name: "Input_params",field: "textArea", value: c}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
-                               console.log("f is " + f.getValue());
+                               //console.log("f is " + f.getValue());
                                if(!f){
                                    throw new Error("can't get input params");
                                }
                                //$.globalEval(f.getValue());
                                globalEval(f.getValue());
-                               console.log("got " + JSON.stringify(results));
+                               //console.log("got " + JSON.stringify(results));
                                var c=this.parent.getChild("result");
                                if(!c){
                                    throw new Error("Cannot find result node");
@@ -701,7 +706,7 @@ require("../index.js");
             descriptionList:{
                 parms:{items:[ "objectArray"]},
                 items:[{label:"objectArray",descriptions: ["type: {label(s): 'string(Array)',description(s): 'string(Array)'}", "where ", "[{label:'string',description:'text'}","{labels:'stringArray',descriptions:'stringArray'}];"]},
-                       {label:"<br>Example:",description:"<code>var items=[{label:'myLabel',description:'some description'},<br> {labels:['one','two'],descriptions:['describe something','and another thing']}];"}]
+                       {label:"Example:",description:"<code>var items=[{label:'myLabel',description:'some description'},<br> {labels:['one','two'],descriptions:['describe something','and another thing']}];<code>"}]
             },
             heading:{
                 parms:{size:"size",text:"text"},
@@ -780,23 +785,28 @@ require("../index.js");
                           {node: "heading",size: "h5",text:"Options"},
                           {node: "descriptionList",items:[{label:"id",descriptions:["type: string ", "Add an id"]},{label:"class",description:"add a class to the node"},{label:"name",descriptions:["type: string","add a name attribute to the node"]}]},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "TextAreaField", value: Commands[i]}, 
+                          {name: "Input_params",field: "textArea", value: Commands[i]}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                // console.log("button action is here");
                                var f=that.parent.getChild("Input_params");
-                               console.log("f is " + f.getValue());
+                            //   console.log("f is " + f.getValue());
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                               if(that.parent.getChild("TESTNODE")){
-                                   that.parent.deleteChild("TESTNODE");
-                               }
-                               //$.globalEval(f.getValue());
+                     
                                globalEval(f.getValue());
-                               console.log("parms are " + dataObject);
                                if(Harvey.checkType["object"](node)){
+                      //             console.log("and it is an object");
+                                   var name=node.name;
+                                   if(that.parent.getChild(name)){
+                                       console.log("deleting child");
+                                       that.parent.deleteChild(name);
+                                   }
+                       //            console.log("adding child");
                                    that.parent.addNode(node);
+                              // console.log("parms are " + node);
+                                  
                                }
                                else{
                                    Harvey.display.dialog("Error", "Input is not a valid object");
@@ -875,7 +885,7 @@ require("../index.js");
             k.components=[{node: "heading", size: "h4", text: "Methods"},
                           {node: "descriptionList", items:items},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "TextAreaField",
+                          {name: "Input_params",field: "textArea",
                            value: "var value=field.getKey();"}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
@@ -888,16 +898,15 @@ require("../index.js");
                                //$.globalEval(f.getValue());
                                globalEval(f.getValue());
                                var nf=that.parent.getChild("Result");
-                               console.log("methods doit got " + value);
+                              // console.log("methods doit got " + value);
                                nf.setValue(JSON.stringify(value));
                                
                            }},
                           {node:"paragraph",text:"Result"},
-                          {field:"StaticField",name:"Result",type:"string" }
+                          {field:"static",name:"Result",type:"string" }
                           
                          ];
    
-            //$.globalEval(Commands[i]);
             globalEval(Commands[i]);
             k.components.push(dataObject);
             
@@ -910,11 +919,11 @@ require("../index.js");
         
         var stuff={
             fieldset:{required:[{label:"components",descriptions:[ "An array of nodes and/or field objects","example",
-                                                                   "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'FloatField',name:'some_name',value:10.0}}]</code>"]}],
+                                                                   "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
                       options:[]
                      },
             form:{required:[{label:"components",descriptions:[ "An array of nodes and/or field objects","example",
-                                                               "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'FloatField',name:'some_name',value:10.0}}]</code>"]}],
+                                                               "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
                   options:[{label:"buttons",descriptions:["an array of button objects","example","<code> buttons: [{name: 'string',text:'string',action: function(that){ //some code }}]</code>"]},
                            {label:"draggable",descriptions:["type: boolean","default: true","if true the form is detached and can be dragged around the browser window"]},
                            {label: "label",description: "type: string"}]},
@@ -939,8 +948,8 @@ require("../index.js");
                  }
         };
         var command={
-            fieldset:"components:[{node:'heading',size:'h4',text:'Test'},{field:'SelectField',name:'select_test',options:['one','two','three']}]",
-            form:"draggable: true, components:[{node:'heading',size:'h4',text:'Test'},{field:'SelectField',name:'select_test',options:['one','two','three']}],buttons:[{name:'ok',text:'OK',action:function(that){alert('OK clicked');}}]",
+            fieldset:"components:[{node:'heading',size:'h4',text:'Test'},{field:'select',name:'select_test',options:['one','two','three']}]",
+            form:"draggable: true, components:[{node:'heading',size:'h4',text:'Test'},{field:'select',name:'select_test',options:['one','two','three']}],buttons:[{name:'ok',text:'OK',action:function(that){alert('OK clicked');}}]",
             grid:"cols:[{name: 'col1',type:'string',editable: false},{name:'col2',type:'integer',editable: true},{name:'col3',type: 'boolean',editable: true}], rows:[{col1:'abc',col2: 10, col3: false},{col1:'def',col2: 10, col3: false},{col1:'vyd',col2: 15, col3: true},{col1:'per',col2: 23, col3: true},{col1:'ted',col2: 43, col3: false},{col1:'tda',col2: 54, col3: true}]",
             menu:"heading: 'Test Menu',list:[{name:'menu1',label: 'menu item 1'},{name:'menu2',label: 'menu item 2'},{name:'menu3',label: 'menu item 3'},{name:'menu4',label: 'menu item 4'} ]",
             slideshow:("values:" +  JSON.stringify(getAType['imageArray']) + ""),
@@ -951,7 +960,7 @@ require("../index.js");
      
 
         for(var i=0;i<HDisplays.length;i++){
-            console.log("mkDisplays making " + HDisplays[i]);
+            //console.log("mkDisplays making " + HDisplays[i]);
             var k={};
           
             k.display="fieldset";
@@ -962,7 +971,6 @@ require("../index.js");
             k.action=function(that){
                // console.log("triggering click");
                 var p=that.getChild("doit");
-                // $(p.element).trigger("click");
                 p.element.click();
             },
             k.components=[{node: "heading",size: "h3", text: HDisplays[i]},
@@ -981,7 +989,7 @@ require("../index.js");
                                                           {label:"after",descriptions:["type: string","where the string is the id of an element that the new elemnent will be displayed after"]}]},
                           {node:"descriptionList",items:stuff[HDisplays[i]].options},
                           {node: "heading",size:'h4',text:"live Demo"},
-                          {name: "Input_params",field: "TextAreaField",
+                          {name: "Input_params",field: "textArea",
                            value: "var dobj=Harvey.display['" + HDisplays[i] + "']({DOM:'right',id:'" + HDisplays[i] + "Display', after:'" + HDisplays[i] + "', " + command[HDisplays[i]] + "});"},
                           {node:'button',name:'doit',text: "Go",
                            action: function(that){
@@ -996,9 +1004,9 @@ require("../index.js");
                                if( d!== null){
                                    Harvey.Panel.get("Displays").deleteChild((n+"Display"));
                                }
-                            //   else{
+                               //   else{
                             //      dobj.hidden=true;
-                            //   }
+                               //   }
                                if(!Harvey.checkType['object'](dobj)){
                                    throw new Error("Bad return");
                                }
@@ -1015,11 +1023,11 @@ require("../index.js");
         var HDisplays=HThings.Displays;
         var Methods={};
         for(var i=0;i<HDisplays.length;i++){
-           // console.log("getting method for " + HDisplays[i]);
+            console.log("getting method for " + HDisplays[i]);
             Methods[HDisplays[i]]=[];
-            var p=Harvey.display[(HDisplays[i]+"Methods")];
+            var p=Harvey.display[(HDisplays[i]+"Methods")]();
             for(var j=0;j<p.length; j++){
-             //   console.log("display " + HDisplays[i] + " has method " + p[j]);
+                console.log("display " + HDisplays[i] + " has method " + p[j]);
                 if(p[j] !== "constructor" && !p[j].startsWith("_")){
                     Methods[HDisplays[i]].push(p[j]);
                 }
@@ -1043,7 +1051,7 @@ require("../index.js");
             select: [],
             addNode:["<code> my_display.addNode(node_object); </code>"],
             addField:["<code> my_display.addField(field_object); </code>"],
-            getJSON: [],
+            getJSON: ["<code> var js=my.display.getJSON();</code>"],
             submit: [],
             sort: [],
             getColIndex:["<code>var v=my_display.getColIndex(col_name); </code>","parms: 'string',column name"],
@@ -1061,14 +1069,13 @@ require("../index.js");
             showFullscreen: []
         };
         var items=[];
-
-        
         for(var i=0;i<HDisplays.length;i++){
-           // console.log("mkFieldMethods making " + HFields[i]);
+           console.log("mkFieldMethods making " + HDisplays[i]);
             var k={};
             items[i]=[];
             for(var j in Methods[HDisplays[i]]){
                 var m=Methods[HDisplays[i]][j];
+                console.log("Methods " + m);
                 items[i].push({label:m,
                                descriptions:display_methods_list[m]});    
             }
@@ -1079,10 +1086,29 @@ require("../index.js");
             k.components=[{node: "heading", size: "h4", text: "Methods"},
                           {node: "descriptionList", items:items[i]},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "TextAreaField",
-                           value: "var v=my_display.getKey();"}, 
-                          {name: "doit", node: "button", text: "Go"}
+                          {node: "paragraph",text: "(global variable for eval)"},
+                          {name: "Input_params",field: "textArea",
+                           value: "var v=window.dobj.getKey();"}, 
+                          {name: "doit", node: "button", text: "Go",
+                           action: function(that){
+                               //                  console.log("button action is here");
+                               var f=that.parent.getChild("Input_params");
+                               if(!f){
+                                   throw new Error("can't get input params");
+                               }
+                               //window.field=that.parent.getChild("SomeString");
+                               //$.globalEval(f.getValue());
+                               globalEval(f.getValue());
+                               var nf=that.parent.getChild("Result");
+                              // console.log("methods doit got " + value);
+                               nf.setValue(JSON.stringify(v));
+                               
+                           }},
+                          {node:"paragraph",text:"Result"},
+                          {field:"static",name:"Result",type:"string" }
+                          
                          ];
+          
            UI.Panels.Displays.components.push(k);  
         }
     };
@@ -1113,7 +1139,7 @@ require("../index.js");
             k.id=HPopups[i];
             k.components=[{node:"heading",size:"h3",text: HPopups[i]},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "TextAreaField", value: cmd},
+                          {name: "Input_params",field: "textArea", value: cmd},
                           {name: "doit", node: "button", text: "Go",action: function(that){
                               var f=that.parent.getChild("Input_params");
                              
@@ -1127,10 +1153,55 @@ require("../index.js");
                                   window.setTimeout(function(){Harvey.popup["spinner"](false);},3000);
                               } 
                           }}
-            ];
+                         ];
             UI.Panels.Popups.components.push(k);
         }
         
+    };
+
+    var mkIO=function(){
+        var HIO=HThings["IO"];
+        for(var i=0;i<HIO.length;i++){
+           // console.log("making io panel",HIO[i]);
+            var k={};
+            k.display="fieldset";
+            k.DOM="right";
+            k.hidden=true;
+            k.id=(HIO[i] + "Methods").toString();
+            k.components=[{node:"heading",size:"h3",text:HIO[i]},
+                          {node: "heading",size:"h5",text: "Live Example"}
+                         ];
+            UI.Panels.IO.components.push(k);
+        }
+    };
+    var mkUtils=function(){
+        var HUtils=HThings["Utils"];
+        var items={
+            binarySearch:{p:"<code>Harvey.Utils.binarySearch(array,item,[sortOrder],[closest])<code>"},
+            dateNow:{p:"<code>Harvey.Utils.dateNow()<code>"},
+            datePast:{p:"<code>Harvey.Utils.datePast()<code>"},
+            detectMobile:{p:"<code>Harvey.Utils.detectMobile()<code>"},
+            draggable:{p:""},
+            extend:{p:""},
+            formatDate:{p:""},
+            getCssValue:{p:""},
+            hashCode:{p:""},
+            observer:{p:""}
+        };
+        for(var i=0;i<HUtils.length;i++){
+           // console.log("making io panel",HUtils[i]);
+            var k={};
+            k.display="fieldset";
+            k.DOM="right";
+            k.hidden=true;
+            k.id=(HUtils[i] + "Methods").toString();
+            k.components=[{node:"heading",size:"h3",text:HUtils[i]},
+                          {node: "paragraph",text: items[HUtils[i]].p},
+                          {node: "heading", size: "h4", text: "Methods"}
+                         
+                         ];
+            UI.Panels.Utils.components.push(k);
+        }
     };
     
     var select_tabs=function (that){
@@ -1176,7 +1247,7 @@ require("../index.js");
 
     var mkPanelMethods=function(){
         var panel_methods={
-            UIStart:[{label: "called by default if",description: "<code> UI,start=['MyPanel']; </code> <br> is defined"},{label: "<br><code>Harvey.Panel.UIStart(stringArray);</code>",descriptions:["<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
+            UIStart:[{label: "called by default if",description: "<code> UI.start=['MyPanel']; </code> <br> is defined"},{label: "<br><code>Harvey.Panel.UIStart(stringArray);</code>",descriptions:["<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
             add:[{label: "<code>Harvey.Panel.add(object|| string);</code>",descriptions:["return: nothing","parms: object or string","e.g from the above definition","<code>Harvey.Panel.add('MyPanel');</code>","or","<code> Harvey.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
             clone:[{label:"<code></code>",description:"clone an object"}],
             delete:[{label:"<code>Harvey.Panel.delete(string);</code>",descriptions:["return: nothing","parms: string","the name of the window to be deleted"]}],
@@ -1229,7 +1300,7 @@ require("../index.js");
                           {node: "heading",size: "h4",text: HPanels[i]},
                           {node: "descriptionList", items:panel_methods[HPanels[i]]},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "TextAreaField", value: cmd[HPanels[i]]},
+                          {name: "Input_params",field: "textArea", value: cmd[HPanels[i]]},
                           {name: "doit", node: "button", text: "Go",action: function(that){
                               var f=that.parent.getChild("Input_params");
                               if(!f){
@@ -1255,10 +1326,9 @@ require("../index.js");
                                       nf.setValue(JSON.stringify(v));
                                   }
                               }
-                               
-                           }},
+                          }},
                           {node:"paragraph",text:"Result"},
-                          {field:"StaticField",name:"Result",type:"string" }
+                          {field:"static",name:"Result",type:"string" }
                                                     
                          ];
            UI.Panels.Panels.components.push(k);  
@@ -1342,7 +1412,7 @@ require("../index.js");
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "About Harvey"},
-                          {node: "paragraph",text: "This site is made exclusively with Harvey Components, written in vanilla javascript. Harvey is a data-driven enterprise level SPA library. The components can be used together or individually"},
+                          {node: "paragraph",text: "Harvey is a data-driven enterprise level SPA library. The components can be used together or individually. This site is made exclusively with Harvey Components, written in vanilla javascript."},
                           {node: "paragraph",text:"Harvey is arranged hierarchically."},
                           {node: "descriptionList",items:[{label: "Windows",description:"Windows contain"},
                                                           {label: "Panels",description:"Panels contain"},
@@ -1361,15 +1431,17 @@ require("../index.js");
                      DOM: "right",
                      components:[
                          {node: "heading",size:"h3",text: "Methods"},
-                         {node: "descriptionList",items:[{label:"start",descriptions:["<code>Harvey.start(options);<code>","<br>Usually put in the html like so", "<code> <br> &#60script type='text/javascript'> </code>",
+                         {node: "descriptionList",items:[{label:"start",descriptions:["<code>Harvey.start(options);<code>","<br>Usually put in the html like so","<code> <br> &#60script type='text/javascript'> </code>","<code> &nbsp &nbsp  window.onload=function(){ Harvey.start(UI.Login);};</code>", "<code> &#60/script><code>","<br> or with jQuery", "<code> <br> &#60script type='text/javascript'> </code>",
                                                                                       "<code> &nbsp &nbsp $(document).ready(function(){</code>",
-                                                                                      "<code>&nbsp &nbsp &nbsp &nbsp Harvey.start();<code>",
+                                                                                      "<code>&nbsp &nbsp &nbsp &nbsp Harvey.start(UI.Login);<code>",
 	                                                                              "<code>});<code>",
                                                                                       "<code> &#60/script><code>"
                                                                                                                                            ] }]
                          },
                          {node:"descriptionList",items:[{label: "param: options",descriptions:["displayObject","type: Any one of the display templates, templateData", "Unlike other calls to Harvey, this object is not held in memory and cannot be accessed through the Harvey.Panels methods(if these are being used). ","Typically used to display a login form"
-                         ]}]}
+                                                                                              ]},
+                                                        {label:"or string array",descriptions:["where the elements of the array are UI.Panel names"]}
+                                                       ]}
                          
                      ]
                     },
@@ -1462,7 +1534,7 @@ require("../index.js");
                           {node: "descriptionList",items:[{label: "window",descriptions:["type:'object'","defult: uses the current browser window","e.g","<code> var win_object={url:'string',name: 'string', opts:'width=600',height=600'}","The html file designated in the url must contain <code>HarveyCoreChild.js</code>","and when the document is loaded call <code>Harvey.childReady();</code>"]}]},
                           {node: "anchor", href: "https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features",target:'_blank',text: "click here for window options"},
                           {node: "heading",size:"h4",text:"Live Example"},
-                          {name: "Input_params",field: "TextAreaField",
+                          {name: "Input_params",field: "textArea",
                            value: "Harvey.Panel.add({name:'TestPanel',window:{url:'child_window.html',name: 'TestWindow',opts:{width:600}},components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})"}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
@@ -1591,8 +1663,10 @@ require("../index.js");
     mkPanelMethods();
     mkPopups();
     mkTypes();
+    mkIO();
+    mkUtils();
     
     UI.start=["Tabs","About"];
-    console.log("Manual UI defs is %j " ,UI.Panels);
+   
     
 })();

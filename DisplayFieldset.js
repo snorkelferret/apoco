@@ -188,20 +188,23 @@ require("./Nodes.js");
         },
         deleteAll:function(){
             for(var i=0;i<this.fields.length;i++){
-                if(this.fields[i].listen){
+               /* if(this.fields[i].listen){
                     Harvey.unsubscribe(this.fields[i]);
                 }
                 //this.fields[i].element.empty();
-                this.fields[i].element.parentNode.removeChild(this.fields[i].element);
+                this.fields[i].element.parentNode.removeChild(this.fields[i].element); */
+                this.fields[i].delete();
             }
             this.fields.length=0;
             for(var i=0;i<this.nodes.length;i++){
                 if(this.nodes[i].listen){
                     Harvey.unsubscribe(this.nodes[i]);
                 }
-                //this.nodes[i].element.empty();
-                //this.nodes[i].element.remove();
-                this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
+                if(this.nodes[i].element.parentNode){
+                    //this.nodes[i].element.empty();
+                    //this.nodes[i].element.remove();
+                    this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
+                }
             }
             this.nodes.length=0;
         },
@@ -230,7 +233,7 @@ require("./Nodes.js");
         getJSON: function(){
             var js={};
 	    for(var i=0; i<this.fields.length; i++){
-                console.log("this field required is " + this.fields[i].required);
+             //   console.log("this field required is " + this.fields[i].required);
                 if(this.fields[i].required){
                     if(this.fields[i].checkValue() !== true){
                         return null;
@@ -258,6 +261,7 @@ require("./Nodes.js");
                 return new HarveyMakeFieldset(opts,win);
             },
             fieldsetMethods:function(){
+                console.log("Harvey.display.fieldsetMethods: getting methods for fieldset");
                 var ar=[];
                 for(var k in HarveyMakeFieldset.prototype){
                     ar.push(k);
