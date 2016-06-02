@@ -74,16 +74,17 @@ require("./DisplayBase.js");
             s.textContent=label;
             t.element.appendChild(s);
 	    t.parent=this;
+            this.tabs[index]=t;
             if(t.action){
 		t.element.addEventListener("click",
-					      function(tab,that){
-						  return function(e){
-						      e.preventDefault();
-						      e.stopPropagation();
-						      tab.action(t);
-                                                      that.select(tab.name);
-						  };
-					      }(t,this),false);
+					   function(tab,that,i){
+					       return function(e){
+						   e.preventDefault();
+						   e.stopPropagation();
+						   tab.action(that,i);
+                                                   that.select(tab.name);
+					       };
+					   }(t,this,index),false);
             }
             t.element.addEventListener("mouseover",function(e){
                // if(e.currentTarget.tagName === "LI"){
@@ -99,7 +100,7 @@ require("./DisplayBase.js");
                     e.currentTarget.classList.remove("ui-state-hover");
                 //}
             },false);
-            this.tabs[index]=t;
+        
 	    tablist.appendChild(t.element);
         },
         getTab:function(name){

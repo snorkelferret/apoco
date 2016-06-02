@@ -360,11 +360,11 @@ require("./datepicker");
             this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
         }
 
-        if(this.required && !this.value ){
+        if(this.required ){
           //  console.log("REQUIRED is TRUE, value is " + this.required);
-            if(this.field !== "CheckBoxField"){
-                this.input.setAttribute("required","required");
-            }
+          //  if(this.field !== "CheckBoxField"){
+                this.input.required=true;
+           // }
         }
         this.element.appendChild(this.input);
 	if(this.value !== null && this.value !== undefined){
@@ -411,7 +411,11 @@ require("./datepicker");
 	dec.appendChild(this.input[1]);
 	el.appendChild(dec);
 	list.appendChild(el);
-
+        if(this.required === true){
+            this.input[1].required=true;
+            this.input[0].required=true;
+        }
+        
         if(this.spinner){
 	    el=document.createElement("li");
             list.appendChild(el);
@@ -572,11 +576,14 @@ require("./datepicker");
         d.field="date";
         d.type="date";
         _Field.call(this,d,element);
-        var s=document.createElement("input");
-        s.type=this.html_type;
-        s.className=this.type;
-        this.input=s;
-        this.element.appendChild(s);
+        this.input=document.createElement("input");
+        this.input.type=this.html_type;
+        this.input.className=this.type;
+        
+        if(this.required === true){
+            this.input.required=true;
+        }
+        this.element.appendChild(this.input);
         if(this.value){
             this.input.value=this.value;
 	}
@@ -603,10 +610,12 @@ require("./datepicker");
         d.type="time";
 
 	_Field.call(this,d,element);
-        var s=document.createElement("input");
-        s.setAttribute("type",this.html_type);
-        s.className=this.type;
-        this.input=s;
+        this.input=document.createElement("input");
+        this.input.setAttribute("type",this.html_type);
+        this.input.className=this.type;
+        if(this.required === true){
+            this.input.required=true;
+        }
         this.element.appendChild(this.input);
     };
 
@@ -616,11 +625,13 @@ require("./datepicker");
         d.field="checkBox";
         d.type="boolean";
   	_Field.call(this,d,element);
-        var s=document.createElement("input");
-        s.setAttribute("type",this.html_type);
-        s.className=this.type;
-        this.input=s;
+        this.input=document.createElement("input");
+        this.input.setAttribute("type",this.html_type);
+        this.input.className=this.type;
         this.element.appendChild(this.input);
+        if(this.required===true){
+            this.input.required=true;
+        }
 	//console.log("checkbox value is " + d.value);
         this.setValue(this.value);
         if(this.editable === false){
@@ -704,6 +715,9 @@ require("./datepicker");
             this.input[i].input=document.createElement("input");
             this.input[i].input.setAttribute("type", this.html_type);
             this.input[i].input.className=this.type;
+            if(this.required===true){
+                this.input[i].input.required=true;
+            }
             this.input[i].input.value=this.input[i].value;
             if( this.delimiter !== undefined){
                 if(i>0 && i<(this.input.length-1)){
@@ -785,6 +799,9 @@ require("./datepicker");
 	_Field.call(this,d,element);
 	this.popup=true;
         this.input=document.createElement("textarea");
+        if(this.required===true){
+            this.input.required=true;
+        }
 	this.element.appendChild(this.input);
 	if(this.value){
             this.input.value=this.value;
@@ -828,6 +845,9 @@ require("./datepicker");
 	_Field.call(this,d,element);
 
         var options=document.createElement("select");
+        if(this.required === true){
+            options.required=true;
+        }
 	for(i=0; i<this.options.length; i++){
 	    if(i===0 && this.blank_option !== undefined && this.blank_option === true){ // add a blank option at the head of the list
                 o=document.createElement("option");
@@ -858,6 +878,9 @@ require("./datepicker");
             this.input.setAttribute("type",this.html_type);
             this.input.style.visibility="hidden";
             this.span=document.createElement("span");
+            if(this.required===true){
+                this.input.required=true;
+            }
             this.span.classList.add("ui-icon","ui-icon-triangle-1-s");
             this.span.style.visibility="hidden";
             this.element.appendChild(this.input);
@@ -1215,6 +1238,9 @@ require("./datepicker");
             var element=document.createElement("li");
             element.className="string";
             this.input[i].input=document.createElement("input");
+            if(this.required===true){
+                this.input[i].input.required=true;
+            }
             this.input[i].input.setAttribute("type","string");
             element.appendChild(this.input[i].input);
             this.element.getElementsByClassName("string_fieldset")[0].appendChild(element);
@@ -1269,6 +1295,9 @@ require("./datepicker");
 	    }
             this.input=document.createElement("input");
             this.input.type="file";
+            if(this.required===true){
+                this.input.required=true;
+            }
             this.input.setAttribute("name","files");
             this.input.setAttribute("multiple","multiple");
 	    this.element.appendChild(this.input);
@@ -1482,6 +1511,9 @@ require("./datepicker");
         box.classList.add(this.type,"harvey_autocomplete","ui-widget");
         this.element.appendChild(box);
         this.input=document.createElement("input");
+        if(this.required===true){
+            this.input.required=true;
+        }
         this.input.setAttribute("type",this.html_type);
         this.input.className=this.type;
         box.appendChild(this.input);  

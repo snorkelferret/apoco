@@ -17,16 +17,18 @@ require("./Utils");
 	};
        // var observer=null;
         var that=this,t;
-        this.options={};
+       // this.options={};
         //this.options = $.extend({}, defaults,options);
+      
         for(var k in defaults){
-            this.options[k]=defaults[k];
+            this[k]=defaults[k];
         }
-        Harvey.mixinDeep(this.options,options);
-	for(var k in this.options){
+        Harvey.mixinDeep(this,options);
+	/*for(var k in this.options){
 	    this[k]=this.options[k];
 	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
-	}
+	 } */
+        
         if(this.DOM === null){
             throw new Error(this.display + ": Must supply a DOM id for an existing node");
         }

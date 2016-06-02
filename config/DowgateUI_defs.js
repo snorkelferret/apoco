@@ -1,7 +1,9 @@
-var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=require('../jquery');
+global.Harvey=require('../declare').Harvey;
+global.UI=require('../declare').UI;
 
+require("../index.js");
 //var UI={};
-;(function($){
+;(function(){
     'use strict';
     // Business Logic
     
@@ -15,7 +17,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
             {name: "client_bid",type:"integer",editable: false,required: false},
   	    {name: "volume",type: "integerArray",size:2, delimiter: "X", editable: false,required: false},
 	    {name: "client_offer",type:"integer",editable: false,required: false},
-	    {name: "maturity",type: "date",editable: false,display:false},
+	    {name: "maturity",type: "date",editable: false,display:true},
 	    {name: "subclass",type:"integer",editable: false,display: false}
 	],
         Broker:[
@@ -82,15 +84,19 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
 		       publish:[{
 			   name: "stockSelection",
 			   action: function(that){
-			       that.element.find("[name='stock']").on("click",function(e){
-				   console.log("got a click on stock");
-				   e.stopPropagation();
-				   e.preventDefault();
-				   var c=$(this).data("harvey").context;
-				   // var m=c.getValue();
-                                   var row=that.getRowFromElement($(this));
-                                   Harvey.IO.dispatch("stockSelection",row);
-			       });
+			       // that.element.find("[name='stock']").on("click",function(e){
+                               that.element.querySelector("div.grid_content").addEventListener("click",function(e){
+                                   if(e.target.name === "stock"){
+				       console.log("got a click on stock");
+				       e.stopPropagation();
+				       e.preventDefault();
+				       // var c=$(this).data("harvey").context;
+                                       
+				       // var m=c.getValue();
+                                       var row=that.getRowFromElement(e.target);
+                                       Harvey.IO.dispatch("stockSelection",row);
+                                   }
+			       },false);
 			   }
 		       }],
 		       listen: [{name:"price",
@@ -98,7 +104,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
 				}],
 		       userSortable: false,    // this must be false if sortOrder is used
 		       sortOrder: ["maturity","stock"],
-		       uniqueKey: "stock",
+		       uniqueKey: ["stock"],
 		       groupBy: "subclass",
 		       cols: UI.Objects.Blotter,
                        rows:data.rows
@@ -115,16 +121,17 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
 		       id: "BottomTabs",
 		       DOM: "Content",
                        selected: "all",
-		     /*  dependsOn: "Blotter",
+		       dependsOn: "Blotter",
 		       action: function(that){
 			   function mk_tabs(b,that){
-			       var g=b.getGrids();
+			       var g=b.getGrid();
 			       for(var i in g){
 				   console.log("this is grid " + g[i].name);
 				   that.tabs.push({name: g[i].name,label:g[i].name,
 						   action: function(that,index){
 						       var n=that.tabs[index].name;
                                                        that.selected=n;
+                                                       console.log("clicked tab " + n);
 						       b.showGrid(n);}});
 			       }
 			   }
@@ -136,10 +143,13 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
 			       return true;
 			   }
 			   return false;
-		      }, */
+		      }, 
                        
 		       tabs:[{ name: "all",label: "All",
 			       action: function(that,index){
+                                   if(!that.parent){
+                                       throw new Error("tabs parent is null");
+                                   }
 				   that.parent.findChild({key:"Blotter"}).showGrid("all");
                                    that.selected=that.tabs[index].name;
 			       }},
@@ -186,7 +196,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
 		      {display: "fieldset",
 		       DOM: "controls",
 		       id: "Active",
-		       components:[ { field: "CheckBoxField",label: "active",name: "active",
+		       components:[ { field: "checkBox",label: "active",name: "active",
 				  action: function(that){ console.log("active is here");}},
 			      ]
 		      }
@@ -198,7 +208,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
 		{display: "fieldset",
 		 DOM: "controls",
 		 id: "Create",
-		 components:[{ field: "SelectField", name: "selection_dropdown", options: [ "Blotter","Broker","Bigfig","Auction-control","Trades","robo-broker","knock-down-ginger","auction"]},
+		 components:[{ field: "select", name: "selection_dropdown", options: [ "Blotter","Broker","Bigfig","Auction-control","Trades","robo-broker","knock-down-ginger","auction"]},
                              { node: "button", name: "create_window",text: "new",
 			       action: function(that){
 				   var h=that.parent.getChild("selection_dropdown").getValue();
@@ -263,7 +273,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
                   components:[ {node: "button",name: "bid",text: "bid"},
                                {node: "button",name: "deleteBid",text: "delete bid"},
                                {node: "button",name: "hit",text: "hit"},
-                               {field: "CheckBoxField",name: "indic",type: "boolean",label: "indic",editable: true }
+                               {field: "checkBox",name: "indic",type: "boolean",label: "indic",editable: true }
                              ]
                 },
                 { display: "fieldset",
@@ -280,7 +290,7 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
                   id:"Other",
                   DOM: "Dmiddle",
                   components:[ {node: "button",name: "clear",text: "clear"},
-                               {field: "CheckBoxField",name: "AorN",type: "boolean",label: "A or N",editable: true },        
+                               {field: "checkBox",name: "AorN",type: "boolean",label: "A or N",editable: true },        
                                {node: "button",name: "endTrade",text: "end trade"},
                                {node: "button",name:"error",text:"ERROR"}
                              ]
@@ -296,6 +306,6 @@ var Harvey=require('../declare').Harvey,UI=require('../declare').UI,jQuery=requi
     UI.start=["Blotter","Controls"];
     
 
-})(jQuery);
+})();
 
 

@@ -206,7 +206,7 @@ require("../index.js");
                                 max:{type:"integer",default: 10},
                                 value:{type: "integer",default: undefined}
                               },
-                      description: "This is a wrapper for the jQuery slider, to access the jQuery object use var slider=my_slider_field.getFlement().find('slider'); Please use the Harvey setValue and getValue methods "
+                      description: "This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Harvey setValue and getValue methods "
                     },
         numberArray:{ options:{type:{type:"string",
                                           default: "integerArray",
@@ -232,12 +232,12 @@ require("../index.js");
                    },
         autoComplete:{options:{options:{type:"stringArray"},
                                     value:{type: "string",default: undefined}},
-                           description: "This is a wrapper for the jQuery autoComplete field. To access the jQuery Object, use <br> <code> var auto_comp=ac.getInputElement();</code> <br>  Please use the Harvey getValue and setValue methods "
+                           description: "This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> <br>  Please use the Harvey getValue and setValue methods "
                           },
         checkBox:{ options:{ value:{type: "boolean",default: false}},
                         description: ""},
         date:{options:{value:{type:"any",default:undefined,params:["Date","string"] }},
-                   description:"This is just a wrapper for the jQuery datepicker, to access the jQuery element use var jquery_dp=my_field.getInputElement().datepicker;"
+                   description:"This uses the browser datepicker(where available) or Harvey.datepicker"
                   },
         time:{options:{value:{type:"time",default:undefined,
                                    description:"A valid partial-time as defined in [RFC 3339]."}},
@@ -862,7 +862,7 @@ require("../index.js");
             deleteValue:{ descriptions:[]},
             addValue:{ descriptions:[]},
             popupEditor:{descriptions:[]},
-            getLabel:{descriptions:["get the jQuery label element"]},
+            getLabel:{descriptions:["get the htmllabel element"]},
             mkThumbnails:{descriptions:["make thumbnails from values array"]},
             loadImages:{descriptions:["load images from the values array"]},
             reset:{descriptions:["set all the values to false"]}
@@ -978,7 +978,7 @@ require("../index.js");
                           {node: "heading",size: "h4",text: "dataObject settings"},
                           {node: "heading",size: "h5",text: "required"},
                           {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string","an existing node with an id (do not include #) which is used as the parent for the display"]},
-                                                          {label: "id",descriptions:["type: string","id of the base jQuery Object the display creates"]}]
+                                                          {label: "id",descriptions:["type: string","id of the base htmlObject the display creates"]}]
                           },
                           {node:"descriptionList", items:stuff[HDisplays[i]].required},
                           {node: "heading",size: "h5",text: "options"},
@@ -1004,13 +1004,12 @@ require("../index.js");
                                if( d!== null){
                                    Harvey.Panel.get("Displays").deleteChild((n+"Display"));
                                }
-                               //   else{
-                            //      dobj.hidden=true;
-                               //   }
+                                                
                                if(!Harvey.checkType['object'](dobj)){
                                    throw new Error("Bad return");
                                }
                                Harvey.Panel.get("Displays").addChild(dobj);
+                               dobj.hide(); 
                            }
                           }
                          ];
@@ -1035,7 +1034,7 @@ require("../index.js");
         }
         var display_methods_list={
             show:["<code> var v=my_display.show();)</code>","return: boolean","add the display to the DOM"],
-            getElement:["<code> var v=my_display.getElement();</code>","return: jQuery object"," the root element of the display"],
+            getElement:["<code> var v=my_display.getElement();</code>","return: htmlobject"," the root element of the display"],
             getChildren:["<code> var v=my_display.getChildren();</code>","return: object","where the object has keys fields, tabs,grids etc depending on the type of children the display object creates"],
             getDisplayType:["<code> var v=my_display.getDisplayType();</code>","return: string","e.g 'tabs','form' etc"],
             getName:["<code> var v=my_display.getName(); </code>","return: string","returns the name if it exists"],
@@ -1057,7 +1056,6 @@ require("../index.js");
             getColIndex:["<code>var v=my_display.getColIndex(col_name); </code>","parms: 'string',column name"],
             getCol: [],
             getGrid: ["<code> var v=my_display.getGrid(grid_name); </code>","return the grid object named grid_name"],
-            getGrids: ["<code> var v=my_display.getGrids(); </code>"],
             showGrid: [],
             hideGrid: [],
             insertRow: [],
@@ -1177,12 +1175,12 @@ require("../index.js");
     var mkUtils=function(){
         var HUtils=HThings["Utils"];
         var items={
-            binarySearch:{p:"<code>Harvey.Utils.binarySearch(array,item,[sortOrder],[closest])<code>"},
-            dateNow:{p:"<code>Harvey.Utils.dateNow()<code>"},
-            datePast:{p:"<code>Harvey.Utils.datePast()<code>"},
-            detectMobile:{p:"<code>Harvey.Utils.detectMobile()<code>"},
-            draggable:{p:""},
-            extend:{p:""},
+            binarySearch:{p:"<code>var index=Harvey.Utils.binarySearch(array,item,[sortOrder],[closest])<code>"},
+            dateNow:{p:"<code>Harvey.Utils.dateNow();<code>"},
+            datePast:{p:"<code>Harvey.Utils.datePast();<code>"},
+            detectMobile:{p:"<code>Harvey.Utils.detectMobile();<code>"},
+            draggable:{p:"<code> var d=Harvey.Utils.draggable(htmlObject);</code>"},
+            extend:{p:"<code> Harvey.Utils.extend(subObject,superObject); </code>"},
             formatDate:{p:""},
             getCssValue:{p:""},
             hashCode:{p:""},
@@ -1197,8 +1195,8 @@ require("../index.js");
             k.id=(HUtils[i] + "Methods").toString();
             k.components=[{node:"heading",size:"h3",text:HUtils[i]},
                           {node: "paragraph",text: items[HUtils[i]].p},
-                          {node: "heading", size: "h4", text: "Methods"}
-                         
+                          {node: "heading", size: "h4", text: "Parameters"}
+                          
                          ];
             UI.Panels.Utils.components.push(k);
         }

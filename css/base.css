@@ -129,6 +129,13 @@ table  tbody tr:hover + tr td{ border-top-width: 0em !important;  background: #3
 .htable .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
 
 /* padding: top right bottom left */
+input:invalid {
+  border: 1px solid red;
+}
+
+input:valid {
+  border: 1px solid green;
+}
 
 .first{width: 2em; }
 .slider{width: 15em; margin:  0.5em 0 0.5em 0} 

@@ -21,7 +21,6 @@ describe("DisplayTabs-(start without tab items)",function(){
     it("creates a tab display object",function(){
         var b=document.createElement("div");
         b.id="test";
-        //$("body").append("<div id='test'></div>");
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
         t=Harvey.display.tabs({id:"test_tabs",DOM:"test"});
@@ -59,12 +58,19 @@ describe("DisplayTabs",function(){
     it("creates a tab display object",function(){
         var b=document.createElement("div");
         b.id="test2";
-        //$("body").append("<div id='test'></div>");
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
         t=Harvey.display.tabs({id:"test_tabs2",DOM:"test2",
-                               tabs:[{name:"tabOne",action:function(that){
-                                   that.element.textContent="clicked";
+                               tabs:[{name:"tabOne",action:function(that,index){
+                                   var p;
+                                   if(that.tabs[index].element.style.visibility === "visible"){
+                                       p="hidden";
+                                   }
+                                   else{
+                                       p="visible";
+                                   }
+                                   
+                                   that.tabs[index].element.style.visibility=p;
                                }},
                                      {name:"tabTwo"},
                                      {name:"tabThree"}
@@ -84,11 +90,12 @@ describe("DisplayTabs",function(){
     });
     it("executes the action function when clicked",function(){
         var b=document.getElementById("test_tabs2").getElementsByTagName("li")[0];
-        //var b=$("#test_tabs").find("li").first();
         assert.isObject(b);
+        b.style.visibility="visible";
         //console.log("text in b is " + b.html());
         b.click();
-        assert.strictEqual(b.textContent,"clicked");
+        var r=b.style.visibility;
+        assert.strictEqual(r,"hidden");
     });
     it("can add a tab",function(){
         t.addTab({name:"tabFour"});
@@ -102,15 +109,9 @@ describe("DisplayTabs",function(){
     });
     it("can still execute the action function when clicked",function(){
         var b=document.getElementById("test_tabs2").getElementsByTagName("li")[0];
-        //var b=$("#test_tabs").find("li").first();
         assert.isObject(b);
         //console.log("text in b is " + b.html());
         b.click();
-       // assert.strictEqual(b.textContent,"clicked");
-       // var b=$("#test_tabs").find("li").first();
-       // assert.notStrictEqual(b.length,0);
-        //console.log("text in b is " + b.html());
-        //b.trigger("click");
-        assert.strictEqual(b.textContent,"clicked");
+        assert.strictEqual(b.style.visibility,"visible");
     });
 });

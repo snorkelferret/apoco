@@ -1,4 +1,5 @@
-module.exports={ DOM: "Content",
+//module.export
+window.data={ DOM: "Content",
      	     sortOrder: ["maturity","stock"],
 	     object: "Blotter",
 	     id: "Blotter",

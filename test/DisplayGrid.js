@@ -100,7 +100,12 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     var t;
     require("../DisplayGrid.js");
     
-    var data=require("./data/data.js");
+    //var data=require("./data/data.js");
+    require("./data/data.js");
+    var data=window.data;
+    it("has got some data",function(){
+        assert.isObject(data); 
+    });
     it("creates a grid display object",function(){
         //$("body").append("<div id='Content'></div>");
         var b=document.createElement("div");
@@ -182,7 +187,7 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         assert.isObject(t);
         t.show();
     });
-    it("creates a jquery container",function(){
+    it("creates htmldiv container",function(){
         var b=document.getElementById("test_grid");
         assert.strictEqual(document.contains(b),true);
     });

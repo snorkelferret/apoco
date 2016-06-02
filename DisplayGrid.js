@@ -44,38 +44,6 @@ jsonishData={
 ;(function(){
     "use strict";
     
-    // special functions for aligning the decimal points in non-editable cells
-   /* var mk_aligned_float=function(cell){ // align to decimal point
-        var p=[];
-        var p=parseFloat(cell.value).toFixed(cell.precision).toString().split(".");
-        if (!cell.value){
-            p[0]="";
-            p[1]="";
-        }
-	cell.element.append("<span class='float_left'>" + p[0] + "</span>");
-        
-	if (p.length >= 2){
-	    cell.element.append("<span class='float_right'> ." + p[1] + "</span>");
-	}
-	else{
-	    cell.element.append("<span class='float_right'> .00  </span>");
-	}
-        
-        
-    };
-    var set_aligned_float=function(val){
-        
-        var p=parseFloat(cell.value).toFixed(cell.precision).toString().split("."); 
-        this.element.find("span.float_left").html(p[0]);
-        if (p.length >= 2){
-            this.element.find("span.float_left").html(p[1]);
-	}
-	else{
-	    this.element.find("span.float_left").html(".00");
-	}
-    };
-    */
-    // end special functions
     
     function rmouse_popup(element){
 
@@ -127,7 +95,6 @@ jsonishData={
 	    }
 	    return false;
 	});
-
     }
 
     function stop_edits(that){
@@ -192,8 +159,6 @@ jsonishData={
 	    throw new Error("cell is null");
 	}
 	console.log("do_cell edit got  " + that.selection_list.length + " number of cells");
-
-
 	var type=that.cellEdit["type"];
 	if(!type){
 	    throw new Error("edit cannot find field type");
@@ -323,46 +288,49 @@ jsonishData={
 
     var HarveyMakeGrid=function(options,win){
 	var DEBUG=true;
-	var that=this,found=0,not_found=[];
+	var that=this,found,not_found=[];
 
-	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+       	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	this.selection_list=[];
 	this.cellEdit=null; // cell currently being edited- this is of type Harvey.field
 	this.allowEdit=true;  // are edits allowed?
  
 	if(this.sortOrder && this.userSortable){
 	    throw new Error("Cannot specify both sortOrder and sortable");
-	    return null;
 	}
+        if(this.cols === undefined || this.cols.length === 0){
+            throw new Error("DisplayGrid: need to supply a least one column");
+        }
         if(this.uniqueKey){
+       //     console.log("this,uniquekey length is " + this.uniqueKey.length);
             this.sortOrderUnique=true;
             if(this.sortOrder){
-                console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
+            //    console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
                 // to determine the absolute ordering is unique
                 // uniqueKey must be a subset of sortOrder
                 for(var i=0;i<this.uniqueKey.length;i++){
+                    found=false;
                     for(var j=0;j<this.sortOrder.length;j++){
-                        if(this.uniqueKey[i] == this.sortOrder){
-                            found++;
+                        if(this.uniqueKey[i] == this.sortOrder[j]){
+                            found=true;
                         }
                     }
-                    if(found !== i){
+                    if(!found){
+                    //    console.log("not found was " + this.uniqueKey[i]);
                         not_found.push(this.uniqueKey[i]);
                     }
                 }
-                if(found !== this.uniqueKey.length){
-                    for(var i=0;i<not_found.length;i++){
-                        this.sortOrder.push(not_found[i]);
-                    }
+               // if(found !== this.uniqueKey.length){
+                for(var i=0;i<not_found.length;i++){
+                   // console.log("not found is pushing " + not_found[i]);
+                    this.sortOrder.push(not_found[i]);
                 }
-                console.log("After MakeGrid sortOrder length is " + this.sortOrder.length);
+               // }
+               // console.log("After MakeGrid sortOrder length is " + this.sortOrder.length);
             }
         }
         
-        if(this.cols === undefined || this.cols.length === 0){
-           throw new Error("DisplayGrid: need to supply a least one column");
-           
-        }
+  
         this.execute();
     };
 
@@ -425,17 +393,21 @@ jsonishData={
 	},
 	sort: function(grid){
 	    var isSortable=false,grids=[],sortOrder=[];
+           
             if(this.sortOrder){
-                sortOrder=this.sortOrder;
+                console.log("this.sortOrder.length is " + this.sortOrder.length);
+                sortOrder=this.sortOrder.slice();
             }
             else if(this.uniqueKey){
-                sortOrder=this.uniqueKey;
+                sortOrder[0]=this.uniqueKey;
             }
 	    if(sortOrder.length > 0){
 		var ar=[],t,s;
+                console.log("sortOrder.length is " + sortOrder.length);
 		for(var i=0; i< sortOrder.length; i++){
+                    console.log("this is sortOrder " + sortOrder[i]);
 		    t=this.getColIndex(sortOrder[i]);
-		    //		console.log("col index is " + t);
+		    console.log("col index is " + t);
 		    s=this.sortOrder[i];  // name of the column in the row
 		    console.log("name is " + s);
 		    if(this.cols){
@@ -470,13 +442,11 @@ jsonishData={
             div=document.createElement("div");
             div.classList.add("inner_table");
 	    if(name !== undefined){
-	        //	var div=$("<div class='inner_table' id='" + name + "'> </div>");
-                div.id=name;
+	        div.id=name;
                 h=document.createElement("h4");
                 h.classList.add("ui-widget","ui-widget-header");
-                h.text=name;
+                h.textContent=name;
                 div.appendChild(h);
-	//	div.append("<h4 class='ui-widget ui-widget-header'>" + name + "</h4>");
 	    }
 	    
 	    var table=document.createElement("table");
@@ -633,24 +603,27 @@ jsonishData={
 	execute:function(){
             var rows,body,r,that=this;
 // 	    var t0=performance.now();
-	    var headtable=document.createElement("table"); //$("<table class='ui-widget head'></table>");
-            var head=document.createElement("thead"); //$("<thead></thead>");
+	    var headtable=document.createElement("table"); 
+            var head=document.createElement("thead"); 
             headtable.classList.add("ui-widget","head");
-            this.element=document.createElement("div"); //$("<div id='" + this.id + "' class='grid htable'></div>");
+            this.element=document.createElement("div"); 
             this.element.id=this.id;
             this.element.classList.add("grid","htable");
 	    headtable.appendChild(head);
 	    this.element.appendChild(headtable);
 
-	    this.colElement=document.createElement("tr");//$("<tr></tr>");
+	    this.colElement=document.createElement("tr");
 	    // setup the grid columns
             head.appendChild(this.colElement); // put the head row into the dom
-            var div_container=document.createElement("div");//$("<div class='grid_content' </div>");
+            var div_container=document.createElement("div");
             div_container.classList.add("grid_content");
-            if(this.resizable){
+           /* if(this.resizable){
 	        div_container.resizable(
                     {alsoResize: this.element});
-	    }
+	    } */
+            if(this.resizable){
+                this.element.classList.add("resizable");
+            }
             this.element.appendChild(div_container);
             //body.selectable(this.select_data()); // allow multiple cells to be selected
 	    for(var i=0; i< this.cols.length; i++){
@@ -947,8 +920,6 @@ jsonishData={
                         if(k===0){
                             parent=el.parentNode;
                         }
-                        //el.empty();
-                        //el.remove();
                         parent.removeChild(el);
                     }
                     parent.parentNode.removeChild(parent);
@@ -958,16 +929,23 @@ jsonishData={
             this.grids.length=0;
         },
 	showGrid: function(name){
-	    if(this.grids.length === 1 || !name){
+            var g;
+            var p=this.element.querySelector("div.grid_content");
+	    if(this.grids.length === 1 || name === undefined){
 		name="all";
 	    }
-	//    console.log("show grid is here");
+	    //console.log("show grid is here");
 	    for(var i=0; i< this.grids.length;i++){
-		if(this.grids[i].name == name || name == "all"){
-		    this.grids[i].element.visibility="visible";
+                g=this.grids[i];
+		if(g.name == name || name == "all"){
+                    if(!document.contains(g.element)){
+		       p.appendChild(g.element);
+                    }
 		}
 		else{
-		    this.grids[i].element.visibility="hidden";
+                    if(document.contains(this.grids[i].element)){
+		        p.removeChild(g.element);
+                    }
 		}
 	    }
 	},
