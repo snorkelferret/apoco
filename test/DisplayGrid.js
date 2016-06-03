@@ -118,7 +118,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
      it("can add a row",function(){
         var b=t.getGrid("1").rows.length;
         b++;
-        var n=t.addRow({stock:"FG63",subclass: 1,bid:10,maturity:20200521});
+        var n=t.addRow({stock:"FG63",subclass: 1,bid:10,maturity:"2020-05-21"});
         var c=t.getGrid("1").rows.length;
         console.log("b is " + b +  " and c " + c);
         //var b=t.getRow({stock:"FG63",subclass: 1,bid:10});
@@ -126,8 +126,8 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
        // console.log("JSON %j",n);
     });
     it("can add another row",function(){
-        var n=t.addRow({stock:"XXX",subclass: 1,bid:109,maturity:20160830});
-        var b=t.getRow({stock:"XXX",subclass: 1,bid:109,maturity:20160830});
+        var n=t.addRow({stock:"XXX",subclass: 1,bid:109,maturity:"2016-08-30"});
+        var b=t.getRow({stock:"XXX",subclass: 1,bid:109,maturity:"2016-08-30"});
         assert.notStrictEqual(b,null);
     });
     it("has a show method which adds the root element to the DOM",function(){
@@ -153,13 +153,13 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     });
     it("updates an existing row",function(){
         //  t.updateRow({stock:"XXX",subclass:1,maturity:20160830,other:"something"});
-        t.updateRow({stock:"ABT",subclass:1,maturity:20350921,other:"something"});
-        var b=t.getRow({stock:"ABT",subclass:1,maturity:20350921});
+        t.updateRow({stock:"ABT",subclass:12,maturity:"2035-10-22",other:"something"});
+        var b=t.getRow({stock:"ABT",subclass:12,maturity:"2035-10-22"});
         assert.notStrictEqual(b,null);
         assert.strictEqual(b["other"].getValue(),"something");
     });
     it("deletes a row",function(){
-        t.deleteRow({stock:"FG63",subclass: 1,bid:10,maturity:20200521});
+        t.deleteRow({stock:"ABZ",subclass: 9,maturity:"2041-02-20"});
         
     });
     it("deletes a column",function(){

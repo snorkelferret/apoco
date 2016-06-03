@@ -1202,9 +1202,12 @@ require("../index.js");
         }
     };
     
-    var select_tabs=function (that){
+    var select_tabs=function (that,index){
+        if(!that){
+            console.log("select_tabs: that is  " + that);
+        }
         var name=that.name;
-      //  console.log("select_tabs: trying to show " + name);
+        console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Harvey.Panel.hide(that.parent.selected.name);
         }

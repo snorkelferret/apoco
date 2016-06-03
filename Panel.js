@@ -1,6 +1,6 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI; 
 require("./Utils");
-
+require("./Popups");
 // Copyright (c) 2015 Pooka Ltd.
 // Name: HarveyDisplaySet.js
 // Function: maintains a reference to  all commands that are currently displayed in _DisplayObjects
@@ -31,7 +31,11 @@ require("./Utils");
 		    }
                     break;
 		case "DOM": // does this object exist ?
-		    var d=document.getElementById(ar[i][k]);
+		    //var d=document.getElementById(ar[i][k]);
+                    var d=true;
+                    if(!ar[i][k] || ar[i][k].length===0){
+                        d=false;
+                    }
 		  // console.log("switch case DOM ", d);
 		    if(!d){
 			msg=msg.concat("No Dom object called " + d);
@@ -118,6 +122,7 @@ require("./Utils");
 	    }
             else{
                 Harvey.mixinDeep(d.opts,defaults);
+                
                 for(var k in d.opts){
                     if(settings === ""){
                         settings=settings.concat((k + "=" + d.opts[k]));
@@ -126,7 +131,7 @@ require("./Utils");
                         settings=settings.concat(("," + k + "=" + d.opts[k]));
                     }
                 }
-            //   console.log("settings are " + settings);
+                console.log("settings are " + settings);
             }
 	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
             var p=new Promise(function(resolve,reject){
@@ -160,7 +165,7 @@ require("./Utils");
                     }
                 };
             }).catch(function(reason){
-                Harvey.error("Window Open Error",reason);
+                Harvey.popup.error("Window Open Error",reason);
             });
                                         
 	    return p;
@@ -175,7 +180,7 @@ require("./Utils");
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
             for(var i=0;i<w.length;i++){
-             //   console.log("trying to find " + w[i]);
+               console.log("trying to find " + w[i]);
                 nv=this._UIGet(w[i]);
                 if(nv !== null){
                     this.add(nv);
@@ -187,12 +192,15 @@ require("./Utils");
 
         },
         _UIGet:function(name){
-          //  console.log("UIGet trying to find " + name);
-          //  console.log("UI Panels " + UI.Panels);
+            console.log("UIGet trying to find " + name);
+            console.log("UIGet Panels " + UI.Panels);
+            if(name === undefined){
+                throw new Error("Panel._UIGet: panel name is undefined");
+            }
             for(var k in UI.Panels){
-             //  console.log("trying to get panel " + name + " from " + k);
+                //console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
-                    //console.log("found " + name);
+                  //  console.log("found " + name);
                     var cd=Harvey.cloneDeep(UI.Panels[k]);
                    // console.log("clone deep is " + cd);
                     return cd;
@@ -208,8 +216,11 @@ require("./Utils");
             }
         },
 	inList: function(k){
+            if(k===undefined){
+                throw new Error("Panel: inList name is undefined");
+            }
 	    for(var i=0;i< this._list.length;i++){
-	//	console.log("i is " + i + "checking is in list " + this._list[i].name);
+		console.log("i is " + i + "checking is in list " + this._list[i].name);
 		if(this._list[i].name == k){
 		    return i;
 		}
@@ -221,10 +232,13 @@ require("./Utils");
             if(u !== null){
                 return this._list[u];
             }
-        //    console.log("panel not yet in list");
+            console.log("panel not yet in list");
             return null;
         },
         show:function(k){
+            if(k===undefined){
+                throw new Error("Panel.show name is undefined");
+            }
             var p=this.get(k);
             if(!p){
                 var w=this._UIGet(k);
@@ -253,7 +267,7 @@ require("./Utils");
         },
         hide:function(k){
             var p=this.get(k);
-          //  console.log("hiding window " + k);
+            console.log("hiding window " + k);
             if(!p){
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
@@ -300,8 +314,8 @@ require("./Utils");
             }
         },
 	add: function(panel){
-	 //   console.log("Panel.add is here");
-	//    console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+	    console.log("Panel.add is here");
+	    console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
             if(Harvey.checkType['string'](panel)){
                 var w=this._UIGet(panel);
                 panel=w;
@@ -317,7 +331,7 @@ require("./Utils");
 		this._list.push(p);
 	    }
 	    else{
-		throw new Error(panel.name + " is already in the display list");
+		throw new Error("Panel.add " + panel.name + " is already in the display list");
 	    }
             return p;
 	},
@@ -365,13 +379,13 @@ require("./Utils");
     };
     var _Components=function(obj){
         var that=this;
-	for(var k in obj){
-	    this[k]=obj[k];
+        //	for(var k in obj){
+	//this[k]=obj[k];
 	  //   console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
-	}
-
-	if(this.window){
-	    var p=Harvey.Window.open(this.window);  // create a new browser window
+	//}
+        Harvey.mixinDeep(this,obj);
+	if(obj.window){
+	    var p=Harvey.Window.open(obj.window);  // create a new browser window
 	    p.then(function(w){
 		w.window.focus();
             //    console.log("got object from window.open.done");
@@ -379,13 +393,14 @@ require("./Utils");
           //          console.log("obj has parm " + k + " with value " + w[k]);
            //     }
 		that.window=w.window;
-	        that._addComponents();
+        	that._addComponents();
+        
 	    } ).catch(function(reason){
                 throw new Error("Panel: cannot open window " + reason);
             });
 	}
         else{
-	    that._addComponents();
+            that._addComponents();
         }
     };
 
@@ -403,17 +418,19 @@ require("./Utils");
 	    };
 
 	    for(var i=0;i<this.components.length;i++){
+                // check that DOM parent exists
+                                                       
 		var p=this.components[i].display;
              //   console.log("adding component " + p);
 		this.components[i].parent=this;
                // console.log("addComponents window is " + that.window);
 	        d=Harvey.display[p](this.components[i],that.window);
                 
-		if(d === null){
+		if(!d){
 		    throw new Error("could not create " + p);
-		    return;
+		  
 	        }
-		if(d.deferred){
+	            /*	if(d.deferred){
                     Harvey.popup.spinner(true);
 		    d.deferred.done(function(that){
 	//		console.log("deferred done");
@@ -423,7 +440,8 @@ require("./Utils");
 		}
 		else{
 		    doit(this,i);
-		}
+		     } */
+                doit(this,i);
 	    }
 
 	},

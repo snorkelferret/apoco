@@ -1,9 +1,10 @@
 off=${1:-1}
-last=${1000:-100}
+last=${2:-100}
+file=${3:-"data.js"}
 alpha=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z)
-rm data.js
-echo "" > data.js
-echo "module.exports={ DOM: \"Content\",
+rm  $file
+echo "" > $file
+echo "window.data={ DOM: \"Content\",
      	     sortOrder: [\"maturity\",\"stock\"],
 	     object: \"Blotter\",
 	     id: \"Blotter\",
@@ -23,7 +24,7 @@ echo "module.exports={ DOM: \"Content\",
 		    ],
 	    rows:[	
 		  
-     " > data.js
+     " > $file
 
 while test $off -le $last; do
 
@@ -96,11 +97,11 @@ while test $off -le $last; do
    day=`expr $number % 30 + 1`;
 
    if(test $off -eq $last); then
-       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid: null, volume:[], client_offer:null,maturity:" $year$tmonth$tday  ",subclass:" $subclass "}" >> data.js
+       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid: null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}" >> $file
    else
-       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid: null, volume:[], client_offer:null,maturity:" $year$tmonth$tday  ",subclass:" $subclass "}," >> data.js
+       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid: null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}," >> $file
    fi
   off=`expr $off + 1`;
 
 done 
-  echo "]};" >> data.js
+  echo "]};" >> $file

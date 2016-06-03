@@ -63,14 +63,14 @@ describe("DisplayTabs",function(){
         t=Harvey.display.tabs({id:"test_tabs2",DOM:"test2",
                                tabs:[{name:"tabOne",action:function(that,index){
                                    var p;
-                                   if(that.tabs[index].element.style.visibility === "visible"){
+                                   if(that.element.style.visibility === "visible"){
                                        p="hidden";
                                    }
                                    else{
                                        p="visible";
                                    }
                                    
-                                   that.tabs[index].element.style.visibility=p;
+                                   that.element.style.visibility=p;
                                }},
                                      {name:"tabTwo"},
                                      {name:"tabThree"}

@@ -216,7 +216,7 @@ require("./datepicker");
         float: function(that){
             var val,p=[];
             if(that.value){
-                val=parseFloat(that.value).toFixed(this.precision);
+                val=parseFloat(that.value).toFixed(that.precision);
 	        p=val.toString().split("."); // align to decimal point
             }
             else{
@@ -228,9 +228,12 @@ require("./datepicker");
             var s=document.createElement("span");
             s.textContent=p[0];
             s.className="float_left";
-            //s=$(s);
+           // console.log("_________________________ mkStatic is " + p.length);
+          //  for(var i=0;i<p.length;i++){
+           //     console.log("got " + i + " vv " + p[i]);
+           // }
             that.element.appendChild(s);
-	    if (p.length >= 2){
+	    if (p.length == 2){
                 s=document.createElement("span");
                 s.className="float_right";
                 s.textContent=("." + p[1]);
@@ -268,8 +271,11 @@ require("./datepicker");
         float: function(that){
             var p=parseFloat(that.value).toFixed(that.precision).toString().split(".");
             that.element.getElementsByClassName("float_left")[0].textContent=p[0];
+           // for(var i=0;i<p.length;i++){
+           //     console.log("static float is " + p[i]);
+           // }
             //that.element.find("span.float_left").html(p[0]);
-            if (p.length >= 2){
+            if (p.length >= 1){
                 //that.element.find("span.float_left").html(p[1]);
                  that.element.getElemenstByClassName("float_rigbt")[0].textContent=p[1];
 	    }

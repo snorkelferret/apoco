@@ -978,7 +978,9 @@ jsonishData={
 	},
         getRowFromElement: function(element){  
             var s,row=[];
-            var c=element.data("harvey");
+            var c=element.data.harvey;
+            //element.data.harvey={name: col.name,"context": row[col.name],"type": col.type};
+            console.log("name is " + c.name + " context " + c.context + " type " + c.type);
             row.push({context:c.context,name: c.name,
                       value:c.context.value });
             //s=$(element).siblings();
@@ -987,7 +989,7 @@ jsonishData={
             for(var i=0;i<s.length;i++){
                 if(s[i] !== element){
                     //c= $(s[i]).data("harvey");
-                    s[i].data("harvey");
+                    c=s[i].data.harvey;
                     console.log( "sib " + c.name + " value " + c.context.value);
                     row.push({context: c.context,name: c.name,
                               value: c.context.value });

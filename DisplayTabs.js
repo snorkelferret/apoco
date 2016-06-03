@@ -81,7 +81,7 @@ require("./DisplayBase.js");
 					       return function(e){
 						   e.preventDefault();
 						   e.stopPropagation();
-						   tab.action(that,i);
+						   tab.action(t,i);
                                                    that.select(tab.name);
 					       };
 					   }(t,this,index),false);

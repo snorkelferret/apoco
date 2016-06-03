@@ -33,6 +33,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    var mid,r,compare;
             var len=arr.length;
             console.log("array len is " + len);
+         
             if(sort_order === null){
                 compare=function(aa){
                     console.log("testing " + aa + " with " + data);
@@ -56,22 +57,22 @@ String.prototype.trim = String.prototype.trim || function trim() {
             else{
 	        compare=function(aa){
 		    var field,item;
-                    //  console.log("Compare: sort_order.length is " + sort_order.length);
+                    console.log("Compare: sort_order.length is " + sort_order.length);
 		    for(var i=0;i<sort_order.length;i++){
 		        field=sort_order[i];
 		        item=data[field];
-		        //  console.log("field is " + field);
+		       console.log("field is " + field);
                         if(aa[field].value == item){ // && i === sort_order.length -1){
-		            //	console.log(aa[field].value + " equals " + item);
+		            console.log(aa[field].value + " equals " + item);
 		            //found[i]=true;
                             continue;
 		        }
 		        else if(aa[field].value > item){
-		            //	console.log(aa[field].value + " is greater than " + item);
+		            console.log(aa[field].value + " is greater than " + item);
 			    return 1;
 		        }
 		        else if(aa[field].value < item){
-		            //	console.log(aa[field].value + " is less than " + item);
+		            console.log(aa[field].value + " is less than " + item);
 			    return -1;
 		        }
 	                else{
@@ -281,9 +282,9 @@ String.prototype.trim = String.prototype.trim || function trim() {
                                   //      console.log("mutation.addNodes key is " + n);
                                   //  }
                                     for(var i=0; i< mutation.addedNodes.length;i++){
-                                        console.log("Mutation observer addedNodes " + mutation.addedNodes[i].id);
+                                       // console.log("Mutation observer addedNodes " + mutation.addedNodes[i].id);
                                         for(var j=0;j<that._list.length;j++){
-                                            console.log("Observer trying to find " + that._list[j].id);
+                                          //  console.log("Observer trying to find " + that._list[j].id);
                                             if(mutation.addedNodes[i].id == that._list[j].id && that._list[j].found === false){
                                                 console.log(" really found ????? " + document.getElementById(that._list[j].id));
                                                 console.log("+++++++++++++++++++++++++++++++++++++++++==Observer Found " + that._list[j].id);

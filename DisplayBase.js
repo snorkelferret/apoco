@@ -37,16 +37,12 @@ require("./Utils");
         }
         
         if(win){
-          //  console.log("Adding display to child window");
+            console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
+            console.log("adding to DOM " + this.DOM);
 	    this.DOM=win.document.getElementById(this.DOM);
             t=win.document.getElementById(this.id);
             if(this.dependsOn){
-                if(this.dependsOn === this.id){
-                    
-                }
-                else{
-                    dp=win.document.getElementById(this.dependsOn);
-                }
+                dp=win.document.getElementById(this.dependsOn);
             }
         }
         else{

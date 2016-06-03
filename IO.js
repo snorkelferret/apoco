@@ -25,7 +25,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 
 	    for(var i=0; i< that.listen.length; i++){
 	        var n=that.listen[i].name;
-	      //  console.log("adding listener " + n  + " to " + b);
+	        console.log("adding listener " + n + " to " + that.getKey());
 	        if(!this._subscribers[n]){
 		    this._subscribers[n]=[];
 	        }
@@ -57,7 +57,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 
         },
         publish:function(that) {//pubsub
-            //	console.log("++++++++++++=+++ publish +++++++++ " + that.id);
+            console.log("++++++++++++=+++ publish +++++++++ " + that.id);
 	    for(var i=0;i<that.publish.length;i++){
 
 	        if(that.publish[i].data){

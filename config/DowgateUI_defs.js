@@ -86,7 +86,8 @@ require("../index.js");
 			   action: function(that){
 			       // that.element.find("[name='stock']").on("click",function(e){
                                that.element.querySelector("div.grid_content").addEventListener("click",function(e){
-                                   if(e.target.name === "stock"){
+                                  // console.log("e target has name " + e.target.getAttribute("name"));
+                                   if(e.target.getAttribute("name") === "stock"){
 				       console.log("got a click on stock");
 				       e.stopPropagation();
 				       e.preventDefault();
@@ -129,7 +130,7 @@ require("../index.js");
 				   console.log("this is grid " + g[i].name);
 				   that.tabs.push({name: g[i].name,label:g[i].name,
 						   action: function(that,index){
-						       var n=that.tabs[index].name;
+						       var n=that.name;
                                                        that.selected=n;
                                                        console.log("clicked tab " + n);
 						       b.showGrid(n);}});
@@ -151,11 +152,11 @@ require("../index.js");
                                        throw new Error("tabs parent is null");
                                    }
 				   that.parent.findChild({key:"Blotter"}).showGrid("all");
-                                   that.selected=that.tabs[index].name;
+                                   that.selected=that.name;
 			       }},
                              {name:"conventionals",label:"Conventionals",
                               action: function(that,index){
-                                  var n=that.tabs[index].name;
+                                  var n=that.name;
                                   that.selected=n;
                                   var b=that.parent.findChild({key:"Blotter"});
                                   for(var i=0;i<4;i++){
@@ -165,7 +166,7 @@ require("../index.js");
                               }},
                              {name:"linkers",label:"Linkers",
                               action: function(that,index){
-                                  var n=that.tabs[index].name;
+                                  var n=that.name;
                                   that.selected=n;
                                   var b=that.parent.findChild({key:"Blotter"});
                                   for(var i=4;i<6;i++){
@@ -174,7 +175,7 @@ require("../index.js");
                               }},
                              {name:"i_swaps",label:"I swaps",
                               action: function(that,index){
-                                  var n=that.tabs[index].name;
+                                  var n=that.name;
                                   that.selected=n;
                                   var b=that.parent.findChild({key:"Blotter"});
                                   for(var i=6;i<10;i++){
@@ -183,7 +184,7 @@ require("../index.js");
                               }},
                              {name:"swaps",label:"Swaps",
                               action: function(that,index){
-                                  var n=that.tabs[index].name;
+                                  var n=that.name;
                                   that.selected=n;
                                   var b=that.parent.findChild({key:"Blotter"});
                                   for(var i=11;i<13;i++){
@@ -232,12 +233,12 @@ require("../index.js");
 	},
     	Broker:{
 	    name: "Broker",
-            window:{name: "DowgateBroker",url:"dowgate_form.html",opts:{width: 440,height:260}}, 
+            window:{name: "DowgateBroker",url:"dowgate_form.html",opts:{width: 260,height:440}}, 
 	    components: [
 		{ display: "fieldset",
-                 // hidden: true,
+                  //hidden: true,
 		  id: "Broker",
-		  DOM: "Content",
+		  DOM: "BrokerContent", //"Content",
 		  object: "Broker",
 		  label: "Broker Window",
 		  //draggable: true,
@@ -245,9 +246,12 @@ require("../index.js");
 		  listen: [{name:"stockSelection",
 			    action: function(that,row){
                                 console.log("got data for stockSelection");
-                                that.element.show();
+                                console.log("stockselection action got row %j ",row);
+                                // that.element.show();
+                                console.log("row length is " + row.length);
                                 for(var i=0; i<row.length; i++){
                                     console.log("form listener got row " + row[i].name);
+                                    console.log("got fields %j",that.fields);
                                     for(var j=0;j<that.fields.length;j++){
                                         console.log("field is " + that.fields[j].name);
                                         if(row[i].name != "volume" && row[i].name === that.fields[j].name){
@@ -258,9 +262,9 @@ require("../index.js");
                                                 }
                                                 that.fields[j].setValue(row[i].value);
                                                 console.log("set value " + row[i].value);
-                                            }
+                                            } 
                                         }       
-                                    }
+                                    } 
                                 }
                                 that.parent.window.focus(); 
 			    }
@@ -303,7 +307,7 @@ require("../index.js");
   
 
 
-    UI.start=["Blotter","Controls"];
+    UI.start=["Blotter","Controls","Broker"];
     
 
 })();

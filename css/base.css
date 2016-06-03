@@ -87,7 +87,15 @@ body{ margin: 1em;/* -webkit-font-smoothing: antialiased;*/ font-family: "Arial"
 /* border round the cells in the grid */
  /* .htable table td{border: 1px solid #73bdf6}   */
 
-.htable table th, td {padding: 0em 1em; margin: 0em; font-size: 8pt; height: 1.5em;} /* border-bottom-width: 0em !important; padding: 0em 10em} */
+.htable table th, td {padding: 0em 1em;
+                      margin: 0em;
+                      font-size: 8pt;
+                      height: 1.5em;
+                      padding: 0;
+                      font-size: 8pt;
+                      font-weight:normal;
+                      padding: 0 0.4em 0 0.4em;
+                      border: 1px solid #bbb} /* border-bottom-width: 0em !important; padding: 0em 10em} */
 .htable table th span{ display: inline-block; float: right; margin-left: 1em; }
 /* hovered-row cells should show bottom border (will be highlighted) */
 /*table tbody tr:hover th,
@@ -124,7 +132,7 @@ table  tbody tr:hover + tr td{ border-top-width: 0em !important;  background: #3
 .htable .inner_table table td.cell_updated{background: #fbec88}
 .htable .inner_table table td.cell_updated_fast{background: #fb8866}
 .htable .inner_table table td input{ background: inherit; text-align: inherit}
-.htable .inner_table table td th { word-wrap: break-word }
+.htable .inner_table table td th { word-wrap: break-word}
 /* set the row colours */
 .htable .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
 
@@ -141,15 +149,15 @@ input:valid {
 .slider{width: 15em; margin:  0.5em 0 0.5em 0} 
 .integer {width: 5em }
 .positiveInteger {width: 5em}
-.negativeInteger {width: 5em}
-.date {width: 8em}
-.time {width: 8em}
+.negativeInteger {width: 5em }
+.date {width: 8em }
+.time {width: 8em }
 .string {width: 6em}
-.token {width: 6em}
-.alphaNum {width: 6em}
-.image {width: 10em}
+.token {width: 6em }
+.alphaNum {width: 6em }
+.image {width: 10em }
 .currency {width: 8em}
-.email {width: 8em}
+.email {width: 8em }
 .float {width: 8em }
 .container {width: 10em}
 .integerArray {width: 8em}

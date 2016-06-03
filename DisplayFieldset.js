@@ -25,8 +25,7 @@ require("./Nodes.js");
     HarveyMakeFieldset.prototype={
 	execute: function(){
 	    var el,p;
-	    //this.element=$("<div id='" + this.id + "' class='field_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
-            this.element=document.createElement("div");
+	    this.element=document.createElement("div");
             this.element.id=this.id;
             this.element.classList.add("field_container","ui-widget","ui-widget-content","ui-corner-all");
             
@@ -45,6 +44,9 @@ require("./Nodes.js");
 		    }
                 }
                 this.components.length=0; // delete
+            }
+            else{
+                console.log("components for " + this.id + " is undefined");
             }
 	},
 	getChildren: function(){
@@ -167,7 +169,7 @@ require("./Nodes.js");
             }
             if(Harvey.field.exists(d.field)){
                 // check that the field has not already been created
-                if(d.element && d.element.length>0){
+                if(d.element){
 		    p=d;
                 }
                 else{
@@ -182,6 +184,7 @@ require("./Nodes.js");
             }
             p.parent=this;
 	    this.fields.push(p);
+            console.log("adding field " + d.name);
 	    this.element.appendChild(p.element);
             
             return p;
