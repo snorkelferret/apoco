@@ -1,11 +1,12 @@
-var Harvey=require('./declare').Harvey;
+global.Harvey=require('./declare').Harvey;
+global.UI=require('./declare').UI;
 require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
 
 
-// Harvey is a singleton for each window session
+// Harvey is a singleton 
 
 (function(){
     'use strict';
@@ -39,6 +40,8 @@ require("./Popups.js");
     Harvey.mixinDeep(Harvey,{
 	start: function(options) {
 	    // Harvey.popup.spinner(true);
+            console.log("++++++++++++++++++++++++++++++== Harvey start is here ");
+            console.log("options are %j ",options);
             if(options){
 	        if(!Harvey.checkType["array"](options) && Harvey.checkType["object"](options)){
 		    var p=Harvey.display[options.display](options);

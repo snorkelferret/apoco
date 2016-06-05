@@ -1,8 +1,7 @@
-global.Harvey=require('../declare').Harvey;
-global.UI=require('../declare').UI;
+//global.Harvey=require('../declare').Harvey;
+//global.UI=require('../declare').UI;
 
-require("../index.js");
-//var UI={};
+
 ;(function(){
     'use strict';
     // Business Logic
@@ -109,14 +108,6 @@ require("../index.js");
 		       groupBy: "subclass",
 		       cols: UI.Objects.Blotter,
                        rows:data.rows
-		     /*  action: function(that){
-			   that.rows=data.rows; //Harvey.IO.Server({get:that.object});
-			   if(that.rows){
-			       if(!Harvey.checkType["array"](that.rows)){
-				   throw new Error("Blotter action rows is not an array");
-			       }
-			   }
-		       } */
 		      },
 		      {display: "tabs",
 		       id: "BottomTabs",

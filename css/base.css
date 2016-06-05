@@ -8,7 +8,7 @@ History: 1st Feb 2012 creation
 
 
 /*html{ height: 100% }*/
-body{ margin: 1em;/* -webkit-font-smoothing: antialiased;*/ font-family: "Arial"; font-size: 10pt}
+body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 10pt}
 
 .hide{ display: none }
 
@@ -59,82 +59,56 @@ body{ margin: 1em;/* -webkit-font-smoothing: antialiased;*/ font-family: "Arial"
 .menu ul li.seperator{border-bottom: inherit; padding: 1em 0em}
 .menu ul li span.seperator{}
 
-
-
-/* default for tables */
-
-/* grid table */
-.grid {min-width: 4em; font-size: inherit; overflow-x: hidden;  overflow-y: hidden; }/* padding-bottom: 12em; padding-right: 12em} /* overflow:  visible} */
-.grid .label{margin: 1em 0 1em 1em;   display: table-row}
-.grid_content { min-width: 8em; min-height: 6em;padding-top: 4em }
-/* this is a div NOT the tfoot html object */
-.grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
-.grid_footer div{ background-color: #888}
-.grid button{ height: 2em}  
-/* .grid table{ display: block; table-layout: fixed } */
-.grid table{ overflow: hidden }
-
-
 .popup { position: absolute; width: 40em; height: 14em; z-index: 1000; background: #101010 }
 
 #grid_popup{ }
 #grid_popup textarea{  width: 40em; height: 10em; }
+/* default for tables */
 
+/* grid table */
+.grid {min-width: 4em; overflow:hidden} 
+.grid .label{margin: 1em 0 1em 1em;   display: table-row}
+.grid_content { min-width: 8em; min-height: 6em;padding-top: 5em }
+.grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
+.grid_footer div{ background-color: #888}
+.grid button{ height: 2em}  
+.grid table{ min-width: 8em }
 
-.htable table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555}
-
-.htable table {table-layout: fixed; border-collapse: collapse}
-/* border round the cells in the grid */
- /* .htable table td{border: 1px solid #73bdf6}   */
-
-.htable table th, td {padding: 0em 1em;
+.grid table {table-layout: fixed; border-collapse: collapse}
+.grid table.head {z-index: 100; position: fixed;  top: 3em;  height: 2em }
+.grid table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555}
+.grid table th, td {padding: 0em 1em;
                       margin: 0em;
-                      font-size: 8pt;
                       height: 1.5em;
                       padding: 0;
-                      font-size: 8pt;
+                      font-size: 80%;
                       font-weight:normal;
+                      min-width: 3em !important;
                       padding: 0 0.4em 0 0.4em;
                       border: 1px solid #bbb} /* border-bottom-width: 0em !important; padding: 0em 10em} */
-.htable table th span{ display: inline-block; float: right; margin-left: 1em; }
-/* hovered-row cells should show bottom border (will be highlighted) */
-/*table tbody tr:hover th,
-table tbody tr:hover td { border-bottom-width: 1px !important; }
+.grid table th span{ display: inline-block; float: right; margin-left: 1em; }
+.grid .hover { background: #aabbcc }
+.grid table tbody tr.last-child th,
+.grid table tbody tr.last-child td { border-bottom-width: 1px !important; }
+.grid table label{ }
+.grid table td{ text-align: right }
+.grid table td input {box-sizing: border-box; font-size: inherit}
+/* .grid table button {background-color: #202020; color: #bbbbbb; border: 1px solid dimgrey;}  */
+.grid table tr td textarea{}
+.grid table textarea,select{}
 
-*/
-/* remove top border if the above row is being hovered to prevent double horizontal borders */
-/*table tbody tr:hover + tr th,
-table  tbody tr:hover + tr td{ border-top-width: 0em !important;  background: #333}
-*/
-/* .htable table tbody tr:hover td{ background: #444 } */
-.htable .hover { background: #aabbcc }
-/* last-row cells should always show bottom border (not necessarily highlighted if not hovered) */
-/* IE7, IE8: selector dependent on CSS classes because of no support for :last-child */
-.htable table tbody tr.last-child th,
-.htable table tbody tr.last-child td { border-bottom-width: 1px !important; }
-
-/* last-row cells should always show bottom border (not necessarily highlighted if not hovered) */
-/* IE8 BUG: if these (unsupported) selectors are added to a rule, other selectors for that rule will stop working as well! */
-/* IE9+, FF, Chrome: make sure the visuals are working even without the CSS classes crutch */
- 
-.htable table label{ }
-.htable table td{ text-align: right }
-.htable table td input {box-sizing: border-box; font-size: inherit}
-/* .htable table button {background-color: #202020; color: #bbbbbb; border: 1px solid dimgrey;}  */
-.htable table tr td textarea{}
-.htable table textarea,select{}
-
-.htable table td span{ display: inline} /*float: right } */
+.grid table td span{ display: inline} /*float: right } */
 /* table with only col names */
-.htable table.head {min-width: 8em;  overflow-x: hidden; z-index: 100; position: fixed;  top: 3em;  height: 2em }
-.htable .inner_table h4{ padding-left: 1em; height: 1em; color: #0000ff}
-.htable .inner_table table{ overflow: auto; height: 100%    }
-.htable .inner_table table td.cell_updated{background: #fbec88}
-.htable .inner_table table td.cell_updated_fast{background: #fb8866}
-.htable .inner_table table td input{ background: inherit; text-align: inherit}
-.htable .inner_table table td th { word-wrap: break-word}
+
+.grid .inner_table h4{ padding-left: 1em; height: 1em; color: #0000ff}
+.grid .inner_table table{ height: 100% }
+.grid .inner_table table td.cell_updated{background: #fbec88}
+.grid .inner_table table td.cell_updated_fast{background: #fb8866}
+.grid .inner_table table td input{ background: inherit; text-align: inherit}
+.grid .inner_table table td th { word-wrap: break-word}
 /* set the row colours */
-.htable .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
+.grid .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
+
 
 /* padding: top right bottom left */
 input:invalid {
@@ -145,22 +119,22 @@ input:valid {
   border: 1px solid green;
 }
 
-.first{width: 2em; }
+.first{width: 2em }
 .slider{width: 15em; margin:  0.5em 0 0.5em 0} 
-.integer {width: 5em }
+.integer {width: 5em}
 .positiveInteger {width: 5em}
-.negativeInteger {width: 5em }
-.date {width: 8em }
-.time {width: 8em }
-.string {width: 6em}
+.negativeInteger {width: 5em}
+.date {width: 8em;}
+.time {width: 8em;  }
+.string {width: 6em;}
 .token {width: 6em }
 .alphaNum {width: 6em }
 .image {width: 10em }
 .currency {width: 8em}
 .email {width: 8em }
-.float {width: 8em }
+.float {width: 8em; }
 .container {width: 10em}
-.integerArray {width: 8em}
+.integerArray {width: 8em;}
 .integerArray input,
 .integerArray span.integerArray{width: 3.5em}
 .floatArray {width: 12em}
@@ -202,7 +176,7 @@ ul.choice {list-style-type: none  }
                         margin: 0em; padding: 0em; flex-flow: row}
 /* .form_style_div ul.aligned_float, */
 .float ul.aligned_float li{ display: flex; flex-flow: row}
-/* .htable table td.float div{display: inline  } */
+/* .grid table td.float div{display: inline  } */
 /* .form_style_div ul.aligned_float, */
 .float ul.aligned_float li input{ border: 0 none}
 
@@ -262,7 +236,7 @@ h5{color: #202020; font-size: 10pt}
    
 }
 
-p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 2em; font-size: 10pt}
+p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 2em}
 p a{text-decoration: none; outline: none}
 p a:hover{outline: none; text-decoration: none}
 
@@ -327,7 +301,7 @@ div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
 
 .hidden{ visibility: hidden}
 
-.tooltip{ font-size: 8pt;} 
+.tooltip{ } 
 
 .bold{font-weight: bold; color: #cccccc}
 .red{background: #aa0000 }

@@ -1,9 +1,8 @@
 // WARNING this script contains evil eval !!!!!!
 global.Harvey=require('../declare').Harvey;
 global.UI=require('../declare').UI;
-//global.jQuery=require('jquery');
-
-require("../index.js");
+require("../index.js"); 
+//module.exports = {Harvey:{},UI:{}};
 
 ;(function(){
     "use strict";

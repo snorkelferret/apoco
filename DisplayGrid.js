@@ -444,7 +444,7 @@ jsonishData={
 	    if(name !== undefined){
 	        div.id=name;
                 h=document.createElement("h4");
-                h.classList.add("ui-widget","ui-widget-header");
+                h.classList.add("ui-widget-header");
                 h.textContent=name;
                 div.appendChild(h);
 	    }
@@ -503,7 +503,7 @@ jsonishData={
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
 	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
                 var h=document.createElement("th");
-                h.classList.add("ui-state-default",this.cols[index].type);
+                h.classList.add(this.cols[index].type);
                 h.type=this.cols[index].type;
                 h.textContent=label;
 		this.cols[index].element=h;
@@ -601,18 +601,17 @@ jsonishData={
             return this.cols;
  	},
 	execute:function(){
-            var rows,body,r,that=this;
+            var rows,body,r,that=this,class_list=[],width;
 // 	    var t0=performance.now();
 	    var headtable=document.createElement("table"); 
             var head=document.createElement("thead"); 
-            headtable.classList.add("ui-widget","head");
+            headtable.classList.add("head");
             this.element=document.createElement("div"); 
             this.element.id=this.id;
-            this.element.classList.add("grid","htable");
+            this.element.classList.add("grid","ui-widget","ui-state-default");
 	    headtable.appendChild(head);
 	    this.element.appendChild(headtable);
-
-	    this.colElement=document.createElement("tr");
+  	    this.colElement=document.createElement("tr");
 	    // setup the grid columns
             head.appendChild(this.colElement); // put the head row into the dom
             var div_container=document.createElement("div");
@@ -628,7 +627,18 @@ jsonishData={
             //body.selectable(this.select_data()); // allow multiple cells to be selected
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
+                if(this.cols[i].display !== false){
+                    class_list[i]=("." + this.cols[i].type).toString();
+                }
 	    }
+            width=Harvey.Utils.widthFromCssClass(class_list,"base.css");
+            console.log("get width of " + width);
+            
+            if(width !== null){
+                // div_container.style.width=width;
+                this.element.style.width=width;
+            }
+            
             if(this.rows !== undefined){
                 sort_into_subGrids(this);
                 this.sort();
@@ -652,9 +662,8 @@ jsonishData={
             if(this.sortOrder){
                 console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
             }
-	   // var t1=performance.now();
-	   // console.log("grid load " + (t1-t0) + "milliseconds ");
-	},
+   
+   	},
         _addCell:function(row,col,r){
             var c,type,settings={};
             

@@ -14,19 +14,74 @@ String.prototype.trim = String.prototype.trim || function trim() {
     Harvey.mixinDeep=require("mixin-deep");
     Harvey.cloneDeep=require("clone-deep");
     Harvey.Utils={  
-        getCssValue:function(css_class,rule){
-            var stylesheets = document.stylesheets;
+        getCssValue:function(css_class,rule,filename){
+            var stylesheets;
+            console.log("class is " + css_class + " rule " + rule + " filename " + filename);
+            if(document && document.styleSheets){
+                stylesheets = document.styleSheets;
+            }
+            else{
+                return null;
+            }
+           // console.log("found " + stylesheets.length + " number of stylesheets");
+            var found=-100;
             for(var j=0;j< stylesheets.length; j++){
+                if(filename !== undefined){
+                  //  console.log("got stylesheets" + stylesheets[j].href);
+                    if(stylesheets[j].href && (stylesheets[j].href.indexOf(filename)>0)) {
+                     //   console.log("filename equals %j ", stylesheets[j]);
+                        found=j;
+                        break;
+                    }
+                }
+            }
+            if(found>=0){
+              //  console.log("Found the filename");
                 var classes=stylesheets[j].rules || stylesheets[j].cssRules || stylesheets[j].rules[0].cssRules;
                 for(var i=0; i<classes.length; i++){
+                   // console.log("got class " + classes[i].selectorText);
                     if(classes[i].selectorText == css_class){
-                        if(classes[i].style == rule){
-                            return classes[i].style;
+                       // console.log("found the class " + classes[i].selectorText + " style " + classes[i].style);
+                     //   console.log("style Object %j ", classes[i].style);
+                     //   console.log("rule is " + classes[i].style[rule]);
+                        if(classes[i].style[rule]){
+                          //  console.log("returning " + classes[i].style[rule]);
+                            return classes[i].style[rule];
                         }
                     }
                 }
             }
             return null;
+        },
+        widthFromCssClass:function(class_list,filename){ // if in ems need to take font-size into account
+            var value=0,units;
+            for(var i=0;i<class_list.length;i++){
+              //  var c=("." + children[i].type).toString();
+                var t=Harvey.Utils.getCssValue(class_list[i],"width",filename);
+                console.log("got class value " + t);
+                if(t=== null){
+                    return null;
+                }
+                if(t.indexOf("em")>0){
+                    var v=t.split("em");
+                    if(units !== undefined && units !== "em"){
+                        return null;
+                    }
+                    units="em";
+                }
+                else if(t.indexOf("px")>0){
+                    var v=t.split("px");
+                    if(units !== undefined && units !== "px"){
+                        return null;
+                    }
+                    units="px";
+                }
+                else{
+                    return null;
+                }
+                value += parseFloat(v[0]);
+            }
+            return (value.toString() + units);
         },
 	binarySearch: function(arr,sort_order,data,closest){ // sorted list on an array of key value objects
 	    // sort_order array -  1st then 2nd etc

@@ -51,9 +51,9 @@ while test $off -le $last; do
    stock=$ff$ft$ttt;
 
     cl=$RANDOM
-   # client_bid=`expr $cl % 24`;
+    client_bid=`expr $cl % 24`;
     ct=$RANDOM
-   # client_offer=`expr $ct % 24`;
+   client_offer=`expr $ct % 24`;
  
    number=$RANDOM
    
@@ -97,9 +97,9 @@ while test $off -le $last; do
    day=`expr $number % 30 + 1`;
 
    if(test $off -eq $last); then
-       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid: null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}" >> $file
+       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid:null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}" >> $file
    else
-       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid: null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}," >> $file
+       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid:null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}," >> $file
    fi
   off=`expr $off + 1`;
 

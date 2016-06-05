@@ -4,7 +4,6 @@ var dcl = require('./declare.js');
 
 //??? which of these are mandatory/optional? ???
 
-//require('jquery');
 require('./Core');
 require('./Utils');
 require('./Types');
