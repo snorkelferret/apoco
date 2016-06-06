@@ -237,9 +237,7 @@ require("./datepicker");
                 s=document.createElement("span");
                 s.className="float_right";
                 s.textContent=("." + p[1]);
-                //s=$(s);
                 that.element.appendChild(s);
-		//this.element.append("<span class='float_right'> ." + p[1] + "</span>");
 	    }
 	    else{
                 s=document.createElement("span");
@@ -271,13 +269,11 @@ require("./datepicker");
         float: function(that){
             var p=parseFloat(that.value).toFixed(that.precision).toString().split(".");
             that.element.getElementsByClassName("float_left")[0].textContent=p[0];
-           // for(var i=0;i<p.length;i++){
-           //     console.log("static float is " + p[i]);
-           // }
-            //that.element.find("span.float_left").html(p[0]);
-            if (p.length >= 1){
-                //that.element.find("span.float_left").html(p[1]);
-                 that.element.getElemenstByClassName("float_rigbt")[0].textContent=p[1];
+            if(p.length !== 2){
+                throw new Error("not a floating point value");
+            }
+            if (p.length ==2){  
+                that.element.getElementsByClassName("float_right")[0].textContent=("." + p[1]);
 	    }
 	    else{
 	        //that.element.find("span.float_left").html(".00");
@@ -287,7 +283,7 @@ require("./datepicker");
         integerArray:function(that){
             var len=that.value;
             //var el=that.element.find(("."+that.type));
-            var el=that.element.getElemenstByClassName(that.type);
+            var el=that.element.getElementsByClassName(that.type);
             for(var i=0;i<len;i++){
                 //el[i].text(that.value[i]);
                 el[i].textContent=that.value[i];

@@ -43,8 +43,58 @@ jsonishData={
 
 ;(function(){
     "use strict";
+
+
+
     
-    
+    var getWidth=function(cols){ 
+        var class_list=[],width;
+        for(var i=0;i<cols.length;i++){
+            if(cols[i].display !== false){
+                class_list[i]={};
+                class_list[i].classname=("." + cols[i].type).toString();
+            }
+	}
+        width=Harvey.Utils.widthFromCssClass(class_list,"base.css");
+        console.log("get width of " + width);
+        // need to add border - assume 1px;
+        // and add any padding on td
+        var padding=Harvey.Utils.getCssValue(".grid table td","padding","base.css");
+        console.log("padding is " + padding);
+        var pp=0;
+        if(padding !== null){
+            var b=padding.split(" ");
+            if(b.length === 2){
+                if(b[1].indexOf("em")>=0){
+                    var p=b[1].split("em");
+                    pp=p[0]*2;
+                }
+            }
+        }
+        console.log("pp is " + pp);
+        if(width !== null){
+            var b=class_list.length;
+            if(width.indexOf("px")>=0){
+                var d=width.split("px");
+                width=((parseFloat(d[0])+b+2).toString() + "px");
+            }
+            else if(width.indexOf("em")>=0){
+                var d=width.split("em");
+                width=((parseFloat(d[0])+ parseFloat((b+2)/13)+ parseFloat(pp*b)).toString() + "em");
+            }
+            if(pp){
+                for(var i=0;i<cols.length;i++){
+                    if(cols[i].display !== false){
+                        var v=((parseFloat(class_list[i].value) + pp).toString() + class_list[i].units).toString();
+                        console.log("setting width to " + v);
+                        cols[i].element.style.width=v;
+                     }
+                }
+            }
+        }
+        return width;
+    };
+
     function rmouse_popup(element){
 
 	element.bind("contextmenu", function(e){
@@ -450,6 +500,7 @@ jsonishData={
 	    }
 	    
 	    var table=document.createElement("table");
+            table.style.width=this.element.style.width;
 	    div.appendChild(table);
 	    //var body=$("<tbody class='selectable'></tbody>");
 	    var body=document.createElement("tbody");//$("<tbody class=''></tbody>");
@@ -502,10 +553,13 @@ jsonishData={
 		if(this.DEBUG) console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
 	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
-                var h=document.createElement("th");
+                //  var h=document.createElement("th");
+                var h=document.createElement("div");
+                var s=document.createElement("soan");
+                h.appendChild(s);
                 h.classList.add(this.cols[index].type);
                 h.type=this.cols[index].type;
-                h.textContent=label;
+                s.textContent=label;
 		this.cols[index].element=h;
 		this.cols[index].sortable=Harvey.isSortable(this.cols[index].type);
 		if(this.cols[index].sortable && this.userSortable){
@@ -601,25 +655,19 @@ jsonishData={
             return this.cols;
  	},
 	execute:function(){
-            var rows,body,r,that=this,class_list=[],width;
-// 	    var t0=performance.now();
-	    var headtable=document.createElement("table"); 
-            var head=document.createElement("thead"); 
-            headtable.classList.add("head");
+            var rows,body,r,that=this;
+            // var t0=performance.now();
             this.element=document.createElement("div"); 
             this.element.id=this.id;
             this.element.classList.add("grid","ui-widget","ui-state-default");
-	    headtable.appendChild(head);
-	    this.element.appendChild(headtable);
-  	    this.colElement=document.createElement("tr");
-	    // setup the grid columns
-            head.appendChild(this.colElement); // put the head row into the dom
+            // make the header
+            this.colElement=document.createElement("div");
+            this.colElement.classList.add("head");
+            this.element.appendChild(this.colElement);
+
             var div_container=document.createElement("div");
             div_container.classList.add("grid_content");
-           /* if(this.resizable){
-	        div_container.resizable(
-                    {alsoResize: this.element});
-	    } */
+
             if(this.resizable){
                 this.element.classList.add("resizable");
             }
@@ -627,15 +675,10 @@ jsonishData={
             //body.selectable(this.select_data()); // allow multiple cells to be selected
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
-                if(this.cols[i].display !== false){
-                    class_list[i]=("." + this.cols[i].type).toString();
-                }
-	    }
-            width=Harvey.Utils.widthFromCssClass(class_list,"base.css");
-            console.log("get width of " + width);
-            
+            }
+            // div_container.style.width=width;
+            var width=getWidth(this.cols);
             if(width !== null){
-                // div_container.style.width=width;
                 this.element.style.width=width;
             }
             
@@ -862,8 +905,8 @@ jsonishData={
 	    var row,subGrid,index,g;
 	    if(this.groupBy){
 		g=cell_data[this.groupBy];
-		if(!g){
-		    throw new Error("No subGrid in cell update data");
+		if(g === undefined){
+                    throw new Error("No subGrid called " + this.groupBy + " in cell update data " + g);
 		}
 	    }
 	    var grid=this.getGrid(g);
@@ -877,15 +920,17 @@ jsonishData={
 		// use a dumb way of finding this....
 		throw new Error("No method available to find this cell");
 	    }
-	    console.log("UpdateRow: found row %j" ,row);
+	  //  console.log("UpdateRow: found row %j" ,row);
 	    if(row){   // need to check that we are not overwritting a sortOrder key, making sort invalid
-		var to;
+		var to,cell;
 		for(var k in cell_data){               
  		    row[k].setValue(cell_data[k]);
                     var cl="cell_updated";
 		    if(row[k].display !== false){
-			if(row[k].getElement().classList.contains(cl)){  // add colours to the cells to show update frequency
-			    row[k].getElement().removeClass(cl).addClass("cell_updated_fast");
+                        cell=row[k].getElement();
+			if(cell.classList.contains(cl)){  // add colours to the cells to show update frequency
+			    cell.classList.remove(cl);
+                            cell.classList.add("cell_updated_fast");
 			    cl="cell_updated_fast";
 			}
 			else{
@@ -946,14 +991,12 @@ jsonishData={
 	    //console.log("show grid is here");
 	    for(var i=0; i< this.grids.length;i++){
                 g=this.grids[i];
+                if(document.contains(this.grids[i].element)){
+		    p.removeChild(g.element);
+                }
 		if(g.name == name || name == "all"){
                     if(!document.contains(g.element)){
 		       p.appendChild(g.element);
-                    }
-		}
-		else{
-                    if(document.contains(this.grids[i].element)){
-		        p.removeChild(g.element);
                     }
 		}
 	    }

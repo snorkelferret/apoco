@@ -6,10 +6,8 @@ History: 1st Feb 2012 creation
 
 */
 
-
-/*html{ height: 100% }*/
-body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 10pt}
-
+body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}
+#wrapper{font-size: 10pt}
 .hide{ display: none }
 
 .bannertop {width: 100%; height: 3em; position: fixed; top: 0; z-index: 10}
@@ -66,7 +64,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 10pt}
 /* default for tables */
 
 /* grid table */
-.grid {min-width: 4em; overflow:hidden} 
+.grid {min-width: 4em; overflow:hidden; font-size: 10pt} 
 .grid .label{margin: 1em 0 1em 1em;   display: table-row}
 .grid_content { min-width: 8em; min-height: 6em;padding-top: 5em }
 .grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
@@ -77,29 +75,26 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 10pt}
 .grid table {table-layout: fixed; border-collapse: collapse}
 .grid table.head {z-index: 100; position: fixed;  top: 3em;  height: 2em }
 .grid table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555}
-.grid table th, td {padding: 0em 1em;
-                      margin: 0em;
-                      height: 1.5em;
-                      padding: 0;
-                      font-size: 80%;
-                      font-weight:normal;
-                      min-width: 3em !important;
-                      padding: 0 0.4em 0 0.4em;
-                      border: 1px solid #bbb} /* border-bottom-width: 0em !important; padding: 0em 10em} */
+.grid div.head{z-index: 100; position: fixed;  top: 3em;  height: 2em; overflow: hidden}
+.grid div.head div{display: inline-table; color: #fff; height: inherit; text-align: center; background-color: #000; border: 1px solid #555; border-collapse: collapse; overflow:hidden;}
+.grid table td {  height: 1.5em;
+                  margin: 0;
+                  font-weight:normal;
+                  text-align: right; 
+                  min-width: 3em !important;
+                  padding: 0em 0.4em 0em 0.4em; 
+                  border: 1px solid #bbb} /* border-bottom-width: 0em !important; padding: 0em 10em} */
 .grid table th span{ display: inline-block; float: right; margin-left: 1em; }
 .grid .hover { background: #aabbcc }
 .grid table tbody tr.last-child th,
 .grid table tbody tr.last-child td { border-bottom-width: 1px !important; }
 .grid table label{ }
-.grid table td{ text-align: right }
 .grid table td input {box-sizing: border-box; font-size: inherit}
 /* .grid table button {background-color: #202020; color: #bbbbbb; border: 1px solid dimgrey;}  */
 .grid table tr td textarea{}
 .grid table textarea,select{}
-
 .grid table td span{ display: inline} /*float: right } */
 /* table with only col names */
-
 .grid .inner_table h4{ padding-left: 1em; height: 1em; color: #0000ff}
 .grid .inner_table table{ height: 100% }
 .grid .inner_table table td.cell_updated{background: #fbec88}
@@ -132,7 +127,7 @@ input:valid {
 .image {width: 10em }
 .currency {width: 8em}
 .email {width: 8em }
-.float {width: 8em; }
+.float {width: 8em}
 .container {width: 10em}
 .integerArray {width: 8em;}
 .integerArray input,
@@ -183,7 +178,7 @@ ul.choice {list-style-type: none  }
 .float ul.aligned_float li div.values .float_right,
 td span.float_right{ float: right; text-align:left; width: 50%}
 .float ul.aligned_float li div.values .float_left,
-td span.float_left{ float: left; text-align:right;width: 50% }
+td span.float_left{ float: left; text-align:right; width: 50% }
 
 .float ul.aligned_float div.arrows{display:flex;
                                    flex-flow: column;

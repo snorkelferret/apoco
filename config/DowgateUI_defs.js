@@ -7,6 +7,76 @@
     // Business Logic
     
 
+    var cellUpdateTest=function(grid){
+	function send_data(grid){
+	    // pick a row
+	    var frr=Math.floor(Math.random()*12); // 12 subclasses
+	    // console.log("subclass is " + frr);
+	    frr=frr.toString();
+	    var len=grid.grids[frr].rows.length;
+	    // console.log("length of grid is " + len);
+
+	    var t=Math.floor(Math.random()*len); 
+	    // console.log("row index is " + t); 
+	    
+	    
+	    var st=grid.grids[frr].rows[t]["stock"].value;
+	    var sc=grid.grids[frr].rows[t]["subclass"].value;
+	    var mat=grid.grids[frr].rows[t]["maturity"].value;
+	    var r=Math.floor(Math.random()*10000)/100;
+	    var v=Math.floor(Math.random()*100);
+	    var m=Math.floor(Math.random()*4);
+	    var pp;
+	    switch(m){
+	    case 0:
+		var ttt={"stock":st , "subclass": sc, "maturity": mat, "bid": r};
+		break;
+	    case 1:
+		var ttt={"stock":st ,"subclass": sc, "maturity": mat,"client_bid": v};
+		break;
+	    case 2:
+		var ttt={"stock":st ,"subclass": sc,"maturity": mat, "offer": r};
+		break;
+	    case 3:
+		var ttt={"stock":st ,"subclass": sc,"maturity": mat, "client_offer": v};
+		break;
+	    default:
+		console.log("Error");
+		break;
+	    }
+          //  console.log("sending data %j " + ttt);
+	    grid.updateRow(ttt);
+	}
+	
+
+	setInterval(function(){send_data(grid);},20000);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1);
+	setInterval(function(){send_data(grid);},1); 
+	setInterval(function(){send_data(grid);},1);  
+
+	//setTimeout(function(){send_data(grid);},1000);
+    };
+	   
+
+
+
+
+
      // fields are required (i.e not nullable) by default
     UI.Objects={  // Objects are things with key values from the server
 	Blotter:[
@@ -77,6 +147,11 @@
 		       object: "Blotter",
 		       DOM: "Content",
 		       id: "Blotter",
+                       dependsOn: "Blotter",
+                       action: function(that){
+                           console.log("starting cell update test");
+                           cellUpdateTest(that);
+                       },
 		       /* publish: [ {name: "dfjh", //simple publish
 			              data: "Hi"
 				      }], */
@@ -123,7 +198,7 @@
 						   action: function(that,index){
 						       var n=that.name;
                                                        that.selected=n;
-                                                       console.log("clicked tab " + n);
+                                                      // console.log("clicked tab " + n);
 						       b.showGrid(n);}});
 			       }
 			   }
@@ -142,7 +217,9 @@
                                    if(!that.parent){
                                        throw new Error("tabs parent is null");
                                    }
-				   that.parent.findChild({key:"Blotter"}).showGrid("all");
+                                   console.log("parent name is " + that.parent.id);
+                                   
+				   that.parent.parent.findChild({key:"Blotter"}).showGrid("all");
                                    that.selected=that.name;
 			       }},
                              {name:"conventionals",label:"Conventionals",
@@ -234,6 +311,7 @@
 		  label: "Broker Window",
 		  //draggable: true,
 		  components: UI.Objects.Broker,
+ 
 		  listen: [{name:"stockSelection",
 			    action: function(that,row){
                                 console.log("got data for stockSelection");

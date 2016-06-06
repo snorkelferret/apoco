@@ -39,11 +39,11 @@ String.prototype.trim = String.prototype.trim || function trim() {
               //  console.log("Found the filename");
                 var classes=stylesheets[j].rules || stylesheets[j].cssRules || stylesheets[j].rules[0].cssRules;
                 for(var i=0; i<classes.length; i++){
-                   // console.log("got class " + classes[i].selectorText);
+                   // console.log("got class " + classes[i].selectorText );
                     if(classes[i].selectorText == css_class){
-                       // console.log("found the class " + classes[i].selectorText + " style " + classes[i].style);
-                     //   console.log("style Object %j ", classes[i].style);
-                     //   console.log("rule is " + classes[i].style[rule]);
+                      console.log("found the class " + classes[i].selectorText + " style " + classes[i].style[rule]);
+                       console.log("style Object %j ", classes[i].style);
+                       console.log("rule is " + classes[i].style[rule]);
                         if(classes[i].style[rule]){
                           //  console.log("returning " + classes[i].style[rule]);
                             return classes[i].style[rule];
@@ -54,10 +54,10 @@ String.prototype.trim = String.prototype.trim || function trim() {
             return null;
         },
         widthFromCssClass:function(class_list,filename){ // if in ems need to take font-size into account
-            var value=0,units;
+            var value=0,units,v;
             for(var i=0;i<class_list.length;i++){
               //  var c=("." + children[i].type).toString();
-                var t=Harvey.Utils.getCssValue(class_list[i],"width",filename);
+                var t=Harvey.Utils.getCssValue(class_list[i].classname,"width",filename);
                 console.log("got class value " + t);
                 if(t=== null){
                     return null;
@@ -79,29 +79,53 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 else{
                     return null;
                 }
+                class_list[i].value=v[0];
+                class_list[i].units=units;
                 value += parseFloat(v[0]);
             }
             return (value.toString() + units);
+        },
+        fontSizeToPixels:function(font_size){
+            var p,pp="";
+            var lu={"6":8,"7":9,"7.5":10,"8":11,"9":12,"10":13,"11":15,"12":16,"13":17,"13.5":18,"14":19,"14.5":20,"15":21,"16":22,"17":23,"18":24,"20":26,"22":29,"24":32,"26":35,"27":36,"28":37,"29":38,"30":40,"32":42,"34":45,"36":48};
+            if(font_size === undefined){
+                return null;
+            }
+            if(font_size.indexOf("pt")>=0){
+                p=font_size.split("pt");
+                pp=p[0].toString();
+            }
+            else if(!isNaN(font_size)){
+                pp=font_size.toString();
+            }
+            else{
+                return null;
+            }
+            if(lu[pp]){
+                return lu[pp];
+            }
+            
+            return null;
         },
 	binarySearch: function(arr,sort_order,data,closest){ // sorted list on an array of key value objects
 	    // sort_order array -  1st then 2nd etc
 	    var mid,r,compare;
             var len=arr.length;
-            console.log("array len is " + len);
+          //  console.log("array len is " + len);
          
             if(sort_order === null){
                 compare=function(aa){
-                    console.log("testing " + aa + " with " + data);
+                 //   console.log("testing " + aa + " with " + data);
                     if(aa == data){
-                        console.log(aa + " is equal to " + data);
+                   //     console.log(aa + " is equal to " + data);
                         return 0;
 		    }
 		    else if(aa > data){
-		       	console.log(aa + " is greater than " + data);
+		     //  	console.log(aa + " is greater than " + data);
 			return 1;
 		    }
 		    else if(aa < data){
-		        console.log(aa + " is less than " + data);
+		       // console.log(aa + " is less than " + data);
 			return -1;
 		    }
 	            else{
@@ -112,22 +136,22 @@ String.prototype.trim = String.prototype.trim || function trim() {
             else{
 	        compare=function(aa){
 		    var field,item;
-                    console.log("Compare: sort_order.length is " + sort_order.length);
+                    //console.log("Compare: sort_order.length is " + sort_order.length);
 		    for(var i=0;i<sort_order.length;i++){
 		        field=sort_order[i];
 		        item=data[field];
-		       console.log("field is " + field);
+		      // console.log("field is " + field);
                         if(aa[field].value == item){ // && i === sort_order.length -1){
-		            console.log(aa[field].value + " equals " + item);
+		        //    console.log(aa[field].value + " equals " + item);
 		            //found[i]=true;
                             continue;
 		        }
 		        else if(aa[field].value > item){
-		            console.log(aa[field].value + " is greater than " + item);
+		         //   console.log(aa[field].value + " is greater than " + item);
 			    return 1;
 		        }
 		        else if(aa[field].value < item){
-		            console.log(aa[field].value + " is less than " + item);
+		           // console.log(aa[field].value + " is less than " + item);
 			    return -1;
 		        }
 	                else{
