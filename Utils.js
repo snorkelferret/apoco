@@ -14,7 +14,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
     Harvey.mixinDeep=require("mixin-deep");
     Harvey.cloneDeep=require("clone-deep");
     Harvey.Utils={  
-        getCssValue:function(css_class,rule,filename){
+        getCssValue:function(css_class,rule,filename){ // doesn't work in chrome
             var stylesheets;
             console.log("class is " + css_class + " rule " + rule + " filename " + filename);
             if(document && document.styleSheets){
@@ -37,7 +37,11 @@ String.prototype.trim = String.prototype.trim || function trim() {
             }
             if(found>=0){
               //  console.log("Found the filename");
-                var classes=stylesheets[j].rules || stylesheets[j].cssRules || stylesheets[j].rules[0].cssRules;
+                var classes=stylesheets[j].rules || stylesheets[j].cssRules; // || stylesheets[j].rules[0].cssRules;
+                if(classes === undefined || classes === null){
+                    return null;
+                }
+                console.log("got classes %j ",classes);
                 for(var i=0; i<classes.length; i++){
                    // console.log("got class " + classes[i].selectorText );
                     if(classes[i].selectorText == css_class){

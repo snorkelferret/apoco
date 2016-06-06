@@ -150,7 +150,7 @@
                        dependsOn: "Blotter",
                        action: function(that){
                            console.log("starting cell update test");
-                           cellUpdateTest(that);
+                         //  cellUpdateTest(that);
                        },
 		       /* publish: [ {name: "dfjh", //simple publish
 			              data: "Hi"

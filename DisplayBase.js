@@ -220,6 +220,9 @@ require("./Utils");
                     else{
                         this.DOM.appendChild(this.element);
                     }
+                    if(this.afterShow !== undefined){
+                        this.afterShow();
+                    }
 		}
 	        else {
 		    //console.log(" --- invalid element");

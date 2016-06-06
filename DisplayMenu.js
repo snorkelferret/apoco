@@ -47,7 +47,7 @@ var Harvey=require('./declare').Harvey;
             this.menu=[];
             this.element=document.createElement("div");
             this.element.id=this.id;
-            this.element.classList.add("menu","ui-widget","ui-widget-content","ui-corner-all");
+            this.element.classList.add("menu","ui-widget-content","ui-corner-all");
             if(this.heading){
                 s=document.createElement("span");
                 s.textContent=this.heading;
@@ -59,7 +59,7 @@ var Harvey=require('./declare').Harvey;
 //	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
-            u.classList.add("harvey_menu_list","ui-menu","ui-widget","ui-widget-content");
+            u.classList.add("harvey_menu_list","ui-menu","ui-widget-content");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){

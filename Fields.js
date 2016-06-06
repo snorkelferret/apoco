@@ -206,7 +206,6 @@ require("./datepicker");
                     return false;
                 }
                 this.input.classList.remove("required");
-                return true;
 	    }
 	    return true;
 	}

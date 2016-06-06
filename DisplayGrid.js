@@ -344,7 +344,40 @@ jsonishData={
 	this.selection_list=[];
 	this.cellEdit=null; // cell currently being edited- this is of type Harvey.field
 	this.allowEdit=true;  // are edits allowed?
- 
+        this.afterShow=function(){
+            var v,c,width=0,d,t;
+            console.log("After show is here");
+            v=that.element.getElementsByClassName("head")[0];
+            if(v){
+                c=v.getElementsByTagName("div");
+                // adding up child widths because window may be smaller than grid width
+                if(c){
+                    for(var i=0; i<c.length;i++){
+                        console.log("found child " + i);
+                        d=window.getComputedStyle(c[i],null).getPropertyValue("width");
+                        console.log("width of child is " + d);
+                        if(d.indexOf("px")>=0){
+                            t=d.split("px");
+                        }
+                        else{
+                            return;
+                        }
+                        width+=parseFloat(t[0]);
+                    }
+                   // var width=window.getComputedStyle(v,null).getPropertyValue("width");
+                    //var width=v.style.width;
+                    width=(Math.ceil(width).toString() + "px");
+                    for(var i=0;i<this.grids.length;i++){
+                        //console.log("setting grid " + i + " to " + width);
+                        this.grids[i].element.style.width=width;
+                    }
+                }
+            }
+            else{
+                console.log("cannot find head element ");
+            }
+        };
+        
 	if(this.sortOrder && this.userSortable){
 	    throw new Error("Cannot specify both sortOrder and sortable");
 	}
@@ -500,7 +533,7 @@ jsonishData={
 	    }
 	    
 	    var table=document.createElement("table");
-            table.style.width=this.element.style.width;
+            //table.style.width=this.element.style.width;
 	    div.appendChild(table);
 	    //var body=$("<tbody class='selectable'></tbody>");
 	    var body=document.createElement("tbody");//$("<tbody class=''></tbody>");
@@ -677,11 +710,11 @@ jsonishData={
                 this.addCol(i);
             }
             // div_container.style.width=width;
-            var width=getWidth(this.cols);
+         /*   var width=getWidth(this.cols);
             if(width !== null){
                 this.element.style.width=width;
             }
-            
+            */
             if(this.rows !== undefined){
                 sort_into_subGrids(this);
                 this.sort();

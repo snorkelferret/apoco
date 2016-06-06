@@ -6,7 +6,8 @@ History: 1st Feb 2012 creation
 
 */
 
-body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}
+body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15px/22.5px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif } */
+
 #wrapper{font-size: 10pt}
 .hide{ display: none }
 
@@ -15,6 +16,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}
 #Tail{position: fixed; bottom: 0; z-index: 100 }
 #Main { /*margin-left: 4em; margin-right: 4em;  */ height: auto}
 
+/* code{font-size: 10pt}  */
 
 .tab_container{background-color: #ddeeff}
 
@@ -52,7 +54,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}
 /* menus */
 .menu {padding-top: 1em;}
 .menu span{font-weight: bolder; padding-left: 0.5em }
-.menu ul{margin: 1em 0 0 0;}
+.menu ul{margin: 1em 0 0 0; font-size:90%}
 .menu ul li:not(.seperator):hover{font-weight: bolder }
 .menu ul li.seperator{border-bottom: inherit; padding: 1em 0em}
 .menu ul li span.seperator{}
@@ -64,7 +66,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}
 /* default for tables */
 
 /* grid table */
-.grid {min-width: 4em; overflow:hidden; font-size: 10pt} 
+.grid {min-width: 4em; overflow:hidden; font-size: 10pt; box-sizing: border-box} 
 .grid .label{margin: 1em 0 1em 1em;   display: table-row}
 .grid_content { min-width: 8em; min-height: 6em;padding-top: 5em }
 .grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
@@ -75,10 +77,11 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}
 .grid table {table-layout: fixed; border-collapse: collapse}
 .grid table.head {z-index: 100; position: fixed;  top: 3em;  height: 2em }
 .grid table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555}
-.grid div.head{z-index: 100; position: fixed;  top: 3em;  height: 2em; overflow: hidden}
-.grid div.head div{display: inline-table; color: #fff; height: inherit; text-align: center; background-color: #000; border: 1px solid #555; border-collapse: collapse; overflow:hidden;}
+.grid div.head{z-index: 100; position: fixed;  top: 3em;  height: 2em;  overflow: hidden}
+.grid div.head div{display: inline-table; color: #fff; height: inherit; text-align: center; background-color: #000; border: 1px solid #555; box-sizing: border-box; border-collapse: collapse; overflow:hidden;}
 .grid table td {  height: 1.5em;
                   margin: 0;
+                  box-sizing: border-box;
                   font-weight:normal;
                   text-align: right; 
                   min-width: 3em !important;
@@ -231,9 +234,11 @@ h5{color: #202020; font-size: 10pt}
    
 }
 
-p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 2em}
+p {margin-left: 0em; text-align: justify; font-size: 80%; margin-top: 0em; margin-right: 2em}
 p a{text-decoration: none; outline: none}
 p a:hover{outline: none; text-decoration: none}
+dl{font-size:90%; text-align:justify}
+code{font-size: 10pt}
 
 .Harvey_dialog{position: fixed; top: 50%; left: 50%; z-index: 1000; width: 20em; height: 12em}
 #Harvey_datepicker{
