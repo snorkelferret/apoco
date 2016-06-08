@@ -66,10 +66,10 @@ require("./Utils");
             this.slideshow_container.classList.add("slideshow","pic_area");
 	    this.element.appendChild(this.slideshow_container);
             if(this.promise){
-                this.promise.then(function(num_loaded){
-                    console.log("Slideshow: Finished loading images");
+                    /* this.promise.then(function(){
+                   console.log("Slideshow: Finished loading images");
                     console.log("asked for  " + that.values.length + " number of images " + " and got " + num_loaded);
-                   Harvey.popup.dialog("Slideshow",("Could only load " + num_loaded + " images"));
+                    Harvey.popup.dialog("Slideshow",("Could only load " + num_loaded + " images"));
                     if(that.values.length !== num_loaded){
                         console.log("Could not load all images");
                         a=that.values.splice();
@@ -80,14 +80,14 @@ require("./Utils");
                                 that.values.push(a);
                             }
                         }
-                    }
+                    } 
                     if(that.values.length>0){
                         console.log("going to start now");
                         that.start();
                     }
                 }).catch(function(reason){
                    // Harvey.popup.error("Slideshow",("Could not load images" + reason));
-                });
+                }); */
             }
        /*     if(this.autoplay || this.fullscreen){
 	       var fw=$("<div class='slideshow_controls' > </div>");

@@ -1368,7 +1368,7 @@ require("./datepicker");
             return promise;
          },
         _getImageFileSelect: function(evt,new_values){
-            var p,that=this;
+            var that=this;
    	    new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = new Array; //evt.target.files;
@@ -1387,6 +1387,7 @@ require("./datepicker");
 		    var reader = new FileReader();
 		    reader.onload = (function(f,last,new_values) {
 		        return function(e) {
+                            var p;
 			    e.stopPropagation();
 	                   // console.log("FileSelect: going to load " + f.name);
                            // console.log("FileSelect: last is " + last + " and count is " + count);
@@ -1424,11 +1425,55 @@ require("./datepicker");
             num_loaded=i;
             not_loaded=0;
             console.log("loadImages last is " + last);
-            for(i; i<last;i++){
+            for(i; i<last;i++){   //aborts everything if one fails
                 promises.push(that._getImage(that.value[i]));
             }
-            var promise=Promise.all(promises);
-                /*  var promise=new Promise(function(resolve,reject){
+            
+            var promise=Promise.all(promises); // rejects on first fail
+          
+
+            
+                /*   var promise=new Promise(function(resolve,reject){ //let some loads fail without aborting everything
+                var prev_promise=new Promise(function(resolve,reject){
+                    resolve();
+                });
+               // for(i;i<last;i++){
+                promises.forEach(function(pr){
+                    console.log("=== " + pr);
+                    prev_promise = prev_promise.then(function() { // prevPromise changes in each iteration
+                        console.log("calling getImage ");
+                        return pr; //that._getImage(value[i]);
+                    }).then(function() {
+                        console.log("last is " + last + " num_loaded " + num_loaded + " fails " + not_loaded);
+                        num_loaded++;
+                        if((num_loaded+not_loaded)=== last){
+                            resolve(num_loaded);
+                        }
+                    }).catch(function(error) {
+                        console.log(error);
+                        not_loaded++;
+                    });
+                });*/
+                                    
+                   /*                
+                    console.log("loadimages i is " + i);
+                    prev_promise=prev_promise.then(function(){
+                        console.log("calling getImage");
+                        return that._getImage(that.value[i]);
+                    }).then(function(){
+                        console.log("last is " + last + " num_loaded " + num_loaded + " fails " + not_loaded);
+                        num_loaded++;
+                        if((num_loaded+not_loaded)=== last){
+                            resolve(num_loaded);
+                        }
+                    }).catch(function(reason){
+                        console.log("error");
+                        not_loaded++;
+                    }); */
+                
+           // });
+            
+            /*  var promise=new Promise(function(resolve,reject){
                 
                 while(i<last){
                     console.log("trying to load image " + that.value[i].src);
