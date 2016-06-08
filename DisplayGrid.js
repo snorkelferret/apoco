@@ -346,16 +346,16 @@ jsonishData={
 	this.allowEdit=true;  // are edits allowed?
         this.afterShow=function(){
             var v,c,width=0,d,t;
-            console.log("After show is here");
+            //console.log("After show is here");
             v=that.element.getElementsByClassName("head")[0];
             if(v){
                 c=v.getElementsByTagName("div");
                 // adding up child widths because window may be smaller than grid width
                 if(c){
                     for(var i=0; i<c.length;i++){
-                        console.log("found child " + i);
+              //          console.log("found child " + i);
                         d=window.getComputedStyle(c[i],null).getPropertyValue("width");
-                        console.log("width of child is " + d);
+                //        console.log("width of child is " + d);
                         if(d.indexOf("px")>=0){
                             t=d.split("px");
                         }
@@ -544,6 +544,7 @@ jsonishData={
         },
         addCol:function(col){
             var that=this,index,r,t,rows;
+            var was_hidden=this.isHidden();
             if(Harvey.checkType["integer"](col)){
                 index=col;
                 col=this.cols[index];
@@ -563,7 +564,12 @@ jsonishData={
                 else{
                     throw new Error("Columns must have unique names");
                 }
+                if(!was_hidden){
+                    Harvey.popup.spinner("true");
+                    this.hide(); // hide whilst adding column
+                }
             }
+         
             // col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
             col.options={};
             for(var k in col){
@@ -583,7 +589,7 @@ jsonishData={
                 }
             }
 	    if(this.cols[index].display !== false){
-		if(this.DEBUG) console.log("grid col " + this.cols[index].name);
+		console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
 	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
                 //  var h=document.createElement("th");
@@ -640,11 +646,17 @@ jsonishData={
 		    h.visibility="hidden";
 		}
 	    }
+            
+            if(!was_hidden){
+                Harvey.popup.spinner(false);   
+                this.show();
+            }
         },
         deleteCol:function(name){
             var el,index=this.getColIndex(name);
+            //var was_hidden=this.isHidden();
             if(index>0){
-                //check that the col is not used as unique key or sortOrder
+                //chepck that the col is not used as unique key or sortOrder
                 for(var i=0;i<this.sortOrder.length;i++){
                     if(this.sortOrder[i] == name){
                         throw new Error("Cannot delete col used for sorting");
@@ -659,6 +671,9 @@ jsonishData={
                         delete this.grids[i].rows[j][name];
                     }
                 }
+                // remove the col from the DOM
+                this.colElement.removeChild(this.cols[index].element);
+                this.cols[index].element=null;
                 // remove the original data copied into col.options
                 this.cols.splice(index,1);
             }
@@ -999,19 +1014,23 @@ jsonishData={
 	deleteAll:function(){
             var el,parent,row;
             for(var i=0;i<this.grids.length;i++){
-                this.grids[i].element.parentNode.removeChild(this.grids[i].element);
                 for(var j=0;j<this.grids[i].rows.length;j++){
                     row=this.grids[i].rows[j];
                     for(var k=0;k<this.cols.length;k++){
-                        el=row[this.cols[k].name].getElement();
-                        if(k===0){
-                            parent=el.parentNode;
+                        el=row[this.cols[k].name].element;
+                        if(this.cols[k].display !== false){
+                            if(k===0){
+                                parent=el.parentNode;
+                            }
+                            parent.removeChild(el);
                         }
-                        parent.removeChild(el);
                     }
-                    parent.parentNode.removeChild(parent);
+                    if(parent){
+                        parent.parentNode.removeChild(parent);
+                    }
                 }
                 this.grids[i].rows.length=0;
+                this.grids[i].element.parentNode.removeChild(this.grids[i].element);
             }
             this.grids.length=0;
         },

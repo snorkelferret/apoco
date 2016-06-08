@@ -52,7 +52,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 	        }
 	    }
 	    else{
-                //	    console.log("Harvey.unsubscribe could not find listener");
+                console.log("Harvey.unsubscribe could not find listener");
 	    }
 
         },

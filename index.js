@@ -15,6 +15,7 @@ require('./DisplayForm');
 require('./DisplayMenu');
 require('./DisplayTabs');
 require('./DisplayGrid');
+require('./DisplaySlideshow');
 require('./IO');
 require('./Nodes');
 require('./Panel');

@@ -7,6 +7,7 @@ require("./Utils");
     // these are the components allowed in display objects
   
     var _display_components=["Field","Node","Tab","Grid","Menu"];
+  
     var dp;
     Harvey._DisplayBase=function(options,win){
 	var defaults={
@@ -24,10 +25,6 @@ require("./Utils");
             this[k]=defaults[k];
         }
         Harvey.mixinDeep(this,options);
-	/*for(var k in this.options){
-	    this[k]=this.options[k];
-	    //console.log("_HarveyDisplayBase got value " + k + " value ", this[k]);
-	 } */
         
         if(this.DOM === null){
             throw new Error(this.display + ": Must supply a DOM id for an existing node");
@@ -37,8 +34,8 @@ require("./Utils");
         }
         
         if(win){
-            console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
-            console.log("adding to DOM " + this.DOM);
+          //  console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
+          //  console.log("adding to DOM " + this.DOM);
 	    this.DOM=win.document.getElementById(this.DOM);
             t=win.document.getElementById(this.id);
             if(this.dependsOn){
@@ -93,6 +90,10 @@ require("./Utils");
             //console.log("listen listen listen");
 	    Harvey.IO.listen(this);  // needs to be here cause listener needs element.
 	}
+        // add the display type to the display_components list
+        
+      //  var d=(this.display).substr( 0, 1 ).toUpperCase() + this.display.substr( 1 );
+      //  console.log("d is " + d + " this.display " + this.display);
     	//console.log("end of libbase");
     };
 
@@ -110,7 +111,7 @@ require("./Utils");
                     else{
                         comp.concat(this[k]());
                     }
-                    console.log("getChildren got " + comp.length);
+                  //  console.log("getChildren got " + comp.length);
                     return comp; //this[k];
 	        }
             }
@@ -138,7 +139,6 @@ require("./Utils");
                         this[k](name);
                     }
                 }
-               
             }
             else{
                 throw new Error("deleteChild- needs a name");
@@ -196,14 +196,14 @@ require("./Utils");
 	    return null;  // if function has not been overwritten - bad return null
 	},
 	show: function(){
-           console.log("HarveyDisplayBase: showing " + this.id);
+          // console.log("HarveyDisplayBase: showing " + this.id);
 	    if(this.publish !== undefined){
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Harvey.IO.publish(this);
 	    }
             //if(!$.contains(this.DOM[0],this.element[0])){
             if(!document.body.contains(this.element)){
-                 console.log("Showing element that is not in DOM");
+              //  console.log("Showing element that is not in DOM");
 	        if(this.element){
 		  //  console.log("show found non null element");
                     if(this.after){
@@ -232,6 +232,12 @@ require("./Utils");
              }
             return true;
  	},
+        isHidden:function(){
+            if(document.contains(this.element)){
+                return false;
+            }
+            return true;
+        },
         displayType: function(){
             return this.displayType;
         },

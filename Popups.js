@@ -53,7 +53,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare');//.UI,jQuery=requ
                     //Hdialog.style.position="absolute";
                     // create header
                     header=document.createElement("div");
-                    header.style.height="1.2em";
                     header.classList.add("ui-dialog-titlebar","ui-widget-header","ui-corner-all");
                     title_text=document.createElement("span");
                     title_text.classList.add("ui-dialog-title");

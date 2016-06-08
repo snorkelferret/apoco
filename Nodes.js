@@ -25,7 +25,7 @@ require("./Types.js");
 	    this.element.id=this.id;
 	}
         if(this.name){
-            console.log("++++++++++++++++Node adding name " + this.name);
+           // console.log("++++++++++++++++Node adding name " + this.name);
             this.element.setAttribute("name",this.name);
         }
         if(element){
@@ -174,6 +174,9 @@ require("./Types.js");
             }
             else if(that.src !== undefined){
                 imm.src=that.src;
+            }
+            else{
+                throw new Error("Node: image no url or src parm supplied");
             }
             that.element=document.createElement("div"); 
 	    imm.onload=function(){

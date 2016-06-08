@@ -1,8 +1,7 @@
 // WARNING this script contains evil eval !!!!!!
-global.Harvey=require('../declare').Harvey;
+/*global.Harvey=require('../declare').Harvey;
 global.UI=require('../declare').UI;
-require("../index.js"); 
-//module.exports = {Harvey:{},UI:{}};
+*/
 
 ;(function(){
     "use strict";
@@ -115,7 +114,8 @@ require("../index.js");
                 
             }
             for(var n in thing){
-               if(!n.startsWith("_")){
+                if(!n.startsWith("_")){
+                   
                    if(k === "Fields"){
                      //  console.log("+++++++++++++++++++++++++++++++got field " + n);
                        //  if(n.indexOf("Field")> -1){
@@ -125,7 +125,7 @@ require("../index.js");
                       // }
                    }
                    else if(k==="Displays"){
-                      // console.log("got display " + n);
+                    //   console.log("got display " + n);
                        if(n.indexOf("Methods")<= -1){
                            HThings[k].push(n);
                        }
@@ -1021,11 +1021,11 @@ require("../index.js");
         var HDisplays=HThings.Displays;
         var Methods={};
         for(var i=0;i<HDisplays.length;i++){
-            console.log("getting method for " + HDisplays[i]);
+           // console.log("getting method for " + HDisplays[i]);
             Methods[HDisplays[i]]=[];
             var p=Harvey.display[(HDisplays[i]+"Methods")]();
             for(var j=0;j<p.length; j++){
-                console.log("display " + HDisplays[i] + " has method " + p[j]);
+             //   console.log("display " + HDisplays[i] + " has method " + p[j]);
                 if(p[j] !== "constructor" && !p[j].startsWith("_")){
                     Methods[HDisplays[i]].push(p[j]);
                 }
@@ -1067,12 +1067,12 @@ require("../index.js");
         };
         var items=[];
         for(var i=0;i<HDisplays.length;i++){
-           console.log("mkFieldMethods making " + HDisplays[i]);
+           //console.log("mkFieldMethods making " + HDisplays[i]);
             var k={};
             items[i]=[];
             for(var j in Methods[HDisplays[i]]){
                 var m=Methods[HDisplays[i]][j];
-                console.log("Methods " + m);
+             //   console.log("Methods " + m);
                 items[i].push({label:m,
                                descriptions:display_methods_list[m]});    
             }
@@ -1182,11 +1182,13 @@ require("../index.js");
             extend:{p:"<code> Harvey.Utils.extend(subObject,superObject); </code>"},
             formatDate:{p:""},
             getCssValue:{p:""},
+            widthFromCssClass:{p:""},
+            fontSizeToPixels:{p:""},
             hashCode:{p:""},
             observer:{p:""}
         };
         for(var i=0;i<HUtils.length;i++){
-           // console.log("making io panel",HUtils[i]);
+          //  console.log("making io panel",HUtils[i]);
             var k={};
             k.display="fieldset";
             k.DOM="right";
@@ -1206,7 +1208,7 @@ require("../index.js");
             console.log("select_tabs: that is  " + that);
         }
         var name=that.name;
-        console.log("select_tabs: trying to show " + name);
+       // console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Harvey.Panel.hide(that.parent.selected.name);
         }
@@ -1667,6 +1669,6 @@ require("../index.js");
     mkUtils();
     
     UI.start=["Tabs","About"];
-   
+    console.log("UI.start is %j " + UI.start);
     
 })();

@@ -145,6 +145,9 @@ require("./Popups");
                             that._list[d.name]=win;
                             resolve({"window":win,"name": d.name});
 		        }
+                        else{
+                            reject(("Harvey.Window: could not open " + d.name));
+                        }
 		      //  console.log("Parent child is ready");
 		    };
 	        }(d.name,win,p),false);
@@ -180,7 +183,7 @@ require("./Popups");
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
             for(var i=0;i<w.length;i++){
-               console.log("trying to find " + w[i]);
+             //  console.log("trying to find " + w[i]);
                 nv=this._UIGet(w[i]);
                 if(nv !== null){
                     this.add(nv);
@@ -192,8 +195,8 @@ require("./Popups");
 
         },
         _UIGet:function(name){
-            console.log("UIGet trying to find " + name);
-            console.log("UIGet Panels " + UI.Panels);
+           // console.log("UIGet trying to find " + name);
+           // console.log("UIGet Panels " + UI.Panels);
             if(name === undefined){
                 throw new Error("Panel._UIGet: panel name is undefined");
             }
@@ -220,7 +223,7 @@ require("./Popups");
                 throw new Error("Panel: inList name is undefined");
             }
 	    for(var i=0;i< this._list.length;i++){
-		console.log("i is " + i + "checking is in list " + this._list[i].name);
+	//	console.log("i is " + i + "checking is in list " + this._list[i].name);
 		if(this._list[i].name == k){
 		    return i;
 		}
@@ -232,7 +235,7 @@ require("./Popups");
             if(u !== null){
                 return this._list[u];
             }
-            console.log("panel not yet in list");
+          //  console.log("panel not yet in list");
             return null;
         },
         show:function(k){
@@ -267,7 +270,7 @@ require("./Popups");
         },
         hide:function(k){
             var p=this.get(k);
-            console.log("hiding window " + k);
+            //console.log("hiding window " + k);
             if(!p){
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
@@ -314,8 +317,8 @@ require("./Popups");
             }
         },
 	add: function(panel){
-	    console.log("Panel.add is here");
-	    console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+	//    console.log("Panel.add is here");
+	 //   console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
             if(Harvey.checkType['string'](panel)){
                 var w=this._UIGet(panel);
                 panel=w;

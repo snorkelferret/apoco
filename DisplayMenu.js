@@ -29,7 +29,6 @@ var Harvey=require('./declare').Harvey;
             throw new Error("Could not find siblings of " + that.parent.name);
         }
         for(var i=0;i<p.length;i++){
-
             if(p[i].id == name){
                 p[i].show();
             }

@@ -84,14 +84,22 @@ require("./datepicker");
 	    Harvey.IO.listen(this);
 	}
 	if(this.action){
-	    this.element.addEventListener("click", (function(that){
+            var a=this.action;
+            this.action=(function(that){
+		return function(e){
+                    e.stopPropagation();
+                    //that.action(that);
+                    a(that);
+                };
+	    })(this);
+	   /* this.element.addEventListener("click", (function(that){
 		return function(e){
                     e.stopPropagation();
                     that.action(that);
                 };
-	    })(this),false);
+	    })(this),false); */
+            this.element.addEventListener("click", this.action,false);
 	}
-
     };
 
     _Field.prototype={
@@ -143,9 +151,9 @@ require("./datepicker");
             if(this.element.parentNode){
                 this.element.parentNode.removeChild(this.element);
             }
-            if(this.action){
-                this.element.removeEventListener(this.action);
-            }
+            if(this.action){ // cannot do if this.action is  wrapped in anonymous function
+                this.element.removeEventListener("click",this.action,false);
+            } 
             if(this.listen){
                 Harvey.IO.unsubscribe(this);
             }
@@ -1340,7 +1348,7 @@ require("./datepicker");
             var imm=new Image();  // get the width and height - need to load in to image
 	    imm.src=o.src;
           
-            console.log("getImage");
+            console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
 	            console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
@@ -1350,6 +1358,11 @@ require("./datepicker");
                     o.aspect_ratio=this.width/this.height;
                     o.image=imm;
                     resolve(o);
+                };
+                imm.onerror=function(){
+                    o.image=null;
+                    console.log("ERROR loading image");
+                    reject("Field:ImageArray._getImage Could not load image");
                 };
             });
             return promise;
@@ -1389,6 +1402,7 @@ require("./datepicker");
 	                        } 
                             }).catch(function(reason){
                                 console.log("could not load image " + reason); 
+                                reject(reason);
                             });
                             //console.log("getImageFiles: new values has " + new_values.length);
  		        };
@@ -1398,24 +1412,48 @@ require("./datepicker");
             });
 	    return promise;
         },
-        loadImages: function(){
-            var i=0,p;
-            var last=this.value.length;
-            this.count=0;
-            // for(var i=0;i<this.value.length;i++){
-            var promise=new Promise(function(reject,resolve){
+        loadImages: function(values){
+            var i=0,p,last,that=this,num_loaded,promises=[],not_loaded;
+            if(values !==undefined && Harvey.checkType["array"](values)){ //loading more images after creation
+                i=this.value.length;
+                console.log("loadImages " + "starting at " + i);
+                this.value=this.value.concat(values);
+            }
+            
+            last=this.value.length;
+            num_loaded=i;
+            not_loaded=0;
+            console.log("loadImages last is " + last);
+            for(i; i<last;i++){
+                promises.push(that._getImage(that.value[i]));
+            }
+            var promise=Promise.all(promises);
+                /*  var promise=new Promise(function(resolve,reject){
+                
                 while(i<last){
-                    p=this._getImage(this.value[i],last);
-                    p.then(function(v){
-                        if(v==last){
-                            resolve(last);
+                    console.log("trying to load image " + that.value[i].src);
+                    p=that._getImage(that.value[i]);
+                    p.then(function(){
+                        num_loaded++;
+                        console.log("last is " + last + " num_loaded " + num_loaded + " fails " + not_loaded);
+                        if((num_loaded+not_loaded) === last){
+                            if(last !== num_loaded){
+                                console.log("loadImages: resolve with errors");
+                                resolve(num_loaded);
+                            }
+                            else{
+                                console.log("loadImages: got all images");
+                                resolve(last);
+                            }
                         } 
                     }).catch(function(reason){
-                        console.log("could not load image " + reason);
+                        console.log("Field: imageArray.loadImages " + reason );
+                        not_loaded++; //let some loads fail without aborting everything
+                        //reject(reason);
                     });
                     i++;
-                }
-            });   
+                } 
+            });   */
             return promise;
         },
         mkThumbnails: function(){
@@ -1449,7 +1487,7 @@ require("./datepicker");
 	        }
             }
   	},
-	getValue:function(){
+	getValue:function(){ // images are in this.value[i].image
 	    return this.value;
 	},
 	checkValue:function(){

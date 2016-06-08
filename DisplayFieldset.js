@@ -184,7 +184,7 @@ require("./Nodes.js");
             }
             p.parent=this;
 	    this.fields.push(p);
-            console.log("adding field " + d.name);
+            //console.log("adding field " + d.name);
 	    this.element.appendChild(p.element);
             
             return p;

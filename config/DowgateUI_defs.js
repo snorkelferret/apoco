@@ -149,8 +149,11 @@
 		       id: "Blotter",
                        dependsOn: "Blotter",
                        action: function(that){
-                           console.log("starting cell update test");
-                         //  cellUpdateTest(that);
+                           //console.log("starting cell update test");
+                           //  cellUpdateTest(that);
+                           console.log("add column test");
+                           // that.addCol({name: "new_col",type:"integer",editable:false});
+                           that.deleteCol("client_offer");
                        },
 		       /* publish: [ {name: "dfjh", //simple publish
 			              data: "Hi"
@@ -311,8 +314,7 @@
 		  label: "Broker Window",
 		  //draggable: true,
 		  components: UI.Objects.Broker,
- 
-		  listen: [{name:"stockSelection",
+ 		  listen: [{name:"stockSelection",
 			    action: function(that,row){
                                 console.log("got data for stockSelection");
                                 console.log("stockselection action got row %j ",row);

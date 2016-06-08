@@ -1,5 +1,8 @@
 var Harvey=require('./declare').Harvey;
-require("DisplayBase");
+require("./DisplayBase");
+require("./Popups");
+require("./Fields");
+require("./Utils");
 // Menu display object
 //  requires HarveyDisplayBase.js
 //
@@ -19,58 +22,73 @@ require("DisplayBase");
             paginate: true,
 	    selection_list_element: null,
 	    element: null,
+            editable: false, //unusual to make it uneditable
             thumbnails:false
 	};
-        var settings;
-        //var settings=$.extend({},defaults,options);
-        for(var k in defaults){
-            settings[k]=defaults[k];
-        }
-        for(var k in options){
-            settings[k]=options[k];
-        }
-	this.DEBUG=true;
-	var that=this;
-	Harvey._DisplayBase.call(this,settings,win);  //use class inheritance - base Class
+	var f,that=this;
+        Harvey.mixinDeep(options,defaults);
+	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	console.log("called display base");
-        this.thumbnails=$("<div class='thumbnails'></div");
-        if(this.values){
-            var f=Harvey.field["ImageArrayField"]({name:"slideshow",required: false,editable:this.editable});//,values:this.values},this.thumbnails);
-            f.values=this.values;
-            this.promise=f.loadImages();
+        this.thumbnails=document.createElement("div"); //$("<div class='thumbnails'></div");
+        this.thumbnails.classList.add("thumbnails");
+        if(this.values){  // start preloading images
+            console.log("got some values");
+            f=Harvey.field["imageArray"]({name:"slideshow"});
+            if(!f){
+                throw new Error("Slideshow: cannot make imageArray");
+            }
+            this.promise=f.loadImages(this.values);
+        }
+        else if(this.editable === true){   // put up file browser to select images 
+            f=Harvey.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
         this.execute();
     };
     var controls=function(that){
-        var d=$("<div lass='slideshow_controls'></div>");
-            /*  if(that.paginate === true){
-            var len=that.values.length;
-            var cmd=function(){alert("blah");};
-            var p=Harvey.node({node:'paginate',number: len,action:cmd});
-            d.append(p);
-             }  */
+        var d=document.createElement("div");//$("<div lass='slideshow_controls'></div>");
+        d.classList.add("slideshow_controls");
+        /*  if(that.paginate === true){
+         var len=that.values.length;
+         var cmd=function(){alert("blah");};
+         var p=Harvey.node({node:'paginate',number: len,action:cmd});
+         d.append(p);
+         }  */
     };
 
     HarveyMakeSlideshow.prototype={
 	execute: function(){
-            var that=this;
+            var that=this,a=[];
 	    console.log("execute of DisplaySlideshow");
-	    this.element=$("<div id='" + this.id + "' class='Harvey_slideshow ui-widget ui-widget-content ui-corner-all'></div>");
-            this.slideshow_container=$("<div class='slideshow pic_area'> </div>");
-	    this.element.append(this.slideshow_container);
-
-            this.promise.done(function(){
-                console.log("Slideshow: Finished loading images");
-                console.log("got " + that.values.length + " number of images ");
-                console.log("going to start now");
-                that.start();
-            });
-            //this.promise.done(this.start);
-            this.promise.fail(function(){
-                Harvey.display.dialog("Slideshow","Could not load images");
-                return null;
-            });
-
+	    this.element=document.createElement("div");  //$("<div id='" + this.id + "' class='Harvey_slideshow ui-widget ui-widget-content ui-corner-all'></div>");
+            this.element.id=this.id;
+            this.element.classList.add("Harvey_slideshow","ui-widget-content","ui-corner-all");
+            this.slideshow_container=document.createElement("div"); //$("<div class='slideshow pic_area'> </div>");
+            this.slideshow_container.classList.add("slideshow","pic_area");
+	    this.element.appendChild(this.slideshow_container);
+            if(this.promise){
+                this.promise.then(function(num_loaded){
+                    console.log("Slideshow: Finished loading images");
+                    console.log("asked for  " + that.values.length + " number of images " + " and got " + num_loaded);
+                   Harvey.popup.dialog("Slideshow",("Could only load " + num_loaded + " images"));
+                    if(that.values.length !== num_loaded){
+                        console.log("Could not load all images");
+                        a=that.values.splice();
+                        that.values.length=0; 
+                        for(var i=0; i<a.length;i++){
+                            console.log("examing images " + i);
+                            if(a.image !== null){
+                                that.values.push(a);
+                            }
+                        }
+                    }
+                    if(that.values.length>0){
+                        console.log("going to start now");
+                        that.start();
+                    }
+                }).catch(function(reason){
+                   // Harvey.popup.error("Slideshow",("Could not load images" + reason));
+                });
+            }
        /*     if(this.autoplay || this.fullscreen){
 	       var fw=$("<div class='slideshow_controls' > </div>");
 	       this.element.append(fw);
@@ -92,40 +110,46 @@ require("DisplayBase");
 	   }*/
         },
         deleteAll:function(){
-            this.element.detach();
-            this.element.empty();
-            this.element.remove();
+            this.element.parentNode.removeChild(this.element); //detach();
+            this.element=null;
         },
         show_fullscreen: function(){
 	    // get the window width and height
 	    var that=this;
-	    var width=$(window).width()-60; //innerWidth();
-	    var height=$(window).height()-60; //innerHeight();
-
-	    that.element.detach();
+	   // var width=$(window).width()-60; //innerWidth();
+	    //var height=$(window).height()-60; //innerHeight();
+            var width=window.innerWidth;
+            var height=window.innerHeight;
+	    that.element.parentNode.removeChild(this.element); //detach();
 	    //console.log("FULLSCREEN ++++++++++=" + this.fullscreen);
 
 	    if(this.fullscreen){
 	        //console.log("Fullscreen is truE- so do it");
-	        that.element.css({width:width,height:height});
-	        that.slideshow_container.css({width: width,height:height});
+	        that.element.style.width=width; //css({width:width,height:height});
+                that.element.style.height=height;
+	        that.slideshow_container.style.width=width;//css({width: width,height:height});
+                that.slideshow.container.style.height=height;
 	        //console.log("remove class pic_area");
-	        that.slideshow_container.removeClass("pic_area");
-	        that.slideshow_container.addClass("pic_area_full");
-	        that.element.addClass("show_full_screen");
-	        that.element.appendTo("#wrapper");
-	        $("#main").addClass('hidden');
+	        that.slideshow_container.classList.remove("pic_area");
+	        that.slideshow_container.classList.add("pic_area_full");
+	        that.element.classList.add("show_full_screen");
+                document.body.appendChild(this.element);
+	        //that.element.appendTo("#wrapper");
+	       // $("#main").addClass('hidden');
 	    }
 	    else{
 	        // console.log("Fullscreen is falsE- so undo it");
-	        that.element.css({width:"",height:""});
-	        that.slideshow_container.css({width:"",height:""});
-	        that.element.removeClass("show_full_screen");
-	        that.slideshow_container.removeClass("pic_area_full");
-	        that.slideshow_container.addClass("pic_area");
-	        that.element.appendTo(that.parent);
+	        that.element.style.width=""; //css({width:"",height:""});
+                that.element.style.height=""; //css({width:"",height:""});
+	        that.slideshow_container.style.width=""; //css({width:"",height:""});
+                that.slideshow_container.style.height=""; //css({width:"",height:""});
+	        that.element.classList.remove("show_full_screen");
+	        that.slideshow_container.classList.remove("pic_area_full");
+	        that.slideshow_container.classList.add("pic_area");
+	        //that.element.appendTo(that.parent);
+                that.DOM.addChild(that.element);
 	        // SJ.BGCarousel.stop();
-	        $("#main").removeClass('hidden');
+	        //$("#main").removeClass('hidden');
 	    }
 	    if(this.current_gallery === null){
 	        throw new Error("Cannot find current gallery");
@@ -136,7 +160,8 @@ require("DisplayBase");
         step: function(dir){
             var num=this.values.length;
             console.log("next is here len vals is " + num + " current is " + this.current);
-            this.values[this.current].SSimage.css({position: "relative",visibility:"hidden"});
+            this.values[this.current].SSimage.style.position="relative";
+            this.values[this.current].SSimage.style.visibility="hidden";
             if(dir==="next"){
                 if(this.current>=(num-1)){
                     this.current=0;
@@ -153,72 +178,94 @@ require("DisplayBase");
                     this.current--;
                 }
             }
-            this.values[this.current].SSimage.css({position:'absolute',visibility:"visible",top:0,left:0});
+            this.values[this.current].SSimage.style.visibility="visible"; //css({position:'absolute',visibility:"visible",top:0,left:0});
+            this.values[this.current].SSimage.style.position="absolute";
+            this.values[this.current].SSimage.style.top=0;
+            this.values[this.current].SSimage.style.left=0;
             console.log("now current is " + this.current);
         },
         start: function(){
+            console.log("slideshow start is here");
 	    var that=this;
             var num,img;
             this.current=0;
-	    this.width=this.slideshow_container.width()? this.slideshow_container.width(): 400;
-	    this.height=this.slideshow_container.height()?this.slideshow_container.height(): 400;
+	    this.width=this.slideshow_container.style.width? this.slideshow_container.style.width: 400;
+	    this.height=this.slideshow_container.style.height?this.slideshow_container.style.height: 400;
             console.log("slideshow container width " + this.width + " height " + this.height);
 
-	    var car=$("<ul class='carousel'></ul>");
-
+	    var car=document.createElement("ul");
+            car.classList.add("carousel");
             var g=this.height/2 -24;
-            var left=$("<span  class='carousel_left' style='top:" + g + "px ; left: 0px '></span>");
+            var left=document.createElement("span");
+            left.classList.add("carousel_left");
+            left.style.top=(g + "px");
+            left.style.left="0px";
+            
+            var right=document.createElement("span");//$("<span class='carousel_right' style='top:" + g + "px ; left:" + (this.width-48) + "px'></span>");
+            
+            right.classList.add("carousel_right");
+            right.style.top=(g + "px");
+            right.style.left=((this.width-48) + "px");
+            //left.hover(function(){$(this).addClass("hover");}, function(){ $(this).removeClass("hover");});
+            //right.hover(function(){$(this).addClass("hover");}, function(){ $(this).removeClass("hover");});
 
-            var right=$("<span class='carousel_right' style='top:" + g + "px ; left:" + (this.width-48) + "px'></span>");
-            left.hover(function(){$(this).addClass("hover");}, function(){ $(this).removeClass("hover");});
-            right.hover(function(){$(this).addClass("hover");}, function(){ $(this).removeClass("hover");});
+            left.addEventListener("click",function(e){e.stopPropagation();
+                                                      that.step("prev");},false);
+            right.addEventListener("click",function(e){e.stopPropagation();
+                                                       that.step("next");},false);
 
-            left.on("click",function(e){e.stopPropagation();
-                                        that.step("prev");});
-            right.on("click",function(e){e.stopPropagation();
-                                         that.step("next");});
-
-            this.slideshow_container.append(left);
-            this.slideshow_container.append(right);
+            this.slideshow_container.appendChild(left);
+            this.slideshow_container.appendChild(right);
 
 	    var ar=that.width/that.height;
-	    that.slideshow_container.append(car);
+	    that.slideshow_container.appendChild(car);
 
 	    for(var i=0; i< this.values.length;i++){
 		console.log("loading image " + i + " with aspect ratio " + this.values[i].aspect_ratio);
                 console.log("image width " + this.values[i].width + " height " + this.values[i].height);
-		var l=$("<li class='slide'> </li>");
-
+		var l=document.createElement("li"); //$("<li class='slide'> </li>");
+                l.classList.add("slide");
 		if(this.values[i].aspect_ratio > ar){   //wider than window - fit to width
 		    var h=this.width/this.values[i].aspect_ratio;
-		    img=$("<img  width='" + this.width + "' height='" + h + "' alt=''>");
+		    img=document.createElement("img");  //$("<img  width='" + this.width + "' height='" + h + "' alt=''>");
+                    img.style.width=this.width;
+                    img.style.height=h;
 		    h=(that.height-h)/2;
-
-		    img.css({"padding-top": h, "padding-bottom": h});
+		    img.style.padding.top=h;  //css({"padding-top": h, "padding-bottom": h});
+                    img.style.padding.bottom=h;
 		}
 		else{  // - fit to height
 		    var w=this.height*this.values[i].aspect_ratio;
-		    img=$("<img  height='" + that.height + "' width='" + w + "' alt=''>");
+		    //img=$("<img  height='" + that.height + "' width='" + w + "' alt=''>");
+                    img=document.createElement("img");
+                    img.style.width=w;
+                    img.style.height=this.height;
 		    w=(that.width-w)/2;
-		    img.css({"padding-left": w, "padding-right": w});
+                    img.style.padding.top=w;
+                    img.style.padding.bottom=w;
+		    //img.css({"padding-left": w, "padding-right": w});
 		}
 
-		img.attr("src",this.values[i].src);
-		l.append(img);
-		car.append(l);
+		img.src=this.values[i].src;
+		l.appendChild(img);
+		car.appendChild(l);
                 this.values[i].SSimage=img;
 	    }
 
         },
-        getImages: function(settings,data){
+        getImages: function(data,settings){
             if(!settings){
                 settings={};
             }
-            var promise=Harvey.REST("GET",settings,data);
-            promise.done(function(rd){
+            var promise=new Promise(function(resolve,reject){
+                Harvey.REST("GET",settings,data);
+            });
+            promise.then(function(rd){
                 for(var i=0;i<rd.length;i++){
                     this.values.push(rd[i]);
                 }
+            }).catch(function(reason){
+                Harvey.popup.dialog("Slideshow: getImages could not load " + reason);
             });
 
             return promise;
@@ -233,8 +280,8 @@ require("DisplayBase");
     Harvey.mixinDeep(Harvey,{
 	display: {
 	    slideshow: function(opts,win){
-                    opts.display="slideshow";
-                    return new HarveyMakeSlideshow(opts,win);
+                opts.display="slideshow";
+                return new HarveyMakeSlideshow(opts,win);
             },
             slideshowMethods:function(){
                 var ar=[];
