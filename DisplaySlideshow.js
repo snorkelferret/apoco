@@ -3,27 +3,21 @@ require("./DisplayBase");
 require("./Popups");
 require("./Fields");
 require("./Utils");
-// Menu display object
-//  requires HarveyDisplayBase.js
-//
 
 
 ;(function(){
-
-  "use strict";
-
-
-// create the  display
-
+    "use strict";
     var HarveyMakeSlideshow=function(options,win){
         var defaults={
 	    autoplay: true,
-	    fullscreen: false,
-            paginate: true,
+	    fullscreen: true,
+            delay: 4000,
 	    selection_list_element: null,
 	    element: null,
             editable: false, //unusual to make it uneditable
-            thumbnails:false
+            thumbnails:false,
+            current: 0,
+            controls: true
 	};
 	var f,that=this;
         Harvey.mixinDeep(options,defaults);
@@ -44,98 +38,169 @@ require("./Utils");
         }
         this.execute();
     };
-    var controls=function(that){
-        var d=document.createElement("div");//$("<div lass='slideshow_controls'></div>");
-        d.classList.add("slideshow_controls");
-        /*  if(that.paginate === true){
-         var len=that.values.length;
-         var cmd=function(){alert("blah");};
-         var p=Harvey.node({node:'paginate',number: len,action:cmd});
-         d.append(p);
-         }  */
-    };
 
     HarveyMakeSlideshow.prototype={
-	execute: function(){
-            var that=this,a=[];
-	    console.log("execute of DisplaySlideshow");
-	    this.element=document.createElement("div");  //$("<div id='" + this.id + "' class='Harvey_slideshow ui-widget ui-widget-content ui-corner-all'></div>");
-            this.element.id=this.id;
-            this.element.classList.add("Harvey_slideshow","ui-widget-content","ui-corner-all");
-            this.slideshow_container=document.createElement("div"); //$("<div class='slideshow pic_area'> </div>");
-            this.slideshow_container.classList.add("slideshow","pic_area");
-	    this.element.appendChild(this.slideshow_container);
+        _controls:function(){
+            var that=this;
+            var d,u,l,s;
+            var icons=[{class:"ui-icon-seek-prev",action: "step"},
+                       {class:"ui-icon-play",action: "play"},
+                       {class:"ui-icon-pause",action: "stop"},
+                       {class:"ui-icon-seek-next",action: "step"},
+                       {class:"ui-icon-arrow-4-diag",action:"show_fullscreen"}];
+            d=document.createElement("div");
+            d.classList.add("slideshow_controls");
+            u=document.createElement("ul");
+            d.appendChild(u);
+            for(var i=0;i<icons.length;i++){
+                l=document.createElement("li");
+                l.classList.add("ui-state-default","ui-corner-all");
+                l.addEventListener("click",(function(icon,that){
+                return function(e){
+                    e.stopPropagation();
+                    that["stop"]();
+                    e.currentTarget.classList.add("ui-state-active");
+                    that[icon.action]();
+                };
+                })(icons[i],this),false);
+                s=document.createElement("span");
+                s.classList.add("ui-icon",icons[i].class);
+                l.appendChild(s);
+                u.appendChild(l);
+            }
+            that.element.appendChild(d); 
+        },
+        _afterShow:function(){ //set the width and height when it has been determined
+            var that=this,ar,lis=[];
+            console.log("AFTER SHOW IS HERE ");
+            
+            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
+            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
+            console.log("slideshow container width " + this.width + " height " + this.height);
+            this.width=parseFloat(this.width);
+            this.height=parseFloat(this.height);
+            ar=this.width/this.height;
+            
+            // get the slide container
+            var car=this.slideshow_container.getElementsByTagName("ul")[0];
             if(this.promise){
-                    /* this.promise.then(function(){
-                   console.log("Slideshow: Finished loading images");
-                    console.log("asked for  " + that.values.length + " number of images " + " and got " + num_loaded);
-                    Harvey.popup.dialog("Slideshow",("Could only load " + num_loaded + " images"));
-                    if(that.values.length !== num_loaded){
-                        console.log("Could not load all images");
-                        a=that.values.splice();
-                        that.values.length=0; 
-                        for(var i=0; i<a.length;i++){
-                            console.log("examing images " + i);
-                            if(a.image !== null){
-                                that.values.push(a);
-                            }
+                this.promise.then(function(){
+                    lis=that.slideshow_container.querySelectorAll("li.slide");
+                    console.log("lis is " + lis + " lis.length " + lis.length);
+                    if(lis.length !== that.values.length){
+	                throw new Error("Slideshow: slide lis do not exist");
+                    }
+                    for(var i=0;i<that.values.length;i++){
+                        console.log("loading image " + i + " with aspect ratio " + that.values[i].aspect_ratio);
+                        console.log("image width " + that.values[i].width + " height " + that.values[i].height);
+                        if(!lis[i].contains(that.values[i].SSimage)){
+                            that.values[i].SSimage=document.createElement("img");
+                            that.values[i].SSimage.src=that.values[i].src;
+                            lis[i].appendChild(that.values[i].SSimage);
                         }
-                    } 
-                    if(that.values.length>0){
-                        console.log("going to start now");
-                        that.start();
+                        console.log("image asepect ratio is " + that.values[i].aspect_ratio);
+                        console.log("window aspect ratio is " + ar);
+	                if(that.values[i].aspect_ratio > ar){   //wider than window - fit to width
+		            var h=that.width/that.values[i].aspect_ratio;
+                            console.log("new image height is " + h);
+                            var w=((that.width).toString() + "px");
+                            console.log("new image width is " + w);
+                            that.values[i].SSimage.style.width=w;
+                            that.values[i].SSimage.style.height=(h.toString() + "px");
+		            h=(that.height-h)/2;
+		            that.values[i].SSimage.style.marginTop=(h.toString() + "px"); 
+                            that.values[i].SSimage.style.marginBottom=(h.toString() + "px");
+		        }
+		        else{  // - fit to height
+		            var w=that.height*that.values[i].aspect_ratio;
+                            console.log("new image width is " + w);
+                            that.values[i].SSimage.style.width=(w + "px");
+                            that.values[i].SSimage.style.height=(that.height + "px");
+		            w=(that.width-w)/2;
+                            that.values[i].SSimage.style.marginLeft=(w + "px");
+                            that.values[i].SSimage.style.marginRight=(w + "px");
+		        }
+                        if(that.current=== i){
+                            that.values[i].SSimage.style.visibility="visible";
+                        }
+                        else{
+                            that.values[i].SSimage.style.visibility="hidden";
+                        }
                     }
                 }).catch(function(reason){
-                   // Harvey.popup.error("Slideshow",("Could not load images" + reason));
-                }); */
+                    //remove the lis
+                    Harvey.popup.error("Slideshow",("Could not load images" + reason));
+                }); 
             }
-       /*     if(this.autoplay || this.fullscreen){
-	       var fw=$("<div class='slideshow_controls' > </div>");
-	       this.element.append(fw);
-	   }
-	   if(this.autoplay){
-               var ap=$("<div class='autoplay'> <p class='small_text'> autoplay</p></div>");
-	       fw.append(ap);
-	       ap.on("click", function(e){ that.api.next(); that.api.play(); });
-	   }
-	   if(this.fullscreen){
-	       var fs=$("<div class='fullscreen' class='ui-state-default ui-icon ui-icon-arrow-4-diag'> </div>");
-	       fw.append(fs);
-	       fs.on("click", function(e){
-		//   console.log("CLICK CLICK fullscreen button");
-		   (that.fullscreen)?that.fullscreen=false: that.fullscreen=true;
-		   that.show_fullscreen();
+        },
+	execute: function(){
+            var that=this,l;
+	    console.log("execute of DisplaySlideshow");
+	    this.element=document.createElement("div"); 
+            this.element.id=this.id;
+            this.element.classList.add("Harvey_slideshow","ui-widget-content","ui-corner-all");
+            this.slideshow_container=document.createElement("div");
+            this.slideshow_container.classList.add("slideshow","pic_area");
+	    this.element.appendChild(this.slideshow_container);
+            var car=document.createElement("ul");
+            car.classList.add("carousel");
+           
+            var left=document.createElement("span");
+            left.classList.add("carousel_left","ui-state-default","ui-corner-all");
+            var right=document.createElement("span");            
+            right.classList.add("carousel_right","ui-state-default","ui-corner-all");
+                    
+            left.addEventListener("click",function(e){e.stopPropagation();
+                                                      that.step("prev");},false);
+            right.addEventListener("click",function(e){e.stopPropagation();
+                                                       that.step("next");},false);
 
-	       });
-	   }*/
+            this.slideshow_container.appendChild(left);
+            this.slideshow_container.appendChild(right);
+	    that.slideshow_container.appendChild(car);
+            for(var i=0;i<this.values.length;i++){ //create containers for images
+                l=document.createElement("li");
+                l.classList.add("slide");
+                car.appendChild(l);
+            }
+            if(that.controls === true){
+                that._controls();
+            }
         },
         deleteAll:function(){
-            this.element.parentNode.removeChild(this.element); //detach();
-            this.element=null;
+            while(this.element.firstChild){
+                this.element.removeChild(this.element.firstChild);
+            }
         },
         show_fullscreen: function(){
 	    // get the window width and height
-	    var that=this;
+	    var that=this,c,t;
 	   // var width=$(window).width()-60; //innerWidth();
 	    //var height=$(window).height()-60; //innerHeight();
-            var width=window.innerWidth;
-            var height=window.innerHeight;
+            var width=parseInt(window.innerWidth-36);
+            var height=parseInt(window.innerHeight-48);
+            console.log("show_fullscreen got width " + width + " height " + height);
 	    that.element.parentNode.removeChild(this.element); //detach();
-	    //console.log("FULLSCREEN ++++++++++=" + this.fullscreen);
-
+           // that.hide();
 	    if(this.fullscreen){
-	        //console.log("Fullscreen is truE- so do it");
-	        that.element.style.width=width; //css({width:width,height:height});
-                that.element.style.height=height;
-	        that.slideshow_container.style.width=width;//css({width: width,height:height});
-                that.slideshow.container.style.height=height;
+	        console.log("Fullscreen is truE- so do it");
+	        that.element.style.width=(width.toString() + "px"); 
+                that.element.style.height=(height.toString() + "px");
+	        that.slideshow_container.style.width=(width.toString() + "px");
+                that.slideshow_container.style.height=((height).toString() + "px");
 	        //console.log("remove class pic_area");
 	        that.slideshow_container.classList.remove("pic_area");
 	        that.slideshow_container.classList.add("pic_area_full");
 	        that.element.classList.add("show_full_screen");
-                document.body.appendChild(this.element);
-	        //that.element.appendTo("#wrapper");
-	       // $("#main").addClass('hidden');
+                document.body.appendChild(that.element);
+                c=that.element.querySelector("div.slideshow_controls");
+                c.style.position="absolute";
+                c.style.top=((height-18).toString() + "px");
+                t=document.createElement("div"); // add a big div to cover everything
+                t.classList.add("slideshow_cover");
+                document.body.appendChild(t);
+                that._afterShow();
+                window.scrollTo(0,0);
 	    }
 	    else{
 	        // console.log("Fullscreen is falsE- so undo it");
@@ -146,20 +211,23 @@ require("./Utils");
 	        that.element.classList.remove("show_full_screen");
 	        that.slideshow_container.classList.remove("pic_area_full");
 	        that.slideshow_container.classList.add("pic_area");
-	        //that.element.appendTo(that.parent);
-                that.DOM.addChild(that.element);
-	        // SJ.BGCarousel.stop();
-	        //$("#main").removeClass('hidden');
+                that.DOM.appendChild(that.element);
 	    }
-	    if(this.current_gallery === null){
-	        throw new Error("Cannot find current gallery");
-	    }
-	    this.start();
-	   //console.log("fullscreen");
+        },
+        play:function(){
+            var that=this;
+            console.log("play is here " + that);
+            this.interval=setInterval(function(){that.step("next");},this.delay);
+        },
+        stop:function(){
+            var that=this;
+            if(this.interval){
+                clearInterval(that.interval);
+            }
         },
         step: function(dir){
             var num=this.values.length;
-            console.log("next is here len vals is " + num + " current is " + this.current);
+           // console.log("next is here len vals is " + num + " current is " + this.current);
             this.values[this.current].SSimage.style.position="relative";
             this.values[this.current].SSimage.style.visibility="hidden";
             if(dir==="next"){
@@ -182,76 +250,7 @@ require("./Utils");
             this.values[this.current].SSimage.style.position="absolute";
             this.values[this.current].SSimage.style.top=0;
             this.values[this.current].SSimage.style.left=0;
-            console.log("now current is " + this.current);
-        },
-        start: function(){
-            console.log("slideshow start is here");
-	    var that=this;
-            var num,img;
-            this.current=0;
-	    this.width=this.slideshow_container.style.width? this.slideshow_container.style.width: 400;
-	    this.height=this.slideshow_container.style.height?this.slideshow_container.style.height: 400;
-            console.log("slideshow container width " + this.width + " height " + this.height);
-
-	    var car=document.createElement("ul");
-            car.classList.add("carousel");
-            var g=this.height/2 -24;
-            var left=document.createElement("span");
-            left.classList.add("carousel_left");
-            left.style.top=(g + "px");
-            left.style.left="0px";
-            
-            var right=document.createElement("span");//$("<span class='carousel_right' style='top:" + g + "px ; left:" + (this.width-48) + "px'></span>");
-            
-            right.classList.add("carousel_right");
-            right.style.top=(g + "px");
-            right.style.left=((this.width-48) + "px");
-            //left.hover(function(){$(this).addClass("hover");}, function(){ $(this).removeClass("hover");});
-            //right.hover(function(){$(this).addClass("hover");}, function(){ $(this).removeClass("hover");});
-
-            left.addEventListener("click",function(e){e.stopPropagation();
-                                                      that.step("prev");},false);
-            right.addEventListener("click",function(e){e.stopPropagation();
-                                                       that.step("next");},false);
-
-            this.slideshow_container.appendChild(left);
-            this.slideshow_container.appendChild(right);
-
-	    var ar=that.width/that.height;
-	    that.slideshow_container.appendChild(car);
-
-	    for(var i=0; i< this.values.length;i++){
-		console.log("loading image " + i + " with aspect ratio " + this.values[i].aspect_ratio);
-                console.log("image width " + this.values[i].width + " height " + this.values[i].height);
-		var l=document.createElement("li"); //$("<li class='slide'> </li>");
-                l.classList.add("slide");
-		if(this.values[i].aspect_ratio > ar){   //wider than window - fit to width
-		    var h=this.width/this.values[i].aspect_ratio;
-		    img=document.createElement("img");  //$("<img  width='" + this.width + "' height='" + h + "' alt=''>");
-                    img.style.width=this.width;
-                    img.style.height=h;
-		    h=(that.height-h)/2;
-		    img.style.padding.top=h;  //css({"padding-top": h, "padding-bottom": h});
-                    img.style.padding.bottom=h;
-		}
-		else{  // - fit to height
-		    var w=this.height*this.values[i].aspect_ratio;
-		    //img=$("<img  height='" + that.height + "' width='" + w + "' alt=''>");
-                    img=document.createElement("img");
-                    img.style.width=w;
-                    img.style.height=this.height;
-		    w=(that.width-w)/2;
-                    img.style.padding.top=w;
-                    img.style.padding.bottom=w;
-		    //img.css({"padding-left": w, "padding-right": w});
-		}
-
-		img.src=this.values[i].src;
-		l.appendChild(img);
-		car.appendChild(l);
-                this.values[i].SSimage=img;
-	    }
-
+          //  console.log("now current is " + this.current);
         },
         getImages: function(data,settings){
             if(!settings){
@@ -274,9 +273,6 @@ require("./Utils");
 
     Harvey.Utils.extend(HarveyMakeSlideshow,Harvey._DisplayBase);
 
-    // Create the namespace
-    // Harvey.display.tabs
-    // $.extend(true, Harvey, {
     Harvey.mixinDeep(Harvey,{
 	display: {
 	    slideshow: function(opts,win){

@@ -1352,10 +1352,10 @@ require("./datepicker");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
 	            console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
-                    o.width=this.width;
-                    o.height=this.height;
+                    o.width=parseFloat(this.width);
+                    o.height=parseFloat(this.height);
                     o.title=o.name;
-                    o.aspect_ratio=this.width/this.height;
+                    o.aspect_ratio=parseFloat(this.width/this.height);
                     o.image=imm;
                     resolve(o);
                 };

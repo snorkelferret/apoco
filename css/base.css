@@ -13,7 +13,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15p
 #wrapper{font-size: 10pt}
 .hide{ display: none }
 
-.bannertop {width: 100%; height: 3em; position: fixed; top: 0; z-index: 10}
+.bannertop {width: 100%; height: 3em; position: fixed; top: 0}
 
 #Tail{position: fixed; bottom: 0; z-index: 100 }
 #Main { /*margin-left: 4em; margin-right: 4em;  */ height: auto}
@@ -34,17 +34,36 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15p
 /* fieldSet */
 .field_container{padding: 1em}
 .fieldset {margin: 0.5em 0}
+.Harvey_paginate{}
+.Harvey_paginate button{}
+.slideshow_cover{position: fixed;
+                 z-index: 9;
+                 left: 0;
+                 top: 0;
+                 width: 100%;
+                 height: 100%; 
+                 background-color: #000 } 
 /* slideshow */
-/* .Harvey_slideshow{width: inherit; height: 400px; overflow: hidden} */
+
 .Harvey_slideshow div.pic_area{width: inherit; position: relative; height: 400px; overflow: hidden}
-
-.Harvey_slideshow ul.carousel{padding: 0}
-.Harvey_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat; width: 48px; height: 48px; }
-.Harvey_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat; width: 48px; height: 48px}
-.Harvey_slideshow span.carousel_left:hover{border: 1px solid #bbb}
-.Harvey_slideshow span.carousel_right:hover{border: 1px solid #bbb}
-
+.Harvey_slideshow div.pic_area_full{position:absolute; top: 0; left:0; z-index: 10}
+.Harvey_slideshow ul.carousel{padding: 0; margin: 0;position:relative;}
+.Harvey_slideshow ul.carousel li{position: absolute; top: 0; left:0; visibility:"hidden"};
+.Harvey_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat #aaa; width: 48px; height: 48px; margin-left: 1em; top: 50%;left:0px; opacity:0 }
+.Harvey_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat #aaa; width: 48px; height: 48px;margin-right: 1em; top: 50%; right: 0px; opacity:0}
+.Harvey_slideshow span.carousel_left:hover{opacity: 1}
+.Harvey_slideshow span.carousel_right:hover{opacity: 1}
 .Harvey_slideshow span.hover{background-color:#555; opacity: 0.5 }
+.Harvey_slideshow div.slideshow_controls{position: relative; width: 140px; margin: 0 auto;z-index:11 }
+.Harvey_slideshow div.slideshow_controls ul{display:table-cell; list-style-type: none; padding:0}
+.Harvey_slideshow div.slideshow_controls li{width: 24px;
+                                            cursor: pointer;
+                                            float: left;
+                                            list-style: outside none none;
+                                            margin: 2px;
+                                            padding: 4px 0;
+                                            position: relative;}
+.Harvey_slideshow div.slideshow_controls span{float:left; margin: 0 4px}
 
 
 /* tabs */
@@ -196,12 +215,6 @@ float ul.aligned_float div.arrows span{height: 50%}
 
 .float ul.aligned_float div.values{ display:flex; 
                                    flex-flow: row; } 
-
-/*
-a {color: #777777; font-size: 8pt; margin: 0.5em 0.5em 1em 0 }
-a:active { color: #ffffff}
-a:hover { color: #aaaaaa}
-*/
 
 textarea{width: 40em; margin: 0.5em 0 0.5em 0}
 

@@ -208,7 +208,7 @@ require("./Utils");
 		  //  console.log("show found non null element");
                     if(this.after){
                         var a=document.getElementById(this.after);
-                        if(a){    // && $.contains(this.DOM[0],a[0])){ //insert after
+                        if(a && a.nextSibling){    // && $.contains(this.DOM[0],a[0])){ //insert after
                             a.parentNode.insertBefore(this.element,a.nextSibling);
                             //$("#" + this.after).after(this.element);
                         }
@@ -220,8 +220,9 @@ require("./Utils");
                     else{
                         this.DOM.appendChild(this.element);
                     }
-                    if(this.afterShow !== undefined){
-                        this.afterShow();
+                    if(this._afterShow !== undefined){
+                        console.log("DisplayBase: calling afterShow ");
+                        this._afterShow();
                     }
 		}
 	        else {

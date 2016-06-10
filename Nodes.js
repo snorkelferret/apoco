@@ -230,7 +230,7 @@ require("./Types.js");
             //console.log("paginator init with number " + that.number);
 	    // var that=this;
             that.element=document.createElement("div");
-            that.element.classList.add("Harvey.paginate");
+            that.element.classList.add("Harvey_paginate");
             var cb=function(index,el){
               //  console.log("index is " + index);
                 n=el.parentNode.childNodes;
