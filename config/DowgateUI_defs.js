@@ -115,8 +115,8 @@
 	      label: "Malaya Login",
               draggable: true,
               components: [{node: "paragraph",text: "Welcome to Malaya"},
-                           {name: "user", label: "User", type: "string", editable: true,required: true},
-	                   {name: "password", label: "Password", type: "password", editable: true, required: true}
+                           {name: "user", autocomplete: "on",label: "User", type: "string", editable: true,required: true},
+	                   {name: "password", autocomplete:"on",label: "Password", type: "password", editable: true, required: true}
 	                  ],
               buttons: [ {name: "login", label: "Login",
                           action: function(that){

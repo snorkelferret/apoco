@@ -321,7 +321,7 @@ describe("NumberArrayField-Integer",function(){
     });
     it("has a value getter",function(){
         var r=f.getValue();
-        assert.sameMembers(r,[1,2,"",""]);
+        assert.sameMembers(r,["1","2","",""]);
     });
     it("sets the values",function(){
         f.setValue([2,5,7]);

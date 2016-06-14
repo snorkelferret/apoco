@@ -17,11 +17,9 @@ body{ background-color: #223344}
 .footer_text{color: #888; font-size: 8pt; font-weight: lighter;
              margin-left:auto; margin-right:auto; width: 40em}
 #Footer{border-top: 1px solid #888;position: relative}
-.string{margin: 1em 0 1em 0; width: 8em}
+
 .field_container textarea {font-family: monospace}
 
-#test div.htable table.head{position: relative;}
-#test div.htable {background-color:#fafafa}
 #test #menuDisplay{width: 10em}
 
 #left{ width: 16em; position: absolute }

@@ -197,7 +197,7 @@ describe("CheckType(integerArray)",function() {
         assert.strictEqual(Harvey.checkType["integerArray"]([1.3,2.4,3,4,5]),false);
     });
     it("returns false on an integer array with a missing value",function(){
-        assert.strictEqual(Harvey.checkType["integerArray"]([1,2,"",4,5]),false);
+        assert.strictEqual(Harvey.checkType["integerArray"]([1,2,"eert",4,5]),false);
     });
 });
 

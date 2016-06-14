@@ -44,31 +44,45 @@ require("./datepicker");
     };
 */
     var _Field=function(d,element){
+        var defaults={
+            required:false,
+            editable: true,
+            value: "",
+            server_confirmation: true  // don't need server confirmation on field value change
+        };
+        if(!d){
+            throw new Error("Field: must have some options");
+        }
         if(!d.name){
             throw new Error("Harvey.field: Field must have a name");
         }
         if(!d.type){
             throw new Error("Harvey.field: must have a type");
 	}
-       // $.extend(this,d);
-        for(var k in d){
-            this[k]=d[k];
+     
+        for(var k in defaults){  // need this because mixinDeep overwrites first object
+            if(!d[k]){
+                d[k]=defaults[k];
+            }
         }
+        Harvey.mixinDeep(this,d);
+   
 	this.html_type=Harvey.dbToHtml[this.type].html_type;
-
         if(element === undefined){
             this.element=document.createElement("div");
         }
 	else if(element){
-           this.element=element;
+            this.element=element;
         }
 	else {
-            throw new Error("not a html element");
+            throw new Error("Field: element is not a html node");
             //this.element=element;
         }
-   
+        this.element.classList.add(this.type);
 	this.element.setAttribute("name",this.name);
-
+        if(this.title !== undefined){
+            this.element.title=this.title;
+        }
 	if(this.label){
             var l=document.createElement("label");
             l.appendChild(document.createTextNode(this.label));
@@ -83,6 +97,7 @@ require("./datepicker");
 	    //console.log("field adding listener " + this.name);
 	    Harvey.IO.listen(this);
 	}
+
 	if(this.action){
             var a=this.action;
             this.action=(function(that){
@@ -92,14 +107,8 @@ require("./datepicker");
                     a(that);
                 };
 	    })(this);
-	   /* this.element.addEventListener("click", (function(that){
-		return function(e){
-                    e.stopPropagation();
-                    that.action(that);
-                };
-	    })(this),false); */
             this.element.addEventListener("click", this.action,false);
-	}
+	}             
     };
 
     _Field.prototype={
@@ -127,6 +136,9 @@ require("./datepicker");
 	    return null;
 	},
 	getValue:function(){
+            if(this.input.pending){
+                return undefined;
+            }
 	    var v=this.input.value;
 	    if( v && v.length > 0){
 		return this.input.value;
@@ -141,6 +153,10 @@ require("./datepicker");
             }
 	    else {
                 this.input.value=v;
+            }
+            if(this.input.pending){
+                this.input.classList.remove("pending");
+                this.input.pending=false;
             }
 	},
         delete:function(){
@@ -174,15 +190,22 @@ require("./datepicker");
 			}
 		    };
 		}(this);
-
 	//	this.input.keypress(cb);
-
 	    //this.input.blur(func(this.input.val()));
 	    }
 	    else{
 		throw new Error("no input element for this type " + this.type);
 	    }
 	},
+        _resetValue:function(){
+            if(Harvey.Utils.checkType["array"](this.value)){
+                for(var i=0;i<this.value; i++){
+                    this.input[i].value=this.value[i];
+                }
+                return;
+            }
+            this.input.value=this.value;
+        },
 /*	displayInvalid:function(element){
 	    if(!element){
 		element=this.element;
@@ -199,22 +222,31 @@ require("./datepicker");
 	    //element.tooltip("disable");
 	}, */
 	checkValue:function(){
-
 	    //console.log("_Field checking value " + this.getValue() + " of type " + this.type );
-	    //this.resetInvalid();
-	    var v=this.getValue();
+	    var array=false;
+            var v=this.getValue();
             if(Harvey.checkType["blank"](v)){
    	        if(this.required){
                     return false;
                 }
             }
             if(this.type){
+                
                 var check=Harvey.dbToHtml[this.type].check;
+                console.log("type to check is " + check);
                 if(!Harvey.checkType[check](v)){
+                  //  if(!array){
+                  //      this.input.setCustomValidity(("Input must be of type " + check));
+                 //   }
                     return false;
                 }
-                this.input.classList.remove("required");
-	    }
+             //   if(!array){
+             //       this.input.setCustomValidity("");
+              //  }
+ 	    }
+            else{
+                throw new Error("Field: checkType no field type specified");
+            }
 	    return true;
 	}
     };
@@ -289,10 +321,8 @@ require("./datepicker");
         },
         integerArray:function(that){
             var len=that.value;
-            //var el=that.element.find(("."+that.type));
             var el=that.element.getElementsByClassName(that.type);
             for(var i=0;i<len;i++){
-                //el[i].text(that.value[i]);
                 el[i].textContent=that.value[i];
             }
         }
@@ -300,7 +330,6 @@ require("./datepicker");
 
     var StaticField=function(d,element){
 	//console.log("static field is here");
-        // var settings=checkDefaultOptions("StaticField",d);
         d.field="static";
         if(d.type===undefined){
             d.type="string";
@@ -317,7 +346,6 @@ require("./datepicker");
             }
         }
     };
-
 
     StaticField.prototype={
 	getValue: function(){
@@ -337,23 +365,21 @@ require("./datepicker");
 	        }
             }
 	},
-        checkValue: function(){
-           return Harvey.checkType[this.type](this.value);
-           // return true;
+        checkValue: function(){ //staticField always true 
+           // return Harvey.checkType[this.type](this.value);
+           return true;
         },
 	popupEditor: null
-
     };
- 
 
     var InputField=function(d,element){
+        var that=this;
 	//console.log("INPUT FIELD IS HERE with required " + d.required);
-       // var settings=checkDefaultOptions("InputField",d);
         d.field="input";
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
-        s.className=this.type;
+        //s.className=this.type;
 
         this.input=s;
         if(this.min){
@@ -369,22 +395,28 @@ require("./datepicker");
             this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
         }
 
-        if(this.required ){
-          //  console.log("REQUIRED is TRUE, value is " + this.required);
-          //  if(this.field !== "CheckBoxField"){
-                this.input.required=true;
-           // }
+        if(this.required === true){
+            this.input.required=true;
         }
         this.element.appendChild(this.input);
+               
+        if(this.server_confirmation){
+            console.log("server confirmation required");
+            this.input.addEventListener("mouseout",function(e){
+                if(that.input.value !== that.value){
+                    console.log("this.input value " + that.input.value + " != " + that.value);
+                    that.input.pending=true;
+                    that.input.classList.add("pending");
+                }
+            },false);
+        } 
 	if(this.value !== null && this.value !== undefined){
             this.input.value=this.value;
 	}
 	return this;
-
     };
 
     Harvey.Utils.extend(InputField,_Field);
-
 
     var FloatField=function(d,element){
         var inp;
@@ -392,11 +424,8 @@ require("./datepicker");
         d.field="float";
         d.type="float";
 	_Field.call(this,d,element);
-
 	this.input=new Array(2);
 	var that=this;
-        this.element.classList.add("float");
-
 	var list=document.createElement("ul"); 
         list.classList.add('aligned_float');
 	var el=document.createElement("li");
@@ -466,19 +495,19 @@ require("./datepicker");
 	        }
 	    };
 
-	    var dispatch_change=function(){
+	 /*   var dispatch_change=function(){
 	        var e=new Event("change");
                 that.element.dispatchEvent(e);
 	    };
-
+*/
 	    var eObj={
 	        mouseover: function(e) {
                     e.stopPropagation();
-		    e.currentTarget.classList.add('ui-state-hover');
+		    e.currentTarget.parentNode.classList.add('ui-state-hover');
 	        },
 	        mouseout: function(e) {
                     e.stopPropagation();
-		    e.currentTarget.classList.remove('ui-state-hover');
+		    e.currentTarget.parentNode.classList.remove('ui-state-hover');
 	        },
                 click:function(e){
                     e.preventDefault();
@@ -505,7 +534,7 @@ require("./datepicker");
 		    if(timer){
 		        clearInterval(timer);
 		    }
-		    dispatch_change();
+		   // dispatch_change();
 	        }
 	    };
             for(var k in eObj){
@@ -553,8 +582,12 @@ require("./datepicker");
 	    }
 	    return this.value;
 	},
+        _resetValue:function(){
+            this.setValue(this.value);
+        },
 	setValue: function(v){
-           // console.log("float setValue " + v);
+            // console.log("float setValue " + v);
+            
 	    if(Harvey.checkType.blank(v)){
                 this.input[0].value="";
                 this.input[1].value="";
@@ -587,9 +620,8 @@ require("./datepicker");
         _Field.call(this,d,element);
         this.input=document.createElement("input");
         this.input.type=this.html_type;
-        this.input.className=this.type;
-        
-        if(this.required === true){
+        //this.input.className=this.type;
+         if(this.required === true){
             this.input.required=true;
         }
         this.element.appendChild(this.input);
@@ -621,7 +653,7 @@ require("./datepicker");
 	_Field.call(this,d,element);
         this.input=document.createElement("input");
         this.input.setAttribute("type",this.html_type);
-        this.input.className=this.type;
+        //this.input.className=this.type;
         if(this.required === true){
             this.input.required=true;
         }
@@ -636,7 +668,8 @@ require("./datepicker");
   	_Field.call(this,d,element);
         this.input=document.createElement("input");
         this.input.setAttribute("type",this.html_type);
-        this.input.className=this.type;
+        this.input.className="check_box";
+        
         this.element.appendChild(this.input);
         if(this.required===true){
             this.input.required=true;
@@ -648,8 +681,6 @@ require("./datepicker");
         }
 	return this;
     };
-
-
 
     CheckBoxField.prototype={
 	getValue:function(){
@@ -767,20 +798,21 @@ require("./datepicker");
             }
    	    for(var i=0;i<this.input.length;i++){
                 if(v[i]){
-                    this.input[i].input.value=v[i];
+                    this.input[i].input.value=Number(v[i]);
                 }
                 else{
                     this.input[i].input.value="";
                 }
 	    }
+            this.value=v;
 	},
 	getValue:function(index){
             if(index !== undefined && index< this.input.length){
-                return this.input[index].value;
+                return this.input[index].input.value;
             }
             var v=new Array;
             for(var i=0;i<this.input.length;i++){
-	        v[i]=this.input[i].value;
+	        v[i]=this.input[i].input.value;
             }
             return v;
 	},
@@ -883,7 +915,7 @@ require("./datepicker");
 
         var mk_input=function(){
             this.input=document.createElement("input");
-            this.input.className=this.type;
+           // this.input.className=this.type;
             this.input.setAttribute("type",this.html_type);
             this.input.style.visibility="hidden";
             this.span=document.createElement("span");
@@ -943,6 +975,7 @@ require("./datepicker");
                 return;
             }
             throw new Error("SelectField: Cannot set value to " + v + " options are " + this.options[0] + " " +  this.options[1] + " " + this.options[2] );
+            this.value=v;
         },
 	getValue:function(){
 	   
@@ -1036,7 +1069,7 @@ require("./datepicker");
 	        }(this,this.input[index].input)); 
             }
 	},
-	reset:function(){
+	_resetValue:function(){
             for(var i=0;i<this.input.length;i++){
 	        this.input[i].input.parentNode.classList.remove('selected');
                 this.input[i].input.checked=false;
@@ -1109,7 +1142,7 @@ require("./datepicker");
 	this.popup=true;
 	this.input= document.createElement("input");
         this.input.setAttribute("type",this.type);
-        this.input.className=this.type;
+        //this.input.className=this.type;
         this.element.appendChild(this.input);
 	var that=this;
 	if(this.min){
@@ -1134,7 +1167,7 @@ require("./datepicker");
 	this.popup=true;
 	var that=this;
 	var array_length=0;
-        this.element.className="stringArray";
+        //this.element.className="stringArray";
 	this.input=[];
         var dv=document.createElement("div");
         dv.className="list_container";
@@ -1347,7 +1380,6 @@ require("./datepicker");
             var that=this;
             var imm=new Image();  // get the width and height - need to load in to image
 	    imm.src=o.src;
-          
             console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
@@ -1532,6 +1564,9 @@ require("./datepicker");
 	        }
             }
   	},
+        _resetValue:function(){
+            return;
+        },
 	getValue:function(){ // images are in this.value[i].image
 	    return this.value;
 	},
@@ -1599,7 +1634,7 @@ require("./datepicker");
             this.input.required=true;
         }
         this.input.setAttribute("type",this.html_type);
-        this.input.className=this.type;
+        //this.input.className=this.type;
         box.appendChild(this.input);  
         //sort the options
         Harvey.sort(this.options,"string");
@@ -1608,7 +1643,7 @@ require("./datepicker");
         }
       
         var select=document.createElement("ul");
-        select.classList.add("string","choice","ui-autocomplete","ui-menu","ui-widget","ui-front","ui-widget-content");
+        select.classList.add("choice","ui-autocomplete","ui-menu","ui-widget","ui-front","ui-widget-content");
         select.style.visibility="hidden";
         select.addEventListener("click",function(e){
             if(e.target.tagName === "LI"){
@@ -1669,6 +1704,7 @@ require("./datepicker");
             }
             //console.log("keyup setting visibility to visible");
             select.style.visibility="visible";
+            this.value=v;
         });
     };
 

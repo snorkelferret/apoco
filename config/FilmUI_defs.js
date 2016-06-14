@@ -1,5 +1,5 @@
-var UI={};
-;(function($){
+//var UI={};
+;(function(){
     'use strict';
 
     UI.webSocketURL="/data/websocket";
@@ -10,20 +10,25 @@ var UI={};
                       action:function(that,data){
                           //console.log(" listen to setup got " + JSON.stringify(data));
                           for(var k in data){
-                              var p=$("#Clapper").find("h1[name='" + k +  "']");
-                              if(p && p.length>0){
+                              //var p=$("#Clapper").find("h1[name='" + k +  "']");
+                              var q=document.getElementById("Clapper");
+                              var p=q.querySelector("h1[name='" + k +  "']");
+                              if(p){
                                   //console.log("Found element " + k);
                                   if(k== "roll"){
-                                      var cam=$("#Clapper").find("h1[name='camera']").text();
+                                      // var cam=$("#Clapper").find("h1[name='camera']").text();
+                                      var cam=q.querySelector("h1[name='camera']").textContent;
                                       p.html((data[k] + cam));
                                   }
                                   else{
-                                      p.html(data[k]);
+                                      // p.html(data[k]);
+                                      p.textContent=data[k];
                                   }
                               }
                           }
 
-                          var w=$("#QRcode");
+                          // var w=$("#QRcode");
+                          var w=document.getElementById("QRcode");
                           if(!w){
                               throw new Error("Could not find QRCode parent");
                           }
@@ -36,22 +41,27 @@ var UI={};
                               throw new Error("could not create image");
                           }
                           //set the go button un disabled
-                          $("div.buttons [name = 'go']").prop("disabled",false);
+                          //$("div.buttons [name = 'go']").prop("disabled",false);
+                          document.querySelector("div.buttons [name='go']").setAttribute("disabled",false);
                       }},
                      {name: "clapperboard",
                       action: function(that,data){
                           //console.log(" listen to clapperboard  got " + JSON.stringify(data));
-                          var p=$("#Clapper").find("h1[name='camera']");
-                          if(p && p.length>0){
-                              p.html(data["camera"]);
+                         // var p=$("#Clapper").find("h1[name='camera']");
+                          var p=document.getElementById("Clapper").querySelector("h1[name='camera']");
+                          if(p){
+                              //p.html(data["camera"]);
+                              p.textContent=data["camera"];
                           }
                       }},
                      {name:"avsync",
                       action: function(that,data){ //do the swap between slate and qrcode
                           //console.log(" listen to avsync is here");
                           var clapper=false;
-                          if($("#selectCamera").length>0){
-                              $("#selectCamera").css("display","none");
+                          var p=document.getElementById("selectCamera");
+                          if(p){
+                              // $("#selectCamera").css("display","none");
+                              p.style.display="none";
                               clapper=true;
                           }
                           if(clapper === true){
@@ -59,8 +69,10 @@ var UI={};
                               var swap=function(){
                                   //console.log("swapping images");
                                   Harvey.beep.beep(data.code);
-                                  $("#Clapper").css("display","none");
-                                  $("#QRcode").css("display","block");
+                                  //$("#Clapper").css("display","none");
+                                  document.getElementById("Clapper").style.display="none";
+                                  //$("#QRcode").css("display","block");
+                                  document.getElementById("QRcode").style.display="block";
                                   window.clearTimeout(t);
                               };
                               t=window.setTimeout(function(){
@@ -69,9 +81,12 @@ var UI={};
                               var tt;
                               var swap_back=function swap_back(){
                                   //console.log("swapping back");
-                                  $("#Clapper").css("display","block");
-                                  $("#QRcode").css("display","none");
-                                  $("#selectCamera").css("display","block"); 
+                                  document.getElementById("Clapper").style.display="block";
+                                  //$("#Clapper").css("display","block");
+                                  //$("#QRcode").css("display","none");
+                                  document.getElementById("QRcode").style.display="none";
+                                  //$("#selectCamera").css("display","block");
+                                  document.getElementById("selectCamera").style.display="block";
                                   window.clearTimeout(tt);
                               };
                               
@@ -81,10 +96,12 @@ var UI={};
                           }
                           else{  // disable buttons on master controls
                               var tt;
-                              $("div.buttons").find("button").prop("disabled",true);
+                              //$("div.buttons").find("button").prop("disabled",true);
+                              document.querySelector("div.buttons button").style.disabled=true;
                               tt=window.setTimeout(function(){
                                   //console.log("removing timeout on buttons");
-                                  $("div.buttons").find("button").prop("disabled",false);
+                                  //$("div.buttons").find("button").prop("disabled",false);
+                                   document.querySelector("div.buttons button").style.disabled=false;
                                   window.clearTimeout(tt);
                               },8000);
                           }
@@ -111,8 +128,9 @@ var UI={};
                            //$("#Clapper").css("display","table");
                        } 
                       else if(data.roles.clapperboard){
-                           $("#Clapper").css("display","table");
-                           Harvey.Panel.UIStart(["SelectCamera"]);
+                          //$("#Clapper").css("display","table");
+                          document.getElementById("Clapper").style.display="table";
+                          Harvey.Panel.UIStart(["SelectCamera"]);
                        }
                    }
                    that.delete();
@@ -145,17 +163,20 @@ var UI={};
                          tabs:[
                              {name: "Controls",label: "Controls",action:function(that,index){
                                  Harvey.Panel.show("Controls");
-                              //   Harvey.Panel.hide("Notes");
-                                 $("#Clapper").css("display","none");
-                                 $("#QRcode").css("display","none");
+                                 //   Harvey.Panel.hide("Notes");
+                                 document.getElementById("Clapper").style.display="none";
+                                 //$("#Clapper").css("display","none");
+                                 //$("#QRcode").css("display","none");
+                                 document.getElementById("QRcode").style.display="none";
                                  that.selected=that.tabs[index].name;
                              }},
                              {name: "Slate",label:"Slate",action:function(that,index){
-                                 var n=$("#Clapper");
+                                 var n=document.getElementById("Clapper"); //$("#Clapper");
                                  Harvey.Panel.hide("Controls");
                                //  Harvey.Panel.hide("Notes");
                                  that.selected=that.tabs[index].name;
-                                 n.css("display","block");
+                                 //n.css("display","block");
+                                 n.style.display="block";
                              }}//,
                           //   {name: "Notes",label: "Notes",action: function(that,index){
                            //      $("#Clapper").css("display","none");
@@ -177,7 +198,8 @@ var UI={};
                       draggable: true,
                       id: "details",
                       action:function(){
-                          $("#Clapper").css("display","none");  
+                          // $("#Clapper").css("display","none");
+                          document.getElementById("Clapper").style.display="none";
                       },
                       components:[
                           {name: "scene",type: "alphaNum",label: "Scene",editable: true,required:true},
@@ -235,4 +257,4 @@ var UI={};
     };
 
     //UI.start=["Controls","Tabs"];
-})(jQuery);
+})();

@@ -422,6 +422,19 @@ String.prototype.trim = String.prototype.trim || function trim() {
             }
 
         },
+        getSiblings:function (elem) {
+            var siblings = [];
+            var sibling = elem.parentNode.firstChild;
+            while(sibling){
+                //for ( ; sibling; sibling = sibling.nextSibling )
+                console.log("found sibling");
+                if ( sibling.nodeType == 1 && sibling != elem ){
+                    siblings.push( sibling );
+                }
+                sibling=sibling.nextSibling;
+            }
+            return siblings;
+        },
         detectMobile: function(){
             if(navigator.userAgent.match(/Android/i)
                ||navigator.userAgent.match(/iPhone/i)

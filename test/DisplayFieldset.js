@@ -113,7 +113,7 @@ describe("DisplayFieldset-(start with data)",function(){
     });
     it("writes out json for all the fields",function(){
         var b=t.getJSON();
-        expect(b).to.eql({ia:[1,3,4],howmany:"10"});
+        expect(b).to.eql({ia:["1","3","4"],howmany:"10"});
     });
     it("throws an error if you try to add a field with the same name",function(){
         var fn=function(){

@@ -470,7 +470,10 @@ jsonishData={
                         //console.log("setting grid " + i + " to " + width);
                         this.grids[i].element.style.width=width;
                     }
+                    v.style.width=width;
                 }
+                // now add all the grids                
+                this.element.appendChild(this.grid_container);
             }
             else{
                 console.log("cannot find head element ");
@@ -521,7 +524,7 @@ jsonishData={
 	    }
 	},
         addGrid:function(grid){
-            var div_container,div,h;
+            var div,h;
 	    var name=grid.name;
 	    var rows=grid.rows;
             div=document.createElement("div");
@@ -540,8 +543,8 @@ jsonishData={
 	    //var body=$("<tbody class='selectable'></tbody>");
 	    var body=document.createElement("tbody");//$("<tbody class=''></tbody>");
 	    table.appendChild(body);
-            div_container=this.element.getElementsByClassName("grid_content")[0];
-	    div_container.appendChild(div);
+           
+	    this.grid_container.appendChild(div);
             grid.element=div;
         },
         addCol:function(col){
@@ -709,19 +712,20 @@ jsonishData={
             // var t0=performance.now();
             this.element=document.createElement("div"); 
             this.element.id=this.id;
-            this.element.classList.add("grid","ui-widget","ui-state-default");
+            this.element.classList.add("grid","ui-widget","ui-widget-content");
             // make the header
             this.colElement=document.createElement("div");
             this.colElement.classList.add("head");
             this.element.appendChild(this.colElement);
 
-            var div_container=document.createElement("div");
-            div_container.classList.add("grid_content");
+            this.grid_container=document.createElement("div");
+            this.grid_container.classList.add("grid_content");
 
             if(this.resizable){
                 this.element.classList.add("resizable");
             }
-            this.element.appendChild(div_container);
+            
+            this.element.appendChild(this.grid_container);
             //body.selectable(this.select_data()); // allow multiple cells to be selected
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
@@ -773,8 +777,7 @@ jsonishData={
             }
 	    //console.log("value is " + row[col_name]);
 	    settings.value=row[col.name];
-            
-	    c=document.createElement("td");
+  	    c=document.createElement("td");
             c.className=col.type;
             //c=$(c);
             //console.log("c is " + JSON.stringify(c));

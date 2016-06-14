@@ -12,7 +12,6 @@ require("./Utils");
 	    autoplay: true,
 	    fullscreen: true,
             delay: 4000,
-	    selection_list_element: null,
 	    element: null,
             editable: false, //unusual to make it uneditable
             thumbnails:false,
@@ -23,8 +22,10 @@ require("./Utils");
         Harvey.mixinDeep(options,defaults);
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	console.log("called display base");
-        this.thumbnails=document.createElement("div"); //$("<div class='thumbnails'></div");
-        this.thumbnails.classList.add("thumbnails");
+        if(this.thumbnails === true){
+            this.thumbnails=document.createElement("div"); 
+            this.thumbnails.classList.add("thumbnails");
+        }
         if(this.values){  // start preloading images
             console.log("got some values");
             f=Harvey.field["imageArray"]({name:"slideshow"});
@@ -42,25 +43,56 @@ require("./Utils");
     HarveyMakeSlideshow.prototype={
         _controls:function(){
             var that=this;
-            var d,u,l,s;
-            var icons=[{class:"ui-icon-seek-prev",action: "step"},
+            var d,u,l,s,sibs;
+            var icons=[{class:"ui-icon-seek-prev",action: "step",params:"prev"},
                        {class:"ui-icon-play",action: "play"},
                        {class:"ui-icon-pause",action: "stop"},
-                       {class:"ui-icon-seek-next",action: "step"},
+                       {class:"ui-icon-seek-next",action: "step",params: "next"},
                        {class:"ui-icon-arrow-4-diag",action:"show_fullscreen"}];
             d=document.createElement("div");
             d.classList.add("slideshow_controls");
             u=document.createElement("ul");
             d.appendChild(u);
+            u.addEventListener("mouseover",function(e){
+                if(e.target.tagName === "LI"){
+                    e.stopPropagation();
+                    e.target.classList.add("ui-icon-hover");
+                }
+            });
+            u.addEventListener("mouseout",function(e){
+                if(e.target.tagName === "LI"){
+                    e.stopPropagation();
+                    e.target.classList.remove("ui-icon-hover");
+                }
+            });
+            
             for(var i=0;i<icons.length;i++){
+                if(icons[i].action === "show_fullscreen" && this.fullscreen !== true){
+                    continue;  //don't show the fullscreen icon
+                }
                 l=document.createElement("li");
                 l.classList.add("ui-state-default","ui-corner-all");
                 l.addEventListener("click",(function(icon,that){
                 return function(e){
                     e.stopPropagation();
-                    that["stop"]();
+                    if(icon.action === "play" && that.interval){
+                        console.log("already in play mode");
+                        e.currentTarget.classList.remove("ui-state-active");
+                        that["stop"]();
+                        return;
+                    }
                     e.currentTarget.classList.add("ui-state-active");
-                    that[icon.action]();
+                    sibs=Harvey.Utils.getSiblings(e.currentTarget);
+                    console.log("got siblings length " + sibs.length);
+                    for(var j=0;j<sibs.length;j++){
+                        sibs[j].classList.remove("ui-state-active");
+                    }
+                    if(icon.params){
+                        that[icon.action](icon.params);
+                    }
+                    else{
+                        that[icon.action](); 
+                    }
                 };
                 })(icons[i],this),false);
                 s=document.createElement("span");
@@ -68,7 +100,8 @@ require("./Utils");
                 l.appendChild(s);
                 u.appendChild(l);
             }
-            that.element.appendChild(d); 
+            that.element.appendChild(d);
+            
         },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,ar,lis=[];
@@ -127,6 +160,13 @@ require("./Utils");
                             that.values[i].SSimage.style.visibility="hidden";
                         }
                     }
+                    if(that.autoplay === true){
+                        console.log("trigger autoplay");
+                        if(that.interval){
+                            that.stop();
+                        }
+                        that.element.querySelector("span.ui-icon-play").click();
+                    }
                 }).catch(function(reason){
                     //remove the lis
                     Harvey.popup.error("Slideshow",("Could not load images" + reason));
@@ -145,7 +185,7 @@ require("./Utils");
             var car=document.createElement("ul");
             car.classList.add("carousel");
            
-            var left=document.createElement("span");
+         /*   var left=document.createElement("span");
             left.classList.add("carousel_left","ui-state-default","ui-corner-all");
             var right=document.createElement("span");            
             right.classList.add("carousel_right","ui-state-default","ui-corner-all");
@@ -156,7 +196,7 @@ require("./Utils");
                                                        that.step("next");},false);
 
             this.slideshow_container.appendChild(left);
-            this.slideshow_container.appendChild(right);
+            this.slideshow_container.appendChild(right); */
 	    that.slideshow_container.appendChild(car);
             for(var i=0;i<this.values.length;i++){ //create containers for images
                 l=document.createElement("li");
@@ -179,10 +219,14 @@ require("./Utils");
 	    //var height=$(window).height()-60; //innerHeight();
             var width=parseInt(window.innerWidth-36);
             var height=parseInt(window.innerHeight-48);
+            //if this node is in the DOM we are already in fullscreen mode
+            var r=document.getElementsByClassName("slideshow_cover")[0];
             console.log("show_fullscreen got width " + width + " height " + height);
-	    that.element.parentNode.removeChild(this.element); //detach();
-           // that.hide();
-	    if(this.fullscreen){
+	    that.element.parentNode.removeChild(this.element); 
+            console.log("slideshow cover is " + r);
+            // that.hide();
+            that.stop();
+	    if(!document.contains(r)){
 	        console.log("Fullscreen is truE- so do it");
 	        that.element.style.width=(width.toString() + "px"); 
                 that.element.style.height=(height.toString() + "px");
@@ -195,7 +239,8 @@ require("./Utils");
                 document.body.appendChild(that.element);
                 c=that.element.querySelector("div.slideshow_controls");
                 c.style.position="absolute";
-                c.style.top=((height-18).toString() + "px");
+                c.style.top=(height.toString() + "px");
+                c.style.left=((width/2 -70).toString() + "px");
                 t=document.createElement("div"); // add a big div to cover everything
                 t.classList.add("slideshow_cover");
                 document.body.appendChild(t);
@@ -203,15 +248,32 @@ require("./Utils");
                 window.scrollTo(0,0);
 	    }
 	    else{
-	        // console.log("Fullscreen is falsE- so undo it");
-	        that.element.style.width=""; //css({width:"",height:""});
-                that.element.style.height=""; //css({width:"",height:""});
-	        that.slideshow_container.style.width=""; //css({width:"",height:""});
-                that.slideshow_container.style.height=""; //css({width:"",height:""});
+                document.body.removeChild(r); // remove slideshow_cover
+                // console.log("Fullscreen is falsE- so undo it");
+	        that.element.style.width=""; 
+                that.element.style.height="";
+	        that.slideshow_container.style.width=""; 
+                that.slideshow_container.style.height=""; 
 	        that.element.classList.remove("show_full_screen");
 	        that.slideshow_container.classList.remove("pic_area_full");
 	        that.slideshow_container.classList.add("pic_area");
-                that.DOM.appendChild(that.element);
+                c=that.element.querySelector("div.slideshow_controls");
+                c.style.position="";
+                c.style.top="";
+                c.style.left="";
+                if(this.after){
+                    t=document.getElementById(that.after);
+                    if(t){
+                        t.parentNode.insertBefore(that.element,t.nextSibling);
+                    }
+                    else{
+                        this.DOM.appendChild(that.element);
+                    }
+                }
+                else{
+                    that.DOM.appendChild(that.element);
+                }
+                that._afterShow();
 	    }
         },
         play:function(){
@@ -224,6 +286,7 @@ require("./Utils");
             if(this.interval){
                 clearInterval(that.interval);
             }
+            this.interval=null;
         },
         step: function(dir){
             var num=this.values.length;
@@ -246,7 +309,7 @@ require("./Utils");
                     this.current--;
                 }
             }
-            this.values[this.current].SSimage.style.visibility="visible"; //css({position:'absolute',visibility:"visible",top:0,left:0});
+            this.values[this.current].SSimage.style.visibility="visible"; 
             this.values[this.current].SSimage.style.position="absolute";
             this.values[this.current].SSimage.style.top=0;
             this.values[this.current].SSimage.style.left=0;

@@ -92,7 +92,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15p
 /* grid table */
 .grid {min-width: 4em; overflow:hidden; font-size: 10pt; box-sizing: border-box} 
 .grid .label{margin: 1em 0 1em 1em;   display: table-row}
-.grid_content { min-width: 8em; min-height: 6em;padding-top: 5em }
+.grid_content { min-width: 8em; min-height: 6em}
 .grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
 .grid_footer div{ background-color: #888}
 .grid button{ height: 2em}  
@@ -101,7 +101,7 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15p
 .grid table {table-layout: fixed; border-collapse: collapse}
 /*.grid table.head {z-index: 100; position: fixed;  top: 3em;  height: 2em }
 .grid table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555} */
-.grid div.head{z-index: 100; background-color:#000; position: fixed;  top: 3em;  height: 2em;  overflow: hidden}
+.grid div.head{z-index: 100; background-color:#000;  top: 3em;  height: 2em;  overflow: hidden}
 .grid div.head div{display: inline-table; color: #fff; height: inherit; text-align: center; background-color: #000; border: 1px solid #555; box-sizing: border-box; border-collapse: collapse; overflow:hidden;}
 .grid table td {  height: 1.5em;
                   margin: 0;
@@ -116,17 +116,18 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15p
 .grid table tbody tr.last-child th,
 .grid table tbody tr.last-child td { border-bottom-width: 1px !important; }
 .grid table label{ }
-.grid table td input {box-sizing: border-box; font-size: inherit}
+
 /* .grid table button {background-color: #202020; color: #bbbbbb; border: 1px solid dimgrey;}  */
 .grid table tr td textarea{}
 .grid table textarea,select{}
 .grid table td span{ display: inline} /*float: right } */
 /* table with only col names */
-.grid .inner_table h4{ padding-left: 1em; height: 1em; color: #0000ff}
+.grid .inner_table h4{ padding-left: 1em; height: 1.5em; color: #0000ff}
 .grid .inner_table table{ height: 100% }
 .grid .inner_table table td.cell_updated{background: #fbec88}
 .grid .inner_table table td.cell_updated_fast{background: #fb8866}
-.grid .inner_table table td input{ background: inherit; text-align: inherit}
+.grid table td input {box-sizing: border-box; font-size: inherit; overflow: hidden}
+.grid .inner_table table td input{ background: inherit; text-align: inherit; margin: 0;padding:0}
 .grid .inner_table table td th { word-wrap: break-word}
 /* set the row colours */
 .grid .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
@@ -141,31 +142,51 @@ input:valid {
   border: 1px solid green;
 }
 
+input.pending{
+    animation: flash 1s infinite;
+}
+
+@keyframes flash{
+    100% { background-color : #cc3325; color: #eee}
+    0% { background-color : inherit; color: inherit}
+}
+
 .first{width: 2em }
 .slider{width: 15em; margin:  0.5em 0 0.5em 0} 
-.integer {width: 5em}
+.integer {width: 5em !important}
+.integer input{width: 4.5em}
 .positiveInteger {width: 5em}
+.positiveInteger input{width: 4.5em}
 .negativeInteger {width: 5em}
+.negativeInteger input {width: 4.5em}
 .date {width: 8em;}
-.time {width: 8em;  }
-.string {width: 6em;}
+.date input {width: 7.5em;}
+.time {width: 8em;}
+.time input {width: 7.5em;}
+.string {width: 6em !important;}
+.string input{width: 5.5em}
 .token {width: 6em }
+.token input{width: 5.5em }
 .alphaNum {width: 6em }
+.alphaNum input{width: 5.5em }
 .image {width: 10em }
 .currency {width: 8em}
+.currency input{width: 7.5em}
 .email {width: 8em }
+.email input{width: 7.5em }
 .float {width: 8em}
 .container {width: 10em}
 .integerArray {width: 8em;}
 .integerArray input,
 .integerArray span.integerArray{width: 3.5em}
 .floatArray {width: 12em}
-.boolean {width: 4em, margin: 0em}
+.boolean {width: 4em;}
 .text { width: 12em}
 .imageArray{display:block;margin-top:1em; margin-bottom: 1em}
 .imageArray div{display: inline; width: 120px;height: 90px;}
 .imageArray img{width: inherit; height:inherit; border: 2px solid #999}
 
+.check_box{width: 16px; height: 16px}
 .field_container textarea {font-family: monospace}
 
 .stringArray li.plus{float: right; margin-left: .4em; border: 1px solid #000 }

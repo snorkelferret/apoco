@@ -157,7 +157,8 @@ global.UI=require('../declare').UI;
         required:{name:{type: "string",description:"tag used in Field methods"}},
         common: {required:{type:"boolean",default: false,description:"Is the cell allowed to be blank"},
                  editable:{type:"boolean",default:true,description: "If false some fields become a StaticField"},
-                 label:{type: "string",default: undefined,description:"added next to the input field"}
+                 label:{type: "string",default: undefined,description:"added next to the input field"},
+                 title:{type: "string",default: undefined,description: "add a tooltip"}
                 },
         special:{
                  action:{type:"function",default: undefined,description:"Function fired on click on element"},
@@ -971,6 +972,7 @@ global.UI=require('../declare').UI;
                // console.log("triggering click");
                 var p=that.getChild("doit");
                 p.element.click();
+                dobj.hide();  // hide the display first time round
             },
             k.components=[{node: "heading",size: "h3", text: HDisplays[i]},
                           {node:"paragraph", text: "<code>var node=Harvey.display['" + HDisplays[i] + "'](dataObject);</code>"},
@@ -1008,7 +1010,7 @@ global.UI=require('../declare').UI;
                                    throw new Error("Bad return");
                                }
                                Harvey.Panel.get("Displays").addChild(dobj);
-                               dobj.hide(); 
+                               // dobj.hide(); 
                            }
                           }
                          ];
@@ -1185,7 +1187,8 @@ global.UI=require('../declare').UI;
             widthFromCssClass:{p:""},
             fontSizeToPixels:{p:""},
             hashCode:{p:""},
-            observer:{p:""}
+            observer:{p:""},
+            getSiblings:{p:""}
         };
         for(var i=0;i<HUtils.length;i++){
           //  console.log("making io panel",HUtils[i]);
