@@ -1,0 +1,15 @@
+.be/id-cache
+
+*~
+\#*\#
+.\#*
+.nfs*
+
+.bash_history
+
+node_modules
+
+npm-debug.log*
+
+manual_bundle.js
+
