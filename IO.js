@@ -5,27 +5,34 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
     Harvey.IO={
         _subscribers:{},
         dispatch:function(name,args){  //pubsub
-            //console.log("dispatch is here name is " + name);
+            console.log("dispatch is here name is " + name);
 	    if(this._subscribers[name]){
-              //  console.log("found subscriber");
+               console.log("found subscriber");
 	        try{
 		    this._subscribers[name].forEach(function(s){
                         if(!s.action){
                             throw new Error("No action for " + s);
                         }
+                     //   for(var k in s.context){
+                     //       console.log("before dispatch " + k);
+                        //   }
+                        console.log("action is " + s.action);
+                        console.log("with args " + args);
 		        s.action(s.context,args);
 		    });
 	        } catch (err){
-		   throw new Error("_Subscriber error on " + name);
+		   throw new Error("_Subscriber error on " + name + " " + err);
 	       }
 	    }
         },
         listen:function(that){ //pubsub
 	    //var b=that.getKey();
-
+          //  for(var k in that){
+          //      console.log("listen has that " + k);
+         //   }
 	    for(var i=0; i< that.listen.length; i++){
 	        var n=that.listen[i].name;
-	        console.log("adding listener " + n + " to " + that.getKey());
+	        console.log("adding listener " + n );// + " to " + that.getKey());
 	        if(!this._subscribers[n]){
 		    this._subscribers[n]=[];
 	        }
@@ -85,7 +92,10 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             
             if(!Harvey.webSocket){
                 var a={'http:':'ws:','https:':'wss:'}[window.location.protocol];
-                //console.log("a is " + a + " protocol " + window.location.protocol);
+                console.log("a is " + a + " protocol " + window.location.protocol);
+                if(!a){
+                    throw new Error("IO: Cannot get protocol for window " + a);
+                }
                 Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
 	    }
             Harvey.webSocket.onmessage=function(e){
@@ -93,7 +103,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                     throw new Error("webSocket: no data or name from server");
                 }
                 var d=JSON.parse(e.data);
-               // console.log("got: %j %j",d[0],d[1]);
+                console.log("got: %j %j",d[0],d[1]);
                 if(d[0] === "error"){
                     Harvey.popup.dialog("Error",d[1]);
                 }
@@ -103,7 +113,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             };
             if(data !== undefined){
                 var msg=JSON.stringify(data);
-                //console.log("got some data " + msg);
+                console.log("got some data " + msg);
                 Harvey.webSocket.send(msg+'\n');
             }
 

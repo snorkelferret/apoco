@@ -5,8 +5,9 @@ Type: css stylesheet
 History: 1st Feb 2012 creation
 
 */
+html{width: 100%; height: 100%}
 
-body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15px/22.5px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif } */
+body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15px/22.5px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif } */
 * {
     box-sizing: border-box;
 }
@@ -33,7 +34,10 @@ body{ margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15p
 
 /* fieldSet */
 .field_container{padding: 1em}
+.field_container div.label{width:auto}
+
 .fieldset {margin: 0.5em 0}
+
 .Harvey_paginate{}
 .Harvey_paginate button{}
 .slideshow_cover{position: fixed;
@@ -153,7 +157,7 @@ input.pending{
 
 .first{width: 2em }
 .slider{width: 15em; margin:  0.5em 0 0.5em 0} 
-.integer {width: 5em !important}
+.integer {width: 5em }
 .integer input{width: 4.5em}
 .positiveInteger {width: 5em}
 .positiveInteger input{width: 4.5em}
@@ -163,7 +167,9 @@ input.pending{
 .date input {width: 7.5em;}
 .time {width: 8em;}
 .time input {width: 7.5em;}
-.string {width: 6em !important;}
+.string {width: 6em }
+.password{width: 7em}
+.password input{width: 6.5em}
 .string input{width: 5.5em}
 .token {width: 6em }
 .token input{width: 5.5em }

@@ -1,5 +1,6 @@
 var Harvey=require('./declare').Harvey;
 require("./DisplayFieldset");
+require("./Utils");
 
 // create a form dynamically from json
 
@@ -15,6 +16,7 @@ require("./DisplayFieldset");
 	var that=this;
         Harvey.display._fieldsetBase.call(this,options,win);
         this.execute();
+
     };
 
 
@@ -22,7 +24,8 @@ require("./DisplayFieldset");
     HarveyMakeForm.prototype={
 	execute: function(){
 	    var that=this,fp,header,container,fc,h;
-             this.element=document.createElement("div");
+            
+            this.element=document.createElement("div");
             this.element.id=this.id;
             this.element.classList.add("harvey_form","resizable","ui-widget","ui-widget-content","ui-corner-all");
             if(this.class !== undefined){
@@ -50,12 +53,9 @@ require("./DisplayFieldset");
             fc.appendChild(container);
             h=document.createElement("h5");
             if(this.label){
-                h.text=this.label;
+                h.textContent=this.label;
 	    }
-	    else{
-                h.text=this.label;
-	    }
-            header.appendChild(h);
+	    header.appendChild(h);
             var close=document.createElement("span");
             close.classList.add("ui-icon","ui-icon-close");
             header.appendChild(close);

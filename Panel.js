@@ -179,11 +179,12 @@ require("./Popups");
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
         UIStart:function(w){
             var nv;
+            console.log("UIStart is here");
             if(w === undefined){
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
             for(var i=0;i<w.length;i++){
-             //  console.log("trying to find " + w[i]);
+                console.log("trying to find " + w[i]);
                 nv=this._UIGet(w[i]);
                 if(nv !== null){
                     this.add(nv);
@@ -195,15 +196,15 @@ require("./Popups");
 
         },
         _UIGet:function(name){
-           // console.log("UIGet trying to find " + name);
-           // console.log("UIGet Panels " + UI.Panels);
+            console.log("UIGet trying to find " + name);
+            console.log("UIGet Panels " + UI.Panels);
             if(name === undefined){
                 throw new Error("Panel._UIGet: panel name is undefined");
             }
             for(var k in UI.Panels){
-                //console.log("trying to get panel " + name + " from " + k);
+                console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
-                  //  console.log("found " + name);
+                    console.log("found " + name);
                     var cd=Harvey.cloneDeep(UI.Panels[k]);
                    // console.log("clone deep is " + cd);
                     return cd;
@@ -317,8 +318,8 @@ require("./Popups");
             }
         },
 	add: function(panel){
-	//    console.log("Panel.add is here");
-	 //   console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+	   console.log("Panel.add is here");
+	    console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
             if(Harvey.checkType['string'](panel)){
                 var w=this._UIGet(panel);
                 panel=w;

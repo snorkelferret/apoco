@@ -48,7 +48,7 @@ require("./datepicker");
             required:false,
             editable: true,
             value: "",
-            server_confirmation: true  // don't need server confirmation on field value change
+            server_confirmation: false  // don't need server confirmation on field value change
         };
         if(!d){
             throw new Error("Field: must have some options");
@@ -88,6 +88,7 @@ require("./datepicker");
             l.appendChild(document.createTextNode(this.label));
             l.setAttribute("for",this.name);
 	    this.element.appendChild(l);
+            this.element.classList.add("label");
 	}
         
 	if(this.publish !== undefined){
@@ -399,7 +400,7 @@ require("./datepicker");
             this.input.required=true;
         }
         this.element.appendChild(this.input);
-               
+        /*       
         if(this.server_confirmation){
             console.log("server confirmation required");
             this.input.addEventListener("mouseout",function(e){
@@ -409,7 +410,7 @@ require("./datepicker");
                     that.input.classList.add("pending");
                 }
             },false);
-        } 
+        } */
 	if(this.value !== null && this.value !== undefined){
             this.input.value=this.value;
 	}

@@ -31,10 +31,10 @@ require("./Nodes.js");
             
             if(this.components !== undefined){
                 for(var i=0;i<this.components.length;i++){
-                    el=document.createElement("div");//$("<div class='fieldset'></div>");
+                    el=document.createElement("div");
                     el.classList.add("fieldset");
                     if(this.components[i].class){
-                        el.addClass(this.components[i].class);
+                        el.classList.add(this.components[i].class);
                     }
  	            if(this.components[i].node){
                         this.addNode(this.components[i],el);

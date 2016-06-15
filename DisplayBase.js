@@ -32,7 +32,7 @@ require("./Utils");
         if(this.id === null){
             throw new Error(this.display + ": Must supply a unique id string");
         }
-        
+    
         if(win){
           //  console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
           //  console.log("adding to DOM " + this.DOM);
@@ -87,8 +87,11 @@ require("./Utils");
         }
 
 	if(this.listen !== undefined){
-            //console.log("listen listen listen");
-	    Harvey.IO.listen(this);  // needs to be here cause listener needs element.
+            console.log("listen listen listen");
+         //   for(var k in this){
+         //       console.log("just before listen " + k);
+        //    }
+	    Harvey.IO.listen(this);  
 	}
         // add the display type to the display_components list
         
@@ -163,7 +166,7 @@ require("./Utils");
 	    }
 	    return null;
 	},
-	getKey: function(){  // this is used by CBM Command etc as the key to look up the obj in templates or DB
+	getKey: function(){  
 	    if(this.name){  // if this is a real instance
 		return this.name;
 	    }
