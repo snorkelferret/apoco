@@ -82,19 +82,19 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
         webSocket:function(options,data){
             var that=this;
             var defaults={url: UI.webSocketURL};
-            
+
             //var settings=$.extend({},defaults,options);
             var settings={};
             settings.url=defaults.url;
             for(var k in options){
                 settings[k]=options[k];
             }
-            
+
             if(!Harvey.webSocket){
-                var a={'http:':'ws:','https:':'wss:'}[window.location.protocol];
+                var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
                 console.log("a is " + a + " protocol " + window.location.protocol);
                 if(!a){
-                    throw new Error("IO: Cannot get protocol for window " + a);
+                    throw new Error("IO: Cannot get protocol for window " + window.location);
                 }
                 Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
 	    }
@@ -122,7 +122,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};
             if(type !== "GET" || type !== "POST"){
                 throw new Error("REST: only knows about GET and POST not " + type);
-            }         
+            }
 	    //    var settings=$.extend({},defaults,options);
             var settings={};
             for(var k in defaults){
@@ -136,7 +136,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             }
             data=JSON.stringify(data);
             //var promise=$.ajax(settings);
-            
+
             var promise=new Promise(function(resolve,reject){
                 var request=new XMLHttpRequest();
                 var stateChange=function(){
@@ -152,9 +152,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                             }
                             Harvey.display.statusCode[request.status]((request.statusText + " " + request.responseText));
                         }
-                    }  
+                    }
                 };
-               
+
                 request.onreadystatechange=stateChange;
                 request.open(type,settings.url);
                 if(type === "POST"){
@@ -165,8 +165,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                     request.responseType=settings.mimeType;
                     request.send();
                 }
-            });            
-           
+            });
+
             return promise;
         }
     };
