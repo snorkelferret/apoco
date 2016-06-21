@@ -108,7 +108,7 @@
 
 
 .harvey_form ul li p{  display: table-cell; float: left }
-.harvey_form .form_button_container{height: 5em; display: block; }  /* container for buttons */ 
+.harvey_form .form_button_container{height: 5em; display: block;position:absolute;min-width:inherit;width:inherit; bottom:0px }  /* container for buttons */ 
 .harvey_form button.print_button { float: right; } 
 .harvey_form button { float: left;  display: block; margin: 1em 3em} 
 .harvey_form li p.required{ color: #aa2222; display: inline; font-size: 8pt; float: right;

@@ -1,6 +1,5 @@
 var Harvey=require('./declare').Harvey;
 require("./DisplayFieldset");
-require("./Utils");
 
 // create a form dynamically from json
 
@@ -15,14 +14,14 @@ require("./Utils");
 	this.DEBUG=true;
 	var that=this;
         Harvey.display._fieldsetBase.call(this,options,win);
-        this.execute();
+        this._execute();
 
     };
 
 
     // overwrite methods from base class
     HarveyMakeForm.prototype={
-	execute: function(){
+	_execute: function(){
 	    var that=this,fp,header,container,fc,h;
             
             this.element=document.createElement("div");
@@ -250,40 +249,9 @@ require("./Utils");
 	resetInvalid: function(){
 	    for(var i=0;i< this.fields.length;i++){
 		if(this.fields[i].required){
-		    this.fields[i].resetInvalid();
+		    this.fields[i]._resetValue();
 		}
 	    }
-	},
-	after_submit: function(callback,use_default_dialog){
-	    var that=this;
-	    if(use_default_dialog === undefined){
-		var use_default_dialog=true;
-	    }
-	    var old_submit=this.submit;
-	    that.submit=function(){
-		that.element.visibility="hidden";
-		var promise=old_submit.call(that);
-		Harvey.display.dialog("Submitting","Waiting confirmation from server",true);  //need to override the dialog options
-
-		promise.done(function(props){
-		    callback(props);
-		    that.destroy();
-		    if(use_default_dialog){
-			Harvey.display.dialog("Success", "Database updated");
-			setTimeout(function(){
-			    Harvey.display.dialog.close();
-			},1000);
-		    }
-		});
-		promise.fail(function(error){
-		    that.destroy();
-		    Harvey.display.dialog("Fail", "you have errors" + JSON.stringify(error));
-		    setTimeout(function(){
-			Harvey.display.dialog.close();
-		    },5000);
-		    that.element.css("display","");
-		});
-	    };
 	},
 	print: function(){
 	    var w=this.element.width();
@@ -313,8 +281,6 @@ require("./Utils");
 		}
 	    }
 	    return valid;
-	},
-	submit: function(){
 	}
     };
 

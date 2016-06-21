@@ -1,7 +1,7 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //jQuery=require('jquery');
+var Harvey=require('./declare').Harvey; //,UI=require('./declare').UI; //jQuery=require('jquery');
 require("./DisplayBase.js");
-require("./Fields.js");
 require("./Sort.js");
+
 /*
  * Copyright (c) Pooka Ltd.2012-2016
  * Distributed under MIT license.
@@ -43,9 +43,6 @@ jsonishData={
 
 ;(function(){
     "use strict";
-
-
-
     
     var getWidth=function(cols){ 
         var class_list=[],width;
@@ -382,13 +379,13 @@ jsonishData={
         }
         
   
-        this.execute();
+        this._execute();
     };
 
 
     HarveyMakeGrid.prototype={
 
-	select_data: function(){
+	_select_data: function(){
 	    var that=this;
 	 /*   return{
 		selected: function(event,ui){
@@ -562,7 +559,7 @@ jsonishData={
                     throw new Error("column must have type and name");
                 }
                 index=this.getColIndex(col.name);
-                if(index<0){
+                if(index===null){
                     index=this.cols.length;
                     this.cols[index]=col;
                 }
@@ -687,12 +684,15 @@ jsonishData={
             }
         },
 	getColIndex: function(name){
+            if(name === undefined){
+                return null;
+            }
 	    for(var i=0; i< this.cols.length;i++){
 		if (this.cols[i].name === name){
 		    return i;
 		}
 	    }
-	    return -1;
+	    return null;
 	},
 	getCol: function(name){ //grid_name){
 	    // console.log("getting columns");
@@ -707,7 +707,7 @@ jsonishData={
       	    }
             return this.cols;
  	},
-	execute:function(){
+	_execute:function(){
             var rows,body,r,that=this;
             // var t0=performance.now();
             this.element=document.createElement("div"); 

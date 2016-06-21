@@ -1,16 +1,10 @@
 var Harvey=require('./declare').Harvey;
 
-
-// Menu display object
-//  requires HarveyDisplayBase.js
-//
-
+require("./DisplayBase");
 
 ;(function(){
 
     "use strict";
-   
-
 // create the  display
 
     var HarveyMakeMenu=function(options,win){
@@ -18,7 +12,7 @@ var Harvey=require('./declare').Harvey;
 	var that=this;
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
-        this.execute();
+        this._execute();
     };
 
 
@@ -39,7 +33,7 @@ var Harvey=require('./declare').Harvey;
     };
 
     HarveyMakeMenu.prototype={
-	execute: function(){
+	_execute: function(){
             var s,u;
 	    //console.log("execute of DisplayMenu");
             this.selected=undefined;

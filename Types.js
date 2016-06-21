@@ -114,6 +114,18 @@ var Harvey=require('./declare').Harvey;
 	    }
 	    return false;
 	},
+        any: function(s){
+            return true;
+        },
+        range:function(s){
+            if(this.float(s)){
+                return true;
+            }
+            if(this.integer(s)){
+                return true;
+            }
+            return false;
+        },
 	decimal: function(s){  //Decimal numbers
 	    s=String(s);
 	    if(this.blank(s) || isNaN(s)){

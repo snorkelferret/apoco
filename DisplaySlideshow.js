@@ -1,9 +1,5 @@
 var Harvey=require('./declare').Harvey;
 require("./DisplayBase");
-require("./Popups");
-require("./Fields");
-require("./Utils");
-
 
 ;(function(){
     "use strict";
@@ -37,7 +33,7 @@ require("./Utils");
         else if(this.editable === true){   // put up file browser to select images 
             f=Harvey.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
-        this.execute();
+        this._execute();
     };
 
     HarveyMakeSlideshow.prototype={
@@ -48,7 +44,7 @@ require("./Utils");
                        {class:"ui-icon-play",action: "play"},
                        {class:"ui-icon-pause",action: "stop"},
                        {class:"ui-icon-seek-next",action: "step",params: "next"},
-                       {class:"ui-icon-arrow-4-diag",action:"show_fullscreen"}];
+                       {class:"ui-icon-arrow-4-diag",action:"showFullscreen"}];
             d=document.createElement("div");
             d.classList.add("slideshow_controls");
             u=document.createElement("ul");
@@ -67,7 +63,7 @@ require("./Utils");
             });
             
             for(var i=0;i<icons.length;i++){
-                if(icons[i].action === "show_fullscreen" && this.fullscreen !== true){
+                if(icons[i].action === "showFullscreen" && this.fullscreen !== true){
                     continue;  //don't show the fullscreen icon
                 }
                 l=document.createElement("li");
@@ -173,7 +169,7 @@ require("./Utils");
                 }); 
             }
         },
-	execute: function(){
+	_execute: function(){
             var that=this,l;
 	    console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
@@ -208,11 +204,17 @@ require("./Utils");
             }
         },
         deleteAll:function(){
+            // delete all the images
+            if(this.values){
+                for(var i=0;i<this.values;i++){
+                    this.slideshow_container.removeChild(this.values[i].SSimage);
+                }
+            }
             while(this.element.firstChild){
                 this.element.removeChild(this.element.firstChild);
             }
         },
-        show_fullscreen: function(){
+        showFullscreen: function(){
 	    // get the window width and height
 	    var that=this,c,t;
 	   // var width=$(window).width()-60; //innerWidth();
@@ -221,7 +223,7 @@ require("./Utils");
             var height=parseInt(window.innerHeight-48);
             //if this node is in the DOM we are already in fullscreen mode
             var r=document.getElementsByClassName("slideshow_cover")[0];
-            console.log("show_fullscreen got width " + width + " height " + height);
+            console.log("showFullscreen got width " + width + " height " + height);
 	    that.element.parentNode.removeChild(this.element); 
             console.log("slideshow cover is " + r);
             // that.hide();
@@ -314,7 +316,7 @@ require("./Utils");
             this.values[this.current].SSimage.style.top=0;
             this.values[this.current].SSimage.style.left=0;
           //  console.log("now current is " + this.current);
-        },
+        } /*,
         getImages: function(data,settings){
             if(!settings){
                 settings={};
@@ -331,7 +333,7 @@ require("./Utils");
             });
 
             return promise;
-        }
+        } */
     };
 
     Harvey.Utils.extend(HarveyMakeSlideshow,Harvey._DisplayBase);

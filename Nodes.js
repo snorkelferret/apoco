@@ -43,7 +43,7 @@ require("./Types.js");
             case "paragraph":
             case "label":
             case "anchor":
-		this.element.textContent=text;
+		this.element.innerHTML=text;
 		this.text=text;
                 return;
             default:

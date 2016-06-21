@@ -18,7 +18,7 @@ require("./DisplayBase.js");
 	var that=this;
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	//console.log("called display base");
-        this.execute();
+        this._execute();
     };
 
 
@@ -30,7 +30,7 @@ require("./DisplayBase.js");
     };
 
     HarveyMakeTabs.prototype={
-	execute: function(){
+	_execute: function(){
             var tt=[],tablist;
 	    // console.log("execute of DisplayTabs");
 	    //   this.element=$("<div id='" + this.id + "' class='tab_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");

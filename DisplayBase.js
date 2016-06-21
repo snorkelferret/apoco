@@ -1,5 +1,7 @@
 var Harvey=require('./declare').Harvey;
 require("./Utils");
+require("./Popups");
+require("./Fields");
 
 ;(function(){
 
@@ -18,9 +20,7 @@ require("./Utils");
 	};
        // var observer=null;
         var that=this,t;
-       // this.options={};
-        //this.options = $.extend({}, defaults,options);
-      
+       
         for(var k in defaults){
             this[k]=defaults[k];
         }
@@ -140,12 +140,14 @@ require("./Utils");
                     k=("delete"+_display_components[i]); 
                     if(this[k]){
                         this[k](name);
+                        return true;
                     }
                 }
             }
             else{
                 throw new Error("deleteChild- needs a name");
             }
+            return null;
         },
         _getMethods:function(){
             var m=[];
@@ -195,7 +197,7 @@ require("./Utils");
 		throw new Error("Parent is not defined for " + this.name);
 	    }
 	},
-	execute: function( data ) {
+	_execute: function( data ) {
 	    return null;  // if function has not been overwritten - bad return null
 	},
 	show: function(){
@@ -204,7 +206,6 @@ require("./Utils");
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Harvey.IO.publish(this);
 	    }
-            //if(!$.contains(this.DOM[0],this.element[0])){
             if(!document.body.contains(this.element)){
               //  console.log("Showing element that is not in DOM");
 	        if(this.element){
@@ -254,9 +255,6 @@ require("./Utils");
             }
 //           console.log("Can't hide element that is NOT in dom");
         },
-	check: function(name){
-	    throw new Error("Base Class check is not implemented");
-	},
 	delete: function(msg_from_parent){
 	    //console.log("delete display object is here");
             if(this.listen){

@@ -1,6 +1,5 @@
 var Harvey=require('./declare').Harvey;
 require("./DisplayBase.js");
-require("./Fields.js");
 require("./Nodes.js");
 
 
@@ -18,12 +17,12 @@ require("./Nodes.js");
         this.fields=[];
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
         if(this.display=="fieldset"){
-            this.execute();
+            this._execute();
         }
     };
 
     HarveyMakeFieldset.prototype={
-	execute: function(){
+	_execute: function(){
 	    var el,p;
 	    this.element=document.createElement("div");
             this.element.id=this.id;
@@ -245,6 +244,18 @@ require("./Nodes.js");
 		js[ this.fields[i].getKey()]=this.fields[i].getValue();
 	    }
             return js;
+        },
+	check: function(){
+            var valid=true;
+
+	    for(var i=0;i<this.fields.length;i++){
+		//console.log("check components " + i);
+		if(!this.fields[i].checkValue()){
+		    //console.log("Value for " +  this.fields[i].getValue() + " is wrong");
+		    valid=false;
+		}
+	    }
+	    return valid;
         },
 	submit: function(url){
             var j=this.getJSON();

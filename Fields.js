@@ -1,6 +1,6 @@
 var Harvey=require('./declare').Harvey;
 require('./Utils');
-require("./Sort.js");
+require("./Sort");
 require('./Types');
 require("./datepicker");
 
@@ -31,7 +31,8 @@ require("./datepicker");
 	stringArray: {html_type: "text",field: "stringArray",check:null,sort: null},
 	imageArray: {html_type: "image", field: "imageArray",check:null,sort: null},
 	password: {html_type: "password", field:"input", check: "string",sort: null},
-        range:{html_type:"range",field: "slider",check: "number",sort:null}
+        range:{html_type:"range",field: "slider",check: "number",sort:null},
+        any:{html_type:"text",field:"input",check: "string",sort:"string"} //default
     };
 
 /*  Harvey.HtmlToType=function(field){
@@ -421,12 +422,15 @@ require("./datepicker");
 
     var FloatField=function(d,element){
         var inp;
+	var that=this;
 	//console.log("FLOAT FIELD IS HERE");
         d.field="float";
         d.type="float";
 	_Field.call(this,d,element);
 	this.input=new Array(2);
-	var that=this;
+        if(this.precision===undefined){
+            this.precision=2;
+        }
 	var list=document.createElement("ul"); 
         list.classList.add('aligned_float');
 	var el=document.createElement("li");

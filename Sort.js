@@ -1,5 +1,6 @@
 var Harvey=require('./declare').Harvey;
-require("./Utils.js");
+require("./Utils");
+require("./Types")
 
 ;(function(){
 

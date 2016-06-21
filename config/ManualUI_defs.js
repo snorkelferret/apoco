@@ -4,6 +4,10 @@ global.UI=require('../declare').UI;
 */
 
 ;(function(){
+
+    UI.URL="/home/val";
+    UI.webSocketURL="home/val";
+    
     "use strict";
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
     var globalEval=function( code ) {
@@ -30,9 +34,7 @@ global.UI=require('../declare').UI;
 	}
     };
     
-    UI.URL="/home/val";
-    UI.webSocketURL="home/val";
-    
+ 
     var getAType={
         integer:14,
         positiveInteger: 10,
@@ -61,7 +63,7 @@ global.UI=require('../declare').UI;
         array: ["One","Two","Three","Four"],
         path: "css/images/rabbit_img1.jpg",
         size: "h3",
-        href: "https://jquery.com",
+        href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
         target: "_blank",
         objectArray:[{label:"value",description: "describe value"},{label:"another_value",descriptions:["one","two","three"]}]
     };
@@ -115,14 +117,11 @@ global.UI=require('../declare').UI;
             }
             for(var n in thing){
                 if(!n.startsWith("_")){
-                   
-                   if(k === "Fields"){
-                     //  console.log("+++++++++++++++++++++++++++++++got field " + n);
-                       //  if(n.indexOf("Field")> -1){
-                       if(n !== "exists"){  // method  not a field
+                    if(k === "Fields"){
+                        if(n !== "exists"){  // method  not a field
                            HThings[k].push(n);
                        }
-                      // }
+                     
                    }
                    else if(k==="Displays"){
                     //   console.log("got display " + n);
@@ -139,445 +138,433 @@ global.UI=require('../declare').UI;
         }
         
     }
-    mkArrays();
+    mkArrays(); // make the arrays of all the things Harvey knows how to build
    
    
-    var get_types=function(field){
-        var f=[];
-        for(var k in Harvey.dbToHtml){
-            if(Harvey.dbToHtml[k].field == field){
-                f.push(k);  
+    // FIELDS
+    var fieldManual={
+        get_types:function(field){
+            var f=[];
+            for(var k in Harvey.dbToHtml){
+                if(Harvey.dbToHtml[k].field == field){
+                    f.push(k);  
+                }
             }
-        }
-        return f;
-    };
-   
-       
-    var field_options={
-        required:{name:{type: "string",description:"tag used in Field methods"}},
-        common: {required:{type:"boolean",default: false,description:"Is the cell allowed to be blank"},
-                 editable:{type:"boolean",default:true,description: "If false some fields become a StaticField"},
-                 label:{type: "string",default: undefined,description:"added next to the input field"},
-                 title:{type: "string",default: undefined,description: "add a tooltip"}
-                },
-        special:{
-                 action:{type:"function",default: undefined,description:"Function fired on click on element"},
-                 listen:{type:"objectArray",default:undefined },
-                 publish:{type: "objectArray",default: undefined,description:""}
-                },
-        input: { options:{type:{type:"string",
-                                     default:"string",
-                                     parms:get_types("input"),
-                                     dependsOn:{float:{min:{default: undefined},
-                                                       max:{default: undefined},
-                                                       step:{default: 0.01},
-                                                       precision:{default: 2,description:"Number of places after the decimal point"}
-                                                      },
-                                                integer:{min:{default: undefined},
-                                                       max:{default: undefined},
-                                                       step:{default: 1}
-                                                        },
-                                                currency:{ ISOCurrencyCode:{default: "GBP"}
-                                                         }
-                                               }
-                                    },
-                               value:{type: "any",default: undefined, description:""}
-                              },
-                      description:""
+            return f;
+        },
+        field_options: function(){
+            var that=this;
+            return{
+            required:{name:{type: "string",description:"tag used in Field methods"}},
+            common: {required:{type:"boolean",default: false,description:"Is the cell allowed to be blank"},
+                     editable:{type:"boolean",default:true,description: "If false some fields become a StaticField"},
+                     label:{type: "string",default: undefined,description:"added next to the input field"},
+                     title:{type: "string",default: undefined,description: "add a tooltip"}
                     },
-        select:{ required:{ options:{type:"stringArray",
-                                          default: undefined,
-                                          description: ""}
-                               },
-                      options:{blank_option:{type:"boolean",
-                                             default: false,
-                                             description:""},
-                               value:{type: "string",default: undefined,description: "An element from the options string Array"}
-                              },
-                      description:""
-               },
-        buttonSet:{required:{labels:{type:"stringArray"}},
-                             options:{checkbox:{type:"boolean",
-                                                          default: false},
-                                      value:{type:"booleanArray"}},
-                             description:""
-                            },
-        slider:{ options:{ min:{type:"integer",default: 1},
-                                max:{type:"integer",default: 10},
-                                value:{type: "integer",default: undefined}
-                              },
-                      description: "This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Harvey setValue and getValue methods "
-                    },
-        numberArray:{ options:{type:{type:"string",
-                                          default: "integerArray",
-                                          params:get_types("numberArray")
-                                         },
-                                    value:{type:"any",default:undefined}
+            special:{
+                action:{type:"function",default: undefined,description:"Function fired on click on element"},
+                listen:{type:"objectArray",default:undefined },
+                publish:{type: "objectArray",default: undefined,description:""}
+            },
+            input: { options:{type:{type:"string",
+                                    default:"string",
+                                    params:that.get_types("input"),
+                                    dependsOn:{float:{min:{default: undefined},
+                                                      max:{default: undefined},
+                                                      step:{default: 0.01},
+                                                      precision:{default: 2,description:"Number of places after the decimal point"}
+                                                     },
+                                               integer:{min:{default: undefined},
+                                                        max:{default: undefined},
+                                                        step:{default: 1}
+                                                       },
+                                               currency:{ ISOCurrencyCode:{default: "GBP"}
+                                                        }
+                                              }
                                    },
-                           description:""
-                         },
-        imageArray:{options:{value:{type:"imageArray",
-                                         default: undefined,
-                                         description: "key value javascript object"},
-                                  thumbnails:{type:"boolean",default: true,description:"Display the images as thumbnails" },
-                                  width:{type:"integer",default: 120,description:"width of the thumbnails"},
-                                  height:{type:"integer",default: 90,description:"height of the thumbnails"}
-                                 },
-                         description:""
-                        },
-        float:{options:{precision:{type:"integer",default: 2,description:"Number of places after the decimal point" },
-                             step:{type:"float",default: 0.1},
-                             value:{type: "float",default: undefined}},
-                    description:"Float field that aligns the decimal point"
-                   },
-        autoComplete:{options:{options:{type:"stringArray"},
-                                    value:{type: "string",default: undefined}},
-                           description: "This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> <br>  Please use the Harvey getValue and setValue methods "
-                          },
-        checkBox:{ options:{ value:{type: "boolean",default: false}},
-                        description: ""},
-        date:{options:{value:{type:"any",default:undefined,params:["Date","string"] }},
-                   description:"This uses the browser datepicker(where available) or Harvey.datepicker"
-                  },
-        time:{options:{value:{type:"time",default:undefined,
-                                   description:"A valid partial-time as defined in [RFC 3339]."}},
-                   description:""
-                  },
-        static:{options:{value:{type:"any",params:["string","float","integer"]}},
+                              value:{type: "any",default: undefined,
+                                     params:that.get_types("input"),
+                                     description:""}
+                             },
                      description:""
-                    },
-        textArea:{options:{value:{type:"text",default: undefined}},
+                   },
+            select:{ required:{ options:{type:"stringArray",
+                                         default: undefined,
+                                         description: ""}
+                              },
+                     options:{blank_option:{type:"boolean",
+                                            default: false,
+                                            description:""},
+                              value:{type: "string",default: undefined,description: "An element from the options string Array"}
+                             },
+                     description:""
+                   },
+            buttonSet:{required:{labels:{type:"stringArray"}},
+                       options:{checkbox:{type:"boolean",
+                                          default: false},
+                                value:{type:"booleanArray"}},
                        description:""
                       },
-        stringArray:{options:{ length:{type:"integer",
-                                            default: 4,
-                                            description:" Max of value array and length"},
-                                    value:{type:"stringArray",default: undefined}
+            slider:{ options:{ min:{type:"integer",default: 1},
+                               max:{type:"integer",default: 10},
+                               value:{type: "integer",default: undefined}
+                             },
+                     description: "This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Harvey setValue and getValue methods "
+                   },
+            numberArray:{ options:{type:{type:"string",
+                                         default: "integerArray",
+                                         params:that.get_types("numberArray")
+                                        },
+                                   value:{type:"any",
+                                          params:that.get_types("numberArray"),
+                                          default:undefined}
                                   },
                           description:""
-                         }
-        
-    };
-
-    // fill in the type field where applicable - from Harvey.dbToHtml
-    function mk_default_types(){
-        for(var k in field_options){
-            var p;
-            // if(k.indexOf("Field")> -1){
-            if(k!== "common" && k !== "special" && k !== "required"){
-                var t=get_types(k);
-                if(t && t.length > 0){
-                    p=field_options[k].options;
-                    if(p && !p["type"]){
-                        p["type"]=new Object;
-                        p["type"].type="string";
-                        p["type"].default=t[0];
-                        if(t.length > 1){
-                            p["type"].params=t;
+                        },
+            imageArray:{options:{value:{type:"imageArray",
+                                        default: undefined,
+                                        description: "key value javascript object"},
+                                 thumbnails:{type:"boolean",default: true,description:"Display the images as thumbnails" },
+                                 width:{type:"integer",default: 120,description:"width of the thumbnails"},
+                                 height:{type:"integer",default: 90,description:"height of the thumbnails"}
+                                },
+                        description:""
+                       },
+            float:{options:{precision:{type:"integer",default: 2,description:"Number of places after the decimal point" },
+                            step:{type:"float",default: 0.1},
+                            value:{type: "float",default: undefined}},
+                   description:"Float field that aligns the decimal point"
+                  },
+            autoComplete:{options:{options:{type:"stringArray"},
+                                   value:{type: "string",default: undefined}},
+                          description: "This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> <br>  Please use the Harvey getValue and setValue methods "
+                         },
+            checkBox:{ options:{ value:{type: "boolean",default: false}},
+                       description: ""},
+            date:{options:{value:{type:"time",default:undefined,params:["Date","string"] }},
+                  description:"This uses the browser datepicker(where available) or Harvey.datepicker"
+                 },
+            time:{options:{value:{type:"time",default:undefined,
+                                  description:"A valid partial-time as defined in [RFC 3339]."}},
+                  description:""
+                 },
+            static:{options:{value:{type:"any",params:["string","float","integer"]}},
+                    description:""
+                   },
+            textArea:{options:{value:{type:"text",default: undefined}},
+                      description:""
+                     },
+            stringArray:{options:{ length:{type:"integer",
+                                           default: 4,
+                                           description:" Max of value array and length"},
+                                   value:{type:"stringArray",default: undefined}
+                                 },
+                         description:""
                         }
-                    }
-                }
-            }
-        }
-    }
-    mk_default_types();
-    
-    var Required=new Map;
-    var Dependencies=new Map;
-   
-    
-    var mkDefaultOptions=function(){
-        var HFields=[];
-        var Options={};
-        var r=[],dpo=[];
-        
-        for(var k in field_options){
-           // if(k.indexOf("Field")> -1){
-            if(k!== "common" && k !== "special" && k !== "required"){
-                HFields.push(k);
-            }
-        }
-        
-        for(var j=0;j<HFields.length; j++){
-            var f=HFields[j];
-            var d={};
-            r.length=0;
-            dpo.length=0;
-            if(field_options.required){
-                for(var n in field_options.required){
-                    if(field_options.required[n].default && field_options.required[n].default !== undefined){
-                        d[n]=field_options.required[n].default;
-                    }
-                    r.push(n);
-                }
-            }
-            if(field_options.common){
-                for(var n in field_options.common){
-             //       console.log("making common default option " + n);
-                    if(field_options.common[n].default !== undefined){
-                        d[n]=field_options.common[n].default;
-                        if(n === "required"){
-               //             console.log("mkDefaultoptions setting required to " + d[n]);
-                        }
-                    }
-                }
-            }
-            for(var k in field_options[f].options){
-               // console.log("option is " + k);
-                var ee=field_options[f].options[k].default;
-                if(ee && ee !== undefined){
-                    d[k]=ee;
-                }
-                if(field_options[f].options[k].dependsOn){
-                    for(var n in field_options[f].options[k].dependsOn){
-                        dpo.push(field_options[f].options[k].dependsOn[n]);
-                    }
-                }
-            }
-            for(var k in field_options[f].required){
-               // console.log("Setting required for " + f + " with value " + k);
-                r.push(k);
-            }
-            if(r.length>0){
-      //          for(var t=0;t<r.length;t++){
-        //            console.log("Field " + f  + " option " + r[t] + " is required ");   
-          //      }
-                Required.set(f,r);
-                Dependencies.set(f,dpo);
-            }
-            Options[f]=d;
-        }
-        return Options;
-    };
-
-    var Options=mkDefaultOptions();
-  /*  
-    for(var k in Options){
-        console.log("Field is " + k);
-        console.log("with options " + JSON.stringify(Options[k]));
-    }
-    
- */    
-  /*  
-    var checkDefaultOptions=function(f,d){
-        var p=$.extend({},Options[f],d);
-        var r=Required.get(f);
-        if(!r){ throw new Error("field " + f + "has not got any required parms");}
-        for(var i=0;i<r.length;r++){
-            if(p && !p[r[i]]){
-                throw new Error("Field " + f + " requires " + r[i]);
-            }
-        }
-        var dop=Dependencies.get(f);
-        if(dop){
-            for(var i=0;i<dop.length;i++){
-                if(p[dop[i]]){
-                    for(var k in dop[i]){
-                        if(dop[i][k].default !== undefined){
-                            p[k]= dop[i][k].default;
-                        }
-                    }
-                }
-            }
-        }
-        return p;
-    };
-
-*/
-  
-    
-    var mkFieldOptionsList=function(Options,Required){
-        var HFields=HThings.Fields;
-        //var field_options=Harvey.field._getAllSettings;
-        var t={};
-        var mk_descriptions=function(obj,BO){
-            var t={};
-            for(var n in obj){
-                t={};
-                t.label=n;
-                t.descriptions=new Array;
-                for(var m in obj[n]){
-                    t.descriptions.push((m + ":  " + obj[n][m] + " ")); 
-                }
-                BO.push(t);
-            }
-        };
-        
-        for(var i=0;i<HFields.length;i++){
-            Options[i]=[];
-            Required[i]=[];
-            if(field_options.required){
-                mk_descriptions(field_options.required,Required[i]);
-            }
-            if(field_options.common){
-                mk_descriptions(field_options.common,Options[i]);
-            }
-            if(field_options.special){
-                mk_descriptions(field_options.special,Options[i]);
-            }
-            if(field_options[HFields[i]]){
-                if(field_options[HFields[i]].required){
-                    mk_descriptions(field_options[HFields[i]].required,Required[i]);
-                }
-                if(field_options[HFields[i]].options){
-                    mk_descriptions(field_options[HFields[i]].options,Options[i]);
-                }
-            }
-        }
-    };
-
-   
-    
-    var mkFieldCommands=function(no_var_equals){
-        var Commands=[];
-        var k,v;
-        var HFields=HThings.Fields;
-  
-        var field_desirable={
-            autoComplete:["options"],
-            static:["value"],
-            stringArray:["value"],
-            float:["value"],
-            numberArray:["value"]
-        };
-
-
-       // Harvey.field._getAllSettings=field_options;
-       // Harvey.field.getDefaultOptions=Options;
-        
-      //  var field_options=Harvey.field._getAllSettings;
-        for(var i=0;i<HFields.length;i++){
-            var c="";
-            //console.log("Creating command for " + HFields[i]);
-            //var c="var dataObject={name:'anyName', editable: true, field:'" + HFields[i] + "'";
-            if(no_var_equals){
-                c="{field:'" + HFields[i] + "'";
-            }
-            else{
-                c="var dataObject={field:'" + HFields[i] + "'";
-            }
+            };
             
-            for(k in Options[HFields[i]]){
-                c=c.concat("," + k + ":" + JSON.stringify(Options[HFields[i]][k]) );
+        },
+        execute:function(){
+            var Options=this.field_options();
+            this.fields={};
+            this.mkOptions(Options);
+            this.mkFieldOptionsList();
+            for(var k in this.fields){
+                console.log("fields  value %j",this.fields[k]);
+                for(var h in this.fields[k]){
+                    console.log("other fields is %j " ,this.fields[k][h]);
+                }
             }
-           
-            //console.log(" c is " + c);
-            // get the globally required opts
-            v=field_options["required"];
-            for(k in v){
-              // console.log("GETTING REQUIRED");
-                c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
-            }
-            // get the required for the specific field
-            v=field_options[HFields[i]].required;
-            for(k in v){
-                c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
-            }
-            // add a label field
-            c=c.concat(", label: 'A Label'");
-       
-            if(field_desirable[HFields[i]]){
-                var fd=field_desirable[HFields[i]];
-                for(var j=0;j<fd.length;j++){
-                    var n=field_options[HFields[i]].options[fd[j]];
-                    //console.log("desirable field " + fd[j] + " type " + n.type );
-                    
-                    if(n){
-                        c=c.concat(","+ fd[j] + ":");
-                      //  console.log("adding desirable field " + fd[j] + " with type " + n.type);
-                        if(n.default !== undefined){
-                        //    console.log("adding default " + n.default);
-                            c=c.concat(n.default);
-                        }
-                        else if(n.type){
-                            if(n.type === "any"){
-                                if(field_options[HFields[i]].options["type"]){
-                                    n.type=field_options[HFields[i]].options["type"].params[0];
-                                }
-                            }
-                          //  console.log("getting value for " + n.type + " is " + getAType[n.type]);
-                            c=c.concat(JSON.stringify(getAType[n.type]));
-                        }
+            this.Commands=this.mkFieldCommands();
+            this.mkFields();
+            this.mkFieldMethods();
+        },
+        mkOptions:function(Options){
+            var HFields=HThings.Fields;
+            var r=[],dpo=[];
+            for(var j=0;j<HFields.length; j++){
+                var f=HFields[j];
+                this.fields[f]={};
+                this.fields[f].required={};
+                this.fields[f].options={};
+                console.log("mkOptions: field is " + f);
+                if(Options.required){
+                    for(var n in Options.required){
+                        this.fields[f].required[n]=Options.required[n];
+                    }
+                }
+                if(Options.common){
+                    for(var n in Options.common){
+                       this.fields[f].options[n]=Options.common[n];
+                    }
+                }
+                if(Options[f].options){
+                    for(var n in Options[f].options){
+                       this.fields[f].options[n]=Options[f].options[n];
+                    }
+                }
+                if(Options[f].required){
+                    for(var n in Options[f].required){
+                        this.fields[f].required[n]=Options[f].required[n];
                     }
                 }
             }
-            c=c.concat("};");
-           // console.log("Made command index i " + i + " cmd " + c);
-            Commands[i]=c;
-        }
-        return Commands;
-    };
-
-   // var Commands=mkFieldCommands();
-  
-    var mkFields=function(){
-        var fields=[];
-        var Options=[];
-        var Required=[];
-        var Commands=mkFieldCommands();
-        var HFields=HThings.Fields;
-        mkFieldOptionsList(Options,Required);
-        //var des=Harvey.field._getAllSettings;
-        var des=field_options;
-        for(var i=0;i<HFields.length;i++){
-            //console.log("++++++++++++++++++== mkFields making " + HFields[i]);
-            var k={};
-            k.display="fieldset";
-            k.DOM="right";
-            k.hidden=true;
-            k.id=HFields[i];
-            k.dependsOn=HFields[i];
-            k.action=function(that){
-                var p=that.getChild("doit");
-      
-                p.element.click();
-            },
-            k.components=[{node: "heading",size: "h3", text: HFields[i]},
-                          {node:"paragraph", text: "<code>var f=Harvey.field['" +HFields[i] +"'](dataObject,element);</code>"},
-                          {node:"paragraph",text:des[HFields[i]].description },
-                          {node: "heading",size: "h5",text: "dataObject settings"},
-                          {node: "heading",size: "h5", text: "Required"},
-                          {node: "descriptionList", items:Required[i]},
-                          {node: "heading", size: "h5", text: "Options"},
-                          {node: "descriptionList", items:Options[i]},
-                          {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "textArea", value: Commands[i]}, 
-                          {name: "doit", node: "button", text: "Go",
-                           action: function(that){
-       //                        console.log("button action is here");
-                               var f=that.parent.getChild("Input_params");
-                               if(!f){
-                                   throw new Error("can't get input params");
-                               }
-                              // $.globalEval(f.getValue());
-                               globalEval(f.getValue());
-                      //         console.log("parms are " + dataObject);
-                               if(Harvey.checkType["object"](dataObject)){
-                      //             console.log("and it is an object");
-                                   var name=dataObject.name;
-                                   if(that.parent.getChild(name)){
-                                       console.log("deleting child");
-                                       that.parent.deleteChild(name);
+        },
+        mkFieldOptionsList:function(){ // make the descriptionlist
+            var HFields=HThings.Fields;
+            var f;
+            var list_name;
+            var mk_descriptions=function(obj,name){
+                var t={};
+                var BO=[];
+                for(var n in obj[name]){
+                    t={};
+                    t.label=n;
+                    t.descriptions=new Array;
+                    for(var m in obj[name][n]){
+                        t.descriptions.push((m + ":  " + obj[name][n][m] + " ")); 
+                    }
+                    BO.push(t);
+                }
+                list_name=(name + "_list");
+                obj[list_name]=BO;
+            };
+            for(var i=0;i<HFields.length;i++){
+                f=HFields[i];
+                if(this.fields[f].required){
+                    mk_descriptions(this.fields[f],"required");
+                }
+                if(this.fields[f].options){
+                    mk_descriptions(this.fields[f],"options");
+                }
+                if(this.fields[f].special){
+                    mk_descriptions(this.fields[f],"special");
+                }
+            }
+        },
+        mkFieldCommands:function(no_var_equals){
+            var that=this;
+            var Commands=[];
+            var f,k,v;
+            var HFields=HThings.Fields;
+            
+            var field_desirable={
+                autoComplete:["options"],
+                static:["value"],
+                stringArray:["value"],
+                float:["value"],
+                numberArray:["value","type"],
+                input:["value","type"]
+            };
+            for(var i=0;i<HFields.length;i++){
+                f=HFields[i];
+                var c="";
+                console.log("Creating command for " + HFields[i]);
+                if(no_var_equals){
+                    c="{field:'" + HFields[i] + "'";
+                }
+                else{
+                    c="var dataObject={field:'" + HFields[i] + "'";
+                }
+                console.log(" c is " + c);
+                // get the globally required opts
+                v=this.fields[f].required;
+                for(k in v){
+                    console.log("GETTING REQUIRED");
+                    c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
+                }
+                c=c.concat(", label: 'A Label'");
+                
+                if(field_desirable[HFields[i]]){
+                    var fd=field_desirable[HFields[i]];
+                    for(var j=0;j<fd.length;j++){
+                        var n=this.fields[f].options[fd[j]];
+                        console.log("desirable field for " + fd[j] + " type " + n.type );
+                        
+                        if(n){
+                            c=c.concat(","+ fd[j] + ":");
+                            console.log("adding desirable field " + fd[j] + " with type " + n.type);
+                            if(n.default !== undefined){
+                                console.log("adding default " + n.default);
+                                c=c.concat(JSON.stringify(n.default));
+                            }
+                            else if(n.type){
+                                if(n.type === "any"){
+                                    if(this.fields[f].options[fd[j]].params){
+                                        n.type=this.fields[f].options[fd[j]].params[0];
+                                    }
+                                }
+                                c=c.concat(JSON.stringify(getAType[n.type]));
+                            }
+                        }
+                    }
+                }
+                c=c.concat("};");
+                console.log("Made command index i " + i + " cmd " + c);
+                Commands[i]=c;
+            }
+            return Commands;
+        },
+        mkFields:function(){
+            var f,fields=[];
+            var that=this;
+            var HFields=HThings.Fields;
+            
+            for(var i=0;i<HFields.length;i++){
+               console.log("++++++++++++++++++== mkFields making " + HFields[i]);
+                var k={};
+                f=HFields[i];
+                k.display="fieldset";
+                k.DOM="right";
+                k.hidden=true;
+                k.id=HFields[i];
+                k.dependsOn=HFields[i];
+                k.action=function(that){
+                    var p=that.getChild("doit");
+                    p.element.click();
+                },
+                k.components=[{node: "heading",size: "h3", text: HFields[i]},
+                              {node:"paragraph", text: "<code>var f=Harvey.field['" +HFields[i] +"'](dataObject,element);</code>"},
+                              {node:"paragraph",text:that.fields[f].description },
+                              {node: "heading",size: "h5",text: "dataObject settings"},
+                              {node: "heading",size: "h5", text: "Required"},
+                              {node: "descriptionList", items:that.fields[f].required_list},
+                              {node: "heading", size: "h5", text: "Options"},
+                              {node: "descriptionList", items:that.fields[f].options_list},
+                              {node: "heading",size: "h5",text: "Live example"},
+                              {name: "Input_params",field: "textArea", value: that.Commands[i]}, 
+                              {name: "doit", node: "button", text: "Go",
+                               action: function(that){
+                                   //                        console.log("button action is here");
+                                   var f=that.parent.getChild("Input_params");
+                                   if(!f){
+                                       throw new Error("can't get input params");
                                    }
-                       //            console.log("adding child");
-                                   that.parent.addField(dataObject);
+                                   console.log("f.getValue is %j",f.getValue());
+                                   // $.globalEval(f.getValue());
+                                   globalEval(f.getValue());
+                                   //         console.log("parms are " + dataObject);
+                                   if(Harvey.checkType["object"](dataObject)){
+                                       //             console.log("and it is an object");
+                                       var name=dataObject.name;
+                                       if(that.parent.getChild(name)){
+                                           console.log("deleting child");
+                                           that.parent.deleteChild(name);
+                                       }
+                                       //            console.log("adding child");
+                                       that.parent.addField(dataObject);
+                                   }
+                                   else{
+                                       Harvey.display.dialog("Error", "Input is not a valid object");
+                                   } 
                                }
-                               else{
-                                   Harvey.display.dialog("Error", "Input is not a valid object");
-                               } 
-                           }
-                          }
-                         ];
-       
-            UI.Panels.Fields.components.push(k);
-        }
-       
+                              }
+                             ];
+                UI.Panels.Fields.components.push(k);
+            }
+        },  
+        mkFieldMethods:function(){
+            var fm=Harvey.field._getMethods();
+         
+            
+            var HFields=HThings.Fields;
+            var fields=[];
+            var field_methods_list={
+                getValue:{descriptions:[
+                    "<code>var r=field.getValue();</code>",
+                    "return: type",
+                    'if no value is set returns "undefined"']
+                         },
+                setValue:{descriptions:[
+                    "<code>var r=field.setValue(value);</code>",
+                    "return: void"
+                ]},
+                checkValue:{descriptions:[
+                    "<code>var r=field.checkValue();</code>",
+                    "return: boolean",
+                    "If the type has been specified checks the value is of the specified type "
+                ]},
+                getElement: {descriptions:[
+                    "<code>var r=field.getElement();<code>",
+                    "return: HTMLObject",
+                    "The original html node supplied in the call to Harvey.Field"
+                ] },
+                getKey: {descriptions:[
+                    "<code>var r=field.getKey();</code>",
+                    "return: string",
+                    "The name if it exists,or label if that has been supplied or null"
+                ]},
+                getInputElement:{descriptions:[
+                    "<code>var r=field.getInputElement()</code>",
+                    "return:HTMLObject",
+                    "The input node"
+                ]},
+                delete:{descriptions:["<code> field.delete()</code>]",
+                                      "return void","delete the field"]},
+                deleteValue:{ descriptions:["<code> var r=field.deleteValue();</code>"]},
+                addValue:{ descriptions:["<code> var r=field.addValue(new_value);</code>"]},
+                popupEditor:{descriptions:["<code>field.popupEditor(function); </code>","return void",
+                                           "supply the function to be called "]},
+                getLabel:{descriptions:["<code>var r=field.getLabel();</code>","return string",
+                                        "get the htmllabel element"]},
+                mkThumbnails:{descriptions:["make thumbnails from values array"]},
+                loadImages:{descriptions:["<code>var promise=field.loadImages(valueArray);</code>",
+                                          "load images from the values array"]},
+                reset:{descriptions:["<code>field.reset();</code>","set all the values to false"]}
+            };
+            var items=[];
+            
+            for(var i=0;i<HFields.length;i++){
+                // console.log("mkFieldMethods making " + HFields[i]);
+                var k={};
+                items=[];
+                Harvey.sort(fm[HFields[i]],"string");
+                for(var j=0;j<fm[HFields[i]].length;j++){
+                    var m=fm[HFields[i]][j];
+                    items[j]={label:m,
+                              descriptions:field_methods_list[m].descriptions};    
+                }
+                k.display="fieldset";
+                k.DOM="right";
+                k.hidden=true;
+                k.id=(HFields[i] + "Methods").toString();
+                k.components=[{node: "heading", size: "h4", text: "Methods"},
+                              {node: "descriptionList", items:items},
+                              {node: "heading",size: "h5",text: "Live example"},
+                              {name: "Input_params",field: "textArea",
+                               value: "var value=field.getKey();"}, 
+                              {name: "doit", node: "button", text: "Go",
+                               action: function(that){
+                               //                  console.log("button action is here");
+                                   var f=that.parent.getChild("Input_params");
+                                   if(!f){
+                                       throw new Error("can't get input params");
+                                   }
+                                   window.field=that.parent.getChild("SomeString");
+                                   //$.globalEval(f.getValue());
+                                   globalEval(f.getValue());
+                                   var nf=that.parent.getChild("Result");
+                                   // console.log("methods doit got " + value);
+                                   nf.setValue(JSON.stringify(value));
+                                   
+                               }},
+                              {node:"paragraph",text:"Result"},
+                              {field:"static",name:"Result",type:"string" }
+                              
+                             ];
+                
+                globalEval(this.Commands[i]);
+                k.components.push(dataObject);
+                
+                UI.Panels.Fields.components.push(k);
+            }
+         }
     };
-  
-    var select_menu=function(that){
-        var name=that.name;
-        var p=that.parent.getSiblings();
-     //   console.log("selecting menu for " + name);
+        
+        var select_menu=function(that){
+            var name=that.name;
+            var p=that.parent.getSiblings();
+            //   console.log("selecting menu for " + name);
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
         }
@@ -638,15 +625,16 @@ global.UI=require('../declare').UI;
             integer:{test:'[90,90.3,"ete","te5"]'},
             integerArray:{test:'[[5,6,7,8],[89.5,45.76,34]]'},
             negativeInteger:{test:'[-45,9.5,-6.4]'},
-            password:{test:'["ioioioi"]'},
+            password:{test:'["ioioioi","uiioouiu"]'},
             phoneNumber:{test:'[89898998,"90wr54"]'},
-            positiveInteger:{test:'[90,"909ewr",666.4]'},
+            positiveInteger:{test:'[90,"909ewr",666.4,-34]'},
             string:{test:'["erre",78.6]'},
             stringArray:{test:'[["6767",7878,"re"]]'},
             text:{test:'["yuyuyuy",898.99]'},
             time:{test:'[78,"10:02 PM","23:33:45","10:34"]'},
-            token:{test:'["7878","78fs-rte",65]'},
-            range:{test:'[42.55,"3wa",42,-10]'}
+            token:{test:'["7878","78fs-rte",65,"%4","^89"]'},
+            range:{test:'[42.55,"3wa",42,-10]'},
+            any:{test:'[34,"sdds","fs",104.4]'}
         };
       
         for(var i=0;i<HTypes.length;i++){
@@ -686,8 +674,6 @@ global.UI=require('../declare').UI;
                           ];
             UI.Panels.Types.components.push(k);
         }
-        
-       
     };
 
     var mkNodes=function(){
@@ -820,101 +806,7 @@ global.UI=require('../declare').UI;
     };
 
 
-    
-    var mkFieldMethods=function(){
-        var fm=Harvey.field._getMethods();
-        var Commands=mkFieldCommands();
-        var HFields=HThings.Fields;
-        var fields=[];
-        // strip the var dataObject= from the head
-        
-        var field_methods_list={
-            getValue:{descriptions:[
-                "<code>var r=field.getValue();</code>",
-                "return: type",
-                'if no value is set returns "undefined"']
-                     },
-            setValue:{descriptions:[
-                "<code>var r=field.setValue(value);</code>",
-                "return: void"
-            ]},
-            checkValue:{descriptions:[
-                "<code>var r=field.checkValue();</code>",
-                "return: boolean",
-                "If the type has been specified checks the value is of the specified type "
-            ]},
-            getElement: {descriptions:[
-                "<code>var r=field.getElement();<code>",
-                "return: jQueryObject",
-                "The original jquery node supplied in the call to Harvey.Field"
-            ] },
-            getKey: {descriptions:[
-                "<code>var r=field.getKey();</code>",
-                "return: string",
-                "The name if it exists,or label if that has been supplied or null"
-            ]},
-            getInputElement:{descriptions:[
-                "<code>var r=getInputElement()</code>",
-                "return:jQueryObject",
-                "The input node"
-            ]},
-            delete:{descriptions:[]},
-            deleteValue:{ descriptions:[]},
-            addValue:{ descriptions:[]},
-            popupEditor:{descriptions:[]},
-            getLabel:{descriptions:["get the htmllabel element"]},
-            mkThumbnails:{descriptions:["make thumbnails from values array"]},
-            loadImages:{descriptions:["load images from the values array"]},
-            reset:{descriptions:["set all the values to false"]}
-        };
-        var items=[];
-              
-        for(var i=0;i<HFields.length;i++){
-           // console.log("mkFieldMethods making " + HFields[i]);
-            var k={};
-            items=[];
-            for(var j=0;j<fm[HFields[i]].length;j++){
-                var m=fm[HFields[i]][j];
-                items[j]={label:m,
-                          descriptions:field_methods_list[m].descriptions};    
-            }
-            k.display="fieldset";
-            k.DOM="right";
-            k.hidden=true;
-            k.id=(HFields[i] + "Methods").toString();
-            k.components=[{node: "heading", size: "h4", text: "Methods"},
-                          {node: "descriptionList", items:items},
-                          {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "textArea",
-                           value: "var value=field.getKey();"}, 
-                          {name: "doit", node: "button", text: "Go",
-                           action: function(that){
-             //                  console.log("button action is here");
-                               var f=that.parent.getChild("Input_params");
-                               if(!f){
-                                   throw new Error("can't get input params");
-                               }
-                               window.field=that.parent.getChild("SomeString");
-                               //$.globalEval(f.getValue());
-                               globalEval(f.getValue());
-                               var nf=that.parent.getChild("Result");
-                              // console.log("methods doit got " + value);
-                               nf.setValue(JSON.stringify(value));
-                               
-                           }},
-                          {node:"paragraph",text:"Result"},
-                          {field:"static",name:"Result",type:"string" }
-                          
-                         ];
-   
-            globalEval(Commands[i]);
-            k.components.push(dataObject);
-            
-            UI.Panels.Fields.components.push(k);
-        }
-       
-    };
-
+  
     var mkDisplays=function(){
         
         var stuff={
@@ -932,7 +824,7 @@ global.UI=require('../declare').UI;
                   options:[
                       {label:"userSortable",descriptions:["type: boolean","can the user sort the cols","userSortable and sortOrder are mutually exclusive"]},
                       {label:"sortOrder",descriptions:["type:stringArray","column names to sort the grid rows","example","<code>sortOrder:['colname1','colname2']<code","sort the rows first by colname1 and then colname2"]},
-                      {label:"groupby",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a label it will be used as a the subgrid seperator"]},
+                      {label:"groupBy",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a label it will be used as a the subgrid seperator"]},
                       {label:"uniqueKey",descriptions:["type: string","the column name of the uniqueKey if it exists"]},
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]}
                   ]}, 
@@ -969,10 +861,13 @@ global.UI=require('../declare').UI;
             k.id=HDisplays[i];
             k.dependsOn=HDisplays[i];
             k.action=function(that){
-               // console.log("triggering click");
+                console.log("triggering click with id ", that.id);
                 var p=that.getChild("doit");
                 p.element.click();
-                dobj.hide();  // hide the display first time round
+                var dobj=window[(that.id + "_obj")];
+                if(dobj){
+                    dobj.hide();  // hide the display first time round
+                }
             },
             k.components=[{node: "heading",size: "h3", text: HDisplays[i]},
                           {node:"paragraph", text: "<code>var node=Harvey.display['" + HDisplays[i] + "'](dataObject);</code>"},
@@ -990,8 +885,9 @@ global.UI=require('../declare').UI;
                                                           {label:"after",descriptions:["type: string","where the string is the id of an element that the new elemnent will be displayed after"]}]},
                           {node:"descriptionList",items:stuff[HDisplays[i]].options},
                           {node: "heading",size:'h4',text:"live Demo"},
+                          {node: "paragraph",text:"Please Note that the display Object is being added to the global window namespace for slight security and ease of access for the methods below"},
                           {name: "Input_params",field: "textArea",
-                           value: "var dobj=Harvey.display['" + HDisplays[i] + "']({DOM:'right',id:'" + HDisplays[i] + "Display', after:'" + HDisplays[i] + "', " + command[HDisplays[i]] + "});"},
+                           value: "var " + HDisplays[i] + "_obj=Harvey.display['" + HDisplays[i] + "']({DOM:'right',id:'" + HDisplays[i] + "Display', after:'" + HDisplays[i] + "', " + command[HDisplays[i]] + "});"},
                           {node:'button',name:'doit',text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -999,18 +895,22 @@ global.UI=require('../declare').UI;
                                    throw new Error("can't get input params");
                                }
                                var n=that.parent.id;
-                               //$.globalEval(f.getValue());
                                globalEval(f.getValue());
                                var d=Harvey.Panel.get("Displays").getChild((n+"Display"));
                                if( d!== null){
                                    Harvey.Panel.get("Displays").deleteChild((n+"Display"));
                                }
-                                                
+                               var p=window[(n + "_obj")];
+                               if(p){
+                                   dobj=p;
+                               }
+                               else{
+                                   throw new Error("Display Object " + n + " not in the DOM");
+                               }              
                                if(!Harvey.checkType['object'](dobj)){
-                                   throw new Error("Bad return");
+                                   throw new Error("Cannot find display Object - Bad return");
                                }
                                Harvey.Panel.get("Displays").addChild(dobj);
-                               // dobj.hide(); 
                            }
                           }
                          ];
@@ -1026,46 +926,76 @@ global.UI=require('../declare').UI;
            // console.log("getting method for " + HDisplays[i]);
             Methods[HDisplays[i]]=[];
             var p=Harvey.display[(HDisplays[i]+"Methods")]();
+            Harvey.sort(p,"string");
             for(var j=0;j<p.length; j++){
              //   console.log("display " + HDisplays[i] + " has method " + p[j]);
                 if(p[j] !== "constructor" && !p[j].startsWith("_")){
                     Methods[HDisplays[i]].push(p[j]);
                 }
             }
+            
         }
         var display_methods_list={
-            show:["<code> var v=my_display.show();)</code>","return: boolean","add the display to the DOM"],
-            getElement:["<code> var v=my_display.getElement();</code>","return: htmlobject"," the root element of the display"],
-            getChildren:["<code> var v=my_display.getChildren();</code>","return: object","where the object has keys fields, tabs,grids etc depending on the type of children the display object creates"],
-            getDisplayType:["<code> var v=my_display.getDisplayType();</code>","return: string","e.g 'tabs','form' etc"],
-            getName:["<code> var v=my_display.getName(); </code>","return: string","returns the name if it exists"],
-            getKey:["<code> var v=my_display.getKey(); </code> ","return string"," return the name if it exists or id(which must exist)"],
-            getParent:["<code> var v=my_display.getParent(); </code>","return: Panel object"," returns window if it exists"],
-            getSiblings:["<code> var v=my_display.getSiblings(); </code>","return: objectArray"," array of the other display objects that are in the same Panel"],
-            hide: ["<code> my_display.hide(); </code>","return: none","remove the display from the DOM"],
-            check: [],
-            delete: ["<code> my_display.delete(); </code>","return: none","delete the display object and all it's children from memory"],
-            update: [],
-            getTabs:["<code> var v=mk_display.getTabs(); </code>"],
-            getTab:[],
-            select: [],
+            show:["<code> var v=my_display.show();</code>","params: none","return: boolean","add the root display element to the DOM"],
+            getElement:["<code> var v=my_display.getElement();</code>","params: none","return: htmlobject"," the root element of the display"],
+            getChild:["<code>var c=my_display.getChild(name);</code>","params: type: string - name as defined in the components array ","return: object","returns null on fail"],
+            getChildren:["<code> var v=my_display.getChildren();</code>","params: none","return: object","where the object has keys fields, tabs,grids etc depending on the type of children the display object creates"],
+            getDisplayType:["<code> var v=my_display.getDisplayType();</code>","params: none","return: string","e.g 'tabs','form' etc"],
+            getName:["<code> var v=my_display.getName(); </code>","return: string","params: none","returns the name if it exists"],
+            getKey:["<code> var v=my_display.getKey(); </code> ","return string","params: none"," return the name if it exists or id(which must exist)"],
+            getParent:["<code> var v=my_display.getParent(); </code>","params: none","return: Panel object"," returns window if it exists"],
+            getSiblings:["<code> var v=my_display.getSiblings(); </code>","params: none","return: objectArray"," array of the other display objects that are in the same Panel"],
+            hide: ["<code> my_display.hide(); </code>","return: none","params: none","remove the display from the DOM"],
+            check: ["<code>var r=my_display.check();</code>","params: none","return: boolean"],
+            delete: ["<code> my_display.delete(); </code>","return: none","params: none","delete the display object and all it's children from memory"],
+            update: ["<code>my_display.update(name);</code>","params: name(string)","return: none","set the current selected  element to name"],
+            getTabs:["<code> var v=my_display.getTabs(); </code>","params: none"],
+            addTab:["<code> my_display.addTab(tab_object,[ ,html_tab_object]);</code>","params: tab_object, e.g <code> tab_object={name:'new_tab_name',action: my_func}</code> <br> html_tab_object- html object type ul (optional) defaults to the current object","return: none "],
+            getTab:["<code>var t=my_display.getTab([ ,name]);</code>","params: name (string) or none, name of an existing tab object","return: none"],
+            deleteTab:["<code>my_display.deleteTab(name);</code>","params: name(string)","return: none"],
+            select: ["<code> my_display.select(name)</code>","params: name(string)","return: none"],
             addNode:["<code> my_display.addNode(node_object); </code>"],
             addField:["<code> my_display.addField(field_object); </code>"],
-            getJSON: ["<code> var js=my.display.getJSON();</code>"],
+            getJSON: ["<code> var js=my_display.getJSON();</code>"],
+            resetInvalid:["<code>my_display.resetInvalid();</code>","params: none","return: none","reset all fields to last known good value"],
             submit: [],
-            sort: [],
-            getColIndex:["<code>var v=my_display.getColIndex(col_name); </code>","parms: 'string',column name"],
-            getCol: [],
-            getGrid: ["<code> var v=my_display.getGrid(grid_name); </code>","return the grid object named grid_name"],
-            showGrid: [],
-            hideGrid: [],
-            insertRow: [],
-            redrawRows: [],
-            updateRow: [],
-            getRowFromElement: [],
-            print: [],
-            start: [],
-            showFullscreen: []
+            play:["<code>my_display.play();</code>","start playback"],
+            step:["<code>my_display.step(dir);</code>","params: dir (string) either 'next' or 'prev'","step forward one frame"],
+            showFullscreen:["<code>my_display.showFullscreen();</code>","params: none","return: none","toggles fullscreen mode, i.e called once makes the display fullscreen called again it pops it back into the DOM tree"],
+            stop:["<code>my_display.stop();</code>","stop playback"],    
+            sort: ["<code> my_display.sort([ ,grid_object]) </code>","params:none or grid object as returned by getGrid ","return: none (throws error on fail)","If no grid_object is specified sorts all the grids","Sorts using sortOrder if given or uniqueKey if that has been supplied"],
+            isHidden:["<code> var t=my_display.isHidden(); </code>","params: none","return: boolean"],
+            displayType:["<code> var t=my_display.displayType(); </code>","params: none","return: string"],
+            getField:["<code> var f=my_display.getField(name); </code>"],
+            deleteChild:["<code> my_display.deleteChild(name); </code>"],
+            addButton:["<code> my_display.addButton(button_object); </code>","params: button_object - e.g <code> var button_object={name: 'new_button',action: my_func}</code>"],
+            addMenu:["<code>my_display.addMenu(menu_object);</code>","params: menu_object - e.g <code> var=menu_object={name;'new_name'}; </code>"],
+            deleteMenu:["<code>my_display.deleteMenu(name);</code>","params: name (string) - name of menu to delete","return: none"],
+            getMenu:["<code> var m=my_display.getMenu([ ,name]);</code>","params: name(string) or none","return: if the name parameter is supplies returns the named menu object, otherwise returns an array of all the menus"],
+            deleteButton:["<code>my_display.deleteButton(name);</code>","params: name(string) - name of button to delete","return: none"],
+            getButton:["<code>var b=my_display.getButton([ ,name])</code>","params: name(string) or none","return: button object if name is supplied or array of all the buttons if no parms submitted" ],
+            getSelected:["<code>var s=my_display.getSelected();</code>","params: none","return: selected Object or null"],
+            getNode:["<code>var n=my_display.getNode([ ,name]);</code>","params: name(string) or none","return: node object if name is supplied or array of nodes"],
+            deleteAll:["<code>my_display.deleteAll();</code>","params: none","return: none","deletes all the children of the displayObject"],
+            deleteNode:["<code>my_display.deleteNode(name);</code>","params: name (string)","return: none"],
+            deleteField:["<code> my_display.deleteField(name);</code>","params: name (string)","return: none"],
+            deleteRow:["<code>my_display.deleteRow(key,[ ,grid_name]);</code>","params: "],
+            deleteCol:["<code> my_display.deleteCol(col_name)</code>","params: string (col_name)","return: none"],
+            addGrid:["<code>my_display.addGrid(grid_object);</code>","params: grid_object - as returned by getFrid()"],
+            getRow:["<code>var r=my_display.getRow(key,[ ,grid_name],[ ,closest]);</code>","params: key -key value pairs that uniquely identify the row e.g if the grid has a unique key then <code> key={'uniqueKey': 10}</code> <br> grid_name - optional (name of the grid) if not given sorts through all the grids <br> closest: object e.g <code> var closest={} </code> optional if supplied and the row does not exist returns the closest_object with  keys e.g <code> closest={index: 10, dir: 'before'} <code> where dir is 'before' or 'after'","return: row_object or null if not found" ],
+            addRow:["<code>my_display.addRow(row_object);</code>","params: row_object e.g <code> var r=my_display.addRow({stock:'XXX' value: 1,class:109,date:'2016-08-30'});<code> ","return: row_object"],
+            addCol:["<code> my_display.addCol(col_object); </code>","params: col_object e.g <code> my_display.addCol({name:'other',type:'string',editable:false}); <code>","return: none - throws error on fail"],
+            getColIndex:["<code>var v=my_display.getColIndex([ ,col_name]); </code>","parms: 'string',column name or none","return: integer - null on fail"],
+            getCol: ["<code> var c=my_display.getCol([ ,name])</code>","params: name string or none","return: col_object is name is supplied or an array of cols if it is not"],
+            getGrid: ["<code> var v=my_display.getGrid([ ,grid_name]); </code>","params: none or grid_name","return the grid object for named grid_name or an array of grids if the name is not supplied"],
+            showGrid: ["<code> var v=my_display.showGrid(grid_name); </code>"],
+            hideGrid: ["<code> var v=my_display.hideGrid(grid_name); </code>"],
+            insertRow: ["<code> var v=my_display.insertRow(row); </code>"],
+            redrawRows: ["<code> var v=my_display.redrawRows(grid_name); </code>"],
+            updateRow: ["<code> var v=my_display.updateRow(row); </code>"],
+            getRowFromElement: ["<code> var v=my_display.getRowFromElement(htmlObject); </code>"],
+            print: ["<code> var v=my_display.print(); </code>"],
+            start: ["<code> var v=my_display.start(); </code>"]
         };
         var items=[];
         for(var i=0;i<HDisplays.length;i++){
@@ -1087,7 +1017,7 @@ global.UI=require('../declare').UI;
                           {node: "heading",size: "h5",text: "Live example"},
                           {node: "paragraph",text: "(global variable for eval)"},
                           {name: "Input_params",field: "textArea",
-                           value: "var v=window.dobj.getKey();"}, 
+                           value: "var v=window." + HDisplays[i]+"_obj.getKey();"}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                //                  console.log("button action is here");
@@ -1095,14 +1025,17 @@ global.UI=require('../declare').UI;
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                               //window.field=that.parent.getChild("SomeString");
-                               //$.globalEval(f.getValue());
+                              // console.log("text area is " + f.getValue());
                                globalEval(f.getValue());
                                var nf=that.parent.getChild("Result");
-                              // console.log("methods doit got " + value);
-                               nf.setValue(JSON.stringify(v));
-                               
-                           }},
+                               try{
+                                   nf.setValue(JSON.stringify(v));    
+                               }
+                               catch(e){
+                                   console.log("methods doit got %j", v);
+                                   nf.setValue(v);
+                               }
+                            }},
                           {node:"paragraph",text:"Result"},
                           {field:"static",name:"Result",type:"string" }
                           
@@ -1176,19 +1109,44 @@ global.UI=require('../declare').UI;
     var mkUtils=function(){
         var HUtils=HThings["Utils"];
         var items={
-            binarySearch:{p:"<code>var index=Harvey.Utils.binarySearch(array,item,[sortOrder],[closest])<code>"},
-            dateNow:{p:"<code>Harvey.Utils.dateNow();<code>"},
-            datePast:{p:"<code>Harvey.Utils.datePast();<code>"},
-            detectMobile:{p:"<code>Harvey.Utils.detectMobile();<code>"},
-            draggable:{p:"<code> var d=Harvey.Utils.draggable(htmlObject);</code>"},
-            extend:{p:"<code> Harvey.Utils.extend(subObject,superObject); </code>"},
-            formatDate:{p:""},
-            getCssValue:{p:""},
-            widthFromCssClass:{p:""},
-            fontSizeToPixels:{p:""},
-            hashCode:{p:""},
-            observer:{p:""},
-            getSiblings:{p:""}
+            binarySearch:{p:"<code>var index=Harvey.Utils.binarySearch(array,item,[sortOrder],[closest])<code>",
+                          params:"array - (any type),<br>sortOrder:(optional) array of fields in the array, <br> closest: -object"},
+            dateNow:{p:"<code>var today=Harvey.Utils.dateNow();<code>",
+                     params: "none",
+                     description: "return: date - YYYY-MM-DD"},
+            datePast:{p:"<code>var t=Harvey.Utils.datePast(date);<code>",
+                      params:"date: - YYYY-MM-DD",
+                      description:"return: boolean"},
+            detectMobile:{p:"<code>var r=Harvey.Utils.detectMobile();<code>",
+                          params: "none",
+                          description: "return: boolean"},
+            draggable:{p:"<code> var d=Harvey.Utils.draggable(htmlObject);</code>",
+                       params:"a htmlObject",
+                       description:"return: false - on fail"},
+            extend:{p:"<code> Harvey.Utils.extend(subclass,superclass); </code>",
+                    params: "subclass-constructor function, superclass: base constructor function",
+                    description: "return: none"},
+            formatDate:{p:"<code> var date_string=Harvey.Utils.formatDate(date); </code>",
+                        params: "date of the form YYYY-MMM-DD",
+                        description: "return: string e.g '12th November 2017'"},
+            getCssValue:{p:"<code> var css_value=Harvey.Utils.getCssValue(css_class,rule,[filename]); </code>",
+                         params:"css_class, rule e.g width, filename[optional] the name of the css file in the header- if not given the function will search through all the css files",
+                         description: "Sadly this does not work in Chrome"},
+            widthFromCssClass:{p:"<code> var width=Harvey.Utils.widthFromCssClass(class_list,filename); </code>",
+                               params:"class_list - string array of classes to be included in width calculation ",
+                               description:"return: string e.g '120px'"},
+            fontSizeToPixels:{p:"<code> var d=Harvey.Utils.fontSizeToPixels(font-size);</code>",
+                              params:"font_size: integer",
+                              description:"return: integer"},
+            hashCode:{p:"<code> var d=Harvey.Utils.hashCode(str);</code>",
+                      params:"str: some string value ",
+                      description:"return: simple hashed string"},
+            observer:{p:"<code>var c=Harvey.Utils.observe(id_name); </code>",
+                      params:"",
+                      description:""},
+            getSiblings:{p:"<code>var c=Harvey.Utils.getSiblings(htmlObject); </code>",
+                         params:"htmlObject",
+                         description: "return: array of sibling htmlObjects"}
         };
         for(var i=0;i<HUtils.length;i++){
           //  console.log("making io panel",HUtils[i]);
@@ -1199,8 +1157,10 @@ global.UI=require('../declare').UI;
             k.id=(HUtils[i] + "Methods").toString();
             k.components=[{node:"heading",size:"h3",text:HUtils[i]},
                           {node: "paragraph",text: items[HUtils[i]].p},
-                          {node: "heading", size: "h4", text: "Parameters"}
-                          
+                          {node: "heading", size: "h4", text: "Parameters"},
+                          {node:"paragraph",text: items[HUtils[i]].params},
+                          {node: "heading", size: "h4", text: "Return"},
+                          {node:"paragraph",text: items[HUtils[i]].description}
                          ];
             UI.Panels.Utils.components.push(k);
         }
@@ -1252,23 +1212,24 @@ global.UI=require('../declare').UI;
 
     var mkPanelMethods=function(){
         var panel_methods={
-            UIStart:[{label: "called by default if",description: "<code> UI.start=['MyPanel']; </code> <br> is defined"},{label: "<br><code>Harvey.Panel.UIStart(stringArray);</code>",descriptions:["<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
-            add:[{label: "<code>Harvey.Panel.add(object|| string);</code>",descriptions:["return: nothing","parms: object or string","e.g from the above definition","<code>Harvey.Panel.add('MyPanel');</code>","or","<code> Harvey.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
-            clone:[{label:"<code></code>",description:"clone an object"}],
-            delete:[{label:"<code>Harvey.Panel.delete(string);</code>",descriptions:["return: nothing","parms: string","the name of the window to be deleted"]}],
-            deleteAll:[{label:"<code>Harvey.Panel.deleteAll();</code>",descriptions:["return: nothing","parms: none","delete all the windows"]}],
-            get:[{label:"<code>var v=Harvey.Panel.get(string);</code>",descriptions:["return: panel object","parms: string",(" " + mk_spaces(7) + "The name of the panel")]}],
-            hide:[{label:"<code>Harvey.Panel.hide(string);</code>",descriptions:["return: none","parms: string",("" + mk_spaces(7) + "name of the window")]}],
-            hideAll:[{label:"<code>Harvey.Panel.hideAll();</code>",descriptions:["return: none","parms: none","Remove all the windows from the DOM"]}],
-            inList: [{label:"<code>var v=Harvey.Panel.inList(string);</code>",descriptions:["return: string","the name of the window or null","parms: string","the name of a window" ]}],
-            getList:[{label:"<code>var v=Harvey.Panel.getList();</code>",descriptions:["return: stingArray","list the names of all the windows in Harvey"]}],
-            show:[{label:"<code>var v=Harvey.Panel.show(string);</code>",descriptions:[]}],
-            addChild:[{label:"<code>Harvey.Panel[string].addChild(object);</code>",descriptions:["<br> return: nothing","parms: object","a Harvey display Object"]}],
-            deleteChild:[{label:"<code>var v=Harvey.Panel[string].deleteChild(object);</code>",descriptions:[]}],
-            deleteChildren:[{label:"<code>var v=Harvey.Panel[string].deleteChildren();</code>",descriptions:[]}],
-            findChild:[{label:"<code>var v=Harvey.Panel[string].findChild(object);</code>",descriptions:[]}],
-            getChild:[{label:"<code>var v=Harvey.Panel[string].getChild(string);</code>",descriptions:[]}],
-            getChildren:[{label:"<code>var v=Harvey.Panel[string].getChildren();</code>",descriptions:[]}]
+            UIStart:[{label:"Usage",descriptions:[ "Called by default if", "<code> UI.start=['MyPanel']; </code> is defined"]},
+                     {label: "Or",descriptions:[ "<br><code>Harvey.Panel.UIStart(stringArray);</code>","<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
+            add:[{label: "Usage",descriptions:[ "<code>Harvey.Panel.add(object|| string);</code>","return: nothing","parms: object or string","e.g from the above definition","<code>Harvey.Panel.add('MyPanel');</code>","or","<code> Harvey.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
+            clone:[{label:"Usage",descriptions:["<code>Harvey.Panel.clone(panel_name,window);</code>","clone a panel object"]}],
+            delete:[{label:"Usage",descriptions:["<code>Harvey.Panel.delete(string);</code>","return: nothing","parms: string","the name of the window to be deleted"]}],
+            deleteAll:[{label:"Usage",descriptions:["<code>Harvey.Panel.deleteAll();</code>","return: nothing","parms: none","delete all the windows"]}],
+            get:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.get(string);</code>","return: panel object","parms: string",(" " + mk_spaces(7) + "The name of the panel")]}],
+            hide:[{label:"Usage",descriptions:["<code>Harvey.Panel.hide(string);</code>","return: none","parms: string",("" + mk_spaces(7) + "name of the window")]}],
+            hideAll:[{label:"Usage",descriptions:["<code>Harvey.Panel.hideAll();</code>","return: none","parms: none","Remove all the windows from the DOM"]}],
+            inList: [{label:"Usage",descriptions:["<code>var v=Harvey.Panel.inList(string);</code>","return: string","the name of the window or null","parms: string","the name of a window" ]}],
+            getList:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.getList();</code>","return: stingArray","list the names of all the windows in Harvey"]}],
+            show:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.show(string);</code>"]}],
+            addChild:[{label:"Usage",descriptions:["<code>Harvey.Panel[string].addChild(object);</code>","<br> return: nothing","parms: object","a Harvey display Object"]}],
+            deleteChild:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].deleteChild(object);</code>"]}],
+            deleteChildren:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].deleteChildren();</code>"]}],
+            findChild:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].findChild(object);</code>"]}],
+            getChild:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].getChild(string);</code>"]}],
+            getChildren:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].getChildren();</code>"]}]
         };
    
 
@@ -1388,7 +1349,7 @@ global.UI=require('../declare').UI;
                                  DOM: "right",
                                  id: "Blurb",
                                  components:[{node:"heading", size: "h2",text: "Harvey Fields"},
-                                             {node:"paragraph", text:"HarveyFields.js  Include in the head of your html file with <br><code> &#60script type='text/javascript' src='HarveyFields.js' &#62 &#60/script><code> <br> or use require(HarveyFields.js) within your javascript <br> Depends on HarveyUtils.js jquery.js and HarveyTypes.js"} ,
+                                             {node:"paragraph", text:"Fields.js <br> depends on Utils.js,Sort.js,Types.js, datepicker.js"} ,
                                              {node: "heading", size: "h3", text: "Usage" },
                                              {node: "paragraph", text: "<code>var field=Harvey.field[fieldType](fieldData,parentNode);</code>"},
                                              {node: "paragraph", text: "Returns a HarveyField object"},
@@ -1417,7 +1378,7 @@ global.UI=require('../declare').UI;
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "About Harvey"},
-                          {node: "paragraph",text: "Harvey is a data-driven enterprise level SPA library. The components can be used together or individually. This site is made exclusively with Harvey Components, written in vanilla javascript."},
+                          {node: "paragraph",text: "Harvey is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. <br> This site is made exclusively with Harvey Components, written in vanilla javascript."},
                           {node: "paragraph",text:"Harvey is arranged hierarchically."},
                           {node: "descriptionList",items:[{label: "Windows",description:"Windows contain"},
                                                           {label: "Panels",description:"Panels contain"},
@@ -1426,8 +1387,8 @@ global.UI=require('../declare').UI;
                                                           {label: "types",description: ""}
                                                          ]},
       
-                          {node:"paragraph",text:"You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) "},
-                          {node: "heading",size: "h4",text:"Required"}
+                          {node:"paragraph",text:"You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) "}
+                        //  {node: "heading",size: "h4",text:"Required"}
            
                       ]},
                     {display:"fieldset",
@@ -1474,7 +1435,7 @@ global.UI=require('../declare').UI;
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "Harvey Nodes"},
-                          {node:"paragraph", text:"HarveyNodes.js  Include in the head of your html file with <br> &#60 script type='text/javascript' src='HarveyNodess.js' &#62 &#60/script> <br> or use require(HarveyNodes.js) within your javascript <br> Depends on HarveyUtils.js  and HarveyTypes.js"} ,
+                          {node:"paragraph", text:"Nodes.js"} ,
                           {node: "heading", size: "h3", text: "Usage" },
                           {node: "paragraph", text: "<code>var node=Harvey.node(nodeObject[,parentElement]);</code>"},
                           {node: "paragraph", text: "Returns a HarveyNode object"},
@@ -1505,10 +1466,12 @@ global.UI=require('../declare').UI;
                          DOM: "right",
                          components:[
                              {node: "heading",size:"h2",text: "Harvey Displays"},
-                             {node:"paragraph", text:"HarveyDisplay.'TemplateName'.js Where 'TemplateName' is one of the display templates.<br> e.g HarveyDisplayMenu.js  <br> Include in the head of your html file with <br> &#60 script type='text/javascript' src='HarveyDisplay.'Templatename'.js' &#62 &#60/script> <br> or use require(HarveyDisplay.'Templatename'.js) within your javascript <br> Depends on HarveyUtils.js and HarveyTypes.js and HarveyDisplayBase.js"} ,
+                             {node:"paragraph", text:"DisplayMenu.js DisplayFieldset.js DisplayForm.js DisplayTabs.js DisplaySlideshow.js DisplayGrid.js"} ,
                              {node: "heading", size: "h4", text: "Usage" },
-                             {node: "paragraph", text: "<code>var display=Harvey.display['templateName'](templateData);</code>"},
+                             {node: "paragraph", text: "<code>var my_display=Harvey.display['templateName'](templateData);</code>"},
                              {node: "paragraph", text: "Returns a HarveyDisplay object"},
+                             {node: "paragraph",text: "display Objects are not automatically added to the DOM, To add the HTML object to the DOM, use "},
+                             {node: "paragraph",text: "<code> my_display.show();</code>"},
                              {node: "heading", size: "h5", text: "templateName"},
                              {node: "paragraph",text: "type: string -  Harvey  display template type"},
                              {node: "heading",size: "h5", text:"templateData"},
@@ -1524,12 +1487,14 @@ global.UI=require('../declare').UI;
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "Harvey Panels"},
+                          {node: "paragraph",text:"Panel.js"},
+                          {node: "paragraph",text: "Only display templates can be added to the Panel components array."},
                           {node: "paragraph",text: ("Harvey panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "tabs:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
                           {node:"paragraph",text: ("This would create a new panel with the name 'MyPanel' with one component, Tabs<br> To add another display component you add it to the components array.")},
-                          {node: "paragraph",text: "Only display templates can be added to the Panel components array."}, {node: "heading", size: "h3", text: "Usage" },
+                          
+                          {node: "heading", size: "h3", text: "Usage" },
                           {node: "paragraph", text: "<code>Harvey.Panel.add(PanelObject);</code><br> or"},
                           {node: "paragraph", text: "<code>Harvey.Panel.UIStart(PanelObjectArray);</code><br>"},
-                          
                           {node: "heading",size:"h4",text: "Panel object" },
                           {node: "heading",size: "h5",text:"required"},
                           {node: "descriptionList",items:[{label:"name",description:"type: 'string'"},
@@ -1581,6 +1546,7 @@ global.UI=require('../declare').UI;
                      DOM: "right",
                      components:[
                          {node: "heading",size:"h2",text: "Harvey Types"},
+                         {node: "paragraph",text:"Types.js"},
                          {node:"heading",size: "h4",text: "Methods" },
                          {node: "descriptionList",items:[{label:"checkType",
                                                           descriptions:["<code>var t=Harvey.checkType[type](some_var);</code>","return boolean","params:","type is a Harvey type","some_var: a value whose type you want to check"]}]},
@@ -1605,7 +1571,8 @@ global.UI=require('../declare').UI;
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey IO"}
+                          {node: "heading",size:"h2",text: "Harvey IO"},
+                          {node: "paragraph",text: "IO.js"}
                       ]
                       
                     },
@@ -1632,7 +1599,8 @@ global.UI=require('../declare').UI;
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey Popups"}
+                          {node: "heading",size:"h2",text: "Harvey Popups"},
+                          {node: "paragraph",text: "Popups.js"}
                       ]
                       
                     }
@@ -1644,7 +1612,8 @@ global.UI=require('../declare').UI;
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey Utils"}
+                          {node: "heading",size:"h2",text: "Harvey Utils"},
+                          {node: "paragraph",text: "Utils.js"}
                       ]
                       
                     },
@@ -1659,9 +1628,7 @@ global.UI=require('../declare').UI;
         }
     };
                                            
-
-    mkFields();
-    mkFieldMethods();
+    fieldManual.execute();
     mkNodes();
     mkDisplays();
     mkDisplayMethods();
