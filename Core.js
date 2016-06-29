@@ -13,30 +13,26 @@ require("./Popups.js");
 
     var DEBUG=false;
     var that=this;
-    window.onerror=function(msg,url,lineno){
-        //Harvey.Error=Harvey.popup.dialog({id:"Harvey_Error"});
-	Harvey.popup.error(url, ("line number " + lineno + " " + msg));
+    window.onerror=function(msg,url,lineno,col_no,error){
+   	Harvey.popup.error(url, ("line number " + lineno + " " + msg));
     };
 
-/*
-    window.onerror=function(msg,url,lineno,colno,error){
-	Harvey.display.dialog(url, ("line number " + lineno + " " + msg + " stack trace " + error.stack ));
-    };  */
-    window.addEventListener('beforeunload',function(e){  // 5 seconds to delete everything
-        window.document.body.style.visibility="hidden";
-        var t;
+    window.addEventListener('beforeunload',function(e){  
+        Harvey.stop(); 
+      /*  var t;
         var d=new Promise(function(resolve,reject){
-            t=window.setTimeout(function(){Harvey.Panel.deleteAll(resolve); },50000);
+            t=window.setTimeout(function(){
+            Harvey.Panel.deleteAll(resolve);// },500000);
         });
         d.then( function(){
+            console.log("got to then for beforeunload");
             window.clearTimeout(t);
         }).catch(function(result){
-            
-        });
+            Harvey.popup.error(result);
+        }); */
+      
     });
    
-
-    //$.extend(true,Harvey,{
     Harvey.mixinDeep(Harvey,{
 	start: function(options) {
 	    // Harvey.popup.spinner(true);

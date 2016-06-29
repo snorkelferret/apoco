@@ -206,7 +206,7 @@ require("./Fields");
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Harvey.IO.publish(this);
 	    }
-            if(!document.body.contains(this.element)){
+            if(!this.DOM.contains(this.element)){
               //  console.log("Showing element that is not in DOM");
 	        if(this.element){
 		  //  console.log("show found non null element");
@@ -238,7 +238,7 @@ require("./Fields");
             return true;
  	},
         isHidden:function(){
-            if(document.contains(this.element)){
+            if(this.DOM.contains(this.element)){
                 return false;
             }
             return true;
@@ -247,10 +247,10 @@ require("./Fields");
             return this.displayType;
         },
         hide:function(){
-          // console.log("trying to hide " + this.id);
-            if(document.body.contains(this.element)){
-            //    console.log("Hiding element that is in dom");
-                this.element.parentNode.removeChild(this.element);
+            console.log("trying to hide " + this.id);
+            if(this.DOM.contains(this.element)){
+                console.log("Hiding element that is in dom");
+                this.DOM.removeChild(this.element);
                 return;
             }
 //           console.log("Can't hide element that is NOT in dom");

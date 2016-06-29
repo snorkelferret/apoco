@@ -88,7 +88,7 @@ describe("Panel",function(){
     it("can delete itself",function(){
         Harvey.Panel.delete(t.name);
         console.log("t is %j", t);
-        assert.strictEqual(Harvey.Panel.inList("test_panel"),null);
+        assert.strictEqual(Harvey.Panel._inList("test_panel"),null);
     });
 });
 

@@ -1,15 +1,10 @@
 var Harvey=require('./declare').Harvey,UI=require('./declare').UI; 
 require("./Utils");
 require("./Popups");
-// Copyright (c) 2015 Pooka Ltd.
-// Name: HarveyDisplaySet.js
-// Function: maintains a reference to  all commands that are currently displayed in _DisplayObjects
+require("./Window");
 
 ;(function() {
     'use strict';
-    var DEBUG=true;
-
-   
     function check(ar){
 	if(!Harvey.checkType["object"](ar)){
 	    throw new Error("This is not a window display object " + ar);
@@ -57,7 +52,6 @@ require("./Popups");
 		 //   console.log("this is default");
 		    break;
 		}
-
 	    }
 	    if(OK !== 3 ){
 		//console.log("got " + OK );
@@ -67,113 +61,7 @@ require("./Popups");
 	return true;
     }
 
-    Harvey.Window={
-        _list:{},
-        close:function(name){
-            var p=this._list[name];
-            if(p){
-                p.close();
-            }
-            else{
-                throw new Error("Harvey.Window: Cannot find window " + name);
-            }
-        },
-        closeAll:function(){
-           // console.log("Close all is here");
-            for(var k in this._list){
-                this._list[k].close();
-            }
-           // this._list.length=0;
-        },
-        inList:function(name){
-           // console.log("is " + name + " in list?");
-           // console.log("Window: inList length is " + this._list.length);
-            for(var k in this._list){
-             //   console.log("window in list is " + k);
-                if(k == name){
-                    return this._list[k];
-                }
-            }
-            return null;
-        },
-        open:function(d){     // open a new window or a tab
-            var settings=new String;
-            var that=this;
-            var defaults={
-                width:600,
-                height:600,
-                menubar:0,
-                toolbar:0,
-                location:0,
-                personalbar:0
-            };
-
-
-            if(this.inList(d.name)){
-                throw new Error("Harvey,Window: " + d.name + " already exists");
-            }
-	  //  console.log("creating new window");
-          //  for(var k in d.opts){
-          //      console.log("option is " + k);
-         //   }
-	    if(!d.opts){
-         //      console.log("NO OPTS FOR WINDOW");
-	        settings="_blank"; // open in new tab
-	    }
-            else{
-                Harvey.mixinDeep(d.opts,defaults);
-                
-                for(var k in d.opts){
-                    if(settings === ""){
-                        settings=settings.concat((k + "=" + d.opts[k]));
-                    }
-                    else{
-                        settings=settings.concat(("," + k + "=" + d.opts[k]));
-                    }
-                }
-                console.log("settings are " + settings);
-            }
-	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
-            var p=new Promise(function(resolve,reject){
-	        if(!win){
-                    reject("Could not open window");
-	        }
-	        window.addEventListener("childReady",function(){
-	            return function(e){
-		        if(e.data === win){
-		            console.log("window equals e.data");
-                            that._list[d.name]=win;
-                            resolve({"window":win,"name": d.name});
-		        }
-                        else{
-                            reject(("Harvey.Window: could not open " + d.name));
-                        }
-		      //  console.log("Parent child is ready");
-		    };
-	        }(d.name,win,p),false);
-            });
-            
-            p.then(function(d){
-                d.window.onunload=function(e){
-                   // console.log("got child closed " + d.name);
-                    // delete the window from the list
-                    var p=that._list[d.name];
-
-                    if(p !== null){
-                        Harvey.Panel._deletePanel(p);
-                        delete that._list[d.name];
-                    }
-                    else{
-                        throw new Error("Could not find window to remove");
-                    }
-                };
-            }).catch(function(reason){
-                Harvey.popup.error("Window Open Error",reason);
-            });
-                                        
-	    return p;
-        }
-    };
+  
 
     Harvey.Panel={
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
@@ -212,18 +100,11 @@ require("./Popups");
             }
             return null;
         },
-        _deletePanel:function(win){ // remove a panel that is in a separate browser
-            for(var i=0;i<this._list.length;i++){
-                if(this._list[i].window == win){
-                    this.delete(this._list[i].name);
-                }
-            }
-        },
-	inList: function(k){
+ 	_inList: function(k){
             if(k===undefined){
                 throw new Error("Panel: inList name is undefined");
             }
-	    for(var i=0;i< this._list.length;i++){
+            for(var i=0;i< this._list.length;i++){
 	//	console.log("i is " + i + "checking is in list " + this._list[i].name);
 		if(this._list[i].name == k){
 		    return i;
@@ -232,7 +113,7 @@ require("./Popups");
 	    return null;
 	},
         get: function(k){
-            var u=this.inList(k);
+            var u=this._inList(k);
             if(u !== null){
                 return this._list[u];
             }
@@ -264,20 +145,59 @@ require("./Popups");
                 c[i].show();
             }
         },
-        hideAll: function(){
+        showAll:function(win){
+            var w,tw=null;
+            if(win !== undefined){
+                w=Harvey.Window.get(win);
+                if(w===null){
+                    throw new Error("Panel.hideAll - cannot find window " + w);
+                }
+                tw=w.window;
+            }
             for(var i=0;i<this._list.length;i++){
-                this.hide(this._list[i].name);
+                if(tw !== null){
+                    if( this._list[i].window === tw){
+                        this.show(this._list[i].name);
+                    }
+                }
+                else{
+                    this.show(this._list[i].name);
+                }
+            }
+        },
+        hideAll: function(win){
+            var w,tw=null;
+            if(win !== undefined){
+               // console.log("hideall got window");
+                w=Harvey.Window.get(win);
+                if(w===null){
+                    throw new Error("Panel.hideAll - cannot find window " + w);
+                }
+                tw=w.window;
+            }
+            for(var i=0;i<this._list.length;i++){
+               // console.log(i + " this is panel " + this._list[i].name + " with window " + this._list[i].window);
+               // console.log("WINDOW IS " + tw);
+                if(tw !== null){
+                    if(this._list[i].window === tw){
+                 //       console.log("hiding panel for window " + win + " name " + this._list[i].name);
+                        this.hide(this._list[i].name);
+                    }
+                }
+                else{
+                   // console.log("hiding things without window");
+                    this.hide(this._list[i].name);
+                }
             }
         },
         hide:function(k){
             var p=this.get(k);
-            //console.log("hiding window " + k);
+            console.log("hiding panel " + k);
             if(!p){
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
             var c=p.getChildren();
             for(var i=0;i<c.length;i++){
-                //c[i].element.detach();
                 c[i].hide();
             }
         },
@@ -289,12 +209,9 @@ require("./Popups");
             }
             return l;
         },
-        clone: function(panel,win){ // clone an existing panel and put in new window
+        clone: function(panel){ // clone an existing panel and put in new window
             var stuff={},np,p,name,i=0;
             
-            if(!win){
-                throw new Error("Harvey,Panel.clone: needs a window parm");
-            }
             p=this.get(panel);
             if(p !== null){
                 name=panel;
@@ -318,16 +235,16 @@ require("./Popups");
             }
         },
 	add: function(panel){
-	   console.log("Panel.add is here");
+	    console.log("Panel.add is here");
 	    console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+         
             if(Harvey.checkType['string'](panel)){
                 var w=this._UIGet(panel);
                 panel=w;
             }
 
-	    if(this.inList(panel.name) === null){
+	    if(this._inList(panel.name) === null){
 		check(panel.components);
-
 		var p=Harvey._panelComponents(panel);
 		// for(var k in p){
 		//     console.log("panel base has keys " + k);
@@ -346,24 +263,25 @@ require("./Popups");
                // console.log("window: removing panel " + this._list[i].name + " from list");
                	obj=this._list[i];
                 obj.deleteChildren();
+                for(var k in obj){
+                    delete obj[k];
+                }
                 if(promise_resolve){
                     if(i===(n-1)){
                        // console.log("***********************************8delete is done");
                         promise_resolve();
                     }
                 }
-                for(var k in obj){
-                    delete obj[k];
-                }
+ 
                 obj=null;
             }
-            if(!promise_resolve){
-                Harvey.Window.closeAll();
-            }
-            this._list.length=0;
+         //   if(!promise_resolve){
+            Harvey.Window._closeAll();
+        //    }
+        //    this._list.length=0;
         },
         delete: function(name){
-   	    var p=this.inList(name);
+   	    var p=this._inList(name);
 	    if(p !== null){
                 var obj=this._list[p];
                 obj.deleteChildren();
@@ -382,34 +300,41 @@ require("./Popups");
 	}
     };
     var _Components=function(obj){
-        var that=this;
+        var that=this,w;
         //	for(var k in obj){
 	//this[k]=obj[k];
 	  //   console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
 	//}
         Harvey.mixinDeep(this,obj);
-	if(obj.window){
-	    var p=Harvey.Window.open(obj.window);  // create a new browser window
-	    p.then(function(w){
-		w.window.focus();
+        
+	if(this.window){
+            w=Harvey.Window.get(this.window);
+            if(w === null){
+                // perhaps have race condition
+                throw new Error("window " + this.window + " does not exist");
+            }
+	   // var p=Harvey.Window.open(obj.window);  // create a new browser window
+	    // p.then(function(w){
+            w.window.focus();
+            this.window=w.window;
+	//	w.window.focus();
             //    console.log("got object from window.open.done");
           //      for(var k in w){
           //          console.log("obj has parm " + k + " with value " + w[k]);
-           //     }
-		that.window=w.window;
-        	that._addComponents();
-        
-	    } ).catch(function(reason){
-                throw new Error("Panel: cannot open window " + reason);
-            });
+            //     }
+	   // that.window=w;
+           // obj.window=w;
+            //that._addComponents();
+	    //} ).catch(function(reason){
+              //  throw new Error("Panel: cannot open window " + reason);
+           // });
 	}
-        else{
-            that._addComponents();
-        }
+        //else{
+        that._addComponents();
+        //}
     };
 
     _Components.prototype={
-
 	_addComponents: function(){
 	    var that=this;
             var d;
@@ -420,19 +345,15 @@ require("./Popups");
                 }
 		that.components[index]=d;
 	    };
-
 	    for(var i=0;i<this.components.length;i++){
                 // check that DOM parent exists
-                                                       
-		var p=this.components[i].display;
+ 		var p=this.components[i].display;
              //   console.log("adding component " + p);
 		this.components[i].parent=this;
                // console.log("addComponents window is " + that.window);
 	        d=Harvey.display[p](this.components[i],that.window);
-                
 		if(!d){
 		    throw new Error("could not create " + p);
-		  
 	        }
 	            /*	if(d.deferred){
                     Harvey.popup.spinner(true);
@@ -447,18 +368,15 @@ require("./Popups");
 		     } */
                 doit(this,i);
 	    }
-
 	},
 	addChild: function(display_object){ // to existing panel
             var d;
-
             if(this.getChild(display_object.id)){
                 throw new Error("Harvey.Panel: already have a child with id " + display_object.id);
             }
             if(!display_object.display){
                 throw new Error("You can only add display objects to a window");
             }
-
             if(!display_object.displayType){ //has not been instantiated
                 d=display_object;
                 display_object=Harvey.display[d.display](d,this.window);

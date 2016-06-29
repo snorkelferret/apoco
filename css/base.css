@@ -255,10 +255,10 @@ h2 a:hover { color: #444444; text-decoration: none}
 h3 { font-size: 16pt ; font-weight: bold; color: #666666; text-align: left; text-decoration: none}
 
 
-h4 {margin: 0em;  color: #404040; text-decoration: none; font-size: 12pt;
+h4 {margin: 0em;  color: #404040; text-decoration: none; font-size: 14pt;
 text-align: left;  padding: 0em 0em .5em 0em}
 
-h5{color: #202020; font-size: 10pt}
+h5{color: #202020; font-size: 12pt}
 
 .disabled{ /*display: none;
            position: absolute;

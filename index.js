@@ -7,6 +7,7 @@ var dcl = require('./declare.js');
 require('./Core');
 require('./Utils');
 require('./Types');
+require('./Window');
 require('./Fields');
 require('./Popups');
 require('./DisplayBase');

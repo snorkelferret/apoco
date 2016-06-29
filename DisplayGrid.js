@@ -43,55 +43,7 @@ jsonishData={
 
 ;(function(){
     "use strict";
-    
-    var getWidth=function(cols){ 
-        var class_list=[],width;
-        for(var i=0;i<cols.length;i++){
-            if(cols[i].display !== false){
-                class_list[i]={};
-                class_list[i].classname=("." + cols[i].type).toString();
-            }
-	}
-        width=Harvey.Utils.widthFromCssClass(class_list,"base.css");
-        console.log("get width of " + width);
-        // need to add border - assume 1px;
-        // and add any padding on td
-        var padding=Harvey.Utils.getCssValue(".grid table td","padding","base.css");
-        console.log("padding is " + padding);
-        var pp=0;
-        if(padding !== null){
-            var b=padding.split(" ");
-            if(b.length === 2){
-                if(b[1].indexOf("em")>=0){
-                    var p=b[1].split("em");
-                    pp=p[0]*2;
-                }
-            }
-        }
-        console.log("pp is " + pp);
-        if(width !== null){
-            var b=class_list.length;
-            if(width.indexOf("px")>=0){
-                var d=width.split("px");
-                width=((parseFloat(d[0])+b+2).toString() + "px");
-            }
-            else if(width.indexOf("em")>=0){
-                var d=width.split("em");
-                width=((parseFloat(d[0])+ parseFloat((b+2)/13)+ parseFloat(pp*b)).toString() + "em");
-            }
-            if(pp){
-                for(var i=0;i<cols.length;i++){
-                    if(cols[i].display !== false){
-                        var v=((parseFloat(class_list[i].value) + pp).toString() + class_list[i].units).toString();
-                        console.log("setting width to " + v);
-                        cols[i].element.style.width=v;
-                     }
-                }
-            }
-        }
-        return width;
-    };
-
+ 
     function rmouse_popup(element){
 
 	element.bind("contextmenu", function(e){
@@ -131,8 +83,6 @@ jsonishData={
 			return function(e){
 			    e.stopPropagation();
 			    d.remove();
-			  //  delete d; // remove all references
-			    //console.log("cancel is here");
 			};
 		    }(d);
 		    ok.on("click",cb);
@@ -266,18 +216,13 @@ jsonishData={
 
     function sort_callback(col_num,that,dir){ //user sort
 	// turn it into an array
-	//$.fn.reverse=[].reverse;
-
 	var type=that.cols[col_num].type;
 	if(that.DEBUG) console.log("START SORT =======================  got sort type " + type);
-
 	stop_edits(that);
-
 	for(var k in that.grids){
 	    Harvey.sort(that.grids[k].rows,{ type: type,
 			                     fn: function(a){ return a[col_num];}
                                            });
-            
 	    if(dir === "down"){
 		that.grids[k].rows.reverse();
 	    }
@@ -289,8 +234,6 @@ jsonishData={
 	    that.cols[i].sorted=false;
 	}
 	that.cols[col_num].sorted=true;
-
-
 	start_edits(that);
     }
 
@@ -730,12 +673,7 @@ jsonishData={
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
             }
-            // div_container.style.width=width;
-         /*   var width=getWidth(this.cols);
-            if(width !== null){
-                this.element.style.width=width;
-            }
-            */
+     
             if(this.rows !== undefined){
                 sort_into_subGrids(this);
                 this.sort();

@@ -356,6 +356,15 @@ require("./datepicker");
         getElement:function(){
             return this.element;
         },
+        delete:function(){
+            if(this.listen){
+                Harvey.IO.unsubscribe(this);
+            }
+            
+            if(this.element.parentNode){
+                this.element.parentNode.removeChild(this.element);
+            }
+        },
 	setValue: function(val){
 	    this.value=val;
             if(this.value !== null){

@@ -63,7 +63,7 @@ describe("Manual",function(){
         });
     });
     test.it("we have some poxy tabs",function(done){
-        assert.strictEqual(tabs.length,9);
+        assert.strictEqual(tabs.length,10);
         console.log("we have poxy tabs " + tabs.length);
         done();
     });
