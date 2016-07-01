@@ -193,7 +193,7 @@ input.pending{
 .imageArray img{width: inherit; height:inherit; border: 2px solid #999}
 
 .check_box{width: 16px; height: 16px}
-.field_container textarea {font-family: monospace}
+.field_container textarea {font-family: monospace; width: 50em; height: 10em}
 
 .stringArray li.plus{float: right; margin-left: .4em; border: 1px solid #000 }
 .stringArray li.minus{float: right; margin-left: .4em; border: 1px solid #000 }

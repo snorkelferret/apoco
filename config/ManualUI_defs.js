@@ -165,7 +165,7 @@
             IO:{
                 action:{type:"function",default: undefined,descriptions:["Function fired on click of element<br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
                 listen:{type:"objectArray",default:undefined ,descriptions:["e.g <code> listen:[{name:'some_name',action:function(that,data){ alert('got data ' + data);}}]</code>"]},
-                publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Harvey.IO.dispatch('some_name',data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
+                publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that,name){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Harvey.IO.dispatch(name,data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
             },
             input: { options:{type:{type:"string",
                                     default:"string",
@@ -315,6 +315,9 @@
                         this.fields[f].required[n]=Options[f].required[n];
                     }
                 }
+                if(Options[f].descriptions){
+                    this.fields[f].descriptions=Options[f].descriptions;
+                }
             }
         },
         mkFieldOptionsList:function(){ // make the descriptionlist
@@ -455,8 +458,11 @@
                     p.element.click();
                 },
                 k.components=[{node: "heading",size: "h3", text: HFields[i]},
-                              {node:"paragraph", text: "<code>var f=Harvey.field['" +HFields[i] +"'](dataObject,element);</code>"},
-                              {node:"paragraph",text:that.fields[f].description },
+                              {node: "paragraph",text: "Called as a standalone -"},
+                              {node:"paragraph", text: " <code>var f=Harvey.field['" +HFields[i] +"'](dataObject,element);</code>"},
+                              {node:"paragraph",text: "or as part of a display grid, fieldset or form"},
+                              {node:"paragraph",text: "<code>{field:" + HFields[i] + " //... other options } </code>"},
+                              {node:"paragraph",text:that.fields[f].descriptions},
                               {node: "heading",size: "h5",text: "dataObject settings"},
                               {node: "heading",size: "h5", text: "Required"},
                               {node: "descriptionList", items:that.fields[f].required_list},
@@ -474,7 +480,6 @@
                                        throw new Error("can't get input params");
                                    }
                                    console.log("f.getValue is %j",f.getValue());
-                                   // $.globalEval(f.getValue());
                                    globalEval(f.getValue());
                                    //         console.log("parms are " + dataObject);
                                    if(Harvey.checkType["object"](dataObject)){
@@ -762,7 +767,8 @@
                     items:[{label: 'href',descriptions:["type: string","a url"]},
                            {label: "text",descriptions: ["type: string",'the clickable text that appears in the DOM']},
                            {label: "target",descriptions: ["type:string","where to open the link "]}]
-                }
+                },
+                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
             },
             descriptionList:{
                 parms:{items:[ "objectArray"]},
@@ -776,8 +782,9 @@
                 parms:{size:"size",text:"text"},
                 required:{
                     items:[{label:"size",descriptions: ["type: string","size param: one of the following sizes","'h1'","'h2'","'h3'","'h4'","'h5'" ]}]
-                }
-               
+                },
+                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                
             },
             image:{ 
                 parms:{src:"path"},
@@ -791,7 +798,9 @@
                 parms:{text:"string",for:"string"},
                 options:{
                     items:[{label: 'for',description:"optional, id of the html element the label belongs to " }]
-                }
+                },
+                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                
             },
             list:{
                 parms:{list:"stringArray"},
@@ -811,7 +820,9 @@
                 parms:{text:"text"},
                 options:{
                     items:[{label: "text",description:"the text can contain unicode and things like ' &#60br&#62'"}]
-                }
+                },
+                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                
             },
             paginate:{
                 parms:{number:"integer",action:'function(that){alert("clicked page" + that.current_num);}'},
@@ -907,9 +918,14 @@
                                    Harvey.display.dialog("Error", "Input is not a valid object");
                                } 
                            }
-                          }
+                          },
+                          {node:'heading',size:'h4',text:'Methods'},
+                          {node:'descriptionList',items:[{label:'node.getElement();',descriptions:['params: none','return: HTML element Object']}]}
+                          
             ];
-        
+            if(opts[HNodes[i]].methods){
+                k.components.push({node:'descriptionList',items:opts[HNodes[i]].methods});
+            }
             UI.Panels.Nodes.components.push(k);
         }
     };
@@ -989,7 +1005,7 @@
                           {node: "heading",size: "h5",text: "options"},
                           {node: "descriptionList",items:[{label:"action",descriptions:["type: function","example","<code> action:function(that){//some code - that=this}<code>"]},
                                                           {label:"dependsOn",descriptions:["type: string","id of the node that needs to be created before the action function is run","example","<code> dependsOn:'nodeId'"]},
-                                                          {label:"publish",descriptions:["type: objectArray","example","<code>publish:[{name:'some_name',action:function(that){ Harvey.dispatch('some_name')}}]</code>"]},
+                                                          {label:"publish",descriptions:["type: objectArray","example","<code>publish:[{name:'some_name',action:function(that,name){ var data=that.myGetData(); <br> Harvey.dispatch(name,data)}}]</code>"]},
                                                           {label:"listen",descriptions:["type: objectArray","example","<code>listen:[{name:'some_name',action:function(that,data){//do something}}]<code>"]},
                                                           {label:"after",descriptions:["type: string","where the string is the id of an element that the new elemnent will be displayed after"]}]},
                           {node:"descriptionList",items:stuff[HDisplays[i]].options},
@@ -1159,19 +1175,76 @@
        
         var command={
             alert:  function(c){ return c.concat('("Hi, An alert");');},
-            clock:function(c){ return c.concat('("clock");');},
             dialog:function(c){return c.concat('("title","my message");');},
             error:function(c){return c.concat('("title","my message");');},
-            paginate:function(c){return c.concat('({DOM:"right",values:[{text:"1",action:function(that){alert("got a click");}},{text:"2",action:function(that){alert("got a click");}}]});');},
-            progressBar:function(c){return c.concat( '(4);');},
+         /*   paginate:function(c){return c.concat('({DOM:"right",values:[{text:"1",action:function(that){alert("got a click");}},{text:"2",action:function(that){alert("got a click");}}]});');},
+            progressBar:function(c){return c.concat( '(4);');}, */
             spinner: function(c){return c.concat('(true);');},
-            statusCode:function(c){return c.concat( '[204]("");');},
+            statusCode:function(c){return c.concat( '[204]("Some more text");');},
             trouble:function(c){return c.concat('("TEST TROUBLE","something horrible text")');}
+        };
+        var ttt={
+            statusCode:{items:[{label: "ERROR_CODE",descriptions:["type: integer","required: true","one of the following"]},
+                               {label: 204,description: "There is no content for this page "},
+	    
+	                       {label:205,description:"Response requires that the requester reset the document view "},
+		               {label:400,description:"Bad request "},
+	    
+	                       {label:401,description: "Unauthorised "},
+	    
+	                       {label:403,description: "Forbidden " },
+	    
+	                       {label:404,description:"Not Found "},
+	                       {label: 410,description:" Gone "},
+	                       {label:413,description:"Request entity too large "},
+	                       {label: 424,description:"Method Failure "},
+	                       {label: 500,description:"Internal server error "},
+	                       {label:501,description:"Not Implemented "},
+	                       {label: 503,description: "Service unavailable "},
+	                       {label: 511,description:"Network authentication required " },
+                               {label: " ",description:"<br>"},
+                               {label: "text",descriptions: ["type: string","required: false"]}
+                              ],
+                        cmd: function(c){return c.concat( '[204]("Some more text");');},
+                        usage: "<code>Harvey.popup['statusCode'][ERROR_CODE](text); </code>",
+                        ret: "none"
+                       },
+            alert:{items:[{label:"text",description:"type: string, required: false "}],
+                   cmd:  function(c){ return c.concat('("Hi, An alert");');},
+                   usage:" <code>Harvey.popup['alert'](title);</code>",
+                   ret: "HTML Element Object"
+                  },
+            dialog:{items:[{label:"title",description:"type: string, required: true"},
+                           {label:"text",description:"type: string, required: false"},
+                           {label: "modal",description: "type: boolean, required: false, default: false"}
+                          ],
+                    cmd: function(c){return c.concat('("title","my message");');},
+                    usage: " <code>Harvey.popup['dialog'](title,[ ,text],[ , modal]);</code> ",
+                    ret: "Object"
+                   },
+            error:{items:[{label: "title",description:"type: string, required: true"},
+                          {label: "text",description: "type: string, required: false"}],
+                   cmd: function(c){return c.concat('("title","my message");');},
+                   usage:"<code>Harvey.popup['error'](title,text);</code>",
+                   ret: "none"
+                  },
+            spinner:{items:[{label:"value",description:"type: boolean, required: true"}],
+                     cmd:  function(c){return c.concat('(true);');},
+                     usage:"<code>Harvey.popup['spinner'](value);</code>",
+                     ret: "HTML Element Object"
+                    },
+            trouble:{items:[{label:"title",description:"type:string , required: true"},
+                            {label: "text",description: "type: string, required: false"}
+                           ],
+                     cmd: function(c){return c.concat('("TEST TROUBLE","something horrible text")');},
+                     usage:"<code>Harvey.popup['trouble'](title,text);</code>",
+                     ret: "HTML Element Object"
+                    }
         };
         
         for(var i=0;i<HPopups.length;i++){
             var c= "var dobj=Harvey.popup['" + HPopups[i] + "']" ;   
-            var cmd=command[HPopups[i]](c);
+            var cmd=ttt[HPopups[i]].cmd(c);
             
             var k={};
             k.display="fieldset";
@@ -1179,6 +1252,12 @@
             k.hidden=true;
             k.id=HPopups[i];
             k.components=[{node:"heading",size:"h3",text: HPopups[i]},
+                          {node:"heading",size:"h4",text: "Usage"},
+                          {node: "paragraph",text: ttt[HPopups[i]].usage},
+                          {node: "heading",size: "h5",text:"Parameters"},
+                          {node: "descriptionList",items: ttt[HPopups[i]].items},
+                          {node: "heading",size: "h5",text:"Return"},
+                          {node: "paragraph",text: ttt[HPopups[i]].ret},
                           {node: "heading",size: "h5",text: "Live example"},
                           {name: "Input_params",field: "textArea", value: cmd},
                           {name: "doit", node: "button", text: "Go",action: function(that){
@@ -1201,28 +1280,47 @@
     var mkIO=function(){
         var HIO=HThings["IO"];
         var items={
-            REST:{code: "<code>Harvey.IO.REST(type,options,data);</code>",
+            REST:{code: "<code>var v=Harvey.IO.REST(type,options,data);</code>",
                   items:[{label: "type",descriptions:["string","'GET' or 'POST'"]},
-                         {label: "options",descriptions:["key-value object","with keys url(required) dataType(optional) defaults to 'json' mimeType(optional) defaults to 'application/json', any other values in the options object will be passed directly to the server","e.g <code>var options={url:'http://my_site/whatever'};</code>"]},
+                         {label: "options",descriptions:["key-value object","  var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};"," keys url(required) dataType(optional)"," defaults to 'json' mimeType(optional) defaults to 'application/json', any other values in the options object will be passed directly to the server","e.g <code>var options={url:'http://my_site/whatever'};</code>"]},
                          
-                         {label:"data",descriptions:["whatever data you like"]}]
+                         {label:"data",descriptions:["any data the can be stringified using JSON.stringify "]}],
+                  cmd:"var v=Harvey.IO.REST('GET',{},'hi'); v.then(function(){ }).catch(function(msg){Harvey.popup.error('request failes',msg)});",
+                  ret: "promise - javascript Promise",
+                  des: " (Example will throw an error for security reasons)"
                  },
             dispatch:{code: "<code>Harvey.IO.dispatch(name,data);</code>",
                       items:[{label:"name",descriptions:["string","event identifier (matches listen)"]},
-                             {label:"data",descriptions:["any data type","data to be sent to listeners"]}]
+                             {label:"data",descriptions:["any data type","data to be sent to listeners"]}],
+                      cmd:"Harvey.IO.dispatch('mySignal','hullo'); // go to listen page to see results",
+                      ret: "none",
+                      des:""
                      },
             listen:{code: "<code>Harvey.IO.listen(object);</code>",
-                    items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}]
+                    items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
+                    cmd: "Harvey.Panel.get('IO').getChild('listenMethods').addField({field:'static',type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addNode({node:'paragraph',text: data});  }}]});  // press go to initialise",
+                    ret:"none",
+                    des: "Listens for messages sent by publish,websocket or dispatch methods"
                    },
             publish:{code: "<code>Harvey.IO.publish(object);</code>",
-                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called publish","e.g <br> <code>var object={publish:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}]
-
+                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called publish","e.g <br> <code>var object={publish:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
+                     cmd: "Harvey.IO.publish({publish:[{name:'mySignal',action:function(that,name){ var t=Harvey.Panel.get('IO').getChild('publishMethods'); t.element.addEventListener('click',function(e){ Harvey.IO.dispatch(name,'hullo from publish');},false); }}]}); // press Go to initialise, and then click anywhere in the panel to send data- the data will be caught on the listen page",
+                     ret: "none",
+                     des:""
                     },
             unsubscribe:{code: "<code>Harvey.IO.unsubscribe(object);</code>",
-                         items:[{label:"object",descriptions:[""]}]
+                         items:[{label:"object",descriptions:[""]}],
+                         cmd:"var t=Harvey.Panel.get('IO').getChild('listenMethods').getField('test_listen'); Harvey.IO.unsubscribe(t);",
+                         ret: "null on error, or undefined on success",
+                         des: "unsubscibe from all messages defined in object.listen"
                         },
             webSocket:{code: "<code>Harvey.IO.webSocket(options,data);</code>",
-                       items:[{label:"object",descriptions:[""]}]
+                       items:[{label:"options",descriptions:["key value object","default={url:UI.webSocketURL}; ","any other settings in options will be passed to the webSocket"]},
+                              {label: "data",description: "any data that can be stringified using JSON.stringify"}
+                             ],
+                       ret: "none",
+                       des: "sends and receives messages, received messages are sent with IO.dispatch (Example will throw an error for security reasons)",
+                       cmd: " Harvey.IO.webSocket({url:'/data/websocket'},['logon',{user: 'fred',password: 'flinstone'}]); "
                       }
         };
         for(var i=0;i<HIO.length;i++){
@@ -1235,10 +1333,24 @@
             k.components=[{node:"heading",size:"h3",text:HIO[i]},
                           {node:"heading",size: "h4",text:"Usage"},
                           {node: "paragraph",text:items[HIO[i]].code},
+                          {node: "paragraph",text: items[HIO[i]].des},
                           {node:"heading",size:"h5",text:"Parameters"},
                           {node: "descriptionList",items: items[HIO[i]].items},
-                          {node: "heading",size:"h5",text: "Live Example"}
+                          {node:"heading",size:"h5",text:"Return"},
+                          {node:"paragraph",text:items[HIO[i]].ret }
                          ];
+            if(items[HIO[i]].cmd){
+                k.components.push({node: "heading",size:"h5",text: "Live Example"});
+                k.components.push({field: "textArea",name:"Input_params",value:items[HIO[i]].cmd});
+                k.components.push({node: "button",name: "Go",text: "Go",action:function(that){
+                    var f=that.parent.getChild("Input_params");
+                    if(!f){
+                        throw new Error("can't get input params");
+                    }
+                    globalEval(f.getValue());
+                }});
+                
+            }
             UI.Panels.IO.components.push(k);
         }
     };
@@ -1247,29 +1359,34 @@
         var W=HThings["Windows"];
         var items={
             close: {cmd:"Harvey.Window.close('TestWindow');",
-                    params:[{label:"win",descriptions:["string - window name","or","object- windowObject",
-                                                       "return - none"]}],
-                    description:"close the window- don't delete the panels it may contain"
+                    params:[{label:"win",descriptions:["string - window name","or","object- windowObject"
+                                                      ]}],
+                    description:"close the window- don't delete the panels it may contain",
+                    ret:[{label:"none",description:""}]
                    },
             deleteAll:{cmd:"Harvey.Window.closeAll();",
-                      params:[{label:"none",description:"return none"}],
-                      description:""
+                       params:[{label:"none",description:"return none"}],
+                       description:"",
+                       ret:[{label:"none",description:""}]
                      },
             delete:{cmd: "Harvey.Window.delete('TestWindow');",
-                    params:[{label:"win",descriptions:["string - window name","or","object - windowObject",
-                                                       "return - none"]}],
-                    description:"close the window and delete all the contents"
+                    params:[{label:"win",descriptions:["string - window name","or","object - windowObject"
+                                                     ]}],
+                    description:"close the window and delete all the contents",
+                    ret:[{label:"none",description:""}]
                    },
-            get:{cmd: "var w=Harvey.Window.get('TestWindow');",
+            get:{cmd: "var v=Harvey.Window.get('TestWindow');",
                  params:[{label:"win",descriptions:["string - window name"," or"," object - windowObject",
-                                                    "return - Harvey windowObject i.e",
-                                                    "<code>w={name:'myName',window:'windowObject',promise:'Promise'}</code>"]}],
-                 description:""
+                                               ]}],
+                 description:"",
+                 ret: [{label:"",descriptions:[  "Harvey windowObject i.e",
+                                                 "<code>w={name:'myName',window:'windowObject',promise:'Promise'}</code>"]}]
                 },
-            open:{cmd:"var promise=Harvey.Window.open({name:'TestWindow',url:'child_window.html',opts:{width: 400}});",
+            open:{cmd:"var v=Harvey.Window.open({name:'TestWindow',url:'child_window.html',opts:{width: 400}});",
                   params:[{label:"winObject",descriptions:["name: string -required ","url: string - required",
                                                            "opts: object - window options (optional) <br> default: <code>{width: 600,height: 600,menubar: 0,toolbar: 0, location: 0, personalbar: 0 }</code> <br> if no opts are supplied the window will be opened in a new tab","opts can included any options normally used by window.open"]}],
-                  description:"Open a new browser window or tab"
+                  description:"Open a new browser window or tab",
+                  ret:[{label:"promise",description:"A javascript promise" }]
                  }
         };
         for(var i=0;i<W.length;i++){
@@ -1281,9 +1398,11 @@
             k.id=(W[i] + "Methods").toString();
             k.components=[{node:"heading",size:"h3",text:W[i]},
                           {node: "paragraph",text: "<code>" + items[W[i]].cmd + "</code>"},
+                          {node: "paragraph",text: items[W[i]].description},
                           {node: "heading",size:"h5",text: "Params"},
                           {node: "descriptionList", items:items[W[i]].params},
-                          {node: "paragraph",text: items[W[i]].description},
+                          {node: "heading",size:"h5",text: "Return"},
+                          {node: "descriptionList",items: items[W[i]].ret},
                           {node: "heading",size: "h5",text: "Live Example"},
                           {name: "Input_params",field: "textArea", value: items[W[i]].cmd},
                           {name: "doit", node: "button", text: "Go",action: function(that){
@@ -1292,8 +1411,11 @@
                                   throw new Error("can't get input params");
                               }
                               globalEval(f.getValue());
-                              
-                          }} 
+                              var p=that.parent.getChild("Result");
+                              p.setText(JSON.stringify(v));
+                          }},
+                          {node: "paragraph",text:"Result"},
+                          {node:"paragraph",text:"",name:"Result"}
                          ];
                     
             UI.Panels.Windows.components.push(k);
@@ -1302,44 +1424,67 @@
     var mkUtils=function(){
         var HUtils=HThings["Utils"];
         var items={
-            binarySearch:{p:"<code>var index=Harvey.Utils.binarySearch(array,item,[sortOrder],[closest])<code>",
-                          params:"array - (any type),<br>sortOrder:(optional) array of fields in the array, <br> closest: -object"},
+            binarySearch:{p:"<code>var index=Harvey.Utils.binarySearch(array,[sortOrder],item,[closest])<code>",
+                          params:"array - (any type),<br>sortOrder:(optional) array of fields in the array, <br> closest: -object",
+                          description:"if exact match is not found, and closest object is supplied - fills in the closest oject e.g <code> {index: closest_index,dir: string(before/after),val: closest_value} <code>",
+                          ret: "index - of the found array item or null",
+                          cmd:" var v={}; var b=Harvey.Utils.binarySearch([1,2,13,24,45],null,15,v);"
+                         },
             dateNow:{p:"<code>var today=Harvey.Utils.dateNow();<code>",
                      params: "none",
-                     description: "return: date - YYYY-MM-DD"},
+                     description:"",
+                     cmd:"var v=Harvey.Utils.dateNow();",
+                     ret: "date - YYYY-MM-DD"},
             datePast:{p:"<code>var t=Harvey.Utils.datePast(date);<code>",
                       params:"date: - YYYY-MM-DD",
-                      description:"return: boolean"},
+                      description:"",
+                      cmd:"var v=Harvey.Utils.datePast('2020-05-12');",
+                      ret:"boolean"},
             detectMobile:{p:"<code>var r=Harvey.Utils.detectMobile();<code>",
                           params: "none",
-                          description: "return: boolean"},
+                          description:"",
+                          cmd:"var v=Harvey.Utils.detectMobile();",
+                          ret: "boolean"},
             draggable:{p:"<code> var d=Harvey.Utils.draggable(htmlObject);</code>",
                        params:"a htmlObject",
-                       description:"return: false - on fail"},
+                       description:"",
+                       ret:"false - on fail"},
             extend:{p:"<code> Harvey.Utils.extend(subclass,superclass); </code>",
                     params: "subclass-constructor function, superclass: base constructor function",
-                    description: "return: none"},
+                    description:"Adds the methods of the superclass to the subclass <br> typically used with new e.g <code> myObj=new subclass; </code>",
+                    cmd: "var a= function(){this.p='hi';}; var b=function(){}; b.prototype={myVar: 'superClass'}; Harvey.Utils.extend(a,b); var v=a.prototype.myVar",
+                    ret: "none"},
             formatDate:{p:"<code> var date_string=Harvey.Utils.formatDate(date); </code>",
-                        params: "date of the form YYYY-MMM-DD",
-                        description: "return: string e.g '12th November 2017'"},
+                        params: "date of the form YYYY-MM-DD",
+                        description:"",
+                        cmd:"var v=Harvey.Utils.formatDate('2018-05-23')",
+                        ret: "string e.g '12th November 2017'"},
             getCssValue:{p:"<code> var css_value=Harvey.Utils.getCssValue(css_class,rule,[filename]); </code>",
                          params:"css_class, rule e.g width, filename[optional] the name of the css file in the header- if not given the function will search through all the css files",
+                         ret: "string - containing the rule or none",
                          description: "Sadly this does not work in Chrome"},
             widthFromCssClass:{p:"<code> var width=Harvey.Utils.widthFromCssClass(class_list,filename); </code>",
                                params:"class_list - string array of classes to be included in width calculation ",
-                               description:"return: string e.g '120px'"},
+                               description:"Sadly does not work in Chrome",
+                               ret:"string e.g '120px'"},
             fontSizeToPixels:{p:"<code> var d=Harvey.Utils.fontSizeToPixels(font-size);</code>",
-                              params:"font_size: integer",
-                              description:"return: integer"},
+                              params:"font_size: integer or string e.g '12pt'",
+                              description:"",
+                              cmd:"var v=Harvey.Utils.fontSizeToPixels(12);",
+                              ret:"integer"},
             hashCode:{p:"<code> var d=Harvey.Utils.hashCode(str);</code>",
                       params:"str: some string value ",
-                      description:"return: simple hashed string"},
-            observer:{p:"<code>var c=Harvey.Utils.observe(id_name); </code>",
-                      params:"",
-                      description:""},
+                      description:" simple hashed string",
+                      cmd:"var v=Harvey.Utils.hashCode('hullo')",
+                      ret:"string - string of integers"},
+            observer:{p:"<code>var c=Harvey.Utils.observe(str); </code>",
+                      params:"str - string(required) id name of element to observe",
+                      description:"",
+                      ret:""},
             getSiblings:{p:"<code>var c=Harvey.Utils.getSiblings(htmlObject); </code>",
                          params:"htmlObject",
-                         description: "return: array of sibling htmlObjects"}
+                         description:"find all the siblings",
+                         ret: "array of sibling htmlObjects"}
         };
         for(var i=0;i<HUtils.length;i++){
           //  console.log("making io panel",HUtils[i]);
@@ -1350,11 +1495,33 @@
             k.id=(HUtils[i] + "Methods").toString();
             k.components=[{node:"heading",size:"h3",text:HUtils[i]},
                           {node: "paragraph",text: items[HUtils[i]].p},
-                          {node: "heading", size: "h4", text: "Parameters"},
+                          {node: "paragraph",text: items[HUtils[i]].description},
+                          {node: "heading", size: "h5", text: "Parameters"},
                           {node:"paragraph",text: items[HUtils[i]].params},
-                          {node: "heading", size: "h4", text: "Return"},
-                          {node:"paragraph",text: items[HUtils[i]].description}
+                          {node: "heading", size: "h5", text: "Return"},
+                          {node:"paragraph",text: items[HUtils[i]].ret}
                          ];
+            if(items[HUtils[i]].cmd !== undefined){
+                k.components.push({node:'heading',size:'h5',text:'Live Example'});
+                k.components.push({field:'textArea',name:'input_params',value: items[HUtils[i]].cmd});
+                k.components.push({node: "button",name: 'Go',action:function(that){
+                    var f=that.parent.getField('input_params');
+                    if(!f){
+                        throw new Error("can't get input params");
+                    }
+                    globalEval(f.getValue());
+                    var p=that.parent.getNode('Result');
+                    if(Harvey.checkType['function'](v)){
+                        p.setText(v);
+                    }
+                    else{
+                        p.setText(JSON.stringify(v));
+                    }
+                    
+                }});
+                k.components.push({node:"heading",size:"h5",text:"Result"});
+                k.components.push({node:"paragraph",name:'Result'});
+            }
             UI.Panels.Utils.components.push(k);
         }
     };
@@ -1408,7 +1575,7 @@
             UIStart:[{label:"Usage",descriptions:[ "Called by default if", "<code> UI.start=['MyPanel']; </code> is defined"]},
                      {label: "Or",descriptions:[ "<br><code>Harvey.Panel.UIStart(stringArray);</code>","<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
             add:[{label: "Usage",descriptions:[ "<code>Harvey.Panel.add(object|| string);</code>","return: nothing","parms: object or string","e.g from the above definition","<code>Harvey.Panel.add('MyPanel');</code>","or","<code> Harvey.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
-            clone:[{label:"Usage",descriptions:["<code>Harvey.Panel.clone(panel_name,window);</code>","clone a panel object"]}],
+            clone:[{label:"Usage",descriptions:["<code>var p=Harvey.Panel.clone(panel_name);</code>","clone a panel object that has been defined in UI.Panels","Add to DOM with <code>Harvey.Panel.add(p);</code>"]}],
             delete:[{label:"Usage",descriptions:["<code>Harvey.Panel.delete(string);</code>","return: nothing","parms: string","the name of the window to be deleted"]}],
             deleteAll:[{label:"Usage",descriptions:["<code>Harvey.Panel.deleteAll();</code>","return: nothing","parms: none","delete all the windows"]}],
             get:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.get(string);</code>","return: panel object","parms: string",(" " + mk_spaces(7) + "The name of the panel")]}],
@@ -1431,10 +1598,10 @@
         for(var i=0;i<HPanels.length;i++){
           //  console.log("mkPanelMethods making " + HPanels[i]);
             var cmd={
-                UIStart:"Harvey.Panel.UIStart();",
+                UIStart:"Harvey.Panel.UIStart(['Tabs']);",
                 add:"Harvey.Panel.add({name: 'TestField', window:'TestWindow',components:[{display:'fieldset',DOM:'Content',id:'TestFieldSet',components:[{node:'heading',size:'h2',text:'Yippee'},{node:'button', name:'some buttom',label:'another button'},{field:'checkBox',name: 'checkBox',label:'a checkbox' }]}]});",
                 "delete":"Harvey.Panel.delete('TestField');",
-                clone:"Harvey.Panel.clone('TestField')",
+                clone:"var v=Harvey.Panel.clone('Tabs');",
                 deleteAll:"Harvey.Panel.deleteAll();",
                 get: "var v=Harvey.Panel.get('TestField');",
                 getList:"var v=Harvey.Panel.getList();",
@@ -1460,6 +1627,7 @@
                           {node: "heading",size: "h4",text: HPanels[i]},
                           {node: "descriptionList", items:panel_methods[HPanels[i]]},
                           {node: "heading",size: "h5",text: "Live example"},
+                          {node: "paragraph",text:"If TestWindow does not exist, either create it by creating ot in the main Panels tab, live example or in the windows open page"},
                           {name: "Input_params",field: "textArea", value: cmd[HPanels[i]]},
                           {name: "doit", node: "button", text: "Go",action: function(that){
                               var f=that.parent.getChild("Input_params");
@@ -1551,6 +1719,7 @@
                                              {node:"paragraph", text:"Fields.js <br> depends on Utils.js,Sort.js,Types.js, datepicker.js"} ,
                                              {node: "heading", size: "h3", text: "Usage" },
                                              {node: "paragraph", text: "<code>var field=Harvey.field[fieldType](fieldData,parentNode);</code>"},
+                                             {node: "paragraph",text: "or as part of another object <br> <code>{field: fieldType, value: val, //etc }</code>"},
                                              {node: "paragraph", text: "Returns a HarveyField object"},
                                              {node: "heading", size: "h5", text: "fieldType"},
                                              {node: "paragraph",text: "type: string -  Harvey field type"},
@@ -1798,7 +1967,8 @@
                           {node: "heading",size:"h2",text: "Harvey IO"},
                           {node: "paragraph",text: "IO.js"},
                           {node: "paragraph",text: "IO Must be done explicitly, none of the Harvey components will send data. There is no  submit or other built-in methods"},
-                          {node: "paragraph",text: "IO is usually controlled through the action function e.g <br> <code> { node: 'button', <br>" + mk_spaces(1) + " name: 'my_button',<br> " + mk_spaces(1) + "action: function(that){ <br> " + mk_spaces(4) + "  var data=get_data(); <br> " + mk_spaces(4) + "Harvey.IO.webSocket({},['logon',{user: data.user,password: data.password}]);<br> " + mk_spaces(2) + "}<br>};</code>"}
+                          {node: "paragraph",text: "IO is usually controlled through the action function e.g <br> <code> { node: 'button', <br>" + mk_spaces(1) + " name: 'my_button',<br> " + mk_spaces(1) + "action: function(that){ <br> " + mk_spaces(4) + "  var data=get_data(); <br> " + mk_spaces(4) + "Harvey.IO.webSocket({},['logon',{user: data.user,password: data.password}]);<br> " + mk_spaces(2) + "}<br>};</code>"},
+                          {node:"paragraph",text:"Or set up publish/listen in the initialisation of a field or display e.g <br> <br> <code> var tabs=Harvey.display['tabs']({id:'myTabs',DOM:'Content',tabs:[{name:'tab1'}],<br> " + mk_spaces(16) + "listen:[{name:'mySignal',<br> " + mk_spaces(22) + "action:function(that,data){<br>" + mk_spaces(26) + " that.addTab({name: data}); <br> " + mk_spaces(22) + "  } <br> "+ mk_spaces(20) + "}]    <br> " + mk_spaces(16) + "}); </code>"}
                       ]
                       
                     },
@@ -1826,7 +1996,9 @@
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "Harvey Popups"},
-                          {node: "paragraph",text: "Popups.js"}
+                          {node: "paragraph",text: "Popups.js"},
+                          {node: "heading",size: "h3",text:"Usage"},
+                          {node: "paragraph",text:"<code>Harvey.popup[popup_name](params);</code>"}
                       ]
                       
                     }

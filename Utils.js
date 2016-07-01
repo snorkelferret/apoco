@@ -95,14 +95,12 @@ String.prototype.trim = String.prototype.trim || function trim() {
             if(font_size === undefined){
                 return null;
             }
-            if(font_size.indexOf("pt")>=0){
-                p=font_size.split("pt");
+            pp=font_size.toString();
+            if(pp.indexOf("pt")>=0){
+                p=pp.split("pt");
                 pp=p[0].toString();
             }
-            else if(!isNaN(font_size)){
-                pp=font_size.toString();
-            }
-            else{
+            else if(isNaN(font_size)){
                 return null;
             }
             if(lu[pp]){

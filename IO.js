@@ -5,9 +5,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
     Harvey.IO={
         _subscribers:{},
         dispatch:function(name,args){  //pubsub
-            console.log("dispatch is here name is " + name);
+            //console.log("dispatch is here name is " + name);
 	    if(this._subscribers[name]){
-               console.log("found subscriber");
+              // console.log("found subscriber");
 	        try{
 		    this._subscribers[name].forEach(function(s){
                         if(!s.action){
@@ -29,10 +29,13 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 	    //var b=that.getKey();
           //  for(var k in that){
           //      console.log("listen has that " + k);
-         //   }
+            //   }
+            if(that === undefined || that.listen === undefined){
+                throw new Error("IO.listen needs an object");
+            }
 	    for(var i=0; i< that.listen.length; i++){
 	        var n=that.listen[i].name;
-	        console.log("adding listener " + n );// + " to " + that.getKey());
+	     //   console.log("adding listener " + n );// + " to " + that.getKey());
 	        if(!this._subscribers[n]){
 		    this._subscribers[n]=[];
 	        }
@@ -57,21 +60,25 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 	        if(this._subscribers[that.listen[index].name].length === 0){ // nobody listening
 		    delete this._subscribers[that.listen[index].name];
 	        }
+                return undefined;
 	    }
 	    else{
                 console.log("Harvey.unsubscribe could not find listener");
-	    }
-
+                return null;
+            }
         },
         publish:function(that) {//pubsub
-            console.log("++++++++++++=+++ publish +++++++++ " + that.id);
+            if(that === undefined || that.publish === undefined){
+                throw new Error("IO.publish needs an object");
+            }
+          //  console.log("++++++++++++=+++ publish +++++++++ " + that.id);
 	    for(var i=0;i<that.publish.length;i++){
 
 	        if(that.publish[i].data){
 		    this.dispatch(that.publish[i].name,that.publish[i].data);
 	        }
 	        else if(that.publish[i].action){
-		    that.publish[i].action(that);
+		    that.publish[i].action(that,that.publish[i].name);
 
 	        }
 	        else{
@@ -82,7 +89,6 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
         webSocket:function(options,data){
             var that=this;
             var defaults={url: UI.webSocketURL};
-
             //var settings=$.extend({},defaults,options);
             var settings={};
             settings.url=defaults.url;
@@ -92,18 +98,24 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 
             if(!Harvey.webSocket){
                 var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
-                console.log("a is " + a + " protocol " + window.location.protocol);
+              //  console.log("a is " + a + " protocol " + window.location.protocol);
                 if(!a){
                     throw new Error("IO: Cannot get protocol for window " + window.location);
                 }
-                Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
+             //   console.log("location host " + window.location.host + " hostname " + window.location.hostname);
+                try{
+                    Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
+                }
+                catch(err){
+                    throw new Error(("webSocket: failed to open" + err));
+                }
 	    }
             Harvey.webSocket.onmessage=function(e){
                 if(!e.data){
                     throw new Error("webSocket: no data or name from server");
                 }
                 var d=JSON.parse(e.data);
-                console.log("got: %j %j",d[0],d[1]);
+               // console.log("got: %j %j",d[0],d[1]);
                 if(d[0] === "error"){
                     Harvey.popup.dialog("Error",d[1]);
                 }
@@ -113,14 +125,15 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             };
             if(data !== undefined){
                 var msg=JSON.stringify(data);
-                console.log("got some data " + msg);
+               // console.log("got some data " + msg);
                 Harvey.webSocket.send(msg+'\n');
             }
 
         },
         REST:function(type,options,data){
             var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};
-            if(type !== "GET" || type !== "POST"){
+            //type=type.toString();
+            if(type !== "GET" && type !== "POST"){
                 throw new Error("REST: only knows about GET and POST not " + type);
             }
 	    //    var settings=$.extend({},defaults,options);
@@ -154,9 +167,12 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                         }
                     }
                 };
-
+                var reqFail=function(e){
+                    reject(request.status);
+                };
                 request.onreadystatechange=stateChange;
                 request.open(type,settings.url);
+                request.addEventListener('error',reqFail);
                 if(type === "POST"){
                     request.setRequestHeader("Content-Type", settings.mimeType);
                     request.send(data);

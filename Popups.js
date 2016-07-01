@@ -1,11 +1,13 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare');//.UI,jQuery=require('jquery');
+var Harvey=require('./declare').Harvey;
 
 ;(function(){
     'use strict';
 
     var popups={
         error:function(title,message){
+            var t="ERROR ";
             if(Harvey.error === undefined){
+                title=t.concat(title);
                 Harvey.error=this.dialog(title,message,true);
                 Harvey.error.close=function(){
                     document.body.removeChild();
@@ -224,7 +226,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare');//.UI,jQuery=requ
                 document.body.removeChild(a);
                 a=null;
                 window.clearTimeout(t);
-                Harvey.error("Unrecoverable Error","Please shutdown now");
+                Harvey.popup.error("Unrecoverable Error","Please shutdown now");
             },5000);
  	},
 
