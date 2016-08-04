@@ -89,45 +89,62 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
         webSocket:function(options,data){
             var that=this;
             var defaults={url: UI.webSocketURL};
-            //var settings=$.extend({},defaults,options);
             var settings={};
+            var sendMessage=function(data){
+                console.log("Trying to send message ___________________________________");
+                var msg=JSON.stringify(data);
+                console.log("got some data " + msg);
+                try{
+                    Harvey.webSocket.send(msg+'\n');
+                }
+                catch(err){
+                    Harvey.popup.error("websocket send", ("Could not send websocket message %j ",err));
+                }
+            };
             settings.url=defaults.url;
             for(var k in options){
                 settings[k]=options[k];
             }
-
+            
             if(!Harvey.webSocket){
+                console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
                 var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
-              //  console.log("a is " + a + " protocol " + window.location.protocol);
+                console.log("a is " + a + " protocol " + window.location.protocol);
                 if(!a){
                     throw new Error("IO: Cannot get protocol for window " + window.location);
                 }
-             //   console.log("location host " + window.location.host + " hostname " + window.location.hostname);
+                console.log("location host " + window.location.host + " hostname " + window.location.hostname);
                 try{
                     Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
+                    console.log("created websocket + + + + + + + + + + + + + + ++");
+                    if(data !== undefined){ // in case of timing issue 
+                        sendMessage(data);
+                    }
                 }
                 catch(err){
                     throw new Error(("webSocket: failed to open" + err));
                 }
 	    }
+            else if(data !== undefined){
+                sendMessage(data);
+            }
+
             Harvey.webSocket.onmessage=function(e){
                 if(!e.data){
                     throw new Error("webSocket: no data or name from server");
                 }
                 var d=JSON.parse(e.data);
-               // console.log("got: %j %j",d[0],d[1]);
+                console.log("got: %j %j",d[0],d[1]);
                 if(d[0] === "error"){
-                    Harvey.popup.dialog("Error",d[1]);
+                    Harvey.popup.dialog("Error",JSON.stringify(d[1]));
                 }
                 else{
                     that.dispatch(d[0],d[1]);
                 }
             };
-            if(data !== undefined){
-                var msg=JSON.stringify(data);
-               // console.log("got some data " + msg);
-                Harvey.webSocket.send(msg+'\n');
-            }
+            //if(data !== undefined){
+            //    sendMessage(data);
+           // }
 
         },
         REST:function(type,options,data){

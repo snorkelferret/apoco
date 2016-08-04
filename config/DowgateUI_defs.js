@@ -10,7 +10,7 @@
     var cellUpdateTest=function(grid){
 	function send_data(grid){
 	    // pick a row
-	    var frr=Math.floor(Math.random()*12); // 12 subclasses
+	    var frr=Math.floor(Math.random()*13); // 12 subclasses
 	    // console.log("subclass is " + frr);
 	    frr=frr.toString();
 	    var len=grid.grids[frr].rows.length;
@@ -150,10 +150,10 @@
                        dependsOn: "Blotter",
                        action: function(that){
                            //console.log("starting cell update test");
-                           //  cellUpdateTest(that);
+                           cellUpdateTest(that);
                            console.log("add column test");
                            // that.addCol({name: "new_col",type:"integer",editable:false});
-                           that.deleteCol("client_offer");
+                          // that.deleteCol("client_offer");
                        },
 		       /* publish: [ {name: "dfjh", //simple publish
 			              data: "Hi"

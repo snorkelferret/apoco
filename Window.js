@@ -14,7 +14,8 @@ require("./Panel");
             }
             w=this._inList(win);
             if(w === null){
-                throw new Error("Window.delete - could not find window " + win);
+                return null; //may already have been deleted
+                //throw new Error("Window.delete - could not find window " + win);
             }
            
             console.log("deleting the panels for window " + win);
@@ -28,6 +29,7 @@ require("./Panel");
             this._list[w].window.onunload=null; // stop the close callback
             this._list[w].window.close();
             this._list.splice(w,1);
+            return undefined;
         },
         _close:function(name){
             var p=this._inList(name);

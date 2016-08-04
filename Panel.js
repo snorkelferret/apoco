@@ -309,29 +309,25 @@ require("./Window");
         
 	if(this.window){
             w=Harvey.Window.get(this.window);
-            if(w === null){
-                // perhaps have race condition
-                throw new Error("window " + this.window + " does not exist");
+            if(w !== null){
+                w.window.focus();
+                that.window=w.window;
+                that._addComponents();
             }
-	   // var p=Harvey.Window.open(obj.window);  // create a new browser window
-	    // p.then(function(w){
-            w.window.focus();
-            this.window=w.window;
-	//	w.window.focus();
-            //    console.log("got object from window.open.done");
-          //      for(var k in w){
-          //          console.log("obj has parm " + k + " with value " + w[k]);
-            //     }
-	   // that.window=w;
-           // obj.window=w;
-            //that._addComponents();
-	    //} ).catch(function(reason){
-              //  throw new Error("Panel: cannot open window " + reason);
-           // });
+            else{ 
+                var p=Harvey.Window.open(obj.window);  // create a new browser window
+	        p.then(function(w){
+                    w.window.focus();
+                    that.window=w.window;
+                    that._addComponents();
+                }).catch(function(msg){
+                    throw new Error("window " + that.window + " does not exist " + msg);
+                });
+            }
 	}
-        //else{
-        that._addComponents();
-        //}
+        else{
+            that._addComponents();
+        }
     };
 
     _Components.prototype={

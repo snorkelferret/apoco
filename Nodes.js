@@ -61,6 +61,19 @@ require("./Types.js");
                 that.element.target="_blank";
             }
 	},
+        whatever: function(that){
+            if(that.nodeType){
+                that.element=document.createElement(that.nodeType);
+                if(that.element !== null){
+                    if(that.text){
+                        that.element.textContent=that.text;
+                    }
+                }
+            }
+            else{
+                throw new Error ("Node: whatever no nodeType specified");
+            }
+        },
 	heading: function(that){
 	    switch(that.size){
 	    case "h1":

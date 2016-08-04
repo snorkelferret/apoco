@@ -62,6 +62,7 @@
         size: "h3",
         href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
         target: "_blank",
+        nodeType: "ul",
         objectArray:[{label:"value",description: "describe value"},{label:"another_value",descriptions:["one","two","three"]}]
     };
     
@@ -834,12 +835,21 @@
                 }
             },
             clock:{
-                parms:{},
+                parms:{}
             },
             button:{
                 parms:{text:"string",action:"function(that){alert('button pressed');}"},
                 options:{
                     items:[{label:"action",descriptions:["type: function","function to call when button is clicked"]}]
+                }
+            },
+            whatever:{
+                parms:{nodeType: "nodeType"},
+                required: {
+                    items:[{label:"nodeType",description:"any valid html element"}]
+                },
+                options:{
+                    items:[{label:"text",description: "text to add to element if applicable"}]
                 }
             }
         };
@@ -1412,7 +1422,14 @@
                               }
                               globalEval(f.getValue());
                               var p=that.parent.getChild("Result");
-                              p.setText(JSON.stringify(v));
+                              try{
+                                   p.setText(JSON.stringify(v));    
+                               }
+                               catch(e){
+                                   console.log("methods doit got %j", v);
+                                  p.setText(v);
+                               }
+                              
                           }},
                           {node: "paragraph",text:"Result"},
                           {node:"paragraph",text:"",name:"Result"}
