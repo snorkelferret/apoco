@@ -17,13 +17,13 @@ require("./DisplayBase");
 	var f,that=this;
         Harvey.mixinDeep(options,defaults);
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-	console.log("called display base");
+//	console.log("called display base");
         if(this.thumbnails === true){
             this.thumbnails=document.createElement("div"); 
             this.thumbnails.classList.add("thumbnails");
         }
         if(this.values){  // start preloading images
-            console.log("got some values");
+     //       console.log("got some values");
             f=Harvey.field["imageArray"]({name:"slideshow"});
             if(!f){
                 throw new Error("Slideshow: cannot make imageArray");
@@ -72,14 +72,14 @@ require("./DisplayBase");
                 return function(e){
                     e.stopPropagation();
                     if(icon.action === "play" && that.interval){
-                        console.log("already in play mode");
+                    //    console.log("already in play mode");
                         e.currentTarget.classList.remove("ui-state-active");
                         that["stop"]();
                         return;
                     }
                     e.currentTarget.classList.add("ui-state-active");
                     sibs=Harvey.Utils.getSiblings(e.currentTarget);
-                    console.log("got siblings length " + sibs.length);
+                 //   console.log("got siblings length " + sibs.length);
                     for(var j=0;j<sibs.length;j++){
                         sibs[j].classList.remove("ui-state-active");
                     }
@@ -101,11 +101,11 @@ require("./DisplayBase");
         },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,ar,lis=[];
-            console.log("AFTER SHOW IS HERE ");
+           // console.log("AFTER SHOW IS HERE ");
             
             this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
             this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
-            console.log("slideshow container width " + this.width + " height " + this.height);
+           // console.log("slideshow container width " + this.width + " height " + this.height);
             this.width=parseFloat(this.width);
             this.height=parseFloat(this.height);
             ar=this.width/this.height;
@@ -115,25 +115,25 @@ require("./DisplayBase");
             if(this.promise){
                 this.promise.then(function(){
                     lis=that.slideshow_container.querySelectorAll("li.slide");
-                    console.log("lis is " + lis + " lis.length " + lis.length);
+             //       console.log("lis is " + lis + " lis.length " + lis.length);
                     if(lis.length !== that.values.length){
 	                throw new Error("Slideshow: slide lis do not exist");
                     }
                     for(var i=0;i<that.values.length;i++){
-                        console.log("loading image " + i + " with aspect ratio " + that.values[i].aspect_ratio);
-                        console.log("image width " + that.values[i].width + " height " + that.values[i].height);
+               //         console.log("loading image " + i + " with aspect ratio " + that.values[i].aspect_ratio);
+               //         console.log("image width " + that.values[i].width + " height " + that.values[i].height);
                         if(!lis[i].contains(that.values[i].SSimage)){
                             that.values[i].SSimage=document.createElement("img");
                             that.values[i].SSimage.src=that.values[i].src;
                             lis[i].appendChild(that.values[i].SSimage);
                         }
-                        console.log("image asepect ratio is " + that.values[i].aspect_ratio);
-                        console.log("window aspect ratio is " + ar);
+              //          console.log("image asepect ratio is " + that.values[i].aspect_ratio);
+              //          console.log("window aspect ratio is " + ar);
 	                if(that.values[i].aspect_ratio > ar){   //wider than window - fit to width
 		            var h=that.width/that.values[i].aspect_ratio;
-                            console.log("new image height is " + h);
+              //              console.log("new image height is " + h);
                             var w=((that.width).toString() + "px");
-                            console.log("new image width is " + w);
+              //              console.log("new image width is " + w);
                             that.values[i].SSimage.style.width=w;
                             that.values[i].SSimage.style.height=(h.toString() + "px");
 		            h=(that.height-h)/2;
@@ -142,7 +142,7 @@ require("./DisplayBase");
 		        }
 		        else{  // - fit to height
 		            var w=that.height*that.values[i].aspect_ratio;
-                            console.log("new image width is " + w);
+             //               console.log("new image width is " + w);
                             that.values[i].SSimage.style.width=(w + "px");
                             that.values[i].SSimage.style.height=(that.height + "px");
 		            w=(that.width-w)/2;
@@ -157,7 +157,7 @@ require("./DisplayBase");
                         }
                     }
                     if(that.autoplay === true){
-                        console.log("trigger autoplay");
+               //         console.log("trigger autoplay");
                         if(that.interval){
                             that.stop();
                         }
@@ -171,7 +171,7 @@ require("./DisplayBase");
         },
 	_execute: function(){
             var that=this,l;
-	    console.log("execute of DisplaySlideshow");
+	//    console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
             this.element.classList.add("Harvey_slideshow","ui-widget-content","ui-corner-all");
@@ -223,13 +223,13 @@ require("./DisplayBase");
             var height=parseInt(window.innerHeight-48);
             //if this node is in the DOM we are already in fullscreen mode
             var r=document.getElementsByClassName("slideshow_cover")[0];
-            console.log("showFullscreen got width " + width + " height " + height);
+     //       console.log("showFullscreen got width " + width + " height " + height);
 	    that.element.parentNode.removeChild(this.element); 
-            console.log("slideshow cover is " + r);
+     //       console.log("slideshow cover is " + r);
             // that.hide();
             that.stop();
 	    if(!document.contains(r)){
-	        console.log("Fullscreen is truE- so do it");
+//	        console.log("Fullscreen is truE- so do it");
 	        that.element.style.width=(width.toString() + "px"); 
                 that.element.style.height=(height.toString() + "px");
 	        that.slideshow_container.style.width=(width.toString() + "px");
@@ -280,7 +280,7 @@ require("./DisplayBase");
         },
         play:function(){
             var that=this;
-            console.log("play is here " + that);
+  //          console.log("play is here " + that);
             this.interval=setInterval(function(){that.step("next");},this.delay);
         },
         stop:function(){

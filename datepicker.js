@@ -12,13 +12,13 @@ var Harvey=require('./declare').Harvey;
     Datepicker.prototype={
         init:function(element){
             var that=this;
-            console.log("Datepicker is here");
-            if(element){
-                console.log("got a paramenter");
-            }
+           // console.log("Datepicker is here");
+            // if(element){
+           //     console.log("got a paramenter");
+           // }
        
             var  click=function(e){
-                console.log("click is here");
+             //   console.log("click is here");
                 var pos=[];
                 if(that.element === undefined){
                     that.create();
@@ -31,12 +31,12 @@ var Harvey=require('./declare').Harvey;
                 var date=e.target.value;
 
                 if(that.current_element !== undefined){
-                    console.log("there is a previous click");
+               //     console.log("there is a previous click");
                     if(element==that.current_element){ //at least 2 clicks
-                        console.log("and it was the same element");
-                        console.log("and the element's  visibility is " + that.element.style.visibility);
+                 //       console.log("and it was the same element");
+                   //     console.log("and the element's  visibility is " + that.element.style.visibility);
                         if(that.element.style.visibility === "visible"){
-                            console.log("and it is visible- so close it");
+                     //       console.log("and it is visible- so close it");
                             that.close();
                             return;
                         }
@@ -53,7 +53,7 @@ var Harvey=require('./declare').Harvey;
                     e.target.value=that.dateToString(that.selectedDate);          
                 } 
 
-                console.log("selected date is " + that.selectedDate);
+               // console.log("selected date is " + that.selectedDate);
                 that.mkCalendarBody();
                 var rect = element.getBoundingClientRect();
                 // get the position
@@ -66,7 +66,7 @@ var Harvey=require('./declare').Harvey;
             };
             var change=function(e){
                 var date;
-                console.log("change is here ================");
+               // console.log("change is here ================");
                 date=e.target.value;
                 var t=that.parseDate(date);
                 if(t){
@@ -81,11 +81,11 @@ var Harvey=require('./declare').Harvey;
                 }
             };
             if(element!== undefined){
-                console.log("++++++++++++++++++++tag name us " + element.tagName);
+              //  console.log("++++++++++++++++++++tag name us " + element.tagName);
                 if(element.tagName.toLowerCase() !== "input"){
                     throw new Error("datepicker: element must be an input node");
                 }
-                console.log("datepicker here");
+               // console.log("datepicker here");
                 element.classList.add("Harvey_datepicker_input");
                 element.addEventListener("click",click,false);
                 element.addEventListener("change",change,false);
@@ -99,7 +99,7 @@ var Harvey=require('./declare').Harvey;
         parseDate:function(date){
             var p;
             if(date === undefined || date === ""){
-                console.log("parseDate date is undefined");
+               // console.log("parseDate date is undefined");
                 return null;
             }
             p=new Date(date);
@@ -227,12 +227,12 @@ var Harvey=require('./declare').Harvey;
             }
             var selectDay=function(e){
                 var day,s,p;
-                console.log("selectDay is here");
-                console.log("target type is " + e.target.type);
-                console.log("target classlist " + e.target.classList.contains("Harvey_date"));
+               // console.log("selectDay is here");
+              //  console.log("target type is " + e.target.type);
+              //  console.log("target classlist " + e.target.classList.contains("Harvey_date"));
                 if(e.target.classList.contains("Harvey_date")){
                     day=e.target.textContent;
-                    console.log("got day " + day);
+                //    console.log("got day " + day);
                     e.stopPropagation();
                     e.preventDefault();
                     //find the previous selection
@@ -246,7 +246,7 @@ var Harvey=require('./declare').Harvey;
                     s=that.dateToString(that.selectedDate);
                     
                     that.current_element.value=s;
-                    console.log("setected day is " + that.selectedDate);
+                  //  console.log("setected day is " + that.selectedDate);
                 }
             };
             this.calendar.addEventListener("click",selectDay,false);
@@ -267,7 +267,7 @@ var Harvey=require('./declare').Harvey;
         },
         mkCalendarBody:function(){
             var c,r,last_day,s;
-            console.log("mkCalendarBody: selected Date is " + this.selectedDate);
+           // console.log("mkCalendarBody: selected Date is " + this.selectedDate);
             var current_month=this.selectedDate.getMonth();
             var prev_month=(current_month === 0)?11:current_month-1;
             var next_month=(current_month+1)%12;
@@ -275,15 +275,15 @@ var Harvey=require('./declare').Harvey;
             var day=this.selectedDate.getDate();
             var t=new Date(),today=-1;
             // is today included in the calendar
-            console.log("today's year is " + t.getFullYear() + " and current " + current_year);
-            console.log("today's month is " + t.getMonth() + " and current " + current_month);              
+           // console.log("today's year is " + t.getFullYear() + " and current " + current_year);
+           // console.log("today's month is " + t.getMonth() + " and current " + current_month);              
             if(t.getFullYear() === current_year){
                 if(t.getMonth() === current_month){
                     today=t.getDate();
                     console.log("today is " + today);
                 }
             }
-            console.log("mkCalendarBody this.calendar is " + this.calendar);
+           // console.log("mkCalendarBody this.calendar is " + this.calendar);
             
             // fill in the title
             c=document.getElementById("Harvey_datepicker_title");
@@ -291,23 +291,23 @@ var Harvey=require('./declare').Harvey;
             //remove the previous body if it exists
             var tbody=this.calendar.getElementsByTagName("tbody")[0];
             r=tbody.getElementsByTagName("tr")[0]; //week names
-            console.log("length of rows is " + r.length);
+            //console.log("length of rows is " + r.length);
             while(tbody.firstChild){
                 tbody.removeChild(tbody.firstChild);
             }
             // put the week names back
             tbody.appendChild(r);
             // what day of the week does the current month start on?
-            console.log("current year " + current_year + " current_month " + current_month);
+            //console.log("current year " + current_year + " current_month " + current_month);
             if((current_month+1) > 9){
                 s=(current_year.toString() + "-" + (current_month+1).toString() + "-01");
             }
             else {
                 s=(current_year.toString() + "-0" + (current_month+1).toString() + "-01");
             }
-            console.log("s is " + s);
+           // console.log("s is " + s);
             var start_day=new Date(s).getDay();
-            console.log("start_day is " + start_day);
+            //console.log("start_day is " + start_day);
             if(start_day !== 0){ // need to get the prev month
                 if(prev_month === 1){ // February - need to see if its a leap year
                     last_day=this.months[prev_month].len;
@@ -321,7 +321,7 @@ var Harvey=require('./declare').Harvey;
             }
             c=Math.ceil((start_day+this.months[current_month].len)/7);
             var len=c*7;
-            console.log("c is " + c + " len is " + len);
+            //console.log("c is " + c + " len is " + len);
             var ml=this.months[current_month].len;
             //howmany days of the previous month do we need to show?
             var p=last_day-start_day+1;
@@ -374,7 +374,7 @@ var Harvey=require('./declare').Harvey;
             this.selectedDate=Date();
 	}
     };        
-    console.log("Making datepicker");
+   // console.log("Making datepicker");
     
     Harvey.datepicker=new Datepicker(); 
     

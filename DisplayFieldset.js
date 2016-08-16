@@ -275,7 +275,7 @@ require("./Nodes.js");
                 return new HarveyMakeFieldset(opts,win);
             },
             fieldsetMethods:function(){
-                console.log("Harvey.display.fieldsetMethods: getting methods for fieldset");
+             //   console.log("Harvey.display.fieldsetMethods: getting methods for fieldset");
                 var ar=[];
                 for(var k in HarveyMakeFieldset.prototype){
                     ar.push(k);

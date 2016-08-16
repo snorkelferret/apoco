@@ -45,14 +45,13 @@ var Harvey=require('./declare').Harvey;
                         document.body.removeChild(Hdialog);
                     }
                 };
-	        // if($("#Harvey_dialog").length === 0){
+
                 this.create=function(){
                     var s,b,t,header;
                     Hdialog=document.createElement("div");
-                  //  Hdialog.id="Harvey_dialog";
                     Hdialog.classList.add("Harvey_dialog","ui-dialog","resizable","ui-widget","ui-widget-content","ui-corner-all");
                     draggable=Harvey.Utils.draggable(Hdialog);
-                    //Hdialog.style.position="absolute";
+
                     // create header
                     header=document.createElement("div");
                     header.classList.add("ui-dialog-titlebar","ui-widget-header","ui-corner-all");
@@ -136,7 +135,7 @@ var Harvey=require('./declare').Harvey;
             
         },
 	spinner: function(on){
-	    //if($("#Harvey_spinner").length === 0){
+	
             if(!document.contains(document.getElementById("Harvey_spinner"))){
 		var spinner=document.createElement("div");
                 spinner.id="Harvey_spinner";
@@ -145,28 +144,23 @@ var Harvey=require('./declare').Harvey;
 	    if(on){
 		//console.log("Harvey spinner on");
                 document.getElementById("Harvey_spinner").style.visibility="visible";
-		//$("#Harvey_spinner").show();
 	    }
 	    else{
 		console.log("Harvey spinner off");
                 document.getElementById("Harvey_spinner").style.visibility="hidden";
-		//$("#Harvey_spinner").hide();
+
 	    }
             return spinner;
 	},
 	alert: function(text,time){
-
-            //	    if($("#Harvey_alert").length == 0){
 	    var nd,ns,np,s;
             nd=document.createElement("div");
             nd.id="Harvey_alert";
             nd.classList.add("ui-widget");
             Harvey.Utils.draggable(nd);
-	    //nd=$("<div id='Harvey_alert' class='ui-widget'></div>").draggable();
             ns=document.createElement("div");
             ns.classList.add("ui-state-error","ui-corner-all");
             ns.style.padding="10px";
-	    //ns=$("<div class='ui-state-error ui-corner-all' style='padding 10px'></div>");
             np=document.createElement("p");
             np.classList.add("ui-state-error-text");
             s=document.createElement("span");
@@ -182,14 +176,10 @@ var Harvey=require('./declare').Harvey;
             s.textContent=text;
             np.appendChild(s);
             
-	    //np=$("<p class='ui-state-error-text'> <span class='ui-icon ui-icon-alert' style='float: left;  margin: 10px;'>  </span> <strong> Alert: </strong> <span class='alert_text'> </span> </p>");
 	    ns.appendChild(np);
 	    nd.appendChild(ns);
 	    document.body.appendChild(nd);
-	    //}
-	  //  $("#Harvey_alert").show();
-	    //$("#Harvey_alert").find(".alert_text").text(text);
-            //$("#Harvey_alert").delay(6000).fadeOut(4000, function(){
+
             var t;
             if(time === undefined){
                 time=10000;
@@ -205,13 +195,12 @@ var Harvey=require('./declare').Harvey;
 	trouble: function(heading,text){
             var a=document.createElement("div");
             a.id="Harvey_trouble";
-	    //var a=$("<div  id='Harvey_trouble'>");
-	    //var b=$("<h1> " + heading + "</h1>");
+
             var b=document.createElement("h1");
             b.textContent=heading;
 	    a.appendChild(b);
 	    if(text!== undefined){
-		//var c=$("<h1 style='margin-left: 100px;' > " + text + " </h1></div>");
+
                 var c=document.createElement("div");
                 var d=document.createElement("h2");
                 d.textContent=text;
@@ -272,7 +261,7 @@ var Harvey=require('./declare').Harvey;
 	    }
 	}
     };
-    // $.extend(true, Harvey, {
+
     Harvey.mixinDeep(Harvey,{
 	popup: popups
     });

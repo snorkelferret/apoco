@@ -235,7 +235,7 @@ require("./datepicker");
             if(this.type){
                 
                 var check=Harvey.dbToHtml[this.type].check;
-                console.log("type to check is " + check);
+             //   console.log("type to check is " + check);
                 if(!Harvey.checkType[check](v)){
                   //  if(!array){
                   //      this.input.setCustomValidity(("Input must be of type " + check));
@@ -644,7 +644,7 @@ require("./datepicker");
 	}
 	if(this.editable !== false){
             if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
-                console.log("Making datepicker for Mozilla");
+              //  console.log("Making datepicker for Mozilla");
                 this.input.type="text";
                 this.input.setAttribute("placeholder","YYYY-MM-DD");
                 Harvey.datepicker.init(this.input);
@@ -704,11 +704,11 @@ require("./datepicker");
 	},
         setValue:function(val){
             if(val === "true" || val === true || val === 1){
-	        console.log("setting checkbox value to true");
+	  //      console.log("setting checkbox value to true");
                 this.input.setAttribute("checked","checked");
 	    }
 	    else {
-	        console.log("setting checkbox value to false");
+	    //    console.log("setting checkbox value to false");
                 if(this.input.hasAttribute("checked")){
                     this.input.removeAttribute("checked");
                 }
@@ -1394,10 +1394,10 @@ require("./datepicker");
             var that=this;
             var imm=new Image();  // get the width and height - need to load in to image
 	    imm.src=o.src;
-            console.log("getImage is here ");
+            //console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
-	            console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
+	          //  console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
@@ -1407,7 +1407,7 @@ require("./datepicker");
                 };
                 imm.onerror=function(){
                     o.image=null;
-                    console.log("ERROR loading image");
+                 //   console.log("ERROR loading image");
                     reject("Field:ImageArray._getImage Could not load image");
                 };
             });
@@ -1418,7 +1418,7 @@ require("./datepicker");
    	    new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = new Array; //evt.target.files;
-	    console.log("got " + files.length + " number of files");
+	  //  console.log("got " + files.length + " number of files");
             //check that the files are images
             for(var i=0;i<evt.target.files.length;i++){
                 if (evt.target.files[i].type.match('image.*')) {
@@ -1429,7 +1429,7 @@ require("./datepicker");
 	    var count=0,finished=false;
             var promise=new Promise(function(resolve,reject){
 	        for (var i=0; i<files.length; i++) {
-		    console.log("found file num " + i);
+	//	    console.log("found file num " + i);
 		    var reader = new FileReader();
 		    reader.onload = (function(f,last,new_values) {
 		        return function(e) {
@@ -1448,7 +1448,7 @@ require("./datepicker");
                                     resolve(last);
 	                        } 
                             }).catch(function(reason){
-                                console.log("could not load image " + reason); 
+       //                         console.log("could not load image " + reason); 
                                 reject(reason);
                             });
                             //console.log("getImageFiles: new values has " + new_values.length);
@@ -1463,14 +1463,14 @@ require("./datepicker");
             var i=0,p,last,that=this,num_loaded,promises=[],not_loaded;
             if(values !==undefined && Harvey.checkType["array"](values)){ //loading more images after creation
                 i=this.value.length;
-                console.log("loadImages " + "starting at " + i);
+         //       console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
             
             last=this.value.length;
             num_loaded=i;
             not_loaded=0;
-            console.log("loadImages last is " + last);
+         //   console.log("loadImages last is " + last);
             for(i; i<last;i++){   //aborts everything if one fails
                 promises.push(that._getImage(that.value[i]));
             }
@@ -1549,16 +1549,16 @@ require("./datepicker");
         },
         mkThumbnails: function(){
             var that=this,el;
-	    console.log("mk_thumbnails got " + this.value.length + " number of files");
+	//    console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.querySelector("div.imageArray");
             if(!td){
-                console.log("making a new image gallery");
+         //       console.log("making a new image gallery");
                 td=document.createElement("div");//"<div class='image_gallery'></div");
                 td.className="imageArray";
                 this.element.appendChild(td);
 	    }
 	    for(var i=0;i<this.value.length;i++){ // each image
-	        console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
+//	        console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
 		var t=this.value[i].title || "";
                 el=td.querySelector("div[title='" + t + "']");
                 if(!el){
@@ -1615,9 +1615,9 @@ require("./datepicker");
             item=item.toLowerCase();
             for(var i=0;i<arr.length;i++){
                 a=arr[i].toLowerCase();
-                console.log("arr " + a + " item " + item);
+           //     console.log("arr " + a + " item " + item);
                 if((a).indexOf(item) !== -1){
-                    console.log("Found one");
+                 //   console.log("Found one");
                     n[count]=arr[i];
                     count++;
                 }
@@ -1652,9 +1652,9 @@ require("./datepicker");
         box.appendChild(this.input);  
         //sort the options
         Harvey.sort(this.options,"string");
-        for(var i=0;i<this.options.length;i++){
-            console.log("sort to " + this.options[i]);
-        }
+       // for(var i=0;i<this.options.length;i++){
+       //     console.log("sort to " + this.options[i]);
+      //  }
       
         var select=document.createElement("ul");
         select.classList.add("choice","ui-autocomplete","ui-menu","ui-widget","ui-front","ui-widget-content");

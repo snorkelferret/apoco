@@ -87,7 +87,7 @@ require("./Fields");
         }
 
 	if(this.listen !== undefined){
-            console.log("listen listen listen");
+          //  console.log("listen listen listen");
          //   for(var k in this){
          //       console.log("just before listen " + k);
         //    }
@@ -225,7 +225,7 @@ require("./Fields");
                         this.DOM.appendChild(this.element);
                     }
                     if(this._afterShow !== undefined){
-                        console.log("DisplayBase: calling afterShow ");
+                     //   console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
                     }
 		}
@@ -247,9 +247,9 @@ require("./Fields");
             return this.displayType;
         },
         hide:function(){
-            console.log("trying to hide " + this.id);
+          //  console.log("trying to hide " + this.id);
             if(this.DOM.contains(this.element)){
-                console.log("Hiding element that is in dom");
+             //   console.log("Hiding element that is in dom");
                 this.DOM.removeChild(this.element);
                 return;
             }

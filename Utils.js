@@ -41,13 +41,13 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 if(classes === undefined || classes === null){
                     return null;
                 }
-                console.log("got classes %j ",classes);
+               // console.log("got classes %j ",classes);
                 for(var i=0; i<classes.length; i++){
                    // console.log("got class " + classes[i].selectorText );
                     if(classes[i].selectorText == css_class){
-                      console.log("found the class " + classes[i].selectorText + " style " + classes[i].style[rule]);
-                       console.log("style Object %j ", classes[i].style);
-                       console.log("rule is " + classes[i].style[rule]);
+                    //  console.log("found the class " + classes[i].selectorText + " style " + classes[i].style[rule]);
+                    //   console.log("style Object %j ", classes[i].style);
+                    //   console.log("rule is " + classes[i].style[rule]);
                         if(classes[i].style[rule]){
                           //  console.log("returning " + classes[i].style[rule]);
                             return classes[i].style[rule];
@@ -62,7 +62,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             for(var i=0;i<class_list.length;i++){
               //  var c=("." + children[i].type).toString();
                 var t=Harvey.Utils.getCssValue(class_list[i].classname,"width",filename);
-                console.log("got class value " + t);
+              //  console.log("got class value " + t);
                 if(t=== null){
                     return null;
                 }
@@ -425,7 +425,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             var sibling = elem.parentNode.firstChild;
             while(sibling){
                 //for ( ; sibling; sibling = sibling.nextSibling )
-                console.log("found sibling");
+               // console.log("found sibling");
                 if ( sibling.nodeType == 1 && sibling != elem ){
                     siblings.push( sibling );
                 }

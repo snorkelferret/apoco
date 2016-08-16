@@ -238,9 +238,9 @@ jsonishData={
     }
 
     function sort_into_subGrids(that){
-	if(that.rows){
-	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
-	}
+//	if(that.rows){
+//	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
+//	}
 	// see if the data has been put into subgrids
 	if(that.rows && Harvey.checkType["array"](that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
@@ -534,7 +534,7 @@ jsonishData={
                 }
             }
 	    if(this.cols[index].display !== false){
-		console.log("grid col " + this.cols[index].name);
+		//console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
 	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
                 //  var h=document.createElement("th");
@@ -694,9 +694,9 @@ jsonishData={
                     }
                 }
             }
-            if(this.sortOrder){
-                console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
-            }
+          //  if(this.sortOrder){
+          //      console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
+         //   }
    
    	},
         _addCell:function(row,col,r){
@@ -717,13 +717,12 @@ jsonishData={
 	    settings.value=row[col.name];
   	    c=document.createElement("td");
             c.className=col.type;
-            //c=$(c);
+            
             //console.log("c is " + JSON.stringify(c));
             row[col.name]=Harvey.field[Harvey.dbToHtml[col.type].field](settings,c);
             if(col.display !== false){
 		r.appendChild(row[col.name].element);
-                
-	        //	$(row[col.name].element).data('harvey',{name: col.name,"context": row[col.name],"type": col.type});
+            
                 row[col.name].element.data={};
                 row[col.name].element.data.harvey={name: col.name,"context": row[col.name],"type": col.type};
 	    }
@@ -772,7 +771,7 @@ jsonishData={
             }
          
             if(!grid.sorted){
-                console.log("adding row to end");
+            //    console.log("adding row to end");
                 grid.rows.push(row_data);
                 grid.element.getElementsByTagName("tbody")[0].appendChild(r);//.find("tbody").append(r);
             }
@@ -819,7 +818,7 @@ jsonishData={
             }
             // remove from dom
             for(var i=0;i<this.cols.length;i++){
-                console.log("deleting col " + this.cols[i].name);
+              //  console.log("deleting col " + this.cols[i].name);
                 if(!row[this.cols[i].name]){
                     throw new Error("row is undefined");
                 }
@@ -1027,17 +1026,17 @@ jsonishData={
             var s,row=[];
             var c=element.data.harvey;
             //element.data.harvey={name: col.name,"context": row[col.name],"type": col.type};
-            console.log("name is " + c.name + " context " + c.context + " type " + c.type);
+           // console.log("name is " + c.name + " context " + c.context + " type " + c.type);
             row.push({context:c.context,name: c.name,
                       value:c.context.value });
             //s=$(element).siblings();
             s=element.parentNode.childNodes;
-            console.log("got siblings " + s.length);   
+           // console.log("got siblings " + s.length);   
             for(var i=0;i<s.length;i++){
                 if(s[i] !== element){
                     //c= $(s[i]).data("harvey");
                     c=s[i].data.harvey;
-                    console.log( "sib " + c.name + " value " + c.context.value);
+             //       console.log( "sib " + c.name + " value " + c.context.value);
                     row.push({context: c.context,name: c.name,
                               value: c.context.value });
                 }
@@ -1077,8 +1076,8 @@ jsonishData={
 		    for(var i=0;i<row.length;i++){
 			rk=row[i].name;
 			jsq.data.push({rk: row[i].getValue()});
-			console.log("value is " + row[i].getValue());
-			console.log("key is " + row[i].name);
+	//		console.log("value is " + row[i].getValue());
+	//		console.log("key is " + row[i].name);
 		    }
 		    return;
 		}
@@ -1098,7 +1097,7 @@ jsonishData={
 		return function(jq,textStatus){
 		    if(this.DEBUG) console.log("Form.submit: promise success");
 		    if(textStatus === "success"){
-			if(this.DEBUG) console.log("Form.submit: deferred-resolve");
+	//		if(this.DEBUG) console.log("Form.submit: deferred-resolve");
 			Harvey.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
 	    		// var cmd=that.getCreator().getCmd(that);
 
@@ -1116,11 +1115,11 @@ jsonishData={
 	    }(this,jsq.properties));
 
 	    submit_promise.fail(function(jq, textStatus){
-		console.log(" textStatus is " + textStatus);
+	//	console.log(" textStatus is " + textStatus);
 		var msg=("callback Fail- status  " +  jq.status + "  "+ jq.statusText + " "  + jq.responseText );
 		Harvey.display.dialog("Update Failed",msg);
 		// highlight from components which were not accepted
-		if(this.DEBUG) console.log("grid.submit: failed to commit to db");
+	//	if(this.DEBUG) console.log("grid.submit: failed to commit to db");
 	    });
 	}
     };

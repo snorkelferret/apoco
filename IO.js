@@ -16,8 +16,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                      //   for(var k in s.context){
                      //       console.log("before dispatch " + k);
                         //   }
-                        console.log("action is " + s.action);
-                        console.log("with args " + args);
+                      //  console.log("action is " + s.action);
+                     //   console.log("with args " + args);
 		        s.action(s.context,args);
 		    });
 	        } catch (err){
@@ -91,9 +91,9 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             var defaults={url: UI.webSocketURL};
             var settings={};
             var sendMessage=function(data){
-                console.log("Trying to send message ___________________________________");
+              //  console.log("Trying to send message ___________________________________");
                 var msg=JSON.stringify(data);
-                console.log("got some data " + msg);
+              //  console.log("got some data " + msg);
                 try{
                     Harvey.webSocket.send(msg+'\n');
                 }
@@ -107,16 +107,16 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
             }
             
             if(!Harvey.webSocket){
-                console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
+              //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
                 var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
-                console.log("a is " + a + " protocol " + window.location.protocol);
+              //  console.log("a is " + a + " protocol " + window.location.protocol);
                 if(!a){
                     throw new Error("IO: Cannot get protocol for window " + window.location);
                 }
-                console.log("location host " + window.location.host + " hostname " + window.location.hostname);
+              //  console.log("location host " + window.location.host + " hostname " + window.location.hostname);
                 try{
                     Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
-                    console.log("created websocket + + + + + + + + + + + + + + ++");
+               //     console.log("created websocket + + + + + + + + + + + + + + ++");
                     if(data !== undefined){ // in case of timing issue 
                         sendMessage(data);
                     }
@@ -134,7 +134,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                     throw new Error("webSocket: no data or name from server");
                 }
                 var d=JSON.parse(e.data);
-                console.log("got: %j %j",d[0],d[1]);
+              //  console.log("got: %j %j",d[0],d[1]);
                 if(d[0] === "error"){
                     Harvey.popup.dialog("Error",JSON.stringify(d[1]));
                 }
@@ -172,7 +172,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 var stateChange=function(){
                     if(request.readyState === XMLHttpRequest.DONE){
                         if(request.status === 200){ //success
-                            console.log("return from server is " + request.responseText);
+                          //  console.log("return from server is " + request.responseText);
                             resolve(JSON.parse(request.responseText));
                         }
                         else{
