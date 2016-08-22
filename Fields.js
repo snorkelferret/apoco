@@ -62,12 +62,15 @@ require("./datepicker");
 	}
      
         for(var k in defaults){  // need this because mixinDeep overwrites first object
-            if(!d[k]){
+            if(d[k] === undefined){
                 d[k]=defaults[k];
             }
         }
-        Harvey.mixinDeep(this,d);
-   
+        
+        for(var k in d){
+            this[k]=d[k];
+        }
+        
 	this.html_type=Harvey.dbToHtml[this.type].html_type;
         if(element === undefined){
             this.element=document.createElement("div");
@@ -290,7 +293,13 @@ require("./datepicker");
 
         },
         integerArray:function(that){
-            var r,s,len=that.value.length;
+            var r,s,len=0;
+            if(that.value && that.value.length){
+                len=that.value.length;
+            }
+            else{
+                that.value=[];
+            }
 	    for(var i=0;i<len;i++){
                 r=document.createElement("span");
                 r.setAttribute("type", that.html_type);

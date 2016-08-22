@@ -191,7 +191,7 @@ require("./DisplayBase");
     // Create the namespace
     // Harvey.display.tabs
     // $.extend(true, Harvey, {
-    Harvey.mixinDeep(Harvey,{
+  /*  Harvey.mixinDeep(Harvey,{
 	display: {
 	    menu: function(opts,win){
                 opts.display="menu";
@@ -205,8 +205,18 @@ require("./DisplayBase");
                 return ar;
             }
 	}
-    });
-
+    }); */
+    Harvey.display.menu=function(opts,win){
+        opts.display="menu";
+        return new HarveyMakeMenu(opts,win);
+    };
+    Harvey.display.menuMethods=function(){
+        var ar=[];
+        for(var k in HarveyMakeMenu.prototype){
+            ar.push(k);
+        }
+        return ar;
+    };
 
 
 })();

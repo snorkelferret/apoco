@@ -33,8 +33,8 @@ require("./Popups.js");
       
     });
    
-    Harvey.mixinDeep(Harvey,{
-	start: function(options) {
+    //Harvey.mixinDeep(Harvey,{
+    Harvey.start=function(options) {
 	    // Harvey.popup.spinner(true);
            // console.log("++++++++++++++++++++++++++++++== Harvey start is here ");
           //  console.log("options are %j ",options);
@@ -55,15 +55,13 @@ require("./Popups.js");
                     throw new Error("Harvey.start: Unknown options");
                 }
             }
-        },
-        stop: function(){
-            Harvey.Panel.deleteAll();
-            if(Harvey.webSocket){
-                Harvey.webSocket.close();
-            }
-
+    };
+    Harvey.stop=function(){
+        Harvey.Panel.deleteAll();
+        if(Harvey.webSocket){
+            Harvey.webSocket.close();
         }
 
-    });
+    };    //});
  
 })();

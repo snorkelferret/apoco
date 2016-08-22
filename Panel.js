@@ -67,7 +67,7 @@ require("./Window");
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
         UIStart:function(w){
             var nv;
-           // console.log("UIStart is here");
+          //  console.log("UIStart is here");
             if(w === undefined){
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
@@ -84,17 +84,17 @@ require("./Window");
 
         },
         _UIGet:function(name){
-          //  console.log("UIGet trying to find " + name);
+           // console.log("UIGet trying to find " + name);
          //   console.log("UIGet Panels " + UI.Panels);
             if(name === undefined){
                 throw new Error("Panel._UIGet: panel name is undefined");
             }
             for(var k in UI.Panels){
-            //    console.log("trying to get panel " + name + " from " + k);
+            //     console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
-               //     console.log("found " + name);
+                //    console.log("found " + name);
                     var cd=Harvey.cloneDeep(UI.Panels[k]);
-                   // console.log("clone deep is " + cd);
+               //     console.log("clone deep is " + cd);
                     return cd;
                 }
             }
@@ -236,7 +236,7 @@ require("./Window");
         },
 	add: function(panel){
 	  //  console.log("Panel.add is here");
-	 //   console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+	   console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
          
             if(Harvey.checkType['string'](panel)){
                 var w=this._UIGet(panel);
@@ -259,26 +259,28 @@ require("./Window");
         deleteAll: function(promise_resolve){
             var obj;
             var n=this._list.length;
+           // console.log("there are " + n + " panels in Panel List");
             for(var i=0;i<n; i++){
-               // console.log("window: removing panel " + this._list[i].name + " from list");
+               // console.log("panel: removing panel " + i + " name " + this._list[i].name + " from list");
                	obj=this._list[i];
                 obj.deleteChildren();
-                for(var k in obj){
-                    delete obj[k];
-                }
+              //  console.log("deleted children of " + this._list[i].name);
+               // for(var k in obj){
+               //     delete obj[k];
+                //}
                 if(promise_resolve){
                     if(i===(n-1)){
-                       // console.log("***********************************8delete is done");
+                  //      console.log("***********************************8delete is done");
                         promise_resolve();
                     }
                 }
- 
-                obj=null;
+                //obj=null;
+                
             }
          //   if(!promise_resolve){
             Harvey.Window._closeAll();
         //    }
-        //    this._list.length=0;
+            this._list.length=0;
         },
         delete: function(name){
    	    var p=this._inList(name);
@@ -301,11 +303,11 @@ require("./Window");
     };
     var _Components=function(obj){
         var that=this,w;
-        //	for(var k in obj){
-	//this[k]=obj[k];
+        for(var k in obj){
+	    this[k]=obj[k];
 	  //   console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
-	//}
-        Harvey.mixinDeep(this,obj);
+	}
+        //Harvey.mixinDeep(this,obj);
         
 	if(this.window){
             w=Harvey.Window.get(this.window);
@@ -393,10 +395,10 @@ require("./Window");
                 throw new Error("Panel: has no children " + this.name);
             }
             for(var i=0;i<this.components.length;i++){
-            //    console.log("panel_components.deleteChildren: " + this.components[i].display);
-                if(this.components[i].listen){
-                    Harvey.IO.unsubscribe(this.components[i]);
-                }
+              //  console.log("panel_components.deleteChildren: " + this.components[i].display);
+             //   if(this.components[i].listen){
+            //       Harvey.IO.unsubscribe(this.components[i]);
+            //    }
                 this.components[i].delete("message from parent");
             }
             this.components.length=0;
@@ -411,7 +413,7 @@ require("./Window");
               //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
-           // console.log("deleteing child length is " + this.components.length);
+           //console.log("deleteing child length is " + this.components.length);
 	   // console.log("Panel delete child is here");
             if(obj.listen){ // remove the listener
 		Harvey.unsubscribe(obj);
@@ -491,7 +493,7 @@ require("./Window");
 	}
     };
 
-    Harvey.mixinDeep(Harvey,
+   /* Harvey.mixinDeep(Harvey,
                      { _panelComponents:
                        function(t){
                            if(t === "methods"){
@@ -504,5 +506,17 @@ require("./Window");
                                return new _Components(t);
                            }
                        }
-                     });
+                     }); */
+    Harvey._panelComponents=function(t){
+        if(t === "methods"){
+            var f={};
+            for(var k in _Components.prototype ){
+                f[k]=k;
+            }
+            return f;
+        }else{
+            return new _Components(t);
+        }
+    };
+      
 })();

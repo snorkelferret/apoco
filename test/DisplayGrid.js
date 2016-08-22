@@ -116,18 +116,18 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         assert.isObject(t);
     });
      it("can add a row",function(){
-        var b=t.getGrid("1").rows.length;
+        var b=t.getGrid("swaps").rows.length;
         b++;
-        var n=t.addRow({stock:"FG63",subclass: 1,bid:10,maturity:"2020-05-21"});
-        var c=t.getGrid("1").rows.length;
+        var n=t.addRow({stock:"FG63",class: "swaps",bid:10,maturity:"2020-05-21"});
+        var c=t.getGrid("swaps").rows.length;
         console.log("b is " + b +  " and c " + c);
         //var b=t.getRow({stock:"FG63",subclass: 1,bid:10});
         assert.strictEqual(b,c);
        // console.log("JSON %j",n);
     });
     it("can add another row",function(){
-        var n=t.addRow({stock:"XXX",subclass: 1,bid:109,maturity:"2016-08-30"});
-        var b=t.getRow({stock:"XXX",subclass: 1,bid:109,maturity:"2016-08-30"});
+        var n=t.addRow({stock:"XXX",class: "swaps",bid:109,maturity:"2016-08-30"});
+        var b=t.getRow({stock:"XXX",class: "swaps",bid:109,maturity:"2016-08-30"});
         assert.notStrictEqual(b,null);
     });
     it("has a show method which adds the root element to the DOM",function(){
@@ -139,7 +139,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     });
     
     it("has added a row to the dom",function(){
-        var b=document.getElementById("1").getElementsByTagName("tr")[0].getElementsByTagName("td")[0];//querySelector("#1 tr:first td:first");
+        var b=document.getElementById("straight").getElementsByTagName("tr")[0].getElementsByTagName("td")[0];//querySelector("#1 tr:first td:first");
         assert.isObject(b);
         var c=b.textContent;
         console.log("td is " + c);
@@ -153,13 +153,13 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     });
     it("updates an existing row",function(){
         //  t.updateRow({stock:"XXX",subclass:1,maturity:20160830,other:"something"});
-        t.updateRow({stock:"ABT",subclass:12,maturity:"2035-10-22",other:"something"});
-        var b=t.getRow({stock:"ABT",subclass:12,maturity:"2035-10-22"});
+        t.updateRow({stock:"AAB",class:"index_linked",maturity:"2017-03-27",other:"something"});
+        var b=t.getRow({stock:"AAB",class:"index_linked",maturity:"2017-03-27"});
         assert.notStrictEqual(b,null);
         assert.strictEqual(b["other"].getValue(),"something");
     });
     it("deletes a row",function(){
-        t.deleteRow({stock:"ABZ",subclass: 9,maturity:"2041-02-20"});
+        t.deleteRow({stock:"AAC",class: "swaps",maturity:"2018-04-22"});
         
     });
     it("deletes a column",function(){

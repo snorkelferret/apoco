@@ -9,17 +9,16 @@ echo "window.data={ DOM: \"Content\",
 	     object: \"Blotter\",
 	     id: \"Blotter\",
 	     display: \"grid\",
-      	     groupBy: \"subclass\", 
+      	     groupBy: \"class\", 
 	     uniqueKey: [\"stock\"],
              cols: [ {name: \"stock\",type: \"string\",editable: false}, 
 	       	     {name:\"bid\",type: \"float\",editable: false,step: 0.1,precision: 3,required: false},
                      {name: \"offer\",type: \"float\",editable: false, step: 0.1,precision: 3,required: false},	
-                     {name:\"client_bid\",type:\"integer\",editable: false,required: false},              
-	       	     {name: \"volume_bid\",type: \"integer\",editable: false,required: false},
-	       	     {name: \"volume_offer\",type: \"integer\",editable: false,required: false},
+                     {name:\"client_bid\",type:\"integer\",editable: false,required: false},  
+                     {name: \"volume\",type: \"integerArray\",size:2, delimiter: \"X\", editable: false,required: false},           
                      {name:\"client_offer\",type:\"integer\",editable: false,required: false},              
                      {name: \"maturity\",type: \"date\",editable: false,display: false},           
-	       	     {name: \"subclass\",type:\"integer\",editable: false,display: false}
+	       	     {name: \"class\",type:\"string\",editable: false,display: false}
 	       	     
 		    ],
 	    rows:[	
@@ -92,14 +91,16 @@ while test $off -le $last; do
    if test $day -lt 10; then
       tday="0"$day;
    fi
-   subclass=`expr $mod % 13`
-
+   ss=`expr $mod % 4`
+   cl=("straight" "swaps" "linkers" "index_linked") 
+   class=${cl[$ss]};   
+   
    day=`expr $number % 30 + 1`;
 
    if(test $off -eq $last); then
-       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid:null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}" >> $file
+       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid:null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",class:" \"$class\" "}" >> $file
    else
-       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid:null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",subclass:" $subclass "}," >> $file
+       echo "{stock:" \"$stock\" ",bid: " $bid " , offer: " $offer ", client_bid:null, volume:[], client_offer:null,maturity:" \"$year"-"$tmonth"-"$tday\" ",class:" \"$class\" "}," >> $file
    fi
   off=`expr $off + 1`;
 

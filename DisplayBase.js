@@ -9,7 +9,9 @@ require("./Fields");
     // these are the components allowed in display objects
   
     var _display_components=["Field","Node","Tab","Grid","Menu"];
-  
+
+    Harvey.display={};  //setup container for display Objects
+    
     var dp;
     Harvey._DisplayBase=function(options,win){
 	var defaults={
@@ -22,10 +24,15 @@ require("./Fields");
         var that=this,t;
        
         for(var k in defaults){
-            this[k]=defaults[k];
+            if(options[k] === undefined){
+                options[k]=defaults[k];
+            }
         }
-        Harvey.mixinDeep(this,options);
-        
+        for(var k in options){
+            this[k]=options[k];
+        }
+
+        console.log("DisplayBase parent is " + this.parent);
         if(this.DOM === null){
             throw new Error(this.display + ": Must supply a DOM id for an existing node");
         }
@@ -180,7 +187,7 @@ require("./Fields");
 	getParent: function(){
 	    return this.parent;  // DisplaySet to which this element belongs
 	},
-	getSiblings: function(){
+	getSibling: function(name){
 	    if(this.parent){
 		var t=this.parent.getChildren();
                 var c=[];
@@ -188,9 +195,17 @@ require("./Fields");
 		for(var i=0;i<t.length;i++){
 		    if(t[i] !== this){
 			//console.log("getSiblings: found " + t[i].getKey());
-			c.push(t[i]);
+                        if(name && t[i].getKey() === name){
+                            return t[i];
+                        }
+			else{
+                            c.push(t[i]);
+                        }
 		    }
 		}
+                if(name){  // not found
+                    return null;
+                }
 		return c;
 	    }
 	    else{
@@ -261,7 +276,8 @@ require("./Fields");
                 Harvey.IO.unsubscribe(this);
             }
             if(this.draggable){
-                this.draggable.delete(); // FIX THIS 
+                //this.draggable.delete(); // FIX THIS
+                console.log("Need method to delete draggable");
             }
             this.deleteAll();
             if(this.element && this.element.parentNode){
@@ -277,6 +293,7 @@ require("./Fields");
 		this.parent.deleteChild(this);
 	    }
             //this.element=null;
+            
 	}
     };
 

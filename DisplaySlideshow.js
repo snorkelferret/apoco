@@ -15,7 +15,12 @@ require("./DisplayBase");
             controls: true
 	};
 	var f,that=this;
-        Harvey.mixinDeep(options,defaults);
+        for(var k in defaults){
+            if(options[k] === undefined){
+                options[k]=defaults[k];
+            }  
+        }
+        //Harvey.mixinDeep(options,defaults);
 	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
         if(this.thumbnails === true){
@@ -338,7 +343,7 @@ require("./DisplayBase");
 
     Harvey.Utils.extend(HarveyMakeSlideshow,Harvey._DisplayBase);
 
-    Harvey.mixinDeep(Harvey,{
+ /*   Harvey.mixinDeep(Harvey,{
 	display: {
 	    slideshow: function(opts,win){
                 opts.display="slideshow";
@@ -352,8 +357,18 @@ require("./DisplayBase");
                 return ar;
             }
 	}
-    });
-
+    }); */
+    Harvey.display.slideshow=function(opts,win){
+        opts.display="slideshow";
+        return new HarveyMakeSlideshow(opts,win);
+    };
+    Harvey.display.slideshowMethods=function(){
+        var ar=[];
+        for(var k in HarveyMakeSlideshow.prototype){
+            ar.push(k);
+        }
+        return ar; 
+    };
 
 
 })();

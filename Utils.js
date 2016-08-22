@@ -11,7 +11,6 @@ String.prototype.trim = String.prototype.trim || function trim() {
 ;(function(){
     var DEBUG=true;
     'use strict';
-    Harvey.mixinDeep=require("mixin-deep");
     Harvey.cloneDeep=require("clone-deep");
     Harvey.Utils={  
         getCssValue:function(css_class,rule,filename){ // doesn't work in chrome

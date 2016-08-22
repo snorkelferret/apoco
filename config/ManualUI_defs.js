@@ -602,7 +602,7 @@
         
         var select_menu=function(that){
             var name=that.name;
-            var p=that.parent.getSiblings();
+            var p=that.parent.getSibling();
             //   console.log("selecting menu for " + name);
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
@@ -1079,7 +1079,7 @@
             getName:["<code> var v=my_display.getName(); </code>","return: string","params: none","returns the name if it exists"],
             getKey:["<code> var v=my_display.getKey(); </code> ","return string","params: none"," return the name if it exists or id(which must exist)"],
             getParent:["<code> var v=my_display.getParent(); </code>","params: none","return: Panel object"," returns window if it exists"],
-            getSiblings:["<code> var v=my_display.getSiblings(); </code>","params: none","return: objectArray"," array of the other display objects that are in the same Panel"],
+            getSibling:["<code> var v=my_display.getSibling(); </code>","params:name, id or none","return: objectArray or object instance if name is given"," array of the other display objects that are in the same Panel"],
             hide: ["<code> my_display.hide(); </code>","return: none","params: none","remove the display from the DOM"],
             check: ["<code>var r=my_display.check();</code>","params: none","return: boolean"],
             delete: ["<code> my_display.delete(); </code>","return: none","params: none","delete the display object and all it's children from memory"],

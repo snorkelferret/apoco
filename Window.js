@@ -42,7 +42,7 @@ require("./Panel");
             this._list.splice(p,1);
         },
         _closeAll:function(){
-            // console.log("Close all is here");
+            console.log("Close all is here");
             
             for(var i=0; i<this._list.length; i++){
                 this._list[i].window.close();

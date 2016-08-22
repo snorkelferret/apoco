@@ -183,7 +183,7 @@ require("./DisplayBase.js");
     // Create the namespace
     // Harvey.display.tabs
     // $.extend(true, Harvey, {
-    Harvey.mixinDeep(Harvey,{
+  /*  Harvey.mixinDeep(Harvey,{
 	display: {
 	    tabs: function(opts,win){
                 opts.display="tabs";
@@ -198,8 +198,19 @@ require("./DisplayBase.js");
                 return ar;
             }
 	}
-    });
-
+   });*/
+    Harvey.display.tabs=function(opts,win){
+        opts.display="tabs";
+        // console.log("tabs: window is " + win);
+        return new HarveyMakeTabs(opts,win);
+    };
+    Harvey.display.tabsMethods=function(){
+        var ar=[];
+        for(var k in HarveyMakeTabs.prototype){
+            ar.push(k);
+        }
+        return ar;
+    };
 
 
 })();

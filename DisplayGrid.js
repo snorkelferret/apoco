@@ -95,12 +95,12 @@ jsonishData={
     }
 
     function stop_edits(that){
-	 if(that.DEBUG) console.log("stop allowing edits");
+	if(that.DEBUG) console.log("stop allowing edits");
 	that.allowEdit=false;
     }
 
     function start_edits(that){
-	 if(that.DEBUG) console.log("start allowing edits");
+	if(that.DEBUG) console.log("start allowing edits");
 	that.allowEdit=true;
     }
 
@@ -246,7 +246,11 @@ jsonishData={
 	    var n,tg,subgrid= new Object;
 	    if(that.groupBy){
 		for(var i=0;i<that.rows.length;i++){
-		    n=that.rows[i][that.groupBy].toString();
+		    n=that.rows[i][that.groupBy];
+                    if(!n){
+                        throw new Error("Grid - sort_into_subGrids field " + that.groupBy + " does not exist");
+                    }
+                    n=n.toString();
 		    if (!subgrid[n]){
 			subgrid[n]={};
 			subgrid[n].name = that.rows[i][that.groupBy];
@@ -273,9 +277,6 @@ jsonishData={
 	}
     }
 
-
-
-
     var HarveyMakeGrid=function(options,win){
 	var DEBUG=true;
 	var that=this,found,not_found=[];
@@ -284,7 +285,6 @@ jsonishData={
 	this.selection_list=[];
 	this.cellEdit=null; // cell currently being edited- this is of type Harvey.field
 	this.allowEdit=true;  // are edits allowed?
-      
         
 	if(this.sortOrder && this.userSortable){
 	    throw new Error("Cannot specify both sortOrder and sortable");
@@ -293,7 +293,7 @@ jsonishData={
             throw new Error("DisplayGrid: need to supply a least one column");
         }
         if(this.uniqueKey){
-       //     console.log("this,uniquekey length is " + this.uniqueKey.length);
+          //  console.log("this,uniquekey length is " + this.uniqueKey.length);
             this.sortOrderUnique=true;
             if(this.sortOrder){
             //    console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
@@ -386,6 +386,9 @@ jsonishData={
             var v,c,width=0,d,t;
             var that=this;
             //console.log("After show is here");
+            if(!this.grids){
+                return;
+            }
             v=that.element.getElementsByClassName("head")[0];
             if(v){
                 c=v.getElementsByTagName("div");
@@ -667,14 +670,15 @@ jsonishData={
             if(this.resizable){
                 this.element.classList.add("resizable");
             }
-            
+         //   console.log("this.rows is " + this.rows)
             this.element.appendChild(this.grid_container);
             //body.selectable(this.select_data()); // allow multiple cells to be selected
 	    for(var i=0; i< this.cols.length; i++){
                 this.addCol(i);
             }
-     
+            
             if(this.rows !== undefined){
+             //   console.log("sorting into subgrids");
                 sort_into_subGrids(this);
                 this.sort();
 	        for(var i=0;i<this.grids.length;i++){
@@ -694,9 +698,9 @@ jsonishData={
                     }
                 }
             }
-          //  if(this.sortOrder){
-          //      console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
-         //   }
+        //   if(this.sortOrder){
+       //         console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
+        //   }
    
    	},
         _addCell:function(row,col,r){
@@ -955,26 +959,28 @@ jsonishData={
 	},
 	deleteAll:function(){
             var el,parent,row;
-            for(var i=0;i<this.grids.length;i++){
-                for(var j=0;j<this.grids[i].rows.length;j++){
-                    row=this.grids[i].rows[j];
-                    for(var k=0;k<this.cols.length;k++){
-                        el=row[this.cols[k].name].element;
-                        if(this.cols[k].display !== false){
-                            if(k===0){
-                                parent=el.parentNode;
+            if(this.grids){
+                for(var i=0;i<this.grids.length;i++){
+                    for(var j=0;j<this.grids[i].rows.length;j++){
+                        row=this.grids[i].rows[j];
+                        for(var k=0;k<this.cols.length;k++){
+                            el=row[this.cols[k].name].element;
+                            if(this.cols[k].display !== false){
+                                if(k===0){
+                                    parent=el.parentNode;
+                                }
+                                parent.removeChild(el);
                             }
-                            parent.removeChild(el);
+                        }
+                        if(parent){
+                            parent.parentNode.removeChild(parent);
                         }
                     }
-                    if(parent){
-                        parent.parentNode.removeChild(parent);
-                    }
+                    this.grids[i].rows.length=0;
+                    this.grids[i].element.parentNode.removeChild(this.grids[i].element);
                 }
-                this.grids[i].rows.length=0;
-                this.grids[i].element.parentNode.removeChild(this.grids[i].element);
+                this.grids.length=0;
             }
-            this.grids.length=0;
         },
 	showGrid: function(name){
             var g;
@@ -1128,7 +1134,7 @@ jsonishData={
     Harvey.Utils.extend(HarveyMakeGrid,Harvey._DisplayBase);
 
     //  $.extend(true, Harvey, {
-    Harvey.mixinDeep( Harvey,{
+ /*   Harvey.mixinDeep( Harvey,{
 	display: {
 	    grid: function(opts,win){
                     opts.display="grid";
@@ -1142,6 +1148,18 @@ jsonishData={
                 return ar;
             }
 	}
-    });
+    }); */
+
+    Harvey.display.grid=function(opts,win){
+        opts.display="grid";
+        return new HarveyMakeGrid(opts,win);
+    };
+    Harvey.display.gridMethods=function(){
+        var ar=[];
+        for(var k in HarveyMakeGrid.prototype ){
+            ar.push(k);
+        }
+        return ar; 
+    };
 
 })();

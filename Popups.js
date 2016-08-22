@@ -3,7 +3,8 @@ var Harvey=require('./declare').Harvey;
 ;(function(){
     'use strict';
 
-    var popups={
+    // var popups={
+    Harvey.popup={
         error:function(title,message){
             var t="ERROR ";
             if(Harvey.error === undefined){
@@ -262,8 +263,8 @@ var Harvey=require('./declare').Harvey;
 	}
     };
 
-    Harvey.mixinDeep(Harvey,{
-	popup: popups
-    });
+   // Harvey.mixinDeep(Harvey,{
+//	popup: popups
+  //  });
 
 })();

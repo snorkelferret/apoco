@@ -9,8 +9,6 @@
     "pretest": "npm run eslint && npm run eslint:test",
     "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test",
     "posttest": "rimraf .__browserify_string_empty.js",
-    "manual": "browserify -r ./index.js  -e ./config/ManualUI_defs.js  -o manual_bundle.js",
-    "dowgate": "browserify -e  ./Core.js -r ./config/DowgateUI_defs.js  -o dowgate_bundle.js",
     "harvey": "browserify  ./index.js -o harvey.js"
   },
   "author": "Val Wardlaw <val@perluceo.com>",
@@ -29,7 +27,6 @@
     "sinon": "^1.17.3"
   },
   "dependencies": {
-    "clone-deep": "^0.2.4",
-    "mixin-deep": "^1.1.3"
+    "clone-deep": "^0.2.4"
   }
 }

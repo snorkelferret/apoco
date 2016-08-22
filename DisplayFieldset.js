@@ -267,15 +267,15 @@ require("./Nodes.js");
 
     Harvey.Utils.extend(HarveyMakeFieldset,Harvey._DisplayBase);
 
-    //$.extend(true, Harvey, {
-    Harvey.mixinDeep( Harvey,{    
+    /* 
+    Harvey.mixinDeep( Harvey,{     
 	display: {
 	    fieldset: function(opts,win){
                 opts.display="fieldset";
                 return new HarveyMakeFieldset(opts,win);
             },
             fieldsetMethods:function(){
-             //   console.log("Harvey.display.fieldsetMethods: getting methods for fieldset");
+                //   console.log("Harvey.display.fieldsetMethods: getting methods for fieldset");
                 var ar=[];
                 for(var k in HarveyMakeFieldset.prototype){
                     ar.push(k);
@@ -284,8 +284,22 @@ require("./Nodes.js");
             },
             _fieldsetBase: HarveyMakeFieldset
 	}
-    });
-
+    }); 
+ 
+      */
+    Harvey.display.fieldset=function(opts,win){
+        opts.display="fieldset";
+        return new HarveyMakeFieldset(opts,win);
+    };
+    Harvey.display.fieldsetMethods=function(){
+        //   console.log("Harvey.display.fieldsetMethods: getting methods for fieldset");
+        var ar=[];
+        for(var k in HarveyMakeFieldset.prototype){
+            ar.push(k);
+        }
+        return ar;
+    };
+    Harvey.display._fieldsetBase=HarveyMakeFieldset;
 
 
 })();

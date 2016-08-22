@@ -287,7 +287,7 @@ require("./DisplayFieldset");
    
     Harvey.Utils.extend(HarveyMakeForm,Harvey.display._fieldsetBase);
    
-    Harvey.mixinDeep(Harvey,{
+   /* Harvey.mixinDeep(Harvey,{
 	display: {
 	    form: function(opts,win){
                 opts.display="form";
@@ -302,10 +302,18 @@ require("./DisplayFieldset");
             }
 
 	}
-    });
-
-
-
+    }); */
+    Harvey.display.form=function(opts,win){
+        opts.display="form";
+        return new HarveyMakeForm(opts,win);
+    };
+    Harvey.display.formMethods=function(){
+        var ar=[];
+        for(var k in HarveyMakeForm.prototype ){
+            ar.push(k);
+        }
+        return ar;
+    };
 
 
 })();
