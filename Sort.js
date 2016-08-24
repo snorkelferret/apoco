@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require("./Utils");
 require("./Types")
 
@@ -77,7 +77,7 @@ require("./Types")
 	case "text":	
 	case "time":
 	default:
-	    //throw new Error("Harvey.sort:- Don't know how to sort " + type);
+	    //throw new Error("Apoco.sort:- Don't know how to sort " + type);
 	    return undefined;
 	}
 	return undefined;    
@@ -85,23 +85,23 @@ require("./Types")
     };
     var default_compare=function(a){return a;};
     
-    Harvey.isSortable=function(type){
+    Apoco.isSortable=function(type){
 	if(sort_fn(type) !== undefined){
 	    return true;
 	}
 	return false;
     };
-    Harvey.sort=function(r,type_data){
+    Apoco.sort=function(r,type_data){
 	var compare,fn,t;
         
-        if(Harvey.checkType['array'](type_data)){
+        if(Apoco.checkType['array'](type_data)){
 	    for(var i=0;i<type_data.length;i++){ // multiple fields to order sort
-		if(!Harvey.isSortable(type_data[i].type)){
-		    throw new Error("Harvey.sort:- Don't know how to sort type " + type_data[i].type);
+		if(!Apoco.isSortable(type_data[i].type)){
+		    throw new Error("Apoco.sort:- Don't know how to sort type " + type_data[i].type);
 		}
-                // if(!Harvey.type_data[i].fn){
+                // if(!Apoco.type_data[i].fn){
                 if(!type_data[i].fn){
-                     throw new Error("Harvey.sort needs a function to retrieve the array element"); 
+                     throw new Error("Apoco.sort needs a function to retrieve the array element"); 
                 }
 	        //	console.log("sort: array index " + i + " has type " + type_data[i].type)
 		type_data[i].compare=sort_fn(type_data[i].type);
@@ -118,14 +118,14 @@ require("./Types")
 	    });
         }
         else{
-            if(type_data && Harvey.checkType["object"](type_data)){
+            if(type_data && Apoco.checkType["object"](type_data)){
 	        compare=sort_fn(type_data.type);
                 if(!type_data.fn){
-                    throw new Error("Harvey.sort needs a function to retrieve the array element");
+                    throw new Error("Apoco.sort needs a function to retrieve the array element");
                 }
 	        fn=type_data.fn;
             }
-            else if(Harvey.checkType["string"](type_data)){
+            else if(Apoco.checkType["string"](type_data)){
                 compare=sort_fn(type_data);
                 if(compare === undefined){
                     throw new Error("Sort: don't know how to sort " + type_data);
@@ -133,7 +133,7 @@ require("./Types")
                 fn=default_compare;
             }
             else{
-                throw new Error("Harvey.sort: Incorrect parameters ");
+                throw new Error("Apoco.sort: Incorrect parameters ");
             }
 	    r.sort(function(a,b){
 	        return compare(a,b,fn);

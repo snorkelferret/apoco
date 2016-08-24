@@ -1,29 +1,29 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 
 ;(function(){
     'use strict';
 
     // var popups={
-    Harvey.popup={
+    Apoco.popup={
         error:function(title,message){
             var t="ERROR ";
-            if(Harvey.error === undefined){
+            if(Apoco.error === undefined){
                 title=t.concat(title);
-                Harvey.error=this.dialog(title,message,true);
-                Harvey.error.close=function(){
+                Apoco.error=this.dialog(title,message,true);
+                Apoco.error.close=function(){
                     document.body.removeChild();
                 };
                 return;
             }
-            Harvey.error.update(title,message,true);
+            Apoco.error.update(title,message,true);
         },
 	dialog: function(title, message,modal){
             var mkDialog=function(title,message,modal){
 	        var Hdialog,message_text,title_text,Modal,draggable;
-                if(modal && Harvey.modal === undefined){
+                if(modal && Apoco.modal === undefined){
                     console.log("creating a modal ");
-                    Harvey.modal=document.createElement("div");
-                    Harvey.modal.id="Harvey_modal";
+                    Apoco.modal=document.createElement("div");
+                    Apoco.modal.id="Apoco_modal";
                 }
 	        if(message === undefined){
                     message="";
@@ -39,8 +39,8 @@ var Harvey=require('./declare').Harvey;
                     console.log("click closed is here");
                     console.log("Gdiakof is " + Hdialog);
                     if(modal === true){
-                        Harvey.modal.removeChild(Hdialog);
-                        document.body.removeChild(Harvey.modal);
+                        Apoco.modal.removeChild(Hdialog);
+                        document.body.removeChild(Apoco.modal);
                     }
                     else{
                         document.body.removeChild(Hdialog);
@@ -50,8 +50,8 @@ var Harvey=require('./declare').Harvey;
                 this.create=function(){
                     var s,b,t,header;
                     Hdialog=document.createElement("div");
-                    Hdialog.classList.add("Harvey_dialog","ui-dialog","resizable","ui-widget","ui-widget-content","ui-corner-all");
-                    draggable=Harvey.Utils.draggable(Hdialog);
+                    Hdialog.classList.add("Apoco_dialog","ui-dialog","resizable","ui-widget","ui-widget-content","ui-corner-all");
+                    draggable=Apoco.Utils.draggable(Hdialog);
 
                     // create header
                     header=document.createElement("div");
@@ -99,8 +99,8 @@ var Harvey=require('./declare').Harvey;
                     b.appendChild(t);
                     Hdialog.appendChild(s);
                     if(modal === true){
-                        document.body.appendChild(Harvey.modal);
-                        Harvey.modal.appendChild(Hdialog);
+                        document.body.appendChild(Apoco.modal);
+                        Apoco.modal.appendChild(Hdialog);
                     }
                     else{
                         document.body.appendChild(Hdialog);
@@ -117,9 +117,9 @@ var Harvey=require('./declare').Harvey;
                     message_text.textContent=message;     
 	            title_text.textContent=title;
                     if(modal === true){
-                        document.body.appendChild(Harvey.modal);
+                        document.body.appendChild(Apoco.modal);
                        // document.body.classList.add("modal");
-                       Harvey.modal.appendChild(Hdialog);
+                       Apoco.modal.appendChild(Hdialog);
                     }
                     else{
                         document.body.appendChild(Hdialog);
@@ -137,18 +137,18 @@ var Harvey=require('./declare').Harvey;
         },
 	spinner: function(on){
 	
-            if(!document.contains(document.getElementById("Harvey_spinner"))){
+            if(!document.contains(document.getElementById("Apoco_spinner"))){
 		var spinner=document.createElement("div");
-                spinner.id="Harvey_spinner";
+                spinner.id="Apoco_spinner";
 		document.body.appendChild(spinner);
 	    }
 	    if(on){
-		//console.log("Harvey spinner on");
-                document.getElementById("Harvey_spinner").style.visibility="visible";
+		//console.log("Apoco spinner on");
+                document.getElementById("Apoco_spinner").style.visibility="visible";
 	    }
 	    else{
-		console.log("Harvey spinner off");
-                document.getElementById("Harvey_spinner").style.visibility="hidden";
+		console.log("Apoco spinner off");
+                document.getElementById("Apoco_spinner").style.visibility="hidden";
 
 	    }
             return spinner;
@@ -156,9 +156,9 @@ var Harvey=require('./declare').Harvey;
 	alert: function(text,time){
 	    var nd,ns,np,s;
             nd=document.createElement("div");
-            nd.id="Harvey_alert";
+            nd.id="Apoco_alert";
             nd.classList.add("ui-widget");
-            Harvey.Utils.draggable(nd);
+            Apoco.Utils.draggable(nd);
             ns=document.createElement("div");
             ns.classList.add("ui-state-error","ui-corner-all");
             ns.style.padding="10px";
@@ -195,7 +195,7 @@ var Harvey=require('./declare').Harvey;
 	},
 	trouble: function(heading,text){
             var a=document.createElement("div");
-            a.id="Harvey_trouble";
+            a.id="Apoco_trouble";
 
             var b=document.createElement("h1");
             b.textContent=heading;
@@ -216,55 +216,51 @@ var Harvey=require('./declare').Harvey;
                 document.body.removeChild(a);
                 a=null;
                 window.clearTimeout(t);
-                Harvey.popup.error("Unrecoverable Error","Please shutdown now");
+                Apoco.popup.error("Unrecoverable Error","Please shutdown now");
             },5000);
  	},
 
 	statusCode: {
 	    204: function(s) {
-		Harvey.popup.error("Bad Return from server: 204","There is no content for this page " + s);
+		Apoco.popup.error("Bad Return from server: 204","There is no content for this page " + s);
 	    },
 	    205: function(s){
-		Harvey.popup.error("Bad Return from server: 205","Response requires that the requester reset the document view " + s);
+		Apoco.popup.error("Bad Return from server: 205","Response requires that the requester reset the document view " + s);
 	    },
 	    400: function(s){  // Bad request
-		Harvey.popup.error("Bad Return from server: 400","Bad request " + s);
+		Apoco.popup.error("Bad Return from server: 400","Bad request " + s);
 	    },
 	    401: function(s){
-		Harvey.popup.error("Bad Return from server: 401","Unauthorised " + s);
+		Apoco.popup.error("Bad Return from server: 401","Unauthorised " + s);
 	    },
 	    403: function(s){
-		Harvey.popup.error("Bad Return from server: 403","Forbidden " + s);
+		Apoco.popup.error("Bad Return from server: 403","Forbidden " + s);
 	    },
 	    404: function(s) {
-		Harvey.popup.error("Bad Return from server: 404","Not Found " + s);
+		Apoco.popup.error("Bad Return from server: 404","Not Found " + s);
 	    },
 	    410: function(s){
-		Harvey.popup.error("Bad Return from server: 410","Gone " + s);
+		Apoco.popup.error("Bad Return from server: 410","Gone " + s);
 	    },
 	    413: function(s){
-		Harvey.popup.error("Bad Return from server: 413","Request entity too large " + s);
+		Apoco.popup.error("Bad Return from server: 413","Request entity too large " + s);
 	    },
 	    424: function(s){
-		Harvey.popup.error("Bad Return from server: 424","Method Failure " + s);
+		Apoco.popup.error("Bad Return from server: 424","Method Failure " + s);
 	    },
 	    500: function(s){
-		Harvey.popup.error("Bad Return from server: 500","Internal server error " +s);
+		Apoco.popup.error("Bad Return from server: 500","Internal server error " +s);
 	    },
 	    501: function(s){
-		Harvey.popup.error("Bad Return from server: 501","Not Implemented " + s);
+		Apoco.popup.error("Bad Return from server: 501","Not Implemented " + s);
 	    },
 	    503: function(s){
-		Harvey.popup.error("Bad Return from server: 503","Service unavailable " +s);
+		Apoco.popup.error("Bad Return from server: 503","Service unavailable " +s);
 	    },
 	    511: function(s){
-		Harvey.popup.error("Bad Return from server: 511","Network authentication required " + s);
+		Apoco.popup.error("Bad Return from server: 511","Network authentication required " + s);
 	    }
 	}
     };
-
-   // Harvey.mixinDeep(Harvey,{
-//	popup: popups
-  //  });
 
 })();

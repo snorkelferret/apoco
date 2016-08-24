@@ -7,7 +7,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 global.document=require("jsdom").jsdom(undefined,
@@ -25,7 +25,7 @@ describe("DisplayFieldset-(no initial data)",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
        // assert($("#test").length>0);
-        t=Harvey.display.fieldset({id:"test_fieldset",DOM:"test"});
+        t=Apoco.display.fieldset({id:"test_fieldset",DOM:"test"});
         assert.isObject(t);
     });
     it("creates a DOM  container",function(){
@@ -95,7 +95,7 @@ describe("DisplayFieldset-(start with data)",function(){
         b.id="test";
         document.body.appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
-        t=Harvey.display.fieldset({id:"test_fieldset",
+        t=Apoco.display.fieldset({id:"test_fieldset",
                                    DOM:"test",
                                    components:[{node:"paragraph",name:"stuff",text:"hullo people"},
                                                {type:"integer",value: 10,name:"howmany"},

@@ -1,17 +1,17 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require("./Types.js");
 // Node class for static elements like headings and text etc
 // No callbacks or publish or listeners for these elements
-// if you need callbacks use Harvey.fields
+// if you need callbacks use Apoco.fields
 
 ;(function(){
 
     var _Node=function(d,element){
         if(!d){
-            throw new Error("Harvey: node, No params");
+            throw new Error("Apoco: node, No params");
         }
 	if(d && !d.node){
-            throw new Error("Harvey: node doesn't know how to make",d.node);
+            throw new Error("Apoco: node doesn't know how to make",d.node);
         };
   	for(var k in d){
 	    this[k]=d[k];
@@ -154,7 +154,7 @@ require("./Types.js");
                     that.element.appendChild(d);
                 }
                 else  if(that.items[i].labels){
-                    if(Harvey.checkType['array'](that.items[i].labels)){
+                    if(Apoco.checkType['array'](that.items[i].labels)){
                         for(var j=0;j<that.items[i].labels.length;j++){
                             d=document.createElement("dt");
                             d.textContent=that.items[i].labels[j];
@@ -168,7 +168,7 @@ require("./Types.js");
                     that.element.appendChild(d);
                 }
                 else if (that.items[i].descriptions){
-                    if(Harvey.checkType['array'](that.items[i].descriptions)){
+                    if(Apoco.checkType['array'](that.items[i].descriptions)){
                         for(var j=0;j<that.items[i].descriptions.length;j++){
                             d=document.createElement("dd");
                             d.innerHTML=that.items[i].descriptions[j];
@@ -211,7 +211,7 @@ require("./Types.js");
         },
 	clock: function(that){  
             that.element=document.createElement("div");  
-            that.element.classList.add("Harvey_clock");
+            that.element.classList.add("Apoco_clock");
             var cb=function(t){
                 var d=new Date();
                 that.element.textContent=d.toLocaleTimeString();
@@ -243,7 +243,7 @@ require("./Types.js");
             //console.log("paginator init with number " + that.number);
 	    // var that=this;
             that.element=document.createElement("div");
-            that.element.classList.add("Harvey_paginate");
+            that.element.classList.add("Apoco_paginate");
             var cb=function(index,el){
               //  console.log("index is " + index);
                 n=el.parentNode.childNodes;
@@ -301,10 +301,10 @@ require("./Types.js");
         }/*,
         progressBar:function(that){
             var max=100;
-            if(!document.contains(document.getElementById("Harvey_progressBar"))){
+            if(!document.contains(document.getElementById("Apoco_progressBar"))){
                 if(!that.element){
-                    that.element=document.createElement("div");//$("<div id='Harvey_progressBar'></div>");
-                    that.element.id="Harvey.progressBar";
+                    that.element=document.createElement("div");//$("<div id='Apoco_progressBar'></div>");
+                    that.element.id="Apoco.progressBar";
                     $(that.element).progressbar({ value: that.value, max: max,min:0});
                     //element.append(pb);
                     //return pb;
@@ -314,7 +314,7 @@ require("./Types.js");
         }*/
     };
 
-    Harvey.node=function(options,el){
+    Apoco.node=function(options,el){
         if(options === "node_list"){ // return the list of nodes- internal use only
             var nl={};
             for(var k in _getNode){
@@ -324,7 +324,7 @@ require("./Types.js");
             return nl;
          }
         else{
-            //console.log("Harvey.node calling _Node");
+            //console.log("Apoco.node calling _Node");
             return new _Node(options,el);
         }
     };

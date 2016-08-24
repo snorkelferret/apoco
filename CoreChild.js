@@ -1,16 +1,16 @@
-var Harvey = require('./declare.js').Harvey;
+var Apoco = require('./declare.js').Apoco;
 
 window.onerror=function(msg,url,lineno){
-    Harvey.popup.dialog(url, ("line number " + lineno + " " + msg));
+    Apoco.popup.dialog(url, ("line number " + lineno + " " + msg));
 };
 
 console.log=window.opener.console.log;
-_.extend(true,Harvey,{
+_.extend(true,Apoco,{
     childReady: function(){
 	window.onload=function(){
 	    var e=new Event("childReady");
 	    e.data=window;
-	    console.log("Harvey.childReady here ");
+	    console.log("Apoco.childReady here ");
 	    window.opener.dispatchEvent(e);
 	};
     }

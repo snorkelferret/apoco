@@ -1,8 +1,8 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=require('jquery');
+var Apoco=require('./declare').Apoco,UI=require('./declare').UI; 
 
 ;(function(){
 
-    Harvey.IO={
+    Apoco.IO={
         _subscribers:{},
         dispatch:function(name,args){  //pubsub
             console.log("dispatch is here name is " + name);
@@ -63,7 +63,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 return undefined;
 	    }
 	    else{
-                console.log("Harvey.unsubscribe could not find listener");
+                console.log("Apoco.unsubscribe could not find listener");
                 return null;
             }
         },
@@ -82,7 +82,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
 
 	        }
 	        else{
-		    throw new Error("incorrect method for harvey.publish");
+		    throw new Error("incorrect method for apoco.publish");
 	        }
 	    }
         },
@@ -95,10 +95,10 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 var msg=JSON.stringify(data);
               //  console.log("got some data " + msg);
                 try{
-                    Harvey.webSocket.send(msg+'\n');
+                    Apoco.webSocket.send(msg+'\n');
                 }
                 catch(err){
-                    Harvey.popup.error("websocket send", ("Could not send websocket message %j ",err));
+                    Apoco.popup.error("websocket send", ("Could not send websocket message %j ",err));
                 }
             };
             settings.url=defaults.url;
@@ -106,7 +106,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 settings[k]=options[k];
             }
             
-            if(!Harvey.webSocket){
+            if(!Apoco.webSocket){
               //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
                 var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
               //  console.log("a is " + a + " protocol " + window.location.protocol);
@@ -115,8 +115,8 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 }
               //  console.log("location host " + window.location.host + " hostname " + window.location.hostname);
                 try{
-                    Harvey.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
-                    Harvey.webSocket.onopen = function (e) {
+                    Apoco.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
+                    Apoco.webSocket.onopen = function (e) {
                           //     console.log("created websocket + + + + + + + + + + + + + + ++");
                         if(data !== undefined){ // in case of timing issue
                               sendMessage(data);
@@ -131,22 +131,22 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 sendMessage(data);
             }
 
-            Harvey.webSocket.onerror=function(e){
-                Harvey.popup.error("webSocket","Received an error msg");
+            Apoco.webSocket.onerror=function(e){
+                Apoco.popup.error("webSocket","Received an error msg");
             };
-            Harvey.webSocket.onclose=function(e){
+            Apoco.webSocket.onclose=function(e){
                 if(e.code !== 1000){ // normal termination
-                    Harvey.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
+                    Apoco.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
                 }
             };
-            Harvey.webSocket.onmessage=function(e){
+            Apoco.webSocket.onmessage=function(e){
                 if(!e.data){
                     throw new Error("webSocket: no data or name from server");
                 }
                 var d=JSON.parse(e.data);
                 console.log("got: %j %j",d[0],d[1]);
                 if(d[0] === "error"){
-                    Harvey.popup.dialog("Error",JSON.stringify(d[1]));
+                    Apoco.popup.dialog("Error",JSON.stringify(d[1]));
                 }
                 else{
                     that.dispatch(d[0],d[1]);
@@ -172,7 +172,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                 settings[k]=options[k];
             }
             if(settings.url === ""){
-                throw new Error("Harvey.REST Must have a url");
+                throw new Error("Apoco.REST Must have a url");
             }
             data=JSON.stringify(data);
             //var promise=$.ajax(settings);
@@ -190,7 +190,7 @@ var Harvey=require('./declare').Harvey,UI=require('./declare').UI; //,jQuery=req
                             if(!request){
                                 throw new Error("REST failed with no return from server");
                             }
-                            Harvey.display.statusCode[request.status]((request.statusText + " " + request.responseText));
+                            Apoco.display.statusCode[request.status]((request.statusText + " " + request.responseText));
                         }
                     }
                 };

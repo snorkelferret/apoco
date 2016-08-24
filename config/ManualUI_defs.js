@@ -83,34 +83,34 @@
            // console.log("k is " + k);
             switch(k){
             case "Fields":
-                thing=Harvey.field;
+                thing=Apoco.field;
                 break;
             case "Displays":
-                thing=Harvey.display;
+                thing=Apoco.display;
                 break;
             case "Nodes":
-                thing=Harvey.node("node_list");
+                thing=Apoco.node("node_list");
                 break;
             case "Popups":
-                thing=Harvey.popup;
+                thing=Apoco.popup;
                 break;
             case "Types":
-                thing= Harvey.dbToHtml;
+                thing= Apoco.dbToHtml;
                 break;
             case "Windows":
-                thing=Harvey.Window;
+                thing=Apoco.Window;
                 break;
             case "IO":
-                thing=Harvey.IO;
+                thing=Apoco.IO;
                 break;
             case "Panels":
-                thing=Harvey.Panel;
+                thing=Apoco.Panel;
                 break;
             case "PanelComponents":
-                thing=Harvey._panelComponents("methods");
+                thing=Apoco._panelComponents("methods");
                 break;
             case "Utils":
-                thing=Harvey.Utils;
+                thing=Apoco.Utils;
                 break;
             default:
                 throw new Error("Don't know how to make " + k);
@@ -136,19 +136,19 @@
                    }
                }
             }
-            Harvey.sort(HThings[k],"string");
+            Apoco.sort(HThings[k],"string");
         }
         
     }
-    mkArrays(); // make the arrays of all the things Harvey knows how to build
+    mkArrays(); // make the arrays of all the things Apoco knows how to build
    
    
     // FIELDS
     var fieldManual={
         get_types:function(field){
             var f=[];
-            for(var k in Harvey.dbToHtml){
-                if(Harvey.dbToHtml[k].field == field){
+            for(var k in Apoco.dbToHtml){
+                if(Apoco.dbToHtml[k].field == field){
                     f.push(k);  
                 }
             }
@@ -166,7 +166,7 @@
             IO:{
                 action:{type:"function",default: undefined,descriptions:["Function fired on click of element<br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
                 listen:{type:"objectArray",default:undefined ,descriptions:["e.g <code> listen:[{name:'some_name',action:function(that,data){ alert('got data ' + data);}}]</code>"]},
-                publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that,name){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Harvey.IO.dispatch(name,data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
+                publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that,name){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Apoco.IO.dispatch(name,data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
             },
             input: { options:{type:{type:"string",
                                     default:"string",
@@ -211,7 +211,7 @@
                                max:{type:"integer",default: 10},
                                value:{type: "integer",default: undefined}
                              },
-                     descriptions:["This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Harvey setValue and getValue methods "]
+                     descriptions:["This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Apoco setValue and getValue methods "]
                    },
             numberArray:{ options:{type:{type:"string",
                                          default: "integerArray",
@@ -239,12 +239,12 @@
                   },
             autoComplete:{options:{options:{type:"stringArray"},
                                    value:{type: "string",default: undefined}},
-                          descriptions: ["This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> ","  Please use the Harvey getValue and setValue methods "]
+                          descriptions: ["This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> ","  Please use the Apoco getValue and setValue methods "]
                          },
             checkBox:{ options:{ value:{type: "boolean",default: false}},
                        descriptions: [""]},
             date:{options:{value:{type:"time",default:undefined,params:["Date","string"] }},
-                  descriptions:["This uses the browser datepicker(where available) or Harvey.datepicker"]
+                  descriptions:["This uses the browser datepicker(where available) or Apoco.datepicker"]
                  },
             time:{options:{value:{type:"time",default:undefined,
                                   description:"A valid partial-time as defined in [RFC 3339]."}},
@@ -271,12 +271,12 @@
             this.fields={};
             this.mkOptions(Options);
             this.mkFieldOptionsList();
-            for(var k in this.fields){
+           /* for(var k in this.fields){
                 console.log("fields  value %j",this.fields[k]);
                 for(var h in this.fields[k]){
                     console.log("other fields is %j " ,this.fields[k][h]);
                 }
-            }
+            }*/
             this.Commands=this.mkFieldCommands();
             this.mkFields();
             this.mkFieldMethods();
@@ -290,7 +290,7 @@
                 this.fields[f].required={};
                 this.fields[f].options={};
                 this.fields[f].IO={};
-                console.log("mkOptions: field is " + f);
+                //console.log("mkOptions: field is " + f);
                 if(Options.required){
                     for(var n in Options.required){
                         this.fields[f].required[n]=Options.required[n];
@@ -394,18 +394,18 @@
             for(var i=0;i<HFields.length;i++){
                 f=HFields[i];
                 var c="";
-                console.log("Creating command for " + HFields[i]);
+              //  console.log("Creating command for " + HFields[i]);
                 if(no_var_equals){
                     c="{field:'" + HFields[i] + "'";
                 }
                 else{
                     c="var dataObject={field:'" + HFields[i] + "'";
                 }
-                console.log(" c is " + c);
+               // console.log(" c is " + c);
                 // get the globally required opts
                 v=this.fields[f].required;
                 for(k in v){
-                    console.log("GETTING REQUIRED");
+                  //  console.log("GETTING REQUIRED");
                     c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
                 }
                 c=c.concat(", label: 'A Label'");
@@ -414,13 +414,13 @@
                     var fd=field_desirable[HFields[i]];
                     for(var j=0;j<fd.length;j++){
                         var n=this.fields[f].options[fd[j]];
-                        console.log("desirable field for " + fd[j] + " type " + n.type );
+                        //console.log("desirable field for " + fd[j] + " type " + n.type );
                         
                         if(n){
                             c=c.concat(","+ fd[j] + ":");
-                            console.log("adding desirable field " + fd[j] + " with type " + n.type);
+                          //  console.log("adding desirable field " + fd[j] + " with type " + n.type);
                             if(n.default !== undefined){
-                                console.log("adding default " + n.default);
+                            //    console.log("adding default " + n.default);
                                 c=c.concat(JSON.stringify(n.default));
                             }
                             else if(n.type){
@@ -435,7 +435,7 @@
                     }
                 }
                 c=c.concat("};");
-                console.log("Made command index i " + i + " cmd " + c);
+              //  console.log("Made command index i " + i + " cmd " + c);
                 Commands[i]=c;
             }
             return Commands;
@@ -446,7 +446,7 @@
             var HFields=HThings.Fields;
             
             for(var i=0;i<HFields.length;i++){
-               console.log("++++++++++++++++++== mkFields making " + HFields[i]);
+             //  console.log("++++++++++++++++++== mkFields making " + HFields[i]);
                 var k={};
                 f=HFields[i];
                 k.display="fieldset";
@@ -460,7 +460,7 @@
                 },
                 k.components=[{node: "heading",size: "h3", text: HFields[i]},
                               {node: "paragraph",text: "Called as a standalone -"},
-                              {node:"paragraph", text: " <code>var f=Harvey.field['" +HFields[i] +"'](dataObject,element);</code>"},
+                              {node:"paragraph", text: " <code>var f=Apoco.field['" +HFields[i] +"'](dataObject,element);</code>"},
                               {node:"paragraph",text: "or as part of a display grid, fieldset or form"},
                               {node:"paragraph",text: "<code>{field:" + HFields[i] + " //... other options } </code>"},
                               {node:"paragraph",text:that.fields[f].descriptions},
@@ -480,21 +480,21 @@
                                    if(!f){
                                        throw new Error("can't get input params");
                                    }
-                                   console.log("f.getValue is %j",f.getValue());
+                                //   console.log("f.getValue is %j",f.getValue());
                                    globalEval(f.getValue());
                                    //         console.log("parms are " + dataObject);
-                                   if(Harvey.checkType["object"](dataObject)){
+                                   if(Apoco.checkType["object"](dataObject)){
                                        //             console.log("and it is an object");
                                        var name=dataObject.name;
                                        if(that.parent.getChild(name)){
-                                           console.log("deleting child");
+                                         //  console.log("deleting child");
                                            that.parent.deleteChild(name);
                                        }
                                        //            console.log("adding child");
                                        that.parent.addField(dataObject);
                                    }
                                    else{
-                                       Harvey.display.dialog("Error", "Input is not a valid object");
+                                       Apoco.display.dialog("Error", "Input is not a valid object");
                                    } 
                                }
                               }
@@ -503,7 +503,7 @@
             }
         },  
         mkFieldMethods:function(){
-            var fm=Harvey.field._getMethods();
+            var fm=Apoco.field._getMethods();
          
             
             var HFields=HThings.Fields;
@@ -526,7 +526,7 @@
                 getElement: {descriptions:[
                     "<code>var r=field.getElement();<code>",
                     "return: HTMLObject",
-                    "The original html node supplied in the call to Harvey.Field"
+                    "The original html node supplied in the call to Apoco.Field"
                 ] },
                 getKey: {descriptions:[
                     "<code>var r=field.getKey();</code>",
@@ -557,7 +557,7 @@
                 // console.log("mkFieldMethods making " + HFields[i]);
                 var k={};
                 items=[];
-                Harvey.sort(fm[HFields[i]],"string");
+                Apoco.sort(fm[HFields[i]],"string");
                 for(var j=0;j<fm[HFields[i]].length;j++){
                     var m=fm[HFields[i]][j];
                     items[j]={label:m,
@@ -723,7 +723,7 @@
             k.DOM="right";
             k.id=HTypes[i];
             k.hidden=true;
-            var c=" var results=[]; var test= " + tests[HTypes[i]].test + ";  for(var i=0;i<test.length;i++){ results[i]=Harvey.checkType['" +  HTypes[i] + "'](test[i]);  }";
+            var c=" var results=[]; var test= " + tests[HTypes[i]].test + ";  for(var i=0;i<test.length;i++){ results[i]=Apoco.checkType['" +  HTypes[i] + "'](test[i]);  }";
             k.components=[{node: "heading",size: "h3", text: HTypes[i]},
                           {node: "descriptionList",items:tests[HTypes[i]].items},
                           {node:"paragraph", text: "Live tests"},
@@ -758,7 +758,7 @@
     var mkNodes=function(){
         var HNodes=HThings.Nodes;
         var node_items=[];
-        var opts=Harvey.node("node_list");
+        var opts=Apoco.node("node_list");
         var Commands=[];
 
         var opts={
@@ -857,7 +857,7 @@
         for(var i=0;i<HNodes.length;i++){
             var k={};
             var t_opts=new String;
-            Commands[i]=("var node=Harvey.node({node:'" + HNodes[i] +"'" + ",name: 'TESTNODE'");
+            Commands[i]=("var node=Apoco.node({node:'" + HNodes[i] +"'" + ",name: 'TESTNODE'");
             for(var n in opts[HNodes[i]].parms){
                 t_opts=t_opts.concat(", " + n + ": ");
                 t_opts=t_opts.concat(JSON.stringify(opts[HNodes[i]].parms[n]));
@@ -893,8 +893,8 @@
             }, 
             k.hidden=true;
             k.components=[{node: "heading",size: "h3", text: HNodes[i]},
-                          // {node:"paragraph", text: "<code>var node=Harvey.node({node:'" + HNodes[i] + "'" + t_opts + "});</code>"},
-                          {node:"code", text: "var node=Harvey.node({node:'" + HNodes[i] + "'" + t_opts + "});"},
+                          // {node:"paragraph", text: "<code>var node=Apoco.node({node:'" + HNodes[i] + "'" + t_opts + "});</code>"},
+                          {node:"code", text: "var node=Apoco.node({node:'" + HNodes[i] + "'" + t_opts + "});"},
                           {node: "heading",size: "h3",text: "Settings"},
                           {node: "heading",size: "h5",text:"required"},
                           {node: "descriptionList",items:opts[HNodes[i]].required.items},
@@ -912,7 +912,7 @@
                                }
                      
                                globalEval(f.getValue());
-                               if(Harvey.checkType["object"](node)){
+                               if(Apoco.checkType["object"](node)){
                       //             console.log("and it is an object");
                                    var name=node.name;
                                    if(that.parent.getChild(name)){
@@ -925,7 +925,7 @@
                                   
                                }
                                else{
-                                   Harvey.display.dialog("Error", "Input is not a valid object");
+                                   Apoco.display.dialog("Error", "Input is not a valid object");
                                } 
                            }
                           },
@@ -996,7 +996,7 @@
             k.id=HDisplays[i];
             k.dependsOn=HDisplays[i];
             k.action=function(that){
-                console.log("triggering click with id ", that.id);
+              //  console.log("triggering click with id ", that.id);
                 var p=that.getChild("doit");
                 p.element.click();
                 var dobj=window[(that.id + "_obj")];
@@ -1005,7 +1005,7 @@
                 }
             },
             k.components=[{node: "heading",size: "h3", text: HDisplays[i]},
-                          {node:"paragraph", text: "<code>var node=Harvey.display['" + HDisplays[i] + "'](dataObject);</code>"},
+                          {node:"paragraph", text: "<code>var node=Apoco.display['" + HDisplays[i] + "'](dataObject);</code>"},
                           {node: "heading",size: "h4",text: "dataObject settings"},
                           {node: "heading",size: "h5",text: "required"},
                           {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string","an existing node with an id (do not include #) which is used as the parent for the display"]},
@@ -1015,14 +1015,14 @@
                           {node: "heading",size: "h5",text: "options"},
                           {node: "descriptionList",items:[{label:"action",descriptions:["type: function","example","<code> action:function(that){//some code - that=this}<code>"]},
                                                           {label:"dependsOn",descriptions:["type: string","id of the node that needs to be created before the action function is run","example","<code> dependsOn:'nodeId'"]},
-                                                          {label:"publish",descriptions:["type: objectArray","example","<code>publish:[{name:'some_name',action:function(that,name){ var data=that.myGetData(); <br> Harvey.dispatch(name,data)}}]</code>"]},
+                                                          {label:"publish",descriptions:["type: objectArray","example","<code>publish:[{name:'some_name',action:function(that,name){ var data=that.myGetData(); <br> Apoco.dispatch(name,data)}}]</code>"]},
                                                           {label:"listen",descriptions:["type: objectArray","example","<code>listen:[{name:'some_name',action:function(that,data){//do something}}]<code>"]},
                                                           {label:"after",descriptions:["type: string","where the string is the id of an element that the new elemnent will be displayed after"]}]},
                           {node:"descriptionList",items:stuff[HDisplays[i]].options},
                           {node: "heading",size:'h4',text:"live Demo"},
                           {node: "paragraph",text:"Please Note that the display Object is being added to the global window namespace for slight security and ease of access for the methods below"},
                           {name: "Input_params",field: "textArea",
-                           value: "var " + HDisplays[i] + "_obj=Harvey.display['" + HDisplays[i] + "']({DOM:'right',id:'" + HDisplays[i] + "Display', after:'" + HDisplays[i] + "', " + command[HDisplays[i]] + "});"},
+                           value: "var " + HDisplays[i] + "_obj=Apoco.display['" + HDisplays[i] + "']({DOM:'right',id:'" + HDisplays[i] + "Display', after:'" + HDisplays[i] + "', " + command[HDisplays[i]] + "});"},
                           {node:'button',name:'doit',text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -1031,9 +1031,9 @@
                                }
                                var n=that.parent.id;
                                globalEval(f.getValue());
-                               var d=Harvey.Panel.get("Displays").getChild((n+"Display"));
+                               var d=Apoco.Panel.get("Displays").getChild((n+"Display"));
                                if( d!== null){
-                                   Harvey.Panel.get("Displays").deleteChild((n+"Display"));
+                                   Apoco.Panel.get("Displays").deleteChild((n+"Display"));
                                }
                                var p=window[(n + "_obj")];
                                if(p){
@@ -1042,10 +1042,10 @@
                                else{
                                    throw new Error("Display Object " + n + " not in the DOM");
                                }              
-                               if(!Harvey.checkType['object'](dobj)){
+                               if(!Apoco.checkType['object'](dobj)){
                                    throw new Error("Cannot find display Object - Bad return");
                                }
-                               Harvey.Panel.get("Displays").addChild(dobj);
+                               Apoco.Panel.get("Displays").addChild(dobj);
                            }
                           }
                          ];
@@ -1060,8 +1060,8 @@
         for(var i=0;i<HDisplays.length;i++){
            // console.log("getting method for " + HDisplays[i]);
             Methods[HDisplays[i]]=[];
-            var p=Harvey.display[(HDisplays[i]+"Methods")]();
-            Harvey.sort(p,"string");
+            var p=Apoco.display[(HDisplays[i]+"Methods")]();
+            Apoco.sort(p,"string");
             for(var j=0;j<p.length; j++){
              //   console.log("display " + HDisplays[i] + " has method " + p[j]);
                 if(p[j] !== "constructor" && !p[j].startsWith("_")){
@@ -1216,12 +1216,12 @@
                                {label: "text",descriptions: ["type: string","required: false"]}
                               ],
                         cmd: function(c){return c.concat( '[204]("Some more text");');},
-                        usage: "<code>Harvey.popup['statusCode'][ERROR_CODE](text); </code>",
+                        usage: "<code>Apoco.popup['statusCode'][ERROR_CODE](text); </code>",
                         ret: "none"
                        },
             alert:{items:[{label:"text",description:"type: string, required: false "}],
                    cmd:  function(c){ return c.concat('("Hi, An alert");');},
-                   usage:" <code>Harvey.popup['alert'](title);</code>",
+                   usage:" <code>Apoco.popup['alert'](title);</code>",
                    ret: "HTML Element Object"
                   },
             dialog:{items:[{label:"title",description:"type: string, required: true"},
@@ -1229,31 +1229,31 @@
                            {label: "modal",description: "type: boolean, required: false, default: false"}
                           ],
                     cmd: function(c){return c.concat('("title","my message");');},
-                    usage: " <code>Harvey.popup['dialog'](title,[ ,text],[ , modal]);</code> ",
+                    usage: " <code>Apoco.popup['dialog'](title,[ ,text],[ , modal]);</code> ",
                     ret: "Object"
                    },
             error:{items:[{label: "title",description:"type: string, required: true"},
                           {label: "text",description: "type: string, required: false"}],
                    cmd: function(c){return c.concat('("title","my message");');},
-                   usage:"<code>Harvey.popup['error'](title,text);</code>",
+                   usage:"<code>Apoco.popup['error'](title,text);</code>",
                    ret: "none"
                   },
             spinner:{items:[{label:"value",description:"type: boolean, required: true"}],
                      cmd:  function(c){return c.concat('(true);');},
-                     usage:"<code>Harvey.popup['spinner'](value);</code>",
+                     usage:"<code>Apoco.popup['spinner'](value);</code>",
                      ret: "HTML Element Object"
                     },
             trouble:{items:[{label:"title",description:"type:string , required: true"},
                             {label: "text",description: "type: string, required: false"}
                            ],
                      cmd: function(c){return c.concat('("TEST TROUBLE","something horrible text")');},
-                     usage:"<code>Harvey.popup['trouble'](title,text);</code>",
+                     usage:"<code>Apoco.popup['trouble'](title,text);</code>",
                      ret: "HTML Element Object"
                     }
         };
         
         for(var i=0;i<HPopups.length;i++){
-            var c= "var dobj=Harvey.popup['" + HPopups[i] + "']" ;   
+            var c= "var dobj=Apoco.popup['" + HPopups[i] + "']" ;   
             var cmd=ttt[HPopups[i]].cmd(c);
             
             var k={};
@@ -1278,7 +1278,7 @@
                               }
                               globalEval(f.getValue());
                               if(that.parent.id === "spinner"){
-                                  window.setTimeout(function(){Harvey.popup["spinner"](false);},3000);
+                                  window.setTimeout(function(){Apoco.popup["spinner"](false);},3000);
                               } 
                           }}
                          ];
@@ -1290,47 +1290,47 @@
     var mkIO=function(){
         var HIO=HThings["IO"];
         var items={
-            REST:{code: "<code>var v=Harvey.IO.REST(type,options,data);</code>",
+            REST:{code: "<code>var v=Apoco.IO.REST(type,options,data);</code>",
                   items:[{label: "type",descriptions:["string","'GET' or 'POST'"]},
                          {label: "options",descriptions:["key-value object","  var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};"," keys url(required) dataType(optional)"," defaults to 'json' mimeType(optional) defaults to 'application/json', any other values in the options object will be passed directly to the server","e.g <code>var options={url:'http://my_site/whatever'};</code>"]},
                          
                          {label:"data",descriptions:["any data the can be stringified using JSON.stringify "]}],
-                  cmd:"var v=Harvey.IO.REST('GET',{},'hi'); v.then(function(){ }).catch(function(msg){Harvey.popup.error('request failes',msg)});",
+                  cmd:"var v=Apoco.IO.REST('GET',{},'hi'); v.then(function(){ }).catch(function(msg){Apoco.popup.error('request failes',msg)});",
                   ret: "promise - javascript Promise",
                   des: " (Example will throw an error for security reasons)"
                  },
-            dispatch:{code: "<code>Harvey.IO.dispatch(name,data);</code>",
+            dispatch:{code: "<code>Apoco.IO.dispatch(name,data);</code>",
                       items:[{label:"name",descriptions:["string","event identifier (matches listen)"]},
                              {label:"data",descriptions:["any data type","data to be sent to listeners"]}],
-                      cmd:"Harvey.IO.dispatch('mySignal','hullo'); // go to listen page to see results",
+                      cmd:"Apoco.IO.dispatch('mySignal','hullo'); // go to listen page to see results",
                       ret: "none",
                       des:""
                      },
-            listen:{code: "<code>Harvey.IO.listen(object);</code>",
+            listen:{code: "<code>Apoco.IO.listen(object);</code>",
                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
-                    cmd: "Harvey.Panel.get('IO').getChild('listenMethods').addField({field:'static',type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addNode({node:'paragraph',text: data});  }}]});  // press go to initialise",
+                    cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addField({field:'static',type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addNode({node:'paragraph',text: data});  }}]});  // press go to initialise",
                     ret:"none",
                     des: "Listens for messages sent by publish,websocket or dispatch methods"
                    },
-            publish:{code: "<code>Harvey.IO.publish(object);</code>",
+            publish:{code: "<code>Apoco.IO.publish(object);</code>",
                      items:[{label:"object",descriptions:["object contains and Array of key value Objects called publish","e.g <br> <code>var object={publish:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
-                     cmd: "Harvey.IO.publish({publish:[{name:'mySignal',action:function(that,name){ var t=Harvey.Panel.get('IO').getChild('publishMethods'); t.element.addEventListener('click',function(e){ Harvey.IO.dispatch(name,'hullo from publish');},false); }}]}); // press Go to initialise, and then click anywhere in the panel to send data- the data will be caught on the listen page",
+                     cmd: "Apoco.IO.publish({publish:[{name:'mySignal',action:function(that,name){ var t=Apoco.Panel.get('IO').getChild('publishMethods'); t.element.addEventListener('click',function(e){ Apoco.IO.dispatch(name,'hullo from publish');},false); }}]}); // press Go to initialise, and then click anywhere in the panel to send data- the data will be caught on the listen page",
                      ret: "none",
                      des:""
                     },
-            unsubscribe:{code: "<code>Harvey.IO.unsubscribe(object);</code>",
+            unsubscribe:{code: "<code>Apoco.IO.unsubscribe(object);</code>",
                          items:[{label:"object",descriptions:[""]}],
-                         cmd:"var t=Harvey.Panel.get('IO').getChild('listenMethods').getField('test_listen'); Harvey.IO.unsubscribe(t);",
+                         cmd:"var t=Apoco.Panel.get('IO').getChild('listenMethods').getField('test_listen'); Apoco.IO.unsubscribe(t);",
                          ret: "null on error, or undefined on success",
                          des: "unsubscibe from all messages defined in object.listen"
                         },
-            webSocket:{code: "<code>Harvey.IO.webSocket(options,data);</code>",
+            webSocket:{code: "<code>Apoco.IO.webSocket(options,data);</code>",
                        items:[{label:"options",descriptions:["key value object","default={url:UI.webSocketURL}; ","any other settings in options will be passed to the webSocket"]},
                               {label: "data",description: "any data that can be stringified using JSON.stringify"}
                              ],
                        ret: "none",
                        des: "sends and receives messages, received messages are sent with IO.dispatch (Example will throw an error for security reasons)",
-                       cmd: " Harvey.IO.webSocket({url:'/data/websocket'},['logon',{user: 'fred',password: 'flinstone'}]); "
+                       cmd: " Apoco.IO.webSocket({url:'/data/websocket'},['logon',{user: 'fred',password: 'flinstone'}]); "
                       }
         };
         for(var i=0;i<HIO.length;i++){
@@ -1368,31 +1368,31 @@
     var mkWindows=function(){
         var W=HThings["Windows"];
         var items={
-            close: {cmd:"Harvey.Window.close('TestWindow');",
+            close: {cmd:"Apoco.Window.close('TestWindow');",
                     params:[{label:"win",descriptions:["string - window name","or","object- windowObject"
                                                       ]}],
                     description:"close the window- don't delete the panels it may contain",
                     ret:[{label:"none",description:""}]
                    },
-            deleteAll:{cmd:"Harvey.Window.closeAll();",
+            deleteAll:{cmd:"Apoco.Window.closeAll();",
                        params:[{label:"none",description:"return none"}],
                        description:"",
                        ret:[{label:"none",description:""}]
                      },
-            delete:{cmd: "Harvey.Window.delete('TestWindow');",
+            delete:{cmd: "Apoco.Window.delete('TestWindow');",
                     params:[{label:"win",descriptions:["string - window name","or","object - windowObject"
                                                      ]}],
                     description:"close the window and delete all the contents",
                     ret:[{label:"none",description:""}]
                    },
-            get:{cmd: "var v=Harvey.Window.get('TestWindow');",
+            get:{cmd: "var v=Apoco.Window.get('TestWindow');",
                  params:[{label:"win",descriptions:["string - window name"," or"," object - windowObject",
                                                ]}],
                  description:"",
-                 ret: [{label:"",descriptions:[  "Harvey windowObject i.e",
+                 ret: [{label:"",descriptions:[  "Apoco windowObject i.e",
                                                  "<code>w={name:'myName',window:'windowObject',promise:'Promise'}</code>"]}]
                 },
-            open:{cmd:"var v=Harvey.Window.open({name:'TestWindow',url:'child_window.html',opts:{width: 400}});",
+            open:{cmd:"var v=Apoco.Window.open({name:'TestWindow',url:'child_window.html',opts:{width: 400}});",
                   params:[{label:"winObject",descriptions:["name: string -required ","url: string - required",
                                                            "opts: object - window options (optional) <br> default: <code>{width: 600,height: 600,menubar: 0,toolbar: 0, location: 0, personalbar: 0 }</code> <br> if no opts are supplied the window will be opened in a new tab","opts can included any options normally used by window.open"]}],
                   description:"Open a new browser window or tab",
@@ -1441,64 +1441,64 @@
     var mkUtils=function(){
         var HUtils=HThings["Utils"];
         var items={
-            binarySearch:{p:"<code>var index=Harvey.Utils.binarySearch(array,[sortOrder],item,[closest])<code>",
+            binarySearch:{p:"<code>var index=Apoco.Utils.binarySearch(array,[sortOrder],item,[closest])<code>",
                           params:"array - (any type),<br>sortOrder:(optional) array of fields in the array, <br> closest: -object",
                           description:"if exact match is not found, and closest object is supplied - fills in the closest oject e.g <code> {index: closest_index,dir: string(before/after),val: closest_value} <code>",
                           ret: "index - of the found array item or null",
-                          cmd:" var v={}; var b=Harvey.Utils.binarySearch([1,2,13,24,45],null,15,v);"
+                          cmd:" var v={}; var b=Apoco.Utils.binarySearch([1,2,13,24,45],null,15,v);"
                          },
-            dateNow:{p:"<code>var today=Harvey.Utils.dateNow();<code>",
+            dateNow:{p:"<code>var today=Apoco.Utils.dateNow();<code>",
                      params: "none",
                      description:"",
-                     cmd:"var v=Harvey.Utils.dateNow();",
+                     cmd:"var v=Apoco.Utils.dateNow();",
                      ret: "date - YYYY-MM-DD"},
-            datePast:{p:"<code>var t=Harvey.Utils.datePast(date);<code>",
+            datePast:{p:"<code>var t=Apoco.Utils.datePast(date);<code>",
                       params:"date: - YYYY-MM-DD",
                       description:"",
-                      cmd:"var v=Harvey.Utils.datePast('2020-05-12');",
+                      cmd:"var v=Apoco.Utils.datePast('2020-05-12');",
                       ret:"boolean"},
-            detectMobile:{p:"<code>var r=Harvey.Utils.detectMobile();<code>",
+            detectMobile:{p:"<code>var r=Apoco.Utils.detectMobile();<code>",
                           params: "none",
                           description:"",
-                          cmd:"var v=Harvey.Utils.detectMobile();",
+                          cmd:"var v=Apoco.Utils.detectMobile();",
                           ret: "boolean"},
-            draggable:{p:"<code> var d=Harvey.Utils.draggable(htmlObject);</code>",
+            draggable:{p:"<code> var d=Apoco.Utils.draggable(htmlObject);</code>",
                        params:"a htmlObject",
                        description:"",
                        ret:"false - on fail"},
-            extend:{p:"<code> Harvey.Utils.extend(subclass,superclass); </code>",
+            extend:{p:"<code> Apoco.Utils.extend(subclass,superclass); </code>",
                     params: "subclass-constructor function, superclass: base constructor function",
                     description:"Adds the methods of the superclass to the subclass <br> typically used with new e.g <code> myObj=new subclass; </code>",
-                    cmd: "var a= function(){this.p='hi';}; var b=function(){}; b.prototype={myVar: 'superClass'}; Harvey.Utils.extend(a,b); var v=a.prototype.myVar",
+                    cmd: "var a= function(){this.p='hi';}; var b=function(){}; b.prototype={myVar: 'superClass'}; Apoco.Utils.extend(a,b); var v=a.prototype.myVar",
                     ret: "none"},
-            formatDate:{p:"<code> var date_string=Harvey.Utils.formatDate(date); </code>",
+            formatDate:{p:"<code> var date_string=Apoco.Utils.formatDate(date); </code>",
                         params: "date of the form YYYY-MM-DD",
                         description:"",
-                        cmd:"var v=Harvey.Utils.formatDate('2018-05-23')",
+                        cmd:"var v=Apoco.Utils.formatDate('2018-05-23')",
                         ret: "string e.g '12th November 2017'"},
-            getCssValue:{p:"<code> var css_value=Harvey.Utils.getCssValue(css_class,rule,[filename]); </code>",
+            getCssValue:{p:"<code> var css_value=Apoco.Utils.getCssValue(css_class,rule,[filename]); </code>",
                          params:"css_class, rule e.g width, filename[optional] the name of the css file in the header- if not given the function will search through all the css files",
                          ret: "string - containing the rule or none",
                          description: "Sadly this does not work in Chrome"},
-            widthFromCssClass:{p:"<code> var width=Harvey.Utils.widthFromCssClass(class_list,filename); </code>",
+            widthFromCssClass:{p:"<code> var width=Apoco.Utils.widthFromCssClass(class_list,filename); </code>",
                                params:"class_list - string array of classes to be included in width calculation ",
                                description:"Sadly does not work in Chrome",
                                ret:"string e.g '120px'"},
-            fontSizeToPixels:{p:"<code> var d=Harvey.Utils.fontSizeToPixels(font-size);</code>",
+            fontSizeToPixels:{p:"<code> var d=Apoco.Utils.fontSizeToPixels(font-size);</code>",
                               params:"font_size: integer or string e.g '12pt'",
                               description:"",
-                              cmd:"var v=Harvey.Utils.fontSizeToPixels(12);",
+                              cmd:"var v=Apoco.Utils.fontSizeToPixels(12);",
                               ret:"integer"},
-            hashCode:{p:"<code> var d=Harvey.Utils.hashCode(str);</code>",
+            hashCode:{p:"<code> var d=Apoco.Utils.hashCode(str);</code>",
                       params:"str: some string value ",
                       description:" simple hashed string",
-                      cmd:"var v=Harvey.Utils.hashCode('hullo')",
+                      cmd:"var v=Apoco.Utils.hashCode('hullo')",
                       ret:"string - string of integers"},
-            observer:{p:"<code>var c=Harvey.Utils.observe(str); </code>",
+            observer:{p:"<code>var c=Apoco.Utils.observe(str); </code>",
                       params:"str - string(required) id name of element to observe",
                       description:"",
                       ret:""},
-            getSiblings:{p:"<code>var c=Harvey.Utils.getSiblings(htmlObject); </code>",
+            getSiblings:{p:"<code>var c=Apoco.Utils.getSiblings(htmlObject); </code>",
                          params:"htmlObject",
                          description:"find all the siblings",
                          ret: "array of sibling htmlObjects"}
@@ -1528,7 +1528,7 @@
                     }
                     globalEval(f.getValue());
                     var p=that.parent.getNode('Result');
-                    if(Harvey.checkType['function'](v)){
+                    if(Apoco.checkType['function'](v)){
                         p.setText(v);
                     }
                     else{
@@ -1550,14 +1550,14 @@
         var name=that.name;
        // console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
-            Harvey.Panel.hide(that.parent.selected.name);
+            Apoco.Panel.hide(that.parent.selected.name);
         }
      //   if(name !== that.selected){
           //  console.log("select_tabs: trying to show " + that.selected);
-        //Harvey.Panel.hide(that.selected);
+        //Apoco.Panel.hide(that.selected);
         
-        Harvey.Panel.show(name);
-        var b=Harvey.Panel.get(name);
+        Apoco.Panel.show(name);
+        var b=Apoco.Panel.get(name);
         if(b){ // may or may not be loaded yet
             var ar=b.getChildren();
             for(var i=0; i< ar.length; i++){
@@ -1590,23 +1590,23 @@
     var mkPanelMethods=function(){
         var panel_methods={
             UIStart:[{label:"Usage",descriptions:[ "Called by default if", "<code> UI.start=['MyPanel']; </code> is defined"]},
-                     {label: "Or",descriptions:[ "<br><code>Harvey.Panel.UIStart(stringArray);</code>","<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Harvey will immediately load this panel by default in the main window","you then don't need to call this method"]}],
-            add:[{label: "Usage",descriptions:[ "<code>Harvey.Panel.add(object|| string);</code>","return: nothing","parms: object or string","e.g from the above definition","<code>Harvey.Panel.add('MyPanel');</code>","or","<code> Harvey.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
-            clone:[{label:"Usage",descriptions:["<code>var p=Harvey.Panel.clone(panel_name);</code>","clone a panel object that has been defined in UI.Panels","Add to DOM with <code>Harvey.Panel.add(p);</code>"]}],
-            delete:[{label:"Usage",descriptions:["<code>Harvey.Panel.delete(string);</code>","return: nothing","parms: string","the name of the window to be deleted"]}],
-            deleteAll:[{label:"Usage",descriptions:["<code>Harvey.Panel.deleteAll();</code>","return: nothing","parms: none","delete all the windows"]}],
-            get:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.get(string);</code>","return: panel object","parms: string",(" " + mk_spaces(7) + "The name of the panel")]}],
-            hide:[{label:"Usage",descriptions:["<code>Harvey.Panel.hide(string);</code>","return: none","parms: string",("" + mk_spaces(7) + "name of the window")]}],
-            hideAll:[{label:"Usage",descriptions:["<code>Harvey.Panel.hideAll();</code>","return: none","parms: none","Remove all the panels from the DOM"]}],
-            getList:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.getList();</code>","return: stingArray","list the names of all the windows in Harvey"]}],
-            show:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel.show(string);</code>"]}],
-            showAll:[{label:"Usage",descriptions:["<code>Harvey.Panel.showAll([ ,win])</code>","params: none or string window name, or window Object"]}],
-            addChild:[{label:"Usage",descriptions:["<code>Harvey.Panel[string].addChild(object);</code>","<br> return: nothing","parms: object","a Harvey display Object"]}],
-            deleteChild:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].deleteChild(object);</code>"]}],
-            deleteChildren:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].deleteChildren();</code>"]}],
-            findChild:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].findChild(object);</code>"]}],
-            getChild:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].getChild(string);</code>"]}],
-            getChildren:[{label:"Usage",descriptions:["<code>var v=Harvey.Panel[string].getChildren();</code>"]}]
+                     {label: "Or",descriptions:[ "<br><code>Apoco.Panel.UIStart(stringArray);</code>","<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Apoco will immediately load this panel by default in the main window","you then don't need to call this method"]}],
+            add:[{label: "Usage",descriptions:[ "<code>Apoco.Panel.add(object|| string);</code>","return: nothing","parms: object or string","e.g from the above definition","<code>Apoco.Panel.add('MyPanel');</code>","or","<code> Apoco.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
+            clone:[{label:"Usage",descriptions:["<code>var p=Apoco.Panel.clone(panel_name);</code>","clone a panel object that has been defined in UI.Panels","Add to DOM with <code>Apoco.Panel.add(p);</code>"]}],
+            delete:[{label:"Usage",descriptions:["<code>Apoco.Panel.delete(string);</code>","return: nothing","parms: string","the name of the window to be deleted"]}],
+            deleteAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.deleteAll();</code>","return: nothing","parms: none","delete all the windows"]}],
+            get:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string);</code>","return: panel object","parms: string",(" " + mk_spaces(7) + "The name of the panel")]}],
+            hide:[{label:"Usage",descriptions:["<code>Apoco.Panel.hide(string);</code>","return: none","parms: string",("" + mk_spaces(7) + "name of the window")]}],
+            hideAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.hideAll();</code>","return: none","parms: none","Remove all the panels from the DOM"]}],
+            getList:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.getList();</code>","return: stingArray","list the names of all the windows in Apoco"]}],
+            show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>"]}],
+            showAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.showAll([ ,win])</code>","params: none or string window name, or window Object"]}],
+            addChild:[{label:"Usage",descriptions:["<code>Apoco.Panel[string].addChild(object);</code>","<br> return: nothing","parms: object","a Apoco display Object"]}],
+            deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].deleteChild(object);</code>"]}],
+            deleteChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].deleteChildren();</code>"]}],
+            findChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].findChild(object);</code>"]}],
+            getChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].getChild(string);</code>"]}],
+            getChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].getChildren();</code>"]}]
         };
    
 
@@ -1615,24 +1615,24 @@
         for(var i=0;i<HPanels.length;i++){
           //  console.log("mkPanelMethods making " + HPanels[i]);
             var cmd={
-                UIStart:"Harvey.Panel.UIStart(['Tabs']);",
-                add:"Harvey.Panel.add({name: 'TestField', window:'TestWindow',components:[{display:'fieldset',DOM:'Content',id:'TestFieldSet',components:[{node:'heading',size:'h2',text:'Yippee'},{node:'button', name:'some buttom',label:'another button'},{field:'checkBox',name: 'checkBox',label:'a checkbox' }]}]});",
-                "delete":"Harvey.Panel.delete('TestField');",
-                clone:"var v=Harvey.Panel.clone('Tabs');",
-                deleteAll:"Harvey.Panel.deleteAll();",
-                get: "var v=Harvey.Panel.get('TestField');",
-                getList:"var v=Harvey.Panel.getList();",
-                hide:"Harvey.Panel.hide('TestField');",
-                hideAll:"Harvey.Panel.hideAll('TestWindow');",
-                inList:"var v=Harvey.Panel.inList('TestField');",
-                show:"Harvey.Panel.show('TestField');",
-                showAll:"Harvey.Panel.showAll('TestWindow')",
-                addChild:"Harvey.Panel.get('TestField').addChild({display:'fieldset',id:'testaddChild',DOM:'Content',components:[{node:'paragraph',text:'Adding some text'}]})",
-                deleteChild:"Harvey.Panel.get('TestField').deleteChild('testaddChild');",
-                deleteChildren:"Harvey.Panel.get('TestField').deleteChildren();",
-                findChild:"var v=Harvey.Panel.get('TestField').findChild('TestFieldSet');",
-                getChild:"var v=Harvey.Panel.get('TestField').getChild('TestFieldSet');",
-                getChildren:"var v=Harvey.Panel.get('TestField').getChildren();"
+                UIStart:"Apoco.Panel.UIStart(['Tabs']);",
+                add:"Apoco.Panel.add({name: 'TestField', window:'TestWindow',components:[{display:'fieldset',DOM:'Content',id:'TestFieldSet',components:[{node:'heading',size:'h2',text:'Yippee'},{node:'button', name:'some buttom',label:'another button'},{field:'checkBox',name: 'checkBox',label:'a checkbox' }]}]});",
+                "delete":"Apoco.Panel.delete('TestField');",
+                clone:"var v=Apoco.Panel.clone('Tabs');",
+                deleteAll:"Apoco.Panel.deleteAll();",
+                get: "var v=Apoco.Panel.get('TestField');",
+                getList:"var v=Apoco.Panel.getList();",
+                hide:"Apoco.Panel.hide('TestField');",
+                hideAll:"Apoco.Panel.hideAll('TestWindow');",
+                inList:"var v=Apoco.Panel.inList('TestField');",
+                show:"Apoco.Panel.show('TestField');",
+                showAll:"Apoco.Panel.showAll('TestWindow')",
+                addChild:"Apoco.Panel.get('TestField').addChild({display:'fieldset',id:'testaddChild',DOM:'Content',components:[{node:'paragraph',text:'Adding some text'}]})",
+                deleteChild:"Apoco.Panel.get('TestField').deleteChild('testaddChild');",
+                deleteChildren:"Apoco.Panel.get('TestField').deleteChildren();",
+                findChild:"var v=Apoco.Panel.get('TestField').findChild('TestFieldSet');",
+                getChild:"var v=Apoco.Panel.get('TestField').getChild('TestFieldSet');",
+                getChildren:"var v=Apoco.Panel.get('TestField').getChildren();"
             };
             var k={};
             k.display="fieldset";
@@ -1654,8 +1654,8 @@
                               
                               var n=that.parent.id.split("Methods");
                             //  console.log("got " + n[0]);
-                              if(Harvey.Panel.get('Panels').getChild(("test"+ n[0]))){
-                                  Harvey.Panel.get('Panels').deleteChild(("test"+n[0]));
+                              if(Apoco.Panel.get('Panels').getChild(("test"+ n[0]))){
+                                  Apoco.Panel.get('Panels').deleteChild(("test"+n[0]));
                               }
                               window.v=null;
                               that.parent.getChild("Result").setValue("");
@@ -1668,7 +1668,7 @@
                               }
                              // console.log("methods doit got " + v);
                               if(v !== undefined){
-                                  if(Harvey.checkType["object"](v)){
+                                  if(Apoco.checkType["object"](v)){
                                       nf.setValue("Object");
                                   }
                                   else{
@@ -1732,14 +1732,14 @@
                                { display: "fieldset",
                                  DOM: "right",
                                  id: "Blurb",
-                                 components:[{node:"heading", size: "h2",text: "Harvey Fields"},
+                                 components:[{node:"heading", size: "h2",text: "Apoco Fields"},
                                              {node:"paragraph", text:"Fields.js <br> depends on Utils.js,Sort.js,Types.js, datepicker.js"} ,
                                              {node: "heading", size: "h3", text: "Usage" },
-                                             {node: "paragraph", text: "<code>var field=Harvey.field[fieldType](fieldData,parentNode);</code>"},
+                                             {node: "paragraph", text: "<code>var field=Apoco.field[fieldType](fieldData,parentNode);</code>"},
                                              {node: "paragraph",text: "or as part of another object <br> <code>{field: fieldType, value: val, //etc }</code>"},
-                                             {node: "paragraph", text: "Returns a HarveyField object"},
+                                             {node: "paragraph", text: "Returns a ApocoField object"},
                                              {node: "heading", size: "h5", text: "fieldType"},
-                                             {node: "paragraph",text: "type: string -  Harvey field type"},
+                                             {node: "paragraph",text: "type: string -  Apoco field type"},
                                              {node: "heading",size: "h5", text:"fieldData"},
                                              {node: "paragraph", text: "A javascript object that will be passed to the field"},
                                              {node: "heading",size:"h5", text: "parentNode"},
@@ -1762,9 +1762,9 @@
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "About Harvey"},
-                          {node: "paragraph",text: "Harvey is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. <br> This site is made exclusively with Harvey Components, written in vanilla javascript."},
-                          {node: "paragraph",text:"Harvey is arranged hierarchically."},
+                          {node: "heading",size:"h2",text: "About Apoco"},
+                          {node: "paragraph",text: "Apoco is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. <br> This site is made exclusively with Apoco Components, written in vanilla javascript."},
+                          {node: "paragraph",text:"Apoco is arranged hierarchically."},
                           {node: "descriptionList",items:[{label: "Windows",description:"Windows contain"},
                                                           {label: "Panels",description:"Panels contain"},
                                                           {label: "displays",description:"displays contain"},
@@ -1782,14 +1782,14 @@
                      DOM: "right",
                      components:[
                          {node: "heading",size:"h3",text: "Methods"},
-                         {node: "descriptionList",items:[{label:"start",descriptions:["<code>Harvey.start(options);<code>","<br>Usually put in the html like so","<code> <br> &#60script type='text/javascript'> </code>","<code> &nbsp &nbsp  window.onload=function(){ Harvey.start(UI.Login);};</code>", "<code> &#60/script><code>","<br> or with jQuery", "<code> <br> &#60script type='text/javascript'> </code>",
+                         {node: "descriptionList",items:[{label:"start",descriptions:["<code>Apoco.start(options);<code>","<br>Usually put in the html like so","<code> <br> &#60script type='text/javascript'> </code>","<code> &nbsp &nbsp  window.onload=function(){ Apoco.start(UI.Login);};</code>", "<code> &#60/script><code>","<br> or with jQuery", "<code> <br> &#60script type='text/javascript'> </code>",
                                                                                       "<code> &nbsp &nbsp $(document).ready(function(){</code>",
-                                                                                      "<code>&nbsp &nbsp &nbsp &nbsp Harvey.start(UI.Login);<code>",
+                                                                                      "<code>&nbsp &nbsp &nbsp &nbsp Apoco.start(UI.Login);<code>",
 	                                                                              "<code>});<code>",
                                                                                       "<code> &#60/script><code>"
                                                                                                                                            ] }]
                          },
-                         {node:"descriptionList",items:[{label: "param: options",descriptions:["displayObject","type: Any one of the display templates, templateData", "Unlike other calls to Harvey, this object is not held in memory and cannot be accessed through the Harvey.Panels methods(if these are being used). ","Typically used to display a login form"
+                         {node:"descriptionList",items:[{label: "param: options",descriptions:["displayObject","type: Any one of the display templates, templateData", "Unlike other calls to Apoco, this object is not held in memory and cannot be accessed through the Apoco.Panels methods(if these are being used). ","Typically used to display a login form"
                                                                                               ]},
                                                         {label:"or string array",descriptions:["where the elements of the array are UI.Panel names"]}
                                                        ]}
@@ -1802,7 +1802,7 @@
                      DOM: "right",
                      components:[
                          {node: "heading",size:"h3",text: "Methods"},
-                         {node: "descriptionList",items:[{label:"stop",descriptions:["<code>Harvey.stop();<code>","<br>Deletes all the elements from the DOM","Removes all Harvey objects from memory"]}] }
+                         {node: "descriptionList",items:[{label:"stop",descriptions:["<code>Apoco.stop();<code>","<br>Deletes all the elements from the DOM","Removes all Apoco objects from memory"]}] }
                      ]
                     }
                 ]},
@@ -1819,13 +1819,13 @@
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey Nodes"},
+                          {node: "heading",size:"h2",text: "Apoco Nodes"},
                           {node:"paragraph", text:"Nodes.js"} ,
                           {node: "heading", size: "h3", text: "Usage" },
-                          {node: "paragraph", text: "<code>var node=Harvey.node(nodeObject[,parentElement]);</code>"},
-                          {node: "paragraph", text: "Returns a HarveyNode object"},
+                          {node: "paragraph", text: "<code>var node=Apoco.node(nodeObject[,parentElement]);</code>"},
+                          {node: "paragraph", text: "Returns a ApocoNode object"},
                          // {node: "heading", size: "h5", text: "nodeType"},
-                         // {node: "paragraph",text: "type: string -  Harvey node type"},
+                         // {node: "paragraph",text: "type: string -  Apoco node type"},
                           {node: "heading",size: "h5", text:"nodeObject"},
                           {node: "paragraph", text: "A javascript object that will be passed to the field"},
                           {node: "heading",size:"h5", text: "parentElement"},
@@ -1850,15 +1850,15 @@
                          id:"Blurb",
                          DOM: "right",
                          components:[
-                             {node: "heading",size:"h2",text: "Harvey Displays"},
+                             {node: "heading",size:"h2",text: "Apoco Displays"},
                              {node:"paragraph", text:"DisplayMenu.js DisplayFieldset.js DisplayForm.js DisplayTabs.js DisplaySlideshow.js DisplayGrid.js"} ,
                              {node: "heading", size: "h4", text: "Usage" },
-                             {node: "paragraph", text: "<code>var my_display=Harvey.display['templateName'](templateData);</code>"},
-                             {node: "paragraph", text: "Returns a HarveyDisplay object"},
+                             {node: "paragraph", text: "<code>var my_display=Apoco.display['templateName'](templateData);</code>"},
+                             {node: "paragraph", text: "Returns a ApocoDisplay object"},
                              {node: "paragraph",text: "display Objects are not automatically added to the DOM, To add the HTML object to the DOM, use "},
                              {node: "paragraph",text: "<code> my_display.show();</code>"},
                              {node: "heading", size: "h5", text: "templateName"},
-                             {node: "paragraph",text: "type: string -  Harvey  display template type"},
+                             {node: "paragraph",text: "type: string -  Apoco  display template type"},
                              {node: "heading",size: "h5", text:"templateData"},
                              {node: "paragraph", text: "A javascript object that will be passed to the template"}
                             ]
@@ -1878,10 +1878,10 @@
                          id:"Blurb",
                          DOM: "right",
                          components:[
-                             {node: "heading",size:"h2",text: "Harvey Windows"},
+                             {node: "heading",size:"h2",text: "Apoco Windows"},
                              {node:"paragraph", text:"Window.js"} ,
                              {node: "heading", size: "h4", text: "Usage" },
-                             {node: "paragraph", text: "<code>var my_window=Harvey.Window.open(templateData);</code>"},
+                             {node: "paragraph", text: "<code>var my_window=Apoco.Window.open(templateData);</code>"},
                              {node: "paragraph", text: "Returns a new browser window object"},
                              {node: "paragraph",text: "d"},
                              {node: "heading",size: "h5", text:"templateData"},
@@ -1896,26 +1896,26 @@
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey Panels"},
+                          {node: "heading",size:"h2",text: "Apoco Panels"},
                           {node: "paragraph",text:"Panel.js"},
                           {node: "paragraph",text: "Only display templates can be added to the Panel components array."},
-                          {node: "paragraph",text: ("Harvey panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "tabs:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
+                          {node: "paragraph",text: ("Apoco panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "tabs:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
                           {node:"paragraph",text: ("This would create a new panel with the name 'MyPanel' with one component, Tabs<br> To add another display component you add it to the components array.")},
                           
                           {node: "heading", size: "h3", text: "Usage" },
-                          {node: "paragraph", text: "<code>Harvey.Panel.add(PanelObject);</code><br> or"},
-                          {node: "paragraph", text: "<code>Harvey.Panel.UIStart(PanelObjectArray);</code><br>"},
+                          {node: "paragraph", text: "<code>Apoco.Panel.add(PanelObject);</code><br> or"},
+                          {node: "paragraph", text: "<code>Apoco.Panel.UIStart(PanelObjectArray);</code><br>"},
                           {node: "heading",size:"h4",text: "Panel object" },
                           {node: "heading",size: "h5",text:"required"},
                           {node: "descriptionList",items:[{label:"name",description:"type: 'string'"},
                                                          
                                                           {label: "components",description:"type:'objectArray'"}]},
                           {node: "heading",size: "h5",text:"options"},
-                          {node: "descriptionList",items:[{label: "window",descriptions:["type:'object'","defult: uses the current browser window","e.g","<code> var win_object={url:'string',name: 'string', opts:'width=600',height=600'}","The html file designated in the url must contain <code>HarveyCoreChild.js</code>","and when the document is loaded call <code>Harvey.childReady();</code>"]}]},
+                          {node: "descriptionList",items:[{label: "window",descriptions:["type:'object'","defult: uses the current browser window","e.g","<code> var win_object={url:'string',name: 'string', opts:'width=600',height=600'}","The html file designated in the url must contain <code>ApocoCoreChild.js</code>","and when the document is loaded call <code>Apoco.childReady();</code>"]}]},
                        
                           {node: "heading",size:"h4",text:"Live Example"},
                           {name: "Input_params",field: "textArea",
-                           value: "if(Harvey.Window.get('TestWindow') === null){var promise=Harvey.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Harvey.Window.get('TestWindow').promise;} promise.then(function(){Harvey.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Harvey.popup.error('cannot open window',message)});"}, 
+                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"}, 
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -1923,8 +1923,8 @@
                                    throw new Error("can't get input params");
                                }
                             
-                               if(Harvey.Panel.get('TestPanel')){
-                                   Harvey.Panel.delete('TestPanel');
+                               if(Apoco.Panel.get('TestPanel')){
+                                   Apoco.Panel.delete('TestPanel');
                                }
                                // $.globalEval(f.getValue());
                                globalEval(f.getValue());
@@ -1955,16 +1955,16 @@
                      id:"Blurb",
                      DOM: "right",
                      components:[
-                         {node: "heading",size:"h2",text: "Harvey Types"},
+                         {node: "heading",size:"h2",text: "Apoco Types"},
                          {node: "paragraph",text:"Types.js <br> Sort.js"},
                          {node:"heading",size: "h4",text: "Methods" },
                          {node: "descriptionList",items:[{label:"checkType",
-                                                          descriptions:["<code>var t=Harvey.checkType[type](some_var);</code>","return boolean","params:","type is a Harvey type","some_var: a value whose type you want to check"]}]},
+                                                          descriptions:["<code>var t=Apoco.checkType[type](some_var);</code>","return boolean","params:","type is a Apoco type","some_var: a value whose type you want to check"]}]},
                          {node: "descriptionList",items:[{label:"sort",
-                                                          descriptions:["<code> Harvey.sort[type](array,type_data);</code>",
+                                                          descriptions:["<code> Apoco.sort[type](array,type_data);</code>",
                                                                         "return null",
                                                                         "params:",
-                                                                        "type: is some Harvey type",
+                                                                        "type: is some Apoco type",
                                                                         "array: is some array of the appropriate type",
                                                                         "type_data: string, object, or objectArray for multiple sort ordering, ", " <br> ",
                                                                         "See the utils page for more info and examples."
@@ -1981,11 +1981,11 @@
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey IO"},
+                          {node: "heading",size:"h2",text: "Apoco IO"},
                           {node: "paragraph",text: "IO.js"},
-                          {node: "paragraph",text: "IO Must be done explicitly, none of the Harvey components will send data. There is no  submit or other built-in methods"},
-                          {node: "paragraph",text: "IO is usually controlled through the action function e.g <br> <code> { node: 'button', <br>" + mk_spaces(1) + " name: 'my_button',<br> " + mk_spaces(1) + "action: function(that){ <br> " + mk_spaces(4) + "  var data=get_data(); <br> " + mk_spaces(4) + "Harvey.IO.webSocket({},['logon',{user: data.user,password: data.password}]);<br> " + mk_spaces(2) + "}<br>};</code>"},
-                          {node:"paragraph",text:"Or set up publish/listen in the initialisation of a field or display e.g <br> <br> <code> var tabs=Harvey.display['tabs']({id:'myTabs',DOM:'Content',tabs:[{name:'tab1'}],<br> " + mk_spaces(16) + "listen:[{name:'mySignal',<br> " + mk_spaces(22) + "action:function(that,data){<br>" + mk_spaces(26) + " that.addTab({name: data}); <br> " + mk_spaces(22) + "  } <br> "+ mk_spaces(20) + "}]    <br> " + mk_spaces(16) + "}); </code>"}
+                          {node: "paragraph",text: "IO Must be done explicitly, none of the Apoco components will send data. There is no  submit or other built-in methods"},
+                          {node: "paragraph",text: "IO is usually controlled through the action function e.g <br> <code> { node: 'button', <br>" + mk_spaces(1) + " name: 'my_button',<br> " + mk_spaces(1) + "action: function(that){ <br> " + mk_spaces(4) + "  var data=get_data(); <br> " + mk_spaces(4) + "Apoco.IO.webSocket({},['logon',{user: data.user,password: data.password}]);<br> " + mk_spaces(2) + "}<br>};</code>"},
+                          {node:"paragraph",text:"Or set up publish/listen in the initialisation of a field or display e.g <br> <br> <code> var tabs=Apoco.display['tabs']({id:'myTabs',DOM:'Content',tabs:[{name:'tab1'}],<br> " + mk_spaces(16) + "listen:[{name:'mySignal',<br> " + mk_spaces(22) + "action:function(that,data){<br>" + mk_spaces(26) + " that.addTab({name: data}); <br> " + mk_spaces(22) + "  } <br> "+ mk_spaces(20) + "}]    <br> " + mk_spaces(16) + "}); </code>"}
                       ]
                       
                     },
@@ -2012,10 +2012,10 @@
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey Popups"},
+                          {node: "heading",size:"h2",text: "Apoco Popups"},
                           {node: "paragraph",text: "Popups.js"},
                           {node: "heading",size: "h3",text:"Usage"},
-                          {node: "paragraph",text:"<code>Harvey.popup[popup_name](params);</code>"}
+                          {node: "paragraph",text:"<code>Apoco.popup[popup_name](params);</code>"}
                       ]
                       
                     }
@@ -2027,7 +2027,7 @@
                       id:"Blurb",
                       DOM: "right",
                       components:[
-                          {node: "heading",size:"h2",text: "Harvey Utils"},
+                          {node: "heading",size:"h2",text: "Apoco Utils"},
                           {node: "paragraph",text: "Utils.js"}
                       ]
                       
@@ -2055,6 +2055,6 @@
     mkWindows();
     
     UI.start=["Tabs","About"];
-    console.log("UI.start is %j " + UI.start);
+    //console.log("UI.start is %j " + UI.start);
     
 })();

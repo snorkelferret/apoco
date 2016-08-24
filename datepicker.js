@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 
 ;(function(){
 // ISO 8691
@@ -86,7 +86,7 @@ var Harvey=require('./declare').Harvey;
                     throw new Error("datepicker: element must be an input node");
                 }
                // console.log("datepicker here");
-                element.classList.add("Harvey_datepicker_input");
+                element.classList.add("Apoco_datepicker_input");
                 element.addEventListener("click",click,false);
                 element.addEventListener("change",change,false);
             }
@@ -111,7 +111,7 @@ var Harvey=require('./declare').Harvey;
         },
         mkCalendarHeader:function(date){
             var table,row,body,head,col,title,span,that=this;
-            var icons=[{id:"Harvey_datepicker_prevYear",
+            var icons=[{id:"Apoco_datepicker_prevYear",
                         func: function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
@@ -125,7 +125,7 @@ var Harvey=require('./declare').Harvey;
                             }
                         }
                        },
-                       {id:"Harvey_datepicker_prevMonth",
+                       {id:"Apoco_datepicker_prevMonth",
                         func:function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
@@ -139,7 +139,7 @@ var Harvey=require('./declare').Harvey;
                             }
                         }
                        },
-                       {id:"Harvey_datepicker_nextYear",
+                       {id:"Apoco_datepicker_nextYear",
                         func:function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
@@ -153,7 +153,7 @@ var Harvey=require('./declare').Harvey;
                             }
                         }
                        },
-                       {id:"Harvey_datepicker_nextMonth",
+                       {id:"Apoco_datepicker_nextMonth",
                         func:function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
@@ -169,7 +169,7 @@ var Harvey=require('./declare').Harvey;
                        }
                       ];
             table=document.createElement("table");
-            table.id="Harvey_datepicker_controls";
+            table.id="Apoco_datepicker_controls";
             table.classList.add("ui-datepicker-header","ui-widget-header","ui-helper-clearfix","ui-corner-all");
             this.element.appendChild(table);
             body=document.createElement("tbody");
@@ -193,7 +193,7 @@ var Harvey=require('./declare').Harvey;
                 col.appendChild(span);
             }
             title=document.createElement("td");
-            title.id="Harvey_datepicker_title";
+            title.id="Apoco_datepicker_title";
             title.classList.add("ui-datepicker-title");
             row.appendChild(title);
             col=document.createElement("td");
@@ -214,7 +214,7 @@ var Harvey=require('./declare').Harvey;
                 col.appendChild(span);
             }
             this.calendar=document.createElement("table");
-            this.calendar.id="Harvey_datepicker_grid";
+            this.calendar.id="Apoco_datepicker_grid";
             this.element.appendChild(this.calendar);
             body=document.createElement("tbody");
             this.calendar.appendChild(body);
@@ -229,8 +229,8 @@ var Harvey=require('./declare').Harvey;
                 var day,s,p;
                // console.log("selectDay is here");
               //  console.log("target type is " + e.target.type);
-              //  console.log("target classlist " + e.target.classList.contains("Harvey_date"));
-                if(e.target.classList.contains("Harvey_date")){
+              //  console.log("target classlist " + e.target.classList.contains("Apoco_date"));
+                if(e.target.classList.contains("Apoco_date")){
                     day=e.target.textContent;
                 //    console.log("got day " + day);
                     e.stopPropagation();
@@ -286,7 +286,7 @@ var Harvey=require('./declare').Harvey;
            // console.log("mkCalendarBody this.calendar is " + this.calendar);
             
             // fill in the title
-            c=document.getElementById("Harvey_datepicker_title");
+            c=document.getElementById("Apoco_datepicker_title");
             c.textContent=(this.months[current_month].name + " " + current_year).toString();
             //remove the previous body if it exists
             var tbody=this.calendar.getElementsByTagName("tbody")[0];
@@ -337,7 +337,7 @@ var Harvey=require('./declare').Harvey;
                 }
                 else if (i=== start_day){
                     p=1;
-                    c.classList.add("Harvey_date");
+                    c.classList.add("Apoco_date");
                 }
                 else if(i=== ml+start_day){
                     p=1;
@@ -348,7 +348,7 @@ var Harvey=require('./declare').Harvey;
                 }
                 c.textContent=p;
                 if(i>=start_day && i<(ml+start_day) ){
-                    c.classList.add("Harvey_date");
+                    c.classList.add("Apoco_date");
                     if(p=== today){ 
                         c.classList.add("ui-state-highlight");
                     }
@@ -365,8 +365,8 @@ var Harvey=require('./declare').Harvey;
 	    if (this.element=== undefined) {
 		this.element = document.createElement('div');
 		//this.element.onselectstart = function () { return false; };
-		this.element.id = "Harvey_datepicker";
-                this.element.classList.add("ui-widget","ui-datepicker","ui-widget-content","ui-corner-all");
+		this.element.id = "Apoco_datepicker";
+                this.element.classList.add("ui-datepicker","ui-widget-content","ui-corner-all");
 		document.getElementsByTagName("body").item(0).appendChild(this.element);
                 this.mkCalendarHeader();
 	    }
@@ -376,7 +376,7 @@ var Harvey=require('./declare').Harvey;
     };        
    // console.log("Making datepicker");
     
-    Harvey.datepicker=new Datepicker(); 
+    Apoco.datepicker=new Datepicker(); 
     
 })();
 

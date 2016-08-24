@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Fields");
@@ -10,10 +10,10 @@ require("./Fields");
   
     var _display_components=["Field","Node","Tab","Grid","Menu"];
 
-    Harvey.display={};  //setup container for display Objects
+    Apoco.display={};  //setup container for display Objects
     
     var dp;
-    Harvey._DisplayBase=function(options,win){
+    Apoco._DisplayBase=function(options,win){
 	var defaults={
 	    parent: null,
 	    element: null,
@@ -32,7 +32,7 @@ require("./Fields");
             this[k]=options[k];
         }
 
-        console.log("DisplayBase parent is " + this.parent);
+        //console.log("DisplayBase parent is " + this.parent);
         if(this.DOM === null){
             throw new Error(this.display + ": Must supply a DOM id for an existing node");
         }
@@ -59,7 +59,7 @@ require("./Fields");
             //console.log("length is " + this.DOM.length);
         }
 	if(!this.DOM){
-	    throw new Error("_HarveyDisplayBase DOM element does not exist " + this.DOM);
+	    throw new Error("_ApocoDisplayBase DOM element does not exist " + this.DOM);
 	}
 
 	if(t){
@@ -77,16 +77,16 @@ require("./Fields");
             if(this.dependsOn && !dp){
                 //this.dependsOn).length === 0){ // watch for node
                 //console.log("in displayBase id is " + this.dependsOn);
-                if(!Harvey.Observer){    // create an observer- only need one
-                    Harvey.Utils.observer.create();
-                    if(!Harvey.Observer){ 
+                if(!Apoco.Observer){    // create an observer- only need one
+                    Apoco.Utils.observer.create();
+                    if(!Apoco.Observer){ 
                         throw new Error("Np observer found");
                     }
                 }
                 var b=document.getElementsByTagName("body")[0];
-                Harvey.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
-                Harvey.Utils.observer.add(this.dependsOn, doit,this);
-                // Harvey.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
+                Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
+                Apoco.Utils.observer.add(this.dependsOn, doit,this);
+                // Apoco.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
             }
             else{ 
                 this.action(this);
@@ -98,7 +98,7 @@ require("./Fields");
          //   for(var k in this){
          //       console.log("just before listen " + k);
         //    }
-	    Harvey.IO.listen(this);  
+	    Apoco.IO.listen(this);  
 	}
         // add the display type to the display_components list
         
@@ -108,7 +108,7 @@ require("./Fields");
     };
 
     // var methods= {
-    Harvey._DisplayBase.prototype={
+    Apoco._DisplayBase.prototype={
 	getChildren: function(){
 	    var comp=[];
             var k;
@@ -216,10 +216,10 @@ require("./Fields");
 	    return null;  // if function has not been overwritten - bad return null
 	},
 	show: function(){
-          // console.log("HarveyDisplayBase: showing " + this.id);
+          // console.log("ApocoDisplayBase: showing " + this.id);
 	    if(this.publish !== undefined){
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
-	        Harvey.IO.publish(this);
+	        Apoco.IO.publish(this);
 	    }
             if(!this.DOM.contains(this.element)){
               //  console.log("Showing element that is not in DOM");
@@ -233,7 +233,7 @@ require("./Fields");
                         }
                         else{
                             this.DOM.appendChild(this.element);
-                            //throw new Error("Harvey.display.show: cannot find element " + this.after );
+                            //throw new Error("Apoco.display.show: cannot find element " + this.after );
                         }
                     }
                     else{
@@ -273,7 +273,7 @@ require("./Fields");
 	delete: function(msg_from_parent){
 	    //console.log("delete display object is here");
             if(this.listen){
-                Harvey.IO.unsubscribe(this);
+                Apoco.IO.unsubscribe(this);
             }
             if(this.draggable){
                 //this.draggable.delete(); // FIX THIS

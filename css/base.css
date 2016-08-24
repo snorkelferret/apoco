@@ -7,7 +7,7 @@ History: 1st Feb 2012 creation
 */
 html{width: 100%; height: 100%}
 
-body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: "Arial"; font-size: 1em}  /*font: 15px/22.5px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif } */
+body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-serif; font-size: 14px;}  /*font: 15px/22.5px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif } */
 * {
     box-sizing: border-box;
 }
@@ -40,8 +40,8 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: "Arial"; fo
 .fieldset {margin: 0.5em 0}
 
 
-.Harvey_paginate{}
-.Harvey_paginate button{}
+.Apoco_paginate{}
+.Apoco_paginate button{}
 .slideshow_cover{position: fixed;
                  z-index: 9;
                  left: 0;
@@ -51,29 +51,29 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: "Arial"; fo
                  background-color: #000 } 
 /* slideshow */
 
-.Harvey_slideshow div.pic_area{width: inherit; position: relative; height: 400px; overflow: hidden}
-.Harvey_slideshow div.pic_area_full{position:absolute; top: 0; left:0; z-index: 10}
-.Harvey_slideshow ul.carousel{padding: 0; margin: 0;position:relative;}
-.Harvey_slideshow ul.carousel li{position: absolute; top: 0; left:0; visibility:"hidden"};
-.Harvey_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat #aaa; width: 48px; height: 48px; margin-left: 1em; top: 50%;left:0px; opacity:0 }
-.Harvey_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat #aaa; width: 48px; height: 48px;margin-right: 1em; top: 50%; right: 0px; opacity:0}
-.Harvey_slideshow span.carousel_left:hover{opacity: 1}
-.Harvey_slideshow span.carousel_right:hover{opacity: 1}
-.Harvey_slideshow span.hover{background-color:#555; opacity: 0.5 }
-.Harvey_slideshow div.slideshow_controls{position: relative; width: 140px; margin: 0 auto;z-index:11 }
-.Harvey_slideshow div.slideshow_controls ul{display:table-cell; list-style-type: none; padding:0}
-.Harvey_slideshow div.slideshow_controls li{width: 24px;
+.Apoco_slideshow div.pic_area{width: inherit; position: relative; height: 400px; overflow: hidden}
+.Apoco_slideshow div.pic_area_full{position:absolute; top: 0; left:0; z-index: 10}
+.Apoco_slideshow ul.carousel{padding: 0; margin: 0;position:relative;}
+.Apoco_slideshow ul.carousel li{position: absolute; top: 0; left:0; visibility:"hidden"};
+.Apoco_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat #aaa; width: 48px; height: 48px; margin-left: 1em; top: 50%;left:0px; opacity:0 }
+.Apoco_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat #aaa; width: 48px; height: 48px;margin-right: 1em; top: 50%; right: 0px; opacity:0}
+.Apoco_slideshow span.carousel_left:hover{opacity: 1}
+.Apoco_slideshow span.carousel_right:hover{opacity: 1}
+.Apoco_slideshow span.hover{background-color:#555; opacity: 0.5 }
+.Apoco_slideshow div.slideshow_controls{position: relative; width: 140px; margin: 0 auto;z-index:11 }
+.Apoco_slideshow div.slideshow_controls ul{display:table-cell; list-style-type: none; padding:0}
+.Apoco_slideshow div.slideshow_controls li{width: 24px;
                                             cursor: pointer;
                                             float: left;
                                             list-style: outside none none;
                                             margin: 2px;
                                             padding: 4px 0;
                                             position: relative;}
-.Harvey_slideshow div.slideshow_controls span{float:left; margin: 0 4px}
+.Apoco_slideshow div.slideshow_controls span{float:left; margin: 0 4px}
 
 
 /* tabs */
-.tab_container{width: 100%; margin-right: 2em; padding-right: 2em}
+.tab_container{width: 100%; margin-right: 2em;}
 .tab_container li{ height: 2em ; cursor: pointer }
 .tab_container li span{ height: 2em; padding: 0em 1em; text-align: center; vertical-align: middle }
 /*.tab_container li:hover{
@@ -210,9 +210,9 @@ input[type=number] {
 }
 */
 
-div.harvey_autocomplete ul{z-index:10; padding: 0; margin: 0.2em}
-div.harvey_autocomplete ul li{display: block; z-index:10; width: inherit}
-div.harvey_autocomplete input{margin-bottom: 0.2em}
+div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0.2em}
+div.apoco_autocomplete ul li{display: block; z-index:10; width: inherit}
+div.apoco_autocomplete input{margin-bottom: 0.2em}
 
 ul.choice {list-style-type: none  }
 /* floats not using the input default */
@@ -269,7 +269,7 @@ h5{color: #202020; font-size: 12pt}
            opacity: 0.4;
  }  /* use <div class='disabled'></div> $(.disabled).show() or .hide()  */
 
-#Harvey_modal {
+#Apoco_modal {
     position: fixed; /* Stay in place */
     z-index: 900; /* Sit on top */
     left: 0;
@@ -281,51 +281,51 @@ h5{color: #202020; font-size: 12pt}
    
 }
 
-p {margin-left: 0em; text-align: justify; font-size: 80%; margin-top: 0em; margin-right: 2em}
+p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 2em}
 p a{text-decoration: none; outline: none}
 p a:hover{outline: none; text-decoration: none}
-dl{font-size:90%; text-align:justify}
+dl{text-align:justify}
 code{font-size: 10pt}
 
-.Harvey_dialog{position: fixed; top: 50%; left: 50%; z-index: 1000; width: 20em; height: 12em}
-.Harvey_dialog div.ui-dialog-titlebar{height: 2em}
-#Harvey_datepicker{
+.Apoco_dialog{position: fixed; top: 50%; left: 50%; z-index: 1000; width: 20em; height: 12em}
+.Apoco_dialog div.ui-dialog-titlebar{height: 2em}
+#Apoco_datepicker{
     display: block;
     left: 36px;
     position: absolute;
     top: 32px;
     z-index: 20;
 }
-#Harvey_datepicker td.Harvey_date{
+#Apoco_datepicker td.Apoco_date{
     cursor: pointer
 }
-#Harvey_datepicker_title{
+#Apoco_datepicker_title{
     color: #222;
 }
-#Harvey_datepicker td{
+#Apoco_datepicker td{
     text-align:center;
 }
-#Harvey_datepicker_controls td.arrows{
+#Apoco_datepicker_controls td.arrows{
     display: block;
     height: 32px ; /* in pixels because icons are 2 X 16px plus margin */
     width: 16px;
     margin-left: 0.2em;
     margin-right: 0.2em;
 }
-#Harvey_datepicker_controls td.arrows span{
+#Apoco_datepicker_controls td.arrows span{
     padding: 0;
 }
-#Harvey_datepicker_grid td.Harvey_date:hover{
+#Apoco_datepicker_grid td.Apoco_date:hover{
     border: 1px solid #aaa; 
 }
 
 
-#Harvey_alert{ width: 20em; height: 12em;margin: auto; z-index: 100; position: absolute; top: 50%;left: 50%}
-#Harvey_trouble{position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.5;  background-color: #800; padding: 30px; z-index: 100}
-#Harvey_trouble h1{font-size: 70pt; position: fixed; top: 20%; left: 30%;  margin: auto; color: #fff ; background-color: inherit; opacity:1.0}
-#Harvey_trouble h2{position:fixed;font-size: 50pt; color: #fff; top: 33%; left:30%; margin:auto; opacity: 1.0}
+#Apoco_alert{ width: 20em; height: 12em;margin: auto; z-index: 100; position: absolute; top: 50%;left: 50%}
+#Apoco_trouble{position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.5;  background-color: #800; padding: 30px; z-index: 100}
+#Apoco_trouble h1{font-size: 70pt; position: fixed; top: 20%; left: 30%;  margin: auto; color: #fff ; background-color: inherit; opacity:1.0}
+#Apoco_trouble h2{position:fixed;font-size: 50pt; color: #fff; top: 33%; left:30%; margin:auto; opacity: 1.0}
 
-#Harvey_spinner
+#Apoco_spinner
 {/* background:url('images/ajax-loader.gif');  */
   position: fixed;
   top: 50%;
@@ -337,7 +337,7 @@ code{font-size: 10pt}
   height: 32px;
 }
 
-.Harvey_clock{border: 1px solid ;border-color: inherit; padding: 0.5em; width: 5em; margin-top:1em}
+.Apoco_clock{border: 1px solid ;border-color: inherit; padding: 0.5em; width: 5em; margin-top:1em}
 div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
 #login_name { margin-right: 1em} 
 

@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require('./Utils');
 require("./Sort");
 require('./Types');
@@ -10,7 +10,7 @@ require("./datepicker");
 ;(function(){
     "use strict";
 
-    Harvey.dbToHtml={
+    Apoco.dbToHtml={
 	integer:{html_type: "number", field: "input",check: "integer",sort:"integer"},
 	positiveInteger: {html_type:"number", field: "input",check:"positiveInteger",sort:"positiveInteger"},
 	negativeInteger:{html_type:"number", field: "input",check:"negativeInteger",sort:"negativeInteger" },
@@ -35,10 +35,10 @@ require("./datepicker");
         any:{html_type:"text",field:"input",check: "string",sort:"string"} //default
     };
 
-/*  Harvey.HtmlToType=function(field){
- 	for(var k in  Harvey.dbToHtml){
-	    if(Harvey.dbToHtml[k].field == field){
-		return Harvey.dbToHtml[k].html_type;
+/*  Apoco.HtmlToType=function(field){
+ 	for(var k in  Apoco.dbToHtml){
+	    if(Apoco.dbToHtml[k].field == field){
+		return Apoco.dbToHtml[k].html_type;
 	    }
 	}
 	return "";
@@ -55,10 +55,10 @@ require("./datepicker");
             throw new Error("Field: must have some options");
         }
         if(!d.name){
-            throw new Error("Harvey.field: Field must have a name");
+            throw new Error("Apoco.field: Field must have a name");
         }
         if(!d.type){
-            throw new Error("Harvey.field: must have a type");
+            throw new Error("Apoco.field: must have a type");
 	}
      
         for(var k in defaults){  // need this because mixinDeep overwrites first object
@@ -71,7 +71,7 @@ require("./datepicker");
             this[k]=d[k];
         }
         
-	this.html_type=Harvey.dbToHtml[this.type].html_type;
+	this.html_type=Apoco.dbToHtml[this.type].html_type;
         if(element === undefined){
             this.element=document.createElement("div");
         }
@@ -96,11 +96,11 @@ require("./datepicker");
 	}
         
 	if(this.publish !== undefined){
-	    Harvey.IO.publish(this);
+	    Apoco.IO.publish(this);
 	}
 	if(this.listen !== undefined){
 	    //console.log("field adding listener " + this.name);
-	    Harvey.IO.listen(this);
+	    Apoco.IO.listen(this);
 	}
 
 	if(this.action){
@@ -176,7 +176,7 @@ require("./datepicker");
                 this.element.removeEventListener("click",this.action,false);
             } 
             if(this.listen){
-                Harvey.IO.unsubscribe(this);
+                Apoco.IO.unsubscribe(this);
             }
             this.element=null;
             this.input=null;
@@ -203,7 +203,7 @@ require("./datepicker");
 	    }
 	},
         _resetValue:function(){
-            if(Harvey.Utils.checkType["array"](this.value)){
+            if(Apoco.Utils.checkType["array"](this.value)){
                 for(var i=0;i<this.value; i++){
                     this.input[i].value=this.value[i];
                 }
@@ -230,16 +230,16 @@ require("./datepicker");
 	    //console.log("_Field checking value " + this.getValue() + " of type " + this.type );
 	    var array=false;
             var v=this.getValue();
-            if(Harvey.checkType["blank"](v)){
+            if(Apoco.checkType["blank"](v)){
    	        if(this.required){
                     return false;
                 }
             }
             if(this.type){
                 
-                var check=Harvey.dbToHtml[this.type].check;
+                var check=Apoco.dbToHtml[this.type].check;
              //   console.log("type to check is " + check);
-                if(!Harvey.checkType[check](v)){
+                if(!Apoco.checkType[check](v)){
                   //  if(!array){
                   //      this.input.setCustomValidity(("Input must be of type " + check));
                  //   }
@@ -367,7 +367,7 @@ require("./datepicker");
         },
         delete:function(){
             if(this.listen){
-                Harvey.IO.unsubscribe(this);
+                Apoco.IO.unsubscribe(this);
             }
             
             if(this.element.parentNode){
@@ -386,7 +386,7 @@ require("./datepicker");
             }
 	},
         checkValue: function(){ //staticField always true 
-           // return Harvey.checkType[this.type](this.value);
+           // return Apoco.checkType[this.type](this.value);
            return true;
         },
 	popupEditor: null
@@ -436,7 +436,7 @@ require("./datepicker");
 	return this;
     };
 
-    Harvey.Utils.extend(InputField,_Field);
+    Apoco.Utils.extend(InputField,_Field);
 
     var FloatField=function(d,element){
         var inp;
@@ -500,7 +500,7 @@ require("./datepicker");
 		    clearInterval(timer);
 		    return;
 	        }
-	        if(!Harvey.checkType.float(t)){
+	        if(!Apoco.checkType.float(t)){
 		    clearInterval(timer);
 		    throw new Error("stepfn return from getValue: this is not a floating point number");
 	        }
@@ -576,16 +576,16 @@ require("./datepicker");
 	getValue: function(){
             var a=this.input[0].value;
             var b=this.input[1].value;
-	    if(Harvey.checkType.blank(a)) {
+	    if(Apoco.checkType.blank(a)) {
 		//console.log("input integer is null");
-		if(Harvey.checkType.blank(b)){
+		if(Apoco.checkType.blank(b)){
 		    return this.value="";
 		}
 		else{
 		    this.value=parseFloat(("0."+b),10).toFixed(this.precision);
 		}
 	    }
-	    else if(Harvey.checkType.blank(b)){
+	    else if(Apoco.checkType.blank(b)){
 		//console.log("input decimal is null");
 		//console.log("getValue: integer part null, value b is " + b);
 		this.value=parseFloat((a + ".000"),10).toFixed(this.precision);
@@ -599,7 +599,7 @@ require("./datepicker");
                     this.value=(parseInt(a,10)+parseFloat(("." + b),10)).toFixed(this.precision);
                 }
 	    }
-	    if(!Harvey.checkType.float(this.value)){
+	    if(!Apoco.checkType.float(this.value)){
 		throw new Error("getValue: this is not a floating point number " + this.value);
 		return null;
 	    }
@@ -611,13 +611,13 @@ require("./datepicker");
 	setValue: function(v){
             // console.log("float setValue " + v);
             
-	    if(Harvey.checkType.blank(v)){
+	    if(Apoco.checkType.blank(v)){
                 this.input[0].value="";
                 this.input[1].value="";
 		this.value="";
 		return;
 	    }
-            if(!Harvey.checkType["float"](v)){
+            if(!Apoco.checkType["float"](v)){
 		throw new Error("FloatField: setValue this value is not a float " + v);
 	    }
 	    v=parseFloat(v,10).toFixed(this.precision);  // not necessarily a number
@@ -634,7 +634,7 @@ require("./datepicker");
         popupEditor: null
     };
 
-    Harvey.Utils.extend(FloatField,_Field);
+    Apoco.Utils.extend(FloatField,_Field);
 
     var DateField=function(d,element){
         var that=this;
@@ -656,7 +656,7 @@ require("./datepicker");
               //  console.log("Making datepicker for Mozilla");
                 this.input.type="text";
                 this.input.setAttribute("placeholder","YYYY-MM-DD");
-                Harvey.datepicker.init(this.input);
+                Apoco.datepicker.init(this.input);
             }
             else{
                 this.picker=document.createElement("datepicker");
@@ -667,7 +667,7 @@ require("./datepicker");
  	return this;
     };
   
-    Harvey.Utils.extend(DateField,_Field);
+    Apoco.Utils.extend(DateField,_Field);
 
     var TimeField=function(d,element){
         d.field="time";
@@ -676,14 +676,13 @@ require("./datepicker");
 	_Field.call(this,d,element);
         this.input=document.createElement("input");
         this.input.setAttribute("type",this.html_type);
-        //this.input.className=this.type;
         if(this.required === true){
             this.input.required=true;
         }
         this.element.appendChild(this.input);
     };
 
-    Harvey.Utils.extend(TimeField,_Field);
+    Apoco.Utils.extend(TimeField,_Field);
 
     var CheckBoxField=function(d,element){
         d.field="checkBox";
@@ -707,8 +706,8 @@ require("./datepicker");
 
     CheckBoxField.prototype={
 	getValue:function(){
-	    console.log("value of checkbox is " + this.input.value + " and prop is " + this.input.getAttribute('checked') + " value is " + this.value);
-	    console.log("this input.checked is " + this.input.checked);
+	   // console.log("value of checkbox is " + this.input.value + " and prop is " + this.input.getAttribute('checked') + " value is " + this.value);
+	   // console.log("this input.checked is " + this.input.checked);
             return this.input.checked;
 	},
         setValue:function(val){
@@ -737,7 +736,7 @@ require("./datepicker");
         }
     };
 
-    Harvey.Utils.extend(CheckBoxField,_Field);
+    Apoco.Utils.extend(CheckBoxField,_Field);
 
     var NumberArrayField=function(d,element){
         if(!d.size && !d.value ){
@@ -753,7 +752,7 @@ require("./datepicker");
         if(this.type === "floatArray" && this.step === undefined){
             this.step=0.1;
         }
-	if(this.value && !Harvey.checkType.array(this.value)){
+	if(this.value && !Apoco.checkType.array(this.value)){
 	    throw new Error("NumberArrayField: value is not an array");
 	}
 	for(var i=0;i<this.input.length;i++){
@@ -854,7 +853,7 @@ require("./datepicker");
 	}
     };
 
-    Harvey.Utils.extend(NumberArrayField,_Field);
+    Apoco.Utils.extend(NumberArrayField,_Field);
 
     var TextAreaField=function(d,element){
         //var settings=checkDefaultOptions("TextAreaField",d);
@@ -899,7 +898,7 @@ require("./datepicker");
 	}
     };
 
-    Harvey.Utils.extend(TextAreaField,_Field);
+    Apoco.Utils.extend(TextAreaField,_Field);
 
 
     var SelectField=function(d,element){
@@ -1020,7 +1019,7 @@ require("./datepicker");
 
     };
 
-   Harvey.Utils.extend(SelectField,_Field);
+   Apoco.Utils.extend(SelectField,_Field);
 
     var ButtonSetField=function(d,element){   // like select field - but not in a dropdown and not editable
         d.field="ButtonSetField";
@@ -1052,7 +1051,7 @@ require("./datepicker");
             if(index === undefined){
                 throw new Error("ButtonSetField: must supply a name");
             }
-            if(!Harvey.checkType["integer"](index)){
+            if(!Apoco.checkType["integer"](index)){
                 var label=index;
                 index=this.input.length;
                 this.input[index]={};
@@ -1099,7 +1098,7 @@ require("./datepicker");
             }
 	},
         setValue: function(name){  
-            if(Harvey.checkType['string'](name)){
+            if(Apoco.checkType['string'](name)){
                 for(var i=0;i<this.input.length;i++){
                     if(this.input[i].label === name){
                         this.input[i].input.click();
@@ -1155,7 +1154,7 @@ require("./datepicker");
 	    return false;
 	}
     };
-    Harvey.Utils.extend(ButtonSetField,_Field);
+    Apoco.Utils.extend(ButtonSetField,_Field);
 
     var SliderField=function(d,element){
         d.field="SliderField";
@@ -1181,7 +1180,7 @@ require("./datepicker");
         this.input.value=this.value;
     };
      
-    Harvey.Utils.extend(SliderField,_Field);
+    Apoco.Utils.extend(SliderField,_Field);
 
     var StringArrayField=function(d,element){
         d.field="StringArrayField";
@@ -1256,7 +1255,7 @@ require("./datepicker");
     
     StringArrayField.prototype={
         setValue:function(v,index){
-            if(!Harvey.checkType["array"](v)){
+            if(!Apoco.checkType["array"](v)){
                 if( index !== undefined && index<this.length){
                     this.input[index].input.value=v;
                     this.value[index]=v;
@@ -1322,11 +1321,11 @@ require("./datepicker");
 		//console.log("checking inputs " + i + " for stringArray");
 		//console.log("got value " + v[i]);
 		if(this.required){
-		    if(!Harvey.checkType["blank"](v[i])){
+		    if(!Apoco.checkType["blank"](v[i])){
 			valid=true;   // at least one non blank value
 		    }
 		}
-		if(!Harvey.checkType["string"](v[i])){  
+		if(!Apoco.checkType["string"](v[i])){  
 		    valid=false;
 		    break;
 		}
@@ -1339,7 +1338,7 @@ require("./datepicker");
 	}
     };
 
-    Harvey.Utils.extend(StringArrayField,_Field);
+    Apoco.Utils.extend(StringArrayField,_Field);
 
     var ImageArrayField=function(d,element){
         var that=this;
@@ -1355,7 +1354,7 @@ require("./datepicker");
         }
         if(this.editable !== false){
 	    if(!window.FileReader){
-	        Harvey.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
+	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
 	        throw new Error("No FileReader");
 	    }
             this.input=document.createElement("input");
@@ -1369,7 +1368,7 @@ require("./datepicker");
 	    this.input.addEventListener("change",function(e){
 	        var file_promise=that._getImageFileSelect(e,new_values);
 	        file_promise.then(function(v){
-		    // Harvey.display.alert("Uploading done");
+		    // Apoco.display.alert("Uploading done");
                     console.log("ImageArray: Upload got " + new_values.length + " files");
                     //for(var i=0;i<new_values.length;i++){
                     that.value=that.value.concat(new_values);
@@ -1470,7 +1469,7 @@ require("./datepicker");
         },
         loadImages: function(values){
             var i=0,p,last,that=this,num_loaded,promises=[],not_loaded;
-            if(values !==undefined && Harvey.checkType["array"](values)){ //loading more images after creation
+            if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
                 i=this.value.length;
          //       console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
@@ -1485,75 +1484,7 @@ require("./datepicker");
             }
             
             var promise=Promise.all(promises); // rejects on first fail
-          
-
-            
-                /*   var promise=new Promise(function(resolve,reject){ //let some loads fail without aborting everything
-                var prev_promise=new Promise(function(resolve,reject){
-                    resolve();
-                });
-               // for(i;i<last;i++){
-                promises.forEach(function(pr){
-                    console.log("=== " + pr);
-                    prev_promise = prev_promise.then(function() { // prevPromise changes in each iteration
-                        console.log("calling getImage ");
-                        return pr; //that._getImage(value[i]);
-                    }).then(function() {
-                        console.log("last is " + last + " num_loaded " + num_loaded + " fails " + not_loaded);
-                        num_loaded++;
-                        if((num_loaded+not_loaded)=== last){
-                            resolve(num_loaded);
-                        }
-                    }).catch(function(error) {
-                        console.log(error);
-                        not_loaded++;
-                    });
-                });*/
-                                    
-                   /*                
-                    console.log("loadimages i is " + i);
-                    prev_promise=prev_promise.then(function(){
-                        console.log("calling getImage");
-                        return that._getImage(that.value[i]);
-                    }).then(function(){
-                        console.log("last is " + last + " num_loaded " + num_loaded + " fails " + not_loaded);
-                        num_loaded++;
-                        if((num_loaded+not_loaded)=== last){
-                            resolve(num_loaded);
-                        }
-                    }).catch(function(reason){
-                        console.log("error");
-                        not_loaded++;
-                    }); */
-                
-           // });
-            
-            /*  var promise=new Promise(function(resolve,reject){
-                
-                while(i<last){
-                    console.log("trying to load image " + that.value[i].src);
-                    p=that._getImage(that.value[i]);
-                    p.then(function(){
-                        num_loaded++;
-                        console.log("last is " + last + " num_loaded " + num_loaded + " fails " + not_loaded);
-                        if((num_loaded+not_loaded) === last){
-                            if(last !== num_loaded){
-                                console.log("loadImages: resolve with errors");
-                                resolve(num_loaded);
-                            }
-                            else{
-                                console.log("loadImages: got all images");
-                                resolve(last);
-                            }
-                        } 
-                    }).catch(function(reason){
-                        console.log("Field: imageArray.loadImages " + reason );
-                        not_loaded++; //let some loads fail without aborting everything
-                        //reject(reason);
-                    });
-                    i++;
-                } 
-            });   */
+      
             return promise;
         },
         mkThumbnails: function(){
@@ -1613,7 +1544,7 @@ require("./datepicker");
         }
     };
 
-    Harvey.Utils.extend(ImageArrayField,_Field);
+    Apoco.Utils.extend(ImageArrayField,_Field);
 
     var AutoCompleteField=function(d,element){
         var v,rect,offset={};
@@ -1650,7 +1581,7 @@ require("./datepicker");
 
         _Field.call(this,d,element);
         box=document.createElement("div");
-        box.classList.add(this.type,"harvey_autocomplete","ui-widget");
+        box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
         this.input=document.createElement("input");
         if(this.required===true){
@@ -1660,13 +1591,13 @@ require("./datepicker");
         //this.input.className=this.type;
         box.appendChild(this.input);  
         //sort the options
-        Harvey.sort(this.options,"string");
+        Apoco.sort(this.options,"string");
        // for(var i=0;i<this.options.length;i++){
        //     console.log("sort to " + this.options[i]);
       //  }
       
         var select=document.createElement("ul");
-        select.classList.add("choice","ui-autocomplete","ui-menu","ui-widget","ui-front","ui-widget-content");
+        select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         select.style.visibility="hidden";
         select.addEventListener("click",function(e){
             if(e.target.tagName === "LI"){
@@ -1735,9 +1666,9 @@ require("./datepicker");
         popupEditor: null
     };
 
-    Harvey.Utils.extend(AutoCompleteField,_Field);
+    Apoco.Utils.extend(AutoCompleteField,_Field);
 
-    Harvey.field=(function(){
+    Apoco.field=(function(){
   	var make_field_or_static = function(FieldType){
 	    return function(options,element) {
 		if (options.editable === false) {
@@ -1778,7 +1709,7 @@ require("./datepicker");
     })();
 
        // get all the methods on the Fields
-    Harvey.field._getMethods=function(){
+    Apoco.field._getMethods=function(){
         var Methods={};
         var ar={"static":StaticField,
                 "input":InputField,

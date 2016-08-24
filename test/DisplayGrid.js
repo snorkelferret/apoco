@@ -6,7 +6,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 global.document=require("jsdom").jsdom(undefined,
@@ -25,7 +25,7 @@ describe("DisplayGrid-(start without rows)",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
         //$("body").append("<div id='test'></div>");
-        t=Harvey.display.grid({id:"test_grid",DOM:"test",cols:[{name: "name",type:"string"}]});
+        t=Apoco.display.grid({id:"test_grid",DOM:"test",cols:[{name: "name",type:"string"}]});
         assert.isObject(t);
     });
     it("has a getElement method",function(){
@@ -112,7 +112,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         b.id="Content";
         document.body.appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
-        t=Harvey.display.grid(data);
+        t=Apoco.display.grid(data);
         assert.isObject(t);
     });
      it("can add a row",function(){
@@ -183,7 +183,7 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         b.id="test";
         document.body.appendChild(b);
         assert.strictEqual(document.contains(b),true);
-        t=Harvey.display.grid(data);
+        t=Apoco.display.grid(data);
         assert.isObject(t);
         t.show();
     });

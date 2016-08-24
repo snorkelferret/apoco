@@ -1,9 +1,9 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require("./DisplayBase");
 
 ;(function(){
     "use strict";
-    var HarveyMakeSlideshow=function(options,win){
+    var ApocoMakeSlideshow=function(options,win){
         var defaults={
 	    autoplay: true,
 	    fullscreen: true,
@@ -20,8 +20,8 @@ require("./DisplayBase");
                 options[k]=defaults[k];
             }  
         }
-        //Harvey.mixinDeep(options,defaults);
-	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+        //Apoco.mixinDeep(options,defaults);
+	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
         if(this.thumbnails === true){
             this.thumbnails=document.createElement("div"); 
@@ -29,19 +29,19 @@ require("./DisplayBase");
         }
         if(this.values){  // start preloading images
      //       console.log("got some values");
-            f=Harvey.field["imageArray"]({name:"slideshow"});
+            f=Apoco.field["imageArray"]({name:"slideshow"});
             if(!f){
                 throw new Error("Slideshow: cannot make imageArray");
             }
             this.promise=f.loadImages(this.values);
         }
         else if(this.editable === true){   // put up file browser to select images 
-            f=Harvey.field["imageArray"]({name:"slideshow",editable: this.editable});
+            f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
         this._execute();
     };
 
-    HarveyMakeSlideshow.prototype={
+    ApocoMakeSlideshow.prototype={
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
@@ -83,7 +83,7 @@ require("./DisplayBase");
                         return;
                     }
                     e.currentTarget.classList.add("ui-state-active");
-                    sibs=Harvey.Utils.getSiblings(e.currentTarget);
+                    sibs=Apoco.Utils.getSiblings(e.currentTarget);
                  //   console.log("got siblings length " + sibs.length);
                     for(var j=0;j<sibs.length;j++){
                         sibs[j].classList.remove("ui-state-active");
@@ -170,7 +170,7 @@ require("./DisplayBase");
                     }
                 }).catch(function(reason){
                     //remove the lis
-                    Harvey.popup.error("Slideshow",("Could not load images" + reason));
+                    Apoco.popup.error("Slideshow",("Could not load images" + reason));
                 }); 
             }
         },
@@ -179,7 +179,7 @@ require("./DisplayBase");
 	//    console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
-            this.element.classList.add("Harvey_slideshow","ui-widget-content","ui-corner-all");
+            this.element.classList.add("Apoco_slideshow","ui-widget-content","ui-corner-all");
             this.slideshow_container=document.createElement("div");
             this.slideshow_container.classList.add("slideshow","pic_area");
 	    this.element.appendChild(this.slideshow_container);
@@ -327,44 +327,29 @@ require("./DisplayBase");
                 settings={};
             }
             var promise=new Promise(function(resolve,reject){
-                Harvey.REST("GET",settings,data);
+                Apoco.REST("GET",settings,data);
             });
             promise.then(function(rd){
                 for(var i=0;i<rd.length;i++){
                     this.values.push(rd[i]);
                 }
             }).catch(function(reason){
-                Harvey.popup.dialog("Slideshow: getImages could not load " + reason);
+                Apoco.popup.dialog("Slideshow: getImages could not load " + reason);
             });
 
             return promise;
         } */
     };
 
-    Harvey.Utils.extend(HarveyMakeSlideshow,Harvey._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeSlideshow,Apoco._DisplayBase);
 
- /*   Harvey.mixinDeep(Harvey,{
-	display: {
-	    slideshow: function(opts,win){
-                opts.display="slideshow";
-                return new HarveyMakeSlideshow(opts,win);
-            },
-            slideshowMethods:function(){
-                var ar=[];
-                for(var k in HarveyMakeSlideshow.prototype){
-                    ar.push(k);
-                }
-                return ar;
-            }
-	}
-    }); */
-    Harvey.display.slideshow=function(opts,win){
+    Apoco.display.slideshow=function(opts,win){
         opts.display="slideshow";
-        return new HarveyMakeSlideshow(opts,win);
+        return new ApocoMakeSlideshow(opts,win);
     };
-    Harvey.display.slideshowMethods=function(){
+    Apoco.display.slideshowMethods=function(){
         var ar=[];
-        for(var k in HarveyMakeSlideshow.prototype){
+        for(var k in ApocoMakeSlideshow.prototype){
             ar.push(k);
         }
         return ar; 

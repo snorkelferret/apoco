@@ -6,7 +6,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 global.document=require("jsdom").jsdom(undefined,
@@ -28,8 +28,8 @@ describe("setup",function(){
         document.body.appendChild(b);
         assert.strictEqual(document.contains(b),true);
     });
-    it('defines Harvey',function(){
-        assert(Harvey); 
+    it('defines Apoco',function(){
+        assert(Apoco); 
     });
     it('creates a virtual console',function(){
         console.log("I am a virtual console");
@@ -45,16 +45,16 @@ describe("InputField",function(){
     require("../Fields.js");
  //   require("../node_modules/jquery-ui");
     
-    it("defines Harvey.field",function(){
-        console.log("here is Harvey.field " + Harvey.field);
-       // assert(Harvey.popup !== undefined);
-        assert.isObject(Harvey.field,true);
+    it("defines Apoco.field",function(){
+        console.log("here is Apoco.field " + Apoco.field);
+       // assert(Apoco.popup !== undefined);
+        assert.isObject(Apoco.field,true);
         
     });
-    var t=Harvey.field["input"]({name: "inputNode",type: "integer"});
+    var t=Apoco.field["input"]({name: "inputNode",type: "integer"});
 
     it("creates an InputField",function(){
-       // var t=Harvey.field["InputField"]({name: "inputNode",type: "integer",value: 10});
+       // var t=Apoco.field["InputField"]({name: "inputNode",type: "integer",value: 10});
         assert(t!== null);
         console.log("got an element " + t.element);
         //assert(t.element);
@@ -119,16 +119,16 @@ describe("FloatField",function(){
     require("../Fields.js");
   //  require("../node_modules/jquery-ui");
    
-    it("defines Harvey",function(){
-        assert(Harvey !== undefined); 
+    it("defines Apoco",function(){
+        assert(Apoco !== undefined); 
     });
-    it("defines Harvey.field",function(){
-        console.log("here is Harvey.field " + Harvey.field);
-       // assert(Harvey.popup !== undefined);
-        assert.isObject(Harvey.field);
+    it("defines Apoco.field",function(){
+        console.log("here is Apoco.field " + Apoco.field);
+       // assert(Apoco.popup !== undefined);
+        assert.isObject(Apoco.field);
         
     });
-    var f=Harvey.field["float"]({name:"floatField",type: "float",precision: 3});
+    var f=Apoco.field["float"]({name:"floatField",type: "float",precision: 3});
     it("has a getElement method",function(){
         assert(f.getElement() !== null); 
     });
@@ -189,7 +189,7 @@ describe("FloatField- with spinner",function(){
   //  require("../node_modules/jquery-ui");
    
  
-    var f=Harvey.field["float"]({name:"floatField",spinner: true,type: "float",value: 10,precision: 3});
+    var f=Apoco.field["float"]({name:"floatField",spinner: true,type: "float",value: 10,precision: 3});
   
     it("creates a div element",function(){
         var b=f.getElement();
@@ -229,15 +229,15 @@ describe("DateField",function(){
     require("../Fields.js");
     //require("../node_modules/jquery-ui").datepicker;
      
-    it("defines Harvey",function(){
-        assert(Harvey !== undefined); 
+    it("defines Apoco",function(){
+        assert(Apoco !== undefined); 
     });
-    it("defines Harvey.field",function(){
-        console.log("here is Harvey.field " + Harvey.field);
-       // assert(Harvey.popup !== undefined);
-        assert.isObject(Harvey.field,true);
+    it("defines Apoco.field",function(){
+        console.log("here is Apoco.field " + Apoco.field);
+       // assert(Apoco.popup !== undefined);
+        assert.isObject(Apoco.field,true);
     });
-    var f=Harvey.field["date"]({name:"dateField",type: "date"});
+    var f=Apoco.field["date"]({name:"dateField",type: "date"});
     it("creates a div element",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -267,7 +267,7 @@ describe("DateField",function(){
 describe("CheckBoxField",function(){
     require("../Fields.js");
    
-    var f=Harvey.field["checkBox"]({name:"checkBoxField",type: "boolean"});
+    var f=Apoco.field["checkBox"]({name:"checkBoxField",type: "boolean"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -309,7 +309,7 @@ describe("NumberArrayField-Integer",function(){
 
     require("../Fields.js");
       
-    var f=Harvey.field["numberArray"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
+    var f=Apoco.field["numberArray"]({name:"numberArrayField",type: "integerArray",size: 4,value:[1,2]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -337,7 +337,7 @@ describe("TextAreaField",function(){
     require("../Fields.js");
   
     
-    var f=Harvey.field["textArea"]({name:"textAreaField",type: "text"});
+    var f=Apoco.field["textArea"]({name:"textAreaField",type: "text"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -367,7 +367,7 @@ describe("SelectField",function(){
   
     require("../Fields.js");
      
-    var f=Harvey.field["select"]({name:"selectField",type: "string",options:["one","two","three"]});
+    var f=Apoco.field["select"]({name:"selectField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -414,7 +414,7 @@ describe("ButtonSetField",function(){
     require("../Fields.js");
  
     
-    var f=Harvey.field["buttonSet"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
+    var f=Apoco.field["buttonSet"]({name:"radioButtonSetField",type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -508,7 +508,7 @@ describe("ButtonSetField",function(){
 
 describe("ButtonSetField - as checkboxes",function(){
     require("../Fields.js");
-    var f=Harvey.field["buttonSet"]({name:"radioButtonSetField",checkbox:true,type: "boolean",labels:["one","two","three"]});
+    var f=Apoco.field["buttonSet"]({name:"radioButtonSetField",checkbox:true,type: "boolean",labels:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -546,7 +546,7 @@ describe("SliderField",function(){
 
     require("../Fields.js");
      
-    var f=Harvey.field["slider"]({name:"sliderField",type: "integer",min: 0,max:10});
+    var f=Apoco.field["slider"]({name:"sliderField",type: "integer",min: 0,max:10});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -573,7 +573,7 @@ describe("StringArrayField",function(){
     require("../Fields.js");
  
     
-    var f=Harvey.field["stringArray"]({name:"stringArrayField",value:["one","two","three"]});
+    var f=Apoco.field["stringArray"]({name:"stringArrayField",value:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -621,7 +621,7 @@ describe("ImageArrayField",function(){
     require("../Fields.js");
  
     
-    var f=Harvey.field["imageArray"]({name:"imageArrayField"});
+    var f=Apoco.field["imageArray"]({name:"imageArrayField"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -634,7 +634,7 @@ describe("AutoCompleteField",function(){
   
     require("../Fields.js");
         
-    var f=Harvey.field["autoComplete"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
+    var f=Apoco.field["autoComplete"]({name:"autoCompleteField",type: "string",options:["one","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 

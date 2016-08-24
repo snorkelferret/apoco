@@ -6,7 +6,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 global.document=require("jsdom").jsdom(undefined,
@@ -23,7 +23,7 @@ describe("DisplayTabs-(start without tab items)",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
-        t=Harvey.display.tabs({id:"test_tabs",DOM:"test"});
+        t=Apoco.display.tabs({id:"test_tabs",DOM:"test"});
         assert.isObject(t);
     });
     it("can add a tab",function(){
@@ -60,7 +60,7 @@ describe("DisplayTabs",function(){
         b.id="test2";
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
-        t=Harvey.display.tabs({id:"test_tabs2",DOM:"test2",
+        t=Apoco.display.tabs({id:"test_tabs2",DOM:"test2",
                                tabs:[{name:"tabOne",action:function(that,index){
                                    var p;
                                    if(that.element.style.visibility === "visible"){

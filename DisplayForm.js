@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require("./DisplayFieldset");
 
 // create a form dynamically from json
@@ -10,23 +10,23 @@ require("./DisplayFieldset");
 
     var DEBUG=true;
 
-    var HarveyMakeForm=function(options,win){
+    var ApocoMakeForm=function(options,win){
 	this.DEBUG=true;
 	var that=this;
-        Harvey.display._fieldsetBase.call(this,options,win);
+        Apoco.display._fieldsetBase.call(this,options,win);
         this._execute();
 
     };
 
 
     // overwrite methods from base class
-    HarveyMakeForm.prototype={
+    ApocoMakeForm.prototype={
 	_execute: function(){
 	    var that=this,fp,header,container,fc,h;
             
             this.element=document.createElement("div");
             this.element.id=this.id;
-            this.element.classList.add("harvey_form","resizable","ui-widget","ui-widget-content","ui-corner-all");
+            this.element.classList.add("apoco_form","resizable","ui-widget-content","ui-corner-all");
             if(this.class !== undefined){
                 this.element.classList.add(this.class);
             }
@@ -39,10 +39,10 @@ require("./DisplayFieldset");
             this.element.innerHeight=this.height;
             this.element.innerWidth=this.width;
             header=document.createElement("div");
-            header.classList.add("form_header","ui-widget", "ui-state-default", "ui-widget-header","ui-corner-all");
+            header.classList.add("form_header","ui-state-default", "ui-widget-header","ui-corner-all");
 	    this.element.appendChild(header);
 	    if(this.draggable !== false){
-                this.draggable=Harvey.Utils.draggable(this.element);
+                this.draggable=Apoco.Utils.draggable(this.element);
 	    }
             container=document.createElement("div");
             container.classList.add("form_scroll");
@@ -70,7 +70,7 @@ require("./DisplayFieldset");
 	    close.addEventListener("click",c,false);
 
             fp=document.createElement("ul");
-            fp.classList.add("harvey_form_list");
+            fp.classList.add("apoco_form_list");
             container.appendChild(fp);
             
             if(this.components){
@@ -91,7 +91,7 @@ require("./DisplayFieldset");
 		this.element.appendChild(button_container);
 		for(var i=0;i<this.buttons.length;i++){
                     this.buttons[i].node="button";
-                    this.buttons[i]=Harvey.node(this.buttons[i]);
+                    this.buttons[i]=Apoco.node(this.buttons[i]);
                     this.buttons[i].parent=this;
 		    button_container.appendChild(this.buttons[i].element);
 		}
@@ -104,7 +104,7 @@ require("./DisplayFieldset");
             var n;
             var ll=document.createElement("li");
             if(parent_element === undefined){
-                parent_element=this.element.querySelector("ul.harvey_form_list");
+                parent_element=this.element.querySelector("ul.apoco_form_list");
             }
             if(d.name && this.getNode(d.name)!==null){
                     throw new Error("Cannot add node with non-unique name");
@@ -112,12 +112,12 @@ require("./DisplayFieldset");
             if(d.element && d.element.length>0){
                 //console.log("ELEMENT ALREADY EXISTS");
                 if(!d.node){
-                    throw new Error("Harvey.displayFieldset: addNode - object is not a node");
+                    throw new Error("Apoco.displayFieldset: addNode - object is not a node");
                 }
                 n=d;
             }
             else{
-                n=Harvey.node(d,ll);
+                n=Apoco.node(d,ll);
             }
             if(n){
                 if(!n.element){
@@ -129,7 +129,7 @@ require("./DisplayFieldset");
                 return n;
             }
             else{
-                throw new Error("Harvey,fieldset, doesn't know how to make " + d.node);
+                throw new Error("Apoco,fieldset, doesn't know how to make " + d.node);
             }
             return n;
         },
@@ -137,11 +137,11 @@ require("./DisplayFieldset");
             var p;
             var ll=document.createElement("li");
             if(parent_element === undefined){
-                parent_element=this.element.querySelector("ul.harvey_form_list");
+                parent_element=this.element.querySelector("ul.apoco_form_list");
             }
             if(!d.field){
                 if(d.type){
-                    d.field=Harvey.dbToHtml[d.type].field;
+                    d.field=Apoco.dbToHtml[d.type].field;
                 }
                 else{
                     throw new Error("Must supply either a field or a type");
@@ -151,14 +151,14 @@ require("./DisplayFieldset");
             if(this.getField(d.name)!== null){
                 throw new Error("Cannot add field with non-unique name " + d.name);
             }
-            if(Harvey.field.exists(d.field)){
+            if(Apoco.field.exists(d.field)){
                 // check that the field has not already been created
                 if(d.element){
                    // console.log("ELEMENT ALREADY EXISTS");
 		    p=d;
                 }
                 else{
-                    p=Harvey.field[d.field](d,ll);
+                    p=Apoco.field[d.field](d,ll);
                 }
 		if(!p){
 		    throw new Error("Cannot make field " + d.field);
@@ -176,7 +176,7 @@ require("./DisplayFieldset");
         addButton:function(d){
             var index,r,b;
             d.node="button";
-            b=Harvey.node(d);
+            b=Apoco.node(d);
             index=this.buttons.length;
             if(b){
                 this.buttons[index]=b;
@@ -253,6 +253,7 @@ require("./DisplayFieldset");
 		}
 	    }
 	},
+
 	print: function(){
 	    var w=this.element.width();
 	    var h=this.element.height();
@@ -263,7 +264,7 @@ require("./DisplayFieldset");
 	    win.document.write('<link rel="stylesheet" href="css/form.css" type="text/css" media="print" >');
 	    win.document.write('</head><body>');
 	    var data=this.element.html();
-	    win.document.write("<div id='" + this.id + "' class='harvey_form'>"); // this.element
+	    win.document.write("<div id='" + this.id + "' class='apoco_form'>"); // this.element
 	    win.document.write(data);
 	    win.document.write("</div>");
 	    win.document.write('</body></html>');
@@ -285,31 +286,15 @@ require("./DisplayFieldset");
     };
 
    
-    Harvey.Utils.extend(HarveyMakeForm,Harvey.display._fieldsetBase);
-   
-   /* Harvey.mixinDeep(Harvey,{
-	display: {
-	    form: function(opts,win){
-                opts.display="form";
-                return new HarveyMakeForm(opts,win);
-            },
-            formMethods:function(){
-                var ar=[];
-                for(var k in HarveyMakeForm.prototype ){
-                    ar.push(k);
-                }
-                return ar;
-            }
-
-	}
-    }); */
-    Harvey.display.form=function(opts,win){
+    Apoco.Utils.extend(ApocoMakeForm,Apoco.display._fieldsetBase);
+  
+    Apoco.display.form=function(opts,win){
         opts.display="form";
-        return new HarveyMakeForm(opts,win);
+        return new ApocoMakeForm(opts,win);
     };
-    Harvey.display.formMethods=function(){
+    Apoco.display.formMethods=function(){
         var ar=[];
-        for(var k in HarveyMakeForm.prototype ){
+        for(var k in ApocoMakeForm.prototype ){
             ar.push(k);
         }
         return ar;

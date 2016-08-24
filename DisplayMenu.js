@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 
 require("./DisplayBase");
 
@@ -7,10 +7,10 @@ require("./DisplayBase");
     "use strict";
 // create the  display
 
-    var HarveyMakeMenu=function(options,win){
+    var ApocoMakeMenu=function(options,win){
 	this.DEBUG=true;
 	var that=this;
-	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
         this._execute();
     };
@@ -32,7 +32,7 @@ require("./DisplayBase");
         }
     };
 
-    HarveyMakeMenu.prototype={
+    ApocoMakeMenu.prototype={
 	_execute: function(){
             var s,u;
 	    //console.log("execute of DisplayMenu");
@@ -52,7 +52,7 @@ require("./DisplayBase");
 //	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
-            u.classList.add("harvey_menu_list","ui-menu","ui-widget-content");
+            u.classList.add("apoco_menu_list","ui-menu","ui-widget-content");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){
@@ -68,7 +68,7 @@ require("./DisplayBase");
 		p.element.click();
 	    }
 	    else{
-		throw new Error("Harvey.menu Could not find element " + name);
+		throw new Error("Apoco.menu Could not find element " + name);
 	    }
 	},
         getSelected: function(){
@@ -98,7 +98,7 @@ require("./DisplayBase");
         addMenu:function(d,parent_element){
             var index,s,l,that=this;
             if(parent_element === undefined){
-                parent_element=this.element.getElementsByClassName("harvey_menu_list")[0];
+                parent_element=this.element.getElementsByClassName("apoco_menu_list")[0];
             }
             index=this.menu.length;
            // console.log("addMenu index is " + index);
@@ -144,7 +144,7 @@ require("./DisplayBase");
         deleteAll:function(){
             for(var i=0;i<this.menu.length;i++){
                 if(this.menu[i].listen){
-                    Harvey.unsubscribe(this.menu[i]);
+                    Apoco.unsubscribe(this.menu[i]);
                 }
                 this.menu[i].element.parentNode.removeChild(this.menu[i].element);
             }
@@ -186,33 +186,15 @@ require("./DisplayBase");
 	}
     };
 
-    Harvey.Utils.extend(HarveyMakeMenu,Harvey._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeMenu,Apoco._DisplayBase);
 
-    // Create the namespace
-    // Harvey.display.tabs
-    // $.extend(true, Harvey, {
-  /*  Harvey.mixinDeep(Harvey,{
-	display: {
-	    menu: function(opts,win){
-                opts.display="menu";
-                return new HarveyMakeMenu(opts,win);
-            },
-            menuMethods:function(){
-                var ar=[];
-                for(var k in HarveyMakeMenu.prototype){
-                    ar.push(k);
-                }
-                return ar;
-            }
-	}
-    }); */
-    Harvey.display.menu=function(opts,win){
+    Apoco.display.menu=function(opts,win){
         opts.display="menu";
-        return new HarveyMakeMenu(opts,win);
+        return new ApocoMakeMenu(opts,win);
     };
-    Harvey.display.menuMethods=function(){
+    Apoco.display.menuMethods=function(){
         var ar=[];
-        for(var k in HarveyMakeMenu.prototype){
+        for(var k in ApocoMakeMenu.prototype){
             ar.push(k);
         }
         return ar;

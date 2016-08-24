@@ -1,8 +1,8 @@
-var Harvey=require('./declare').Harvey; //,UI=require('./declare').UI; //jQuery=require('jquery');
+var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
 
 require("./DisplayBase.js");
 // Menu display object
-//  requires HarveyDisplayBase.js
+//  requires ApocoDisplayBase.js
 //
 
 
@@ -13,10 +13,10 @@ require("./DisplayBase.js");
 
 // create the tabs display
 
-    var HarveyMakeTabs=function(options,win){
+    var ApocoMakeTabs=function(options,win){
 	this.DEBUG=true;
 	var that=this;
-	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	//console.log("called display base");
         this._execute();
     };
@@ -24,24 +24,24 @@ require("./DisplayBase.js");
 
     var default_select_tabs_action=function (that){
         var name=that.selected.name;
-        Harvey.Panel.hideAll();
-        Harvey.Panel.show(name);
+        Apoco.Panel.hideAll();
+        Apoco.Panel.show(name);
         
     };
 
-    HarveyMakeTabs.prototype={
+    ApocoMakeTabs.prototype={
 	_execute: function(){
             var tt=[],tablist;
 	    // console.log("execute of DisplayTabs");
-	    //   this.element=$("<div id='" + this.id + "' class='tab_container ui-tabs ui-widget ui-widget-content ui-corner-all'></div>");
+	   
             this.element=document.createElement("div");
             this.element.id=this.id;
-            this.element.classList.add("tab_container","ui-tabs","ui-widget","ui-widget-content","ui-corner-all");
+            this.element.classList.add("tab_container","ui-tabs","ui-widget-content","ui-corner-all");
 	    if(!this.tabs){
 	        this.tabs=[];
 	    }
 	    //console.log("Tabs creating new element");
-	    //tablist=$("<ul role='tablist' class='ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all tabs' > </ul>");
+	    
             tablist=document.createElement("ul");
             tablist.role="tablist";
             tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
@@ -117,7 +117,7 @@ require("./DisplayBase.js");
         deleteAll:function(){
             for(var i=0;i<this.tabs.length;i++){
                 if(this.tabs[i].listen){
-                    Harvey.unsubscribe(this.tabs[i]);
+                    Apoco.unsubscribe(this.tabs[i]);
                 }
                 this.tabs[i].element.parentNode.removeChild(this.tabs[i].element);
                 this.tabs[i].element=null;
@@ -139,7 +139,7 @@ require("./DisplayBase.js");
                 throw new Error("DisplayTabs: deleteTab - cannot find name " + name);
             }
             if(this.tabs[i].listen){
-                    Harvey.unsubscribe(this.tabs[i]);
+                    Apoco.unsubscribe(this.tabs[i]);
             }
             this.tabs[index].element.parentNode.removeChild(this.tabs[index].element);
             this.tabs[index].element=null;
@@ -156,7 +156,7 @@ require("./DisplayBase.js");
 		p.element.click();
 	    }
 	    else{
-		throw new Error("Harvey.tabs Could not find element " + name);
+		throw new Error("Apoco.tabs Could not find element " + name);
 	    }
 	},
         getSelected:function(){
@@ -178,35 +178,16 @@ require("./DisplayBase.js");
 	}
     };
 
-    Harvey.Utils.extend(HarveyMakeTabs,Harvey._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeTabs,Apoco._DisplayBase);
 
-    // Create the namespace
-    // Harvey.display.tabs
-    // $.extend(true, Harvey, {
-  /*  Harvey.mixinDeep(Harvey,{
-	display: {
-	    tabs: function(opts,win){
-                opts.display="tabs";
-                // console.log("tabs: window is " + win);
-                return new HarveyMakeTabs(opts,win);
-            },
-            tabsMethods:function(){
-                var ar=[];
-                for(var k in HarveyMakeTabs.prototype){
-                    ar.push(k);
-                }
-                return ar;
-            }
-	}
-   });*/
-    Harvey.display.tabs=function(opts,win){
+    Apoco.display.tabs=function(opts,win){
         opts.display="tabs";
         // console.log("tabs: window is " + win);
-        return new HarveyMakeTabs(opts,win);
+        return new ApocoMakeTabs(opts,win);
     };
-    Harvey.display.tabsMethods=function(){
+    Apoco.display.tabsMethods=function(){
         var ar=[];
-        for(var k in HarveyMakeTabs.prototype){
+        for(var k in ApocoMakeTabs.prototype){
             ar.push(k);
         }
         return ar;

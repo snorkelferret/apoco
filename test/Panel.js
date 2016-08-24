@@ -7,7 +7,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 const UI=require('../declare').UI;
 
 global.document=require("jsdom").jsdom(undefined,
@@ -19,7 +19,7 @@ global.navigator=global.window.navigator;
 describe("Panel",function(){
   
     var t;
-    var MO=stub(Harvey.Utils.observer,"create");
+    var MO=stub(Apoco.Utils.observer,"create");
     MO.returns(true);
     
     require("../Panel.js");
@@ -29,7 +29,7 @@ describe("Panel",function(){
         //$("body").append("<div id='test'></div>");
         document.body.appendChild(b);
         assert.strictEqual(document.contains(b),true);
-        t=Harvey.Panel.add({name:"test_panel",
+        t=Apoco.Panel.add({name:"test_panel",
                             components:[
                                 {display:"menu",
                                  DOM: "test",
@@ -59,7 +59,7 @@ describe("Panel",function(){
             t.addChild({display: "tabs",DOM:"test",id:"test_tabs",
                         tabs:[{name:"one"},{name:"two"},{name:"three"}]});
         };
-        assert.throws(fn,"Harvey.Panel: already have a child with id test_tabs" );
+        assert.throws(fn,"Apoco.Panel: already have a child with id test_tabs" );
     });
     it("will allow another display object to be added",function(){
         t.addChild({display:"menu",
@@ -86,9 +86,9 @@ describe("Panel",function(){
         assert.strictEqual(t.getChildren().length,1);
     });
     it("can delete itself",function(){
-        Harvey.Panel.delete(t.name);
+        Apoco.Panel.delete(t.name);
         console.log("t is %j", t);
-        assert.strictEqual(Harvey.Panel._inList("test_panel"),null);
+        assert.strictEqual(Apoco.Panel._inList("test_panel"),null);
     });
 });
 
@@ -105,7 +105,7 @@ describe("Panel - from data file",function(){
        
        // assert.strictEqual(document.contains(b),true);
     
-        t=Harvey.Panel.add("TestPanel");
+        t=Apoco.Panel.add("TestPanel");
         console.log("return from panels is " + t);
         assert.isObject(t);
     });
@@ -114,9 +114,9 @@ describe("Panel - from data file",function(){
         assert.strictEqual(document.contains(b),true);
     }); 
     it("can clone a panel and add it to the components list",function(){
-        var b=Harvey.Panel.clone("TestPanel",window);
+        var b=Apoco.Panel.clone("TestPanel",window);
         assert.isObject(b);
-        Harvey.Panel.add(b);
+        Apoco.Panel.add(b);
     });
     it("the clone has been put into the dom",function(){
         var b=document.getElementById("Create1");

@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey,UI=require('./declare').UI; 
+var Apoco=require('./declare').Apoco,UI=require('./declare').UI; 
 require("./Utils");
 require("./Popups");
 require("./Window");
@@ -6,7 +6,7 @@ require("./Window");
 ;(function() {
     'use strict';
     function check(ar){
-	if(!Harvey.checkType["object"](ar)){
+	if(!Apoco.checkType["object"](ar)){
 	    throw new Error("This is not a window display object " + ar);
 	}
 	for(var i in ar){
@@ -18,8 +18,8 @@ require("./Window");
 		case "display": // check whether there is a display object
 		    var d=ar[i][k];
 		   //console.log("switch case display " + d);
-		    if(!Harvey.display[d]){
-			msg=msg.concat("Harvey does not know how to create " + d);
+		    if(!Apoco.display[d]){
+			msg=msg.concat("Apoco does not know how to create " + d);
 		    }
 		    else{
 			OK++;
@@ -63,7 +63,7 @@ require("./Window");
 
   
 
-    Harvey.Panel={
+    Apoco.Panel={
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
         UIStart:function(w){
             var nv;
@@ -78,7 +78,7 @@ require("./Window");
                     this.add(nv);
                 }
                 else{
-                    throw new Error("Harvey.Panel: No panel called " + w[i] + " was found in UI.Panels");
+                    throw new Error("Apoco.Panel: No panel called " + w[i] + " was found in UI.Panels");
                 }
             }
 
@@ -93,7 +93,7 @@ require("./Window");
             //     console.log("trying to get panel " + name + " from " + k);
                 if(k == name){
                 //    console.log("found " + name);
-                    var cd=Harvey.cloneDeep(UI.Panels[k]);
+                    var cd=Apoco.cloneDeep(UI.Panels[k]);
                //     console.log("clone deep is " + cd);
                     return cd;
                 }
@@ -148,7 +148,7 @@ require("./Window");
         showAll:function(win){
             var w,tw=null;
             if(win !== undefined){
-                w=Harvey.Window.get(win);
+                w=Apoco.Window.get(win);
                 if(w===null){
                     throw new Error("Panel.hideAll - cannot find window " + w);
                 }
@@ -169,7 +169,7 @@ require("./Window");
             var w,tw=null;
             if(win !== undefined){
                // console.log("hideall got window");
-                w=Harvey.Window.get(win);
+                w=Apoco.Window.get(win);
                 if(w===null){
                     throw new Error("Panel.hideAll - cannot find window " + w);
                 }
@@ -231,21 +231,21 @@ require("./Window");
                 return np;
             }
             else{
-                throw new Error("Harvey.Panel.clone: No panel named " + panel + " found");
+                throw new Error("Apoco.Panel.clone: No panel named " + panel + " found");
             }
         },
 	add: function(panel){
 	  //  console.log("Panel.add is here");
-	   console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
+	   //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
          
-            if(Harvey.checkType['string'](panel)){
+            if(Apoco.checkType['string'](panel)){
                 var w=this._UIGet(panel);
                 panel=w;
             }
 
 	    if(this._inList(panel.name) === null){
 		check(panel.components);
-		var p=Harvey._panelComponents(panel);
+		var p=Apoco._panelComponents(panel);
 		// for(var k in p){
 		//     console.log("panel base has keys " + k);
 		// }
@@ -278,7 +278,7 @@ require("./Window");
                 
             }
          //   if(!promise_resolve){
-            Harvey.Window._closeAll();
+            Apoco.Window._closeAll();
         //    }
             this._list.length=0;
         },
@@ -297,7 +297,7 @@ require("./Window");
                 obj=null;
             }
             else {
-                throw new Error("Harvey.Panel delete -" + name + "is not in the list of Panels");
+                throw new Error("Apoco.Panel delete -" + name + "is not in the list of Panels");
             }
 	}
     };
@@ -305,19 +305,19 @@ require("./Window");
         var that=this,w;
         for(var k in obj){
 	    this[k]=obj[k];
-	  //   console.log("_HarveyPanelComponents got value " + k + " value ", this[k]);
+	  //   console.log("_ApocoPanelComponents got value " + k + " value ", this[k]);
 	}
-        //Harvey.mixinDeep(this,obj);
+        //Apoco.mixinDeep(this,obj);
         
 	if(this.window){
-            w=Harvey.Window.get(this.window);
+            w=Apoco.Window.get(this.window);
             if(w !== null){
                 w.window.focus();
                 that.window=w.window;
                 that._addComponents();
             }
             else{ 
-                var p=Harvey.Window.open(obj.window);  // create a new browser window
+                var p=Apoco.Window.open(obj.window);  // create a new browser window
 	        p.then(function(w){
                     w.window.focus();
                     that.window=w.window;
@@ -349,16 +349,16 @@ require("./Window");
              //   console.log("adding component " + p);
 		this.components[i].parent=this;
                // console.log("addComponents window is " + that.window);
-	        d=Harvey.display[p](this.components[i],that.window);
+	        d=Apoco.display[p](this.components[i],that.window);
 		if(!d){
 		    throw new Error("could not create " + p);
 	        }
 	            /*	if(d.deferred){
-                    Harvey.popup.spinner(true);
+                    Apoco.popup.spinner(true);
 		    d.deferred.done(function(that){
 	//		console.log("deferred done");
 			doit(that,i);
-                        Harvey.popup.spinner(false);
+                        Apoco.popup.spinner(false);
 		    }(that));
 		}
 		else{
@@ -370,14 +370,14 @@ require("./Window");
 	addChild: function(display_object){ // to existing panel
             var d;
             if(this.getChild(display_object.id)){
-                throw new Error("Harvey.Panel: already have a child with id " + display_object.id);
+                throw new Error("Apoco.Panel: already have a child with id " + display_object.id);
             }
             if(!display_object.display){
                 throw new Error("You can only add display objects to a window");
             }
             if(!display_object.displayType){ //has not been instantiated
                 d=display_object;
-                display_object=Harvey.display[d.display](d,this.window);
+                display_object=Apoco.display[d.display](d,this.window);
                 if(!display_object){
                     throw new Error("Panel.addChild: could not create display object " + d.display);
                 }
@@ -397,7 +397,7 @@ require("./Window");
             for(var i=0;i<this.components.length;i++){
               //  console.log("panel_components.deleteChildren: " + this.components[i].display);
              //   if(this.components[i].listen){
-            //       Harvey.IO.unsubscribe(this.components[i]);
+            //       Apoco.IO.unsubscribe(this.components[i]);
             //    }
                 this.components[i].delete("message from parent");
             }
@@ -407,16 +407,16 @@ require("./Window");
             var index=-1;
             //var obj=o;
             if(!obj){
-                throw new Error("Harvey.Panel: deleteChild obj is null");
+                throw new Error("Apoco.Panel: deleteChild obj is null");
             }
-            if(Harvey.checkType['string'](obj)){
+            if(Apoco.checkType['string'](obj)){
               //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
            //console.log("deleteing child length is " + this.components.length);
 	   // console.log("Panel delete child is here");
             if(obj.listen){ // remove the listener
-		Harvey.unsubscribe(obj);
+		Apoco.unsubscribe(obj);
 	    }
 	    for(var i=0;i<this.components.length;i++){
 		if(obj === this.components[i]){
@@ -433,7 +433,7 @@ require("./Window");
             }
 	  //  if(this.components.length === 0){
 	//	console.log("No components left");
-	 //       Harvey.Panel.delete(this.name);
+	 //       Apoco.Panel.delete(this.name);
 	 //   }
 	  //  console.log("after delete child length is " + this.components.length);
 	},
@@ -492,22 +492,7 @@ require("./Window");
 	    return null;
 	}
     };
-
-   /* Harvey.mixinDeep(Harvey,
-                     { _panelComponents:
-                       function(t){
-                           if(t === "methods"){
-                               var f={};
-                               for(var k in _Components.prototype ){
-                                   f[k]=k;
-                               }
-                               return f;
-                           }else{
-                               return new _Components(t);
-                           }
-                       }
-                     }); */
-    Harvey._panelComponents=function(t){
+    Apoco._panelComponents=function(t){
         if(t === "methods"){
             var f={};
             for(var k in _Components.prototype ){

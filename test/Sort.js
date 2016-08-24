@@ -1,4 +1,4 @@
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 require("../Sort.js");
 
@@ -8,33 +8,33 @@ const expect = require('chai').expect;
 describe("Sort",function() {
     it("sorts an array of integers",function(){
         var b=[32,535,5454,6,77,879,5];
-        Harvey.sort(b,"integer");
+        Apoco.sort(b,"integer");
         expect(b).to.eql([5,6,32,77,535,879,5454]);
     });
     it("sorts an array of strings",function(){
         var b=["fog","dog","apple","zebra"];
-        Harvey.sort(b,"string");
+        Apoco.sort(b,"string");
         expect(b).to.eql(["apple","dog","fog","zebra"]);
     });
     it("sorts an array of dates",function(){
         var b=[20200521,20160624,20300113,20200814];
-        Harvey.sort(b,"date");
+        Apoco.sort(b,"date");
         expect(b).to.eql([20160624,20200521,20200814,20300113]);
     });
     it("sorts an array of alphanumerics",function(){
         var b=["x43","dsa4","X43","rew42","3","rwd","s56","f"];
-        Harvey.sort(b,"alphaNum");
+        Apoco.sort(b,"alphaNum");
         expect(b).to.eql(["3","X43", "dsa4","f","rew42","rwd","s56","x43"]);
     });
     it("sorts an array of negative integers",function(){
         var b=[20,-200,-45,20,-4,-55];
-        Harvey.sort(b,"negativeInteger");
+        Apoco.sort(b,"negativeInteger");
         expect(b).to.eql([20,20,-4,-45,-55,-200]);
     });
     it("throws an error if it is given an unsortable type",function(){
         var b=["rew00",234,"ad",0];
         var fn=function(){
-            Harvey.sort(b,"boolean");
+            Apoco.sort(b,"boolean");
         };
         assert.throws(fn,"Sort: don't know how to sort " );
     });
@@ -45,7 +45,7 @@ describe("Sort",function() {
                {stock: "AAC" ,maturity: 20180214 ,subclass: 8 },
                {stock: "AAD" ,maturity: 20191022 ,subclass: 7 },
                {stock: "AAG" ,maturity: 20221010 ,subclass: 10 }];
-        Harvey.sort(b,[{type:"string",fn:function(a){return a["stock"];}},
+        Apoco.sort(b,[{type:"string",fn:function(a){return a["stock"];}},
                        {type: "integer",fn: function(a){return a["maturity"];}}]);
         
         expect(b).to.eql([{"maturity": 20171105,"stock": "AAB","subclass": 12},

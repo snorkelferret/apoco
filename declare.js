@@ -1,9 +1,9 @@
-module.exports = {Harvey:{},UI:{}};
+module.exports = {Apoco:{},UI:{}};
 /*var fs = require('fs');
 var browserify = require('browserify');
 
 module.exports = function( callback ) {
-    var Harvey={};
+    var Apoco={};
     var UI={};
     callback = callback || function(){};
 

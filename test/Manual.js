@@ -7,7 +7,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-//const Harvey=require('../declare').Harvey;
+//const Apoco=require('../declare').Apoco;
 var webdriver = require('selenium-webdriver');
 var By=webdriver.By;
 var until=webdriver.until;
@@ -32,7 +32,7 @@ describe("Manual",function(){
             .build();
     
     //});
-    driver.get("file:///home/val/harvey/manual.html");
+    driver.get("file:///home/val/apoco/manual.html");       
    
     
     test.after(function() {
@@ -173,7 +173,7 @@ describe("Manual About Page",function(){
         driver.wait(function(){
             return driver.isElementPresent(By.id("Content"));
         },15000); 
-        var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Harvey')]")).then(function(b){
+        var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Apoco')]")).then(function(b){
         assert.isObject(b);
         done();
         //});
@@ -213,7 +213,7 @@ describe("Manual Fields Page",function(){
         driver.wait(function(){
             return driver.isElementPresent(By.id("Content"));
         },15000); 
-        var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Harvey')]")).then(function(b){
+        var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Apoco')]")).then(function(b){
             assert.isObject(b);
             done();
         //});

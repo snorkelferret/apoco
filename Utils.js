@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 
 
 // check that we have the string methos to remove leading and trailing whitespace
@@ -11,8 +11,8 @@ String.prototype.trim = String.prototype.trim || function trim() {
 ;(function(){
     var DEBUG=true;
     'use strict';
-    Harvey.cloneDeep=require("clone-deep");
-    Harvey.Utils={  
+    Apoco.cloneDeep=require("clone-deep");
+    Apoco.Utils={  
         getCssValue:function(css_class,rule,filename){ // doesn't work in chrome
             var stylesheets;
             console.log("class is " + css_class + " rule " + rule + " filename " + filename);
@@ -60,7 +60,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             var value=0,units,v;
             for(var i=0;i<class_list.length;i++){
               //  var c=("." + children[i].type).toString();
-                var t=Harvey.Utils.getCssValue(class_list[i].classname,"width",filename);
+                var t=Apoco.Utils.getCssValue(class_list[i].classname,"width",filename);
               //  console.log("got class value " + t);
                 if(t=== null){
                     return null;
@@ -180,13 +180,13 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 if(closest){
                     closest.dir="after";
                 }
-            	return Harvey.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
+            	return Apoco.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
 	    }
 	    else if (r > 0 && arr.length > 1) {
                 if(closest){
                     closest.dir="before";
                 }
-		return Harvey.Utils.binarySearch(arr.slice(0, mid),sort_order,data,closest);
+		return Apoco.Utils.binarySearch(arr.slice(0, mid),sort_order,data,closest);
 	    }
 	    else if (r  === 0) {
                 return arr[mid];
@@ -394,17 +394,17 @@ String.prototype.trim = String.prototype.trim || function trim() {
                     }
                     that._list=temp;
                     if(that._list.length==0){ // all fullfilled so reset
-                        Harvey.Observer.takeRecords(); //empty the list
-                        Harvey.Observer.disconnect(); //stop observing
+                        Apoco.Observer.takeRecords(); //empty the list
+                        Apoco.Observer.disconnect(); //stop observing
                        // console.log("OBSERVER DISCONNECT");
                     }
 
                    // console.log("observer list is now " + that._list.length);
                 };
-                if(!Harvey.Observer){
+                if(!Apoco.Observer){
                     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
                   //  console.log("MAKING NEW OBSERVER");
-                    Harvey.Observer=new MutationObserver(function(mutations){
+                    Apoco.Observer=new MutationObserver(function(mutations){
                         check(mutations);
                     });
                 }

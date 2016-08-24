@@ -1,8 +1,8 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 
 ;(function(){
 
-    Harvey.checkType={
+    Apoco.checkType={
 	blank: function(s){
 	    // s=String(s);
 	    if(s){

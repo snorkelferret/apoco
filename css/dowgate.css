@@ -1,11 +1,11 @@
-#Broker {height: 2em;min-width:420px;!important }
+#Broker { min-width:420px !important; height: 12em }
 #Broker div.fieldset{float: left}
                     
 #Broker div.fieldset label{display: table-cell}
 /* #Broker div.fieldset input{display: table-column} */
 
-#DowgateControls {width: 30em; z-index: 10}
-#DowgateControls div#Dleft{width: 10em; float: left}
+#DowgateControls {width: 30em; height: 12em; display: table; z-index: 10}
+#DowgateControls div#Dleft{width: 10em; float: left; padding: 0 1em;}
 #DowgateControls div#Dmiddle{width: 10em;display: inline-block}
 #DowgateControls div#Dright{width: 10em; float: right}
 

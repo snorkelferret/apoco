@@ -6,7 +6,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 global.document=require("jsdom").jsdom(undefined,
@@ -24,7 +24,7 @@ describe("DisplayForm-(start without fields)",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.contains(b),true);
-        t=Harvey.display.form({id:"test_form",DOM:"test"});
+        t=Apoco.display.form({id:"test_form",DOM:"test"});
         assert.isObject(t);
     });
     it("can add a field",function(){
@@ -82,7 +82,7 @@ describe("DisplayForm",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.contains(b),true);
-        t=Harvey.display.form({id:"test_form",DOM:"test",
+        t=Apoco.display.form({id:"test_form",DOM:"test",
                                components:[{node:"heading",size:"h2",text:"Start"},
                                            {node:"paragraph",text:"hullo people"},
                                            {type: "integer",value: 10,name:"ID"}

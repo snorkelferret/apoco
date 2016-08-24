@@ -6,7 +6,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 describe("JSDOM",function(){
@@ -25,8 +25,8 @@ describe("JSDOM",function(){
         document.body.appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
     });
-    it('defines Harvey',function(){
-        assert(Harvey); 
+    it('defines Apoco',function(){
+        assert(Apoco); 
     });
     it('creates a virtual console',function(){
         console.log("I am a virtual console");
@@ -41,24 +41,24 @@ describe("Popups",function(){
 
     require("../Popups");
 
-    it("defines Harvey",function(){
-        assert(Harvey !== undefined); 
+    it("defines Apoco",function(){
+        assert(Apoco !== undefined); 
     });
-    it("defines Harvey.popup",function(){
-        console.log("here is Harvey.popup " + Harvey.popup);
-       // assert(Harvey.popup !== undefined);
-        assert.isObject(Harvey.popup);
+    it("defines Apoco.popup",function(){
+        console.log("here is Apoco.popup " + Apoco.popup);
+       // assert(Apoco.popup !== undefined);
+        assert.isObject(Apoco.popup);
         
     });
     it("creates an alert",function(){
-        Harvey.popup.alert();
-        var b=document.getElementById("Harvey_alert");
+        Apoco.popup.alert();
+        var b=document.getElementById("Apoco_alert");
         assert.strictEqual(document.contains(b),true);
     });
     
     it('makes a dialog popup', function () {
-        Harvey.popup.dialog("what","here i am");
-        var b=document.getElementsByClassName("Harvey_dialog")[0];
+        Apoco.popup.dialog("what","here i am");
+        var b=document.getElementsByClassName("Apoco_dialog")[0];
         assert.strictEqual(document.contains(b),true);;
         
     });

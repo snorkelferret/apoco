@@ -1,4 +1,4 @@
-var Harvey=require('./declare').Harvey; //,UI=require('./declare').UI; //jQuery=require('jquery');
+var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
 require("./DisplayBase.js");
 require("./Sort.js");
 
@@ -22,7 +22,7 @@ jsonishData={
 
       cols:  // have these keys
       {  name: string, // required key
-         type: // see HarveyTypes  // required key
+         type: // see ApocoTypes  // required key
          editable: boolean, (default true)
          unique: boolean,(default false)
          hidden: boolean,(default false)
@@ -67,8 +67,8 @@ jsonishData={
 		    var cc=$("<div></div>").css({'width': '100px','height': '100px','background':'#101010'});
 
 		    d.append(cc);
-		    var ok=$("<button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
-		    var cancel=$("<button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
+		    var ok=$("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
+		    var cancel=$("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
 		    d.append(ok);
 		    d.append(cancel);
 		    $(this).parent().append(d);
@@ -112,7 +112,7 @@ jsonishData={
 		for(var i=0;i< that.selection_list.length;i++){
 		    console.log("value was " + that.selection_list[i].textContent);
 		    if(update){
-			p=that.selection_list[i].data["harvey"];
+			p=that.selection_list[i].data["apoco"];
 			cell=that.rows[p.row][that.cols[p.col].name];
 			cell.setValue(val);
 		    }
@@ -149,7 +149,7 @@ jsonishData={
 	     console.log("already editing this" + cell);
 	    return;
 	}
-	that.cellEdit=cell.data("harvey").context;
+	that.cellEdit=cell.data("apoco").context;
 
 	if(that.cellEdit === null){
 	    console.log("cell is null");
@@ -180,10 +180,10 @@ jsonishData={
 	if(that.cellEdit.popup){
 	    console.log("popup is here for " + n);
 	    var d=$("<div class='popup' id='grid_popup'> </div>");
-	    that.field=Harvey.field[n](that.cellEdit.data["harvey"],d);
+	    that.field=Apoco.field[n](that.cellEdit.data["apoco"],d);
 	    that.cellEdit.getEelement().append(d);
-	    var ok=$("<button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
-	    var cancel=$("<button class='ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
+	    var ok=$("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
+	    var cancel=$("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
 	    d.append(ok);
 	    d.append(cancel);
 	    that.field.element.focus();
@@ -206,7 +206,7 @@ jsonishData={
 		update_column(that,value,true);
 	    }
 	    else{
-		Harvey.display.dialog("Invalid Input","Incorrect type for this field should be a " + type);
+		Apoco.display.dialog("Invalid Input","Incorrect type for this field should be a " + type);
 	    }
 	}
 
@@ -220,7 +220,7 @@ jsonishData={
 	if(that.DEBUG) console.log("START SORT =======================  got sort type " + type);
 	stop_edits(that);
 	for(var k in that.grids){
-	    Harvey.sort(that.grids[k].rows,{ type: type,
+	    Apoco.sort(that.grids[k].rows,{ type: type,
 			                     fn: function(a){ return a[col_num];}
                                            });
 	    if(dir === "down"){
@@ -242,7 +242,7 @@ jsonishData={
 //	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
 //	}
 	// see if the data has been put into subgrids
-	if(that.rows && Harvey.checkType["array"](that.rows)){ // not sorted into subgrids
+	if(that.rows && Apoco.checkType["array"](that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
 	    if(that.groupBy){
 		for(var i=0;i<that.rows.length;i++){
@@ -273,17 +273,17 @@ jsonishData={
 	}
        	// that.rows.length=0; // delete rows array
 	if(!that.grids){
-	    throw new Error("Harvey.display.grid: no rows or grids in " + that.id);
+	    throw new Error("Apoco.display.grid: no rows or grids in " + that.id);
 	}
     }
 
-    var HarveyMakeGrid=function(options,win){
+    var ApocoMakeGrid=function(options,win){
 	var DEBUG=true;
 	var that=this,found,not_found=[];
 
-       	Harvey._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+       	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 	this.selection_list=[];
-	this.cellEdit=null; // cell currently being edited- this is of type Harvey.field
+	this.cellEdit=null; // cell currently being edited- this is of type Apoco.field
 	this.allowEdit=true;  // are edits allowed?
         
 	if(this.sortOrder && this.userSortable){
@@ -326,7 +326,7 @@ jsonishData={
     };
 
 
-    HarveyMakeGrid.prototype={
+    ApocoMakeGrid.prototype={
 
 	_select_data: function(){
 	    var that=this;
@@ -461,7 +461,7 @@ jsonishData={
                     grids=this.grids;
                 }
 		for(var j=0;j<grids.length;j++){
-		    Harvey.sort(grids[j].rows,ar);
+		    Apoco.sort(grids[j].rows,ar);
                     grids[j].sorted=true;
 		}
 	    }
@@ -493,7 +493,7 @@ jsonishData={
         addCol:function(col){
             var that=this,index,r,t,rows;
             var was_hidden=this.isHidden();
-            if(Harvey.checkType["integer"](col)){
+            if(Apoco.checkType["integer"](col)){
                 index=col;
                 col=this.cols[index];
                 if(!col.name || !col.type){
@@ -513,7 +513,7 @@ jsonishData={
                     throw new Error("Columns must have unique names");
                 }
                 if(!was_hidden){
-                    Harvey.popup.spinner("true");
+                    Apoco.popup.spinner("true");
                     this.hide(); // hide whilst adding column
                 }
             }
@@ -548,7 +548,7 @@ jsonishData={
                 h.type=this.cols[index].type;
                 s.textContent=label;
 		this.cols[index].element=h;
-		this.cols[index].sortable=Harvey.isSortable(this.cols[index].type);
+		this.cols[index].sortable=Apoco.isSortable(this.cols[index].type);
 		if(this.cols[index].sortable && this.userSortable){
 		    //  var dec=$("<div class='arrows'></div>");
                     var dec=document.createElement("div");
@@ -596,7 +596,7 @@ jsonishData={
 	    }
             
             if(!was_hidden){
-                Harvey.popup.spinner(false);   
+                Apoco.popup.spinner(false);   
                 this.show();
             }
         },
@@ -658,7 +658,7 @@ jsonishData={
             // var t0=performance.now();
             this.element=document.createElement("div"); 
             this.element.id=this.id;
-            this.element.classList.add("grid","ui-widget","ui-widget-content");
+            this.element.classList.add("grid","ui-widget-content");
             // make the header
             this.colElement=document.createElement("div");
             this.colElement.classList.add("head");
@@ -723,12 +723,12 @@ jsonishData={
             c.className=col.type;
             
             //console.log("c is " + JSON.stringify(c));
-            row[col.name]=Harvey.field[Harvey.dbToHtml[col.type].field](settings,c);
+            row[col.name]=Apoco.field[Apoco.dbToHtml[col.type].field](settings,c);
             if(col.display !== false){
 		r.appendChild(row[col.name].element);
             
                 row[col.name].element.data={};
-                row[col.name].element.data.harvey={name: col.name,"context": row[col.name],"type": col.type};
+                row[col.name].element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
 	    }
 	    if(col.hidden){
 		row[col.name].element.visibility="hidden";
@@ -884,7 +884,7 @@ jsonishData={
                             }
                         }
                     }
-		    row=Harvey.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
+		    row=Apoco.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
                     if(row){
                         return row;
                     }
@@ -1030,8 +1030,8 @@ jsonishData={
 	},
         getRowFromElement: function(element){  
             var s,row=[];
-            var c=element.data.harvey;
-            //element.data.harvey={name: col.name,"context": row[col.name],"type": col.type};
+            var c=element.data.apoco;
+            //element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
            // console.log("name is " + c.name + " context " + c.context + " type " + c.type);
             row.push({context:c.context,name: c.name,
                       value:c.context.value });
@@ -1040,8 +1040,8 @@ jsonishData={
            // console.log("got siblings " + s.length);   
             for(var i=0;i<s.length;i++){
                 if(s[i] !== element){
-                    //c= $(s[i]).data("harvey");
-                    c=s[i].data.harvey;
+                    //c= $(s[i]).data("apoco");
+                    c=s[i].data.apoco;
              //       console.log( "sib " + c.name + " value " + c.context.value);
                     row.push({context: c.context,name: c.name,
                               value: c.context.value });
@@ -1093,7 +1093,7 @@ jsonishData={
 	    }
 	    if(this.DEBUG) console.log("jsq is " + JSON.stringify(jsq));
 
-	    var submit_promise=Harvey.ajax.jsq(jsq,{url:"/JSQ/cbm",
+	    var submit_promise=Apoco.ajax.jsq(jsq,{url:"/JSQ/cbm",
 						    type:"POST",
 						    dataType:'json',
 						    contentType:"application/json"});
@@ -1104,7 +1104,7 @@ jsonishData={
 		    if(this.DEBUG) console.log("Form.submit: promise success");
 		    if(textStatus === "success"){
 	//		if(this.DEBUG) console.log("Form.submit: deferred-resolve");
-			Harvey.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
+			Apoco.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
 	    		// var cmd=that.getCreator().getCmd(that);
 
 			// cmd.undo();
@@ -1123,7 +1123,7 @@ jsonishData={
 	    submit_promise.fail(function(jq, textStatus){
 	//	console.log(" textStatus is " + textStatus);
 		var msg=("callback Fail- status  " +  jq.status + "  "+ jq.statusText + " "  + jq.responseText );
-		Harvey.display.dialog("Update Failed",msg);
+		Apoco.display.dialog("Update Failed",msg);
 		// highlight from components which were not accepted
 	//	if(this.DEBUG) console.log("grid.submit: failed to commit to db");
 	    });
@@ -1131,32 +1131,15 @@ jsonishData={
     };
 
 
-    Harvey.Utils.extend(HarveyMakeGrid,Harvey._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeGrid,Apoco._DisplayBase);
 
-    //  $.extend(true, Harvey, {
- /*   Harvey.mixinDeep( Harvey,{
-	display: {
-	    grid: function(opts,win){
-                    opts.display="grid";
-                    return new HarveyMakeGrid(opts,win);
-            },
-            gridMethods:function(){
-                var ar=[];
-                for(var k in HarveyMakeGrid.prototype ){
-                    ar.push(k);
-                }
-                return ar;
-            }
-	}
-    }); */
-
-    Harvey.display.grid=function(opts,win){
+    Apoco.display.grid=function(opts,win){
         opts.display="grid";
-        return new HarveyMakeGrid(opts,win);
+        return new ApocoMakeGrid(opts,win);
     };
-    Harvey.display.gridMethods=function(){
+    Apoco.display.gridMethods=function(){
         var ar=[];
-        for(var k in HarveyMakeGrid.prototype ){
+        for(var k in ApocoMakeGrid.prototype ){
             ar.push(k);
         }
         return ar; 

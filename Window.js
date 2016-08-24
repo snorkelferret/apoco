@@ -1,11 +1,11 @@
-var Harvey=require('./declare').Harvey;
+var Apoco=require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Panel");
 
 ;(function(){
     "use strict";
-    Harvey.Window={
+    Apoco.Window={
         _list:[],
         delete:function(win){ // remove a panel that is in a separate browser
             var w;
@@ -19,11 +19,11 @@ require("./Panel");
             }
            
             console.log("deleting the panels for window " + win);
-            var p=Harvey.Panel._list;
+            var p=Apoco.Panel._list;
             for(var j=0;j<p.length;j++){
                 if(p[j].window && p[j].window === this._list[w].window){
                     console.log("deleting " + p[j].name);
-                    Harvey.Panel.delete(p[j].name);
+                    Apoco.Panel.delete(p[j].name);
                 }
             }
             this._list[w].window.onunload=null; // stop the close callback
@@ -37,7 +37,7 @@ require("./Panel");
                 this._list[p].window.close();
             }
             else{
-                throw new Error("Harvey.Window: Cannot find window " + name);
+                throw new Error("Apoco.Window: Cannot find window " + name);
             }
             this._list.splice(p,1);
         },
@@ -62,7 +62,7 @@ require("./Panel");
             if(name === undefined){
                 throw new Error("no name given");
             }
-            if(Harvey.checkType["string"](name)){
+            if(Apoco.checkType["string"](name)){
                 str=true;
             }
             console.log("is " + name + " in list?");
@@ -103,7 +103,7 @@ require("./Panel");
                 throw new Error("Window: open - must have a url");
             }
             if(this.get(d.name)){
-                throw new Error("Harvey,Window: " + d.name + " already exists");
+                throw new Error("Apoco,Window: " + d.name + " already exists");
             }
 	    if(!d.opts){
   	        settings="_blank"; // open in new tab
@@ -139,7 +139,7 @@ require("./Panel");
                             resolve(tt);
 		        }
                         else{
-                            reject(("Harvey.Window: could not open " + d.name));
+                            reject(("Apoco.Window: could not open " + d.name));
                         }
 		      //  console.log("Parent child is ready");
 		    };
@@ -152,14 +152,14 @@ require("./Panel");
                     // delete the window from the list
                     var win= d.window; //that._list[d.name];
                     if(win !== null){
-                        Harvey.Window.delete(win);
+                        Apoco.Window.delete(win);
                     }
                     else{
                         throw new Error("Could not find window to remove");
                     }
                 };
             }).catch(function(reason){
-                Harvey.popup.error("Window Open Error",reason);
+                Apoco.popup.error("Window Open Error",reason);
             });
                                         
 	    return p;

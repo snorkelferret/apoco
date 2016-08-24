@@ -6,7 +6,7 @@ const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
-const Harvey=require('../declare').Harvey;
+const Apoco=require('../declare').Apoco;
 
 
 global.document=require("jsdom").jsdom(undefined,
@@ -22,7 +22,7 @@ describe("DisplayMenu-(start without menu items)",function(){
         b.id="test";
         document.body.appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
-        t=Harvey.display.menu({id:"test_menu",DOM:"test"});
+        t=Apoco.display.menu({id:"test_menu",DOM:"test"});
         assert.isObject(t);
     });
     it("has a show method which adds root to DOM",function(){
@@ -64,7 +64,7 @@ describe("DisplayMenu",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
        
-        t=Harvey.display.menu({id:"test_menu",DOM:"test",list:[{name:"one"},
+        t=Apoco.display.menu({id:"test_menu",DOM:"test",list:[{name:"one"},
                                                                {name:"two",
                                                                 action:function(that){
                                                                     that.element.textContent="clicked";
