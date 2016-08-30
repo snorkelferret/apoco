@@ -1,7 +1,7 @@
 "use strict";
 
 const       assert = require('chai').assert;
-const       stub = require('sinon').stub;
+const         stub = require('sinon').stub;
 //const        jsdom = require('jsdom');
 const   browserify = require('browserify');
 const browserifyFn = require('browserify-string');
@@ -23,27 +23,27 @@ var promise=require("selenium-webdriver/lib/promise");
 
 
 describe("Manual",function(){
-//    var $= global.jQuery; 
+//    var $= global.jQuery;
     var driver;
     var tabs;
     //test.before(function(){
         driver = new webdriver.Builder()
             .forBrowser('firefox')
             .build();
-    
+
     //});
-    driver.get("file:///home/val/apoco/manual.html");       
-   
-    
+    driver.get("file://"+process.cwd()+"/manual.html");
+
+
     test.after(function() {
         driver.quit();
     });
-  
+
     test.it("has loaded a node called Content",function(done){
         this.timeout(15000);
         driver.wait(function(){
            return driver.isElementPresent(By.id("Content"));
-       },15000); 
+       },15000);
        var b=driver.findElement(By.id("Content"));
         //driver.findElement(By.id("Content")).then(function(b){
         console.log("Got content node " + b);
@@ -71,7 +71,7 @@ describe("Manual",function(){
     test.it("can find a tab name",function(done){
         var span,text="Fields",index=-1;    //(By.xpath("//span[contains(., 'Fields')]"))
          for(var i=0;i<tabs.length;i++){
-            
+
              tabs[i].findElements(By.tagName("span")).then(
                 function(spanArray){
                     console.log('Found spans length:'+ spanArray.length);
@@ -84,7 +84,7 @@ describe("Manual",function(){
                                 done();
                             }
                         });
-                    }); 
+                    });
                 });
         }
     });
@@ -149,30 +149,30 @@ describe("Manual",function(){
         tab.click();
         assert.isObject(driver.findElement(By.id("UtilsMenu")));
         done();
-    }); 
-    
+    });
+
 });
 
 /*
 
 describe("Manual About Page",function(){
-    var $= global.jQuery; 
+    var $= global.jQuery;
     var driver;
-       
+
     driver = new webdriver.Builder()
         .forBrowser('firefox')
         .build();
-    
+
     driver.get("file:///home/val/harvey/manual.html");
     after(function() {
         driver.quit();
     });
-    
+
     test.it("has loaded a node called Blurb",function(done){
         this.timeout(15000);
         driver.wait(function(){
             return driver.isElementPresent(By.id("Content"));
-        },15000); 
+        },15000);
         var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Apoco')]")).then(function(b){
         assert.isObject(b);
         done();
@@ -181,7 +181,7 @@ describe("Manual About Page",function(){
     test.it("has loaded the lhs menus",function(done){
         this.timeout(15000);
         driver.findElements(By.xpath(".//div[@id='AboutMenu']/ul/li")).then(function(m){
-            console.log("got menu items " + m.length);   
+            console.log("got menu items " + m.length);
             m.forEach(function(nextElement) {
                 console.log("in span array " + nextElement);
                 nextElement.getText().then(function(p){
@@ -192,27 +192,27 @@ describe("Manual About Page",function(){
              });
             done();
         });
-    });  
+    });
 });
-    
+
 describe("Manual Fields Page",function(){
-    var $= global.jQuery; 
+    var $= global.jQuery;
     var driver;
-       
+
     driver = new webdriver.Builder()
         .forBrowser('firefox')
         .build();
-    
+
     driver.get("file:///home/val/harvey/manual.html");
     after(function() {
         driver.quit();
     });
-    
+
     test.it("has loaded a node called Blurb",function(done){
         this.timeout(1500);
         driver.wait(function(){
             return driver.isElementPresent(By.id("Content"));
-        },15000); 
+        },15000);
         var b=driver.findElement(By.id("Blurb")) ; //.then(function(b){ //xpath(".//div[@id='Blurb']/h2[contains(.,'About Apoco')]")).then(function(b){
             assert.isObject(b);
             done();
@@ -221,7 +221,7 @@ describe("Manual Fields Page",function(){
     test.it("has loaded the lhs menus",function(done){
         this.timeout(15000);
         driver.findElements(By.xpath(".//div[@id='FieldsMenu']/ul/li")).then(function(m){
-            console.log("got menu items " + m.length);   
+            console.log("got menu items " + m.length);
             m.forEach(function(nextElement) {
                 console.log("in span array " + nextElement);
                 nextElement.getText().then(function(p){
@@ -237,7 +237,7 @@ describe("Manual Fields Page",function(){
             done();
         });
     });
-    
+
 });
 
 */
