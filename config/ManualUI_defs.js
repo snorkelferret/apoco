@@ -2,9 +2,9 @@
 
 ;(function(){
 
-    UI.URL="/home/val";
-    UI.webSocketURL="home/val";
-    
+    //UI.URL="/home/val";
+    UI.webSocketURL=".";
+
     "use strict";
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
     var globalEval=function( code ) {
@@ -30,8 +30,8 @@
 	    }
 	}
     };
-    
- 
+
+
     var getAType={
         integer:14,
         positiveInteger: 10,
@@ -65,7 +65,7 @@
         nodeType: "ul",
         objectArray:[{label:"value",description: "describe value"},{label:"another_value",descriptions:["one","two","three"]}]
     };
-    
+
     var HThings={Fields:[],
                  Displays:[],
                  Nodes:[],
@@ -115,7 +115,7 @@
             default:
                 throw new Error("Don't know how to make " + k);
                 return;
-                
+
             }
             for(var n in thing){
                 if(!n.startsWith("_")){
@@ -123,7 +123,7 @@
                         if(n !== "exists"){  // method  not a field
                            HThings[k].push(n);
                        }
-                     
+
                    }
                    else if(k==="Displays"){
                     //   console.log("got display " + n);
@@ -138,18 +138,18 @@
             }
             Apoco.sort(HThings[k],"string");
         }
-        
+
     }
     mkArrays(); // make the arrays of all the things Apoco knows how to build
-   
-   
+
+
     // FIELDS
     var fieldManual={
         get_types:function(field){
             var f=[];
             for(var k in Apoco.dbToHtml){
                 if(Apoco.dbToHtml[k].field == field){
-                    f.push(k);  
+                    f.push(k);
                 }
             }
             return f;
@@ -264,7 +264,7 @@
                          descriptions:[""]
                         }
             };
-            
+
         },
         execute:function(){
             var Options=this.field_options();
@@ -304,7 +304,7 @@
                 if(Options.IO){
                     for(var n in Options.IO){
                         this.fields[f].IO[n]=Options.IO[n];
-                    }  
+                    }
                 }
                 if(Options[f].options){
                     for(var n in Options[f].options){
@@ -382,7 +382,7 @@
             var Commands=[];
             var f,k,v;
             var HFields=HThings.Fields;
-            
+
             var field_desirable={
                 autoComplete:["options"],
                 static:["value"],
@@ -409,13 +409,13 @@
                     c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
                 }
                 c=c.concat(", label: 'A Label'");
-                
+
                 if(field_desirable[HFields[i]]){
                     var fd=field_desirable[HFields[i]];
                     for(var j=0;j<fd.length;j++){
                         var n=this.fields[f].options[fd[j]];
                         //console.log("desirable field for " + fd[j] + " type " + n.type );
-                        
+
                         if(n){
                             c=c.concat(","+ fd[j] + ":");
                           //  console.log("adding desirable field " + fd[j] + " with type " + n.type);
@@ -444,7 +444,7 @@
             var f,fields=[];
             var that=this;
             var HFields=HThings.Fields;
-            
+
             for(var i=0;i<HFields.length;i++){
              //  console.log("++++++++++++++++++== mkFields making " + HFields[i]);
                 var k={};
@@ -472,7 +472,7 @@
                               {node: "heading", size: "h5", text: "IO Options"},
                               {node: "descriptionList", items:that.fields[f].IO_list},
                               {node: "heading",size: "h5",text: "Live example"},
-                              {name: "Input_params",field: "textArea", value: that.Commands[i]}, 
+                              {name: "Input_params",field: "textArea", value: that.Commands[i]},
                               {name: "doit", node: "button", text: "Go",
                                action: function(that){
                                    //                        console.log("button action is here");
@@ -495,17 +495,17 @@
                                    }
                                    else{
                                        Apoco.display.dialog("Error", "Input is not a valid object");
-                                   } 
+                                   }
                                }
                               }
                              ];
                 UI.Panels.Fields.components.push(k);
             }
-        },  
+        },
         mkFieldMethods:function(){
             var fm=Apoco.field._getMethods();
-         
-            
+
+
             var HFields=HThings.Fields;
             var fields=[];
             var field_methods_list={
@@ -552,7 +552,7 @@
                 reset:{descriptions:["<code>field.reset();</code>","set all the values to false"]}
             };
             var items=[];
-            
+
             for(var i=0;i<HFields.length;i++){
                 // console.log("mkFieldMethods making " + HFields[i]);
                 var k={};
@@ -561,7 +561,7 @@
                 for(var j=0;j<fm[HFields[i]].length;j++){
                     var m=fm[HFields[i]][j];
                     items[j]={label:m,
-                              descriptions:field_methods_list[m].descriptions};    
+                              descriptions:field_methods_list[m].descriptions};
                 }
                 k.display="fieldset";
                 k.DOM="right";
@@ -571,7 +571,7 @@
                               {node: "descriptionList", items:items},
                               {node: "heading",size: "h5",text: "Live example"},
                               {name: "Input_params",field: "textArea",
-                               value: "var value=field.getKey();"}, 
+                               value: "var value=field.getKey();"},
                               {name: "doit", node: "button", text: "Go",
                                action: function(that){
                                //                  console.log("button action is here");
@@ -585,21 +585,21 @@
                                    var nf=that.parent.getChild("Result");
                                    // console.log("methods doit got " + value);
                                    nf.setValue(JSON.stringify(value));
-                                   
+
                                }},
                               {node:"paragraph",text:"Result"},
                               {field:"static",name:"Result",type:"string" }
-                              
+
                              ];
-                
+
                 globalEval(this.Commands[i]);
                 k.components.push(dataObject);
-                
+
                 UI.Panels.Fields.components.push(k);
             }
          }
     };
-        
+
         var select_menu=function(that){
             var name=that.name;
             var p=that.parent.getSibling();
@@ -623,7 +623,7 @@
             }
             else if(p[i].id ==("test" + name)){
                 p[i].show();
-            } 
+            }
             else{
                 p[i].hide();
             }
@@ -643,7 +643,7 @@
                 f.push({name: HThings["PanelComponents"][i], action: select_menu });
             }
         }
-        
+
         return f;
     };
 
@@ -715,7 +715,7 @@
                  items:[{label:"description",description:""}]
                 }
         };
-      
+
         for(var i=0;i<HTypes.length;i++){
          //   console.log("======== type is ++++++++++= " + HTypes[i]);
             var k={};
@@ -727,7 +727,7 @@
             k.components=[{node: "heading",size: "h3", text: HTypes[i]},
                           {node: "descriptionList",items:tests[HTypes[i]].items},
                           {node:"paragraph", text: "Live tests"},
-                          {name: "Input_params",field: "textArea", value: c}, 
+                          {name: "Input_params",field: "textArea", value: c},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -746,7 +746,7 @@
                                    t=t.concat("" + test[i] + " is " + results[i] + "<br>");
                                }
                                c.setText(t);
-                               
+
                            }},
                           {node:"heading",size:"h4", text:"Result"},
                           {node:"paragraph",name: "result", text:"" }
@@ -777,7 +777,7 @@
                     items:[{label:"objectArray",descriptions: ["type: {label(s): 'string(Array)',description(s): 'string(Array)'}", "where ", "[{label:'string',description:'text'}","{labels:'stringArray',descriptions:'stringArray'}];"]},
                            {label:"Example:",description:"<code>var items=[{label:'myLabel',description:'some description'},<br> {labels:['one','two'],descriptions:['describe something','and another thing']}];<code>"}]
                 }
-                
+
             },
             heading:{
                 parms:{size:"size",text:"text"},
@@ -785,9 +785,9 @@
                     items:[{label:"size",descriptions: ["type: string","size param: one of the following sizes","'h1'","'h2'","'h3'","'h4'","'h5'" ]}]
                 },
                 methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
-                
+
             },
-            image:{ 
+            image:{
                 parms:{src:"path"},
                 required:{items:[{label:"src",descriptions:["type: string","path to image"]}]},
                 options:{
@@ -801,21 +801,21 @@
                     items:[{label: 'for',description:"optional, id of the html element the label belongs to " }]
                 },
                 methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
-                
+
             },
             list:{
                 parms:{list:"stringArray"},
                 required:{
                     items:[{label: "stringArray",description:"example: ['one','two'.'three']"}]
                 }
-                
+
             },
             code:{
                 parms:{text:"text"},
                 required:{
                     items:[{label: "text",description:"text will be displayed as code"}]
                 }
-               
+
             },
             paragraph:{
                 parms:{text:"text"},
@@ -823,7 +823,7 @@
                     items:[{label: "text",description:"the text can contain unicode and things like ' &#60br&#62'"}]
                 },
                 methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
-                
+
             },
             paginate:{
                 parms:{number:"integer",action:'function(that){alert("clicked page" + that.current_num);}'},
@@ -853,7 +853,7 @@
                 }
             }
         };
-        
+
         for(var i=0;i<HNodes.length;i++){
             var k={};
             var t_opts=new String;
@@ -862,12 +862,12 @@
                 t_opts=t_opts.concat(", " + n + ": ");
                 t_opts=t_opts.concat(JSON.stringify(opts[HNodes[i]].parms[n]));
                 if(n == "action"){
-                    Commands[i]=Commands[i].concat(","+ n + ":" + opts[HNodes[i]].parms[n]);                
+                    Commands[i]=Commands[i].concat(","+ n + ":" + opts[HNodes[i]].parms[n]);
                 }
                 else{
                     Commands[i]=Commands[i].concat(","+ n + ":" + JSON.stringify(getAType[opts[HNodes[i]].parms[n]]));
                 }
-            } 
+            }
             Commands[i]=Commands[i].concat("});");
             if(!opts[HNodes[i]].required){
                 opts[HNodes[i]].required={};
@@ -890,7 +890,7 @@
                 var p=that.getChild("doit");
                 //$(p.element).trigger("click");
                 p.element.click();
-            }, 
+            },
             k.hidden=true;
             k.components=[{node: "heading",size: "h3", text: HNodes[i]},
                           // {node:"paragraph", text: "<code>var node=Apoco.node({node:'" + HNodes[i] + "'" + t_opts + "});</code>"},
@@ -901,7 +901,7 @@
                           {node: "heading",size: "h5",text:"Options"},
                           {node: "descriptionList",items:opts[HNodes[i]].options.items},
                           {node: "heading",size: "h5",text: "Live example"},
-                          {name: "Input_params",field: "textArea", value: Commands[i]}, 
+                          {name: "Input_params",field: "textArea", value: Commands[i]},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                // console.log("button action is here");
@@ -910,7 +910,7 @@
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                     
+
                                globalEval(f.getValue());
                                if(Apoco.checkType["object"](node)){
                       //             console.log("and it is an object");
@@ -922,16 +922,16 @@
                        //            console.log("adding child");
                                    that.parent.addNode(node);
                               // console.log("parms are " + node);
-                                  
+
                                }
                                else{
                                    Apoco.display.dialog("Error", "Input is not a valid object");
-                               } 
+                               }
                            }
                           },
                           {node:'heading',size:'h4',text:'Methods'},
                           {node:'descriptionList',items:[{label:'node.getElement();',descriptions:['params: none','return: HTML element Object']}]}
-                          
+
             ];
             if(opts[HNodes[i]].methods){
                 k.components.push({node:'descriptionList',items:opts[HNodes[i]].methods});
@@ -941,9 +941,9 @@
     };
 
 
-  
+
     var mkDisplays=function(){
-        
+
         var stuff={
             fieldset:{required:[{label:"components",descriptions:[ "An array of nodes and/or field objects","example",
                                                                    "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
@@ -962,7 +962,7 @@
                       {label:"groupBy",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a label it will be used as a the subgrid seperator"]},
                       {label:"uniqueKey",descriptions:["type: string","the column name of the uniqueKey if it exists"]},
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]}
-                  ]}, 
+                  ]},
             menu:{  required:[{label: "list",description:""}],
                     options:[{label: "label",description:""},
                              {label: "heading",description:""},
@@ -984,12 +984,12 @@
         };
 
         var HDisplays=HThings.Displays;
-     
+
 
         for(var i=0;i<HDisplays.length;i++){
             //console.log("mkDisplays making " + HDisplays[i]);
             var k={};
-          
+
             k.display="fieldset";
             k.DOM="right";
             k.hidden=true;
@@ -1041,7 +1041,7 @@
                                }
                                else{
                                    throw new Error("Display Object " + n + " not in the DOM");
-                               }              
+                               }
                                if(!Apoco.checkType['object'](dobj)){
                                    throw new Error("Cannot find display Object - Bad return");
                                }
@@ -1049,10 +1049,10 @@
                            }
                           }
                          ];
-            
+
             UI.Panels.Displays.components.push(k);
         }
-    }; 
+    };
 
     var mkDisplayMethods=function(){
         var HDisplays=HThings.Displays;
@@ -1068,7 +1068,7 @@
                     Methods[HDisplays[i]].push(p[j]);
                 }
             }
-            
+
         }
         var display_methods_list={
             show:["<code> var v=my_display.show();</code>","params: none","return: boolean","add the root display element to the DOM"],
@@ -1097,7 +1097,7 @@
             play:["<code>my_display.play();</code>","start playback"],
             step:["<code>my_display.step(dir);</code>","params: dir (string) either 'next' or 'prev'","step forward one frame"],
             showFullscreen:["<code>my_display.showFullscreen();</code>","params: none","return: none","toggles fullscreen mode, i.e called once makes the display fullscreen called again it pops it back into the DOM tree"],
-            stop:["<code>my_display.stop();</code>","stop playback"],    
+            stop:["<code>my_display.stop();</code>","stop playback"],
             sort: ["<code> my_display.sort([ ,grid_object]) </code>","params:none or grid object as returned by getGrid ","return: none (throws error on fail)","If no grid_object is specified sorts all the grids","Sorts using sortOrder if given or uniqueKey if that has been supplied"],
             isHidden:["<code> var t=my_display.isHidden(); </code>","params: none","return: boolean"],
             displayType:["<code> var t=my_display.displayType(); </code>","params: none","return: string"],
@@ -1141,7 +1141,7 @@
                 var m=Methods[HDisplays[i]][j];
              //   console.log("Methods " + m);
                 items[i].push({label:m,
-                               descriptions:display_methods_list[m]});    
+                               descriptions:display_methods_list[m]});
             }
             k.display="fieldset";
             k.DOM="right";
@@ -1152,7 +1152,7 @@
                           {node: "heading",size: "h5",text: "Live example"},
                           {node: "paragraph",text: "(global variable for eval)"},
                           {name: "Input_params",field: "textArea",
-                           value: "var v=window." + HDisplays[i]+"_obj.getKey();"}, 
+                           value: "var v=window." + HDisplays[i]+"_obj.getKey();"},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                //                  console.log("button action is here");
@@ -1164,7 +1164,7 @@
                                globalEval(f.getValue());
                                var nf=that.parent.getChild("Result");
                                try{
-                                   nf.setValue(JSON.stringify(v));    
+                                   nf.setValue(JSON.stringify(v));
                                }
                                catch(e){
                                    console.log("methods doit got %j", v);
@@ -1173,16 +1173,16 @@
                             }},
                           {node:"paragraph",text:"Result"},
                           {field:"static",name:"Result",type:"string" }
-                          
+
                          ];
-          
-           UI.Panels.Displays.components.push(k);  
+
+           UI.Panels.Displays.components.push(k);
         }
     };
 
     var mkPopups=function(){
         var HPopups=HThings["Popups"];
-       
+
         var command={
             alert:  function(c){ return c.concat('("Hi, An alert");');},
             dialog:function(c){return c.concat('("title","my message");');},
@@ -1196,14 +1196,14 @@
         var ttt={
             statusCode:{items:[{label: "ERROR_CODE",descriptions:["type: integer","required: true","one of the following"]},
                                {label: 204,description: "There is no content for this page "},
-	    
+
 	                       {label:205,description:"Response requires that the requester reset the document view "},
 		               {label:400,description:"Bad request "},
-	    
+
 	                       {label:401,description: "Unauthorised "},
-	    
+
 	                       {label:403,description: "Forbidden " },
-	    
+
 	                       {label:404,description:"Not Found "},
 	                       {label: 410,description:" Gone "},
 	                       {label:413,description:"Request entity too large "},
@@ -1251,11 +1251,11 @@
                      ret: "HTML Element Object"
                     }
         };
-        
+
         for(var i=0;i<HPopups.length;i++){
-            var c= "var dobj=Apoco.popup['" + HPopups[i] + "']" ;   
+            var c= "var dobj=Apoco.popup['" + HPopups[i] + "']" ;
             var cmd=ttt[HPopups[i]].cmd(c);
-            
+
             var k={};
             k.display="fieldset";
             k.DOM="right";
@@ -1272,19 +1272,19 @@
                           {name: "Input_params",field: "textArea", value: cmd},
                           {name: "doit", node: "button", text: "Go",action: function(that){
                               var f=that.parent.getChild("Input_params");
-                             
+
                               if(!f){
                                   throw new Error("can't get input params");
                               }
                               globalEval(f.getValue());
                               if(that.parent.id === "spinner"){
                                   window.setTimeout(function(){Apoco.popup["spinner"](false);},3000);
-                              } 
+                              }
                           }}
                          ];
             UI.Panels.Popups.components.push(k);
         }
-        
+
     };
 
     var mkIO=function(){
@@ -1293,7 +1293,7 @@
             REST:{code: "<code>var v=Apoco.IO.REST(type,options,data);</code>",
                   items:[{label: "type",descriptions:["string","'GET' or 'POST'"]},
                          {label: "options",descriptions:["key-value object","  var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};"," keys url(required) dataType(optional)"," defaults to 'json' mimeType(optional) defaults to 'application/json', any other values in the options object will be passed directly to the server","e.g <code>var options={url:'http://my_site/whatever'};</code>"]},
-                         
+
                          {label:"data",descriptions:["any data the can be stringified using JSON.stringify "]}],
                   cmd:"var v=Apoco.IO.REST('GET',{},'hi'); v.then(function(){ }).catch(function(msg){Apoco.popup.error('request failes',msg)});",
                   ret: "promise - javascript Promise",
@@ -1359,7 +1359,7 @@
                     }
                     globalEval(f.getValue());
                 }});
-                
+
             }
             UI.Panels.IO.components.push(k);
         }
@@ -1423,18 +1423,18 @@
                               globalEval(f.getValue());
                               var p=that.parent.getChild("Result");
                               try{
-                                   p.setText(JSON.stringify(v));    
+                                   p.setText(JSON.stringify(v));
                                }
                                catch(e){
                                    console.log("methods doit got %j", v);
                                   p.setText(v);
                                }
-                              
+
                           }},
                           {node: "paragraph",text:"Result"},
                           {node:"paragraph",text:"",name:"Result"}
                          ];
-                    
+
             UI.Panels.Windows.components.push(k);
         }
     };
@@ -1534,7 +1534,7 @@
                     else{
                         p.setText(JSON.stringify(v));
                     }
-                    
+
                 }});
                 k.components.push({node:"heading",size:"h5",text:"Result"});
                 k.components.push({node:"paragraph",name:'Result'});
@@ -1542,7 +1542,7 @@
             UI.Panels.Utils.components.push(k);
         }
     };
-    
+
     var select_tabs=function (that,index){
         if(!that){
             console.log("select_tabs: that is  " + that);
@@ -1555,7 +1555,7 @@
      //   if(name !== that.selected){
           //  console.log("select_tabs: trying to show " + that.selected);
         //Apoco.Panel.hide(that.selected);
-        
+
         Apoco.Panel.show(name);
         var b=Apoco.Panel.get(name);
         if(b){ // may or may not be loaded yet
@@ -1608,10 +1608,10 @@
             getChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].getChild(string);</code>"]}],
             getChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel[string].getChildren();</code>"]}]
         };
-   
+
 
         var HPanels=HThings["Panels"].concat(HThings["PanelComponents"]);
-        
+
         for(var i=0;i<HPanels.length;i++){
           //  console.log("mkPanelMethods making " + HPanels[i]);
             var cmd={
@@ -1651,7 +1651,7 @@
                               if(!f){
                                   throw new Error("can't get input params");
                               }
-                              
+
                               var n=that.parent.id.split("Methods");
                             //  console.log("got " + n[0]);
                               if(Apoco.Panel.get('Panels').getChild(("test"+ n[0]))){
@@ -1661,7 +1661,7 @@
                               that.parent.getChild("Result").setValue("");
                               //$.globalEval(f.getValue());
                               globalEval(f.getValue());
-                              
+
                               var nf=that.parent.getChild("Result");
                               if(!nf){
                                   return;
@@ -1678,17 +1678,17 @@
                           }},
                           {node:"paragraph",text:"Result"},
                           {field:"static",name:"Result",type:"string" }
-                                                    
+
                          ];
-           UI.Panels.Panels.components.push(k);  
+           UI.Panels.Panels.components.push(k);
         }
-        
+
     };
     UI.Windows={
         TestWindow:{name: "TestWindow",opts:{height:800}}
-        
+
     };
-    
+
     UI.Panels={
         Tabs:{ name: "Tabs",
                components:[ {display: "tabs",
@@ -1746,7 +1746,7 @@
                                              {node:"paragraph", text: "A HTML node that is used as the parent of the field,typically a div or li node. DO NOT supply an input node!"}
                                             ]
                                },
-                             ] 
+                             ]
                 },
         About:{ name: "About",
                 components:[
@@ -1771,10 +1771,10 @@
                                                           {label: "fields or nodes",description: "which contain"},
                                                           {label: "types",description: ""}
                                                          ]},
-      
+
                           {node:"paragraph",text:"You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) "}
                         //  {node: "heading",size: "h4",text:"Required"}
-           
+
                       ]},
                     {display:"fieldset",
                      id: "start",
@@ -1793,7 +1793,7 @@
                                                                                               ]},
                                                         {label:"or string array",descriptions:["where the elements of the array are UI.Panel names"]}
                                                        ]}
-                         
+
                      ]
                     },
                     {display:"fieldset",
@@ -1833,7 +1833,7 @@
                           {node:"heading",size:"h3",text: "Methods"},
                           {node: "descriptionList",items:[{label:"getElement",descriptions:["<code> var v=myNode.getElement();</code","returns the created HTML element"] },{label:"setText",descriptions:["<code> myNode.setText('some string');</code>","No return value","only applies if the node has a text option"]}]}
                       ]
-                      
+
                     }
                 ]
               },
@@ -1844,7 +1844,7 @@
                         id: "DisplaysMenu",
                       //  selected: "Menu",
                         heading:"Display Templates",
-                        list: mkMenu(HThings.Displays) 
+                        list: mkMenu(HThings.Displays)
                        },
                        { display: "fieldset",
                          id:"Blurb",
@@ -1862,7 +1862,7 @@
                              {node: "heading",size: "h5", text:"templateData"},
                              {node: "paragraph", text: "A javascript object that will be passed to the template"}
                             ]
-                         
+
                        }
                    ]},
         Windows:{ name: "Windows",
@@ -1872,7 +1872,7 @@
                        id: "WindowsMenu",
                        //  selected: "Menu",
                        heading:"Window Templates",
-                       list: mkMenu(HThings.Windows) 
+                       list: mkMenu(HThings.Windows)
                       },
                       { display: "fieldset",
                          id:"Blurb",
@@ -1887,7 +1887,7 @@
                              {node: "heading",size: "h5", text:"templateData"},
                              {node: "paragraph", text: "A javascript object that will be passed to the template"}
                             ]
-                        
+
                       }
                 ]},
         Panels:{ name: "Panels",
@@ -1901,28 +1901,28 @@
                           {node: "paragraph",text: "Only display templates can be added to the Panel components array."},
                           {node: "paragraph",text: ("Apoco panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "tabs:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
                           {node:"paragraph",text: ("This would create a new panel with the name 'MyPanel' with one component, Tabs<br> To add another display component you add it to the components array.")},
-                          
+
                           {node: "heading", size: "h3", text: "Usage" },
                           {node: "paragraph", text: "<code>Apoco.Panel.add(PanelObject);</code><br> or"},
                           {node: "paragraph", text: "<code>Apoco.Panel.UIStart(PanelObjectArray);</code><br>"},
                           {node: "heading",size:"h4",text: "Panel object" },
                           {node: "heading",size: "h5",text:"required"},
                           {node: "descriptionList",items:[{label:"name",description:"type: 'string'"},
-                                                         
+
                                                           {label: "components",description:"type:'objectArray'"}]},
                           {node: "heading",size: "h5",text:"options"},
                           {node: "descriptionList",items:[{label: "window",descriptions:["type:'object'","defult: uses the current browser window","e.g","<code> var win_object={url:'string',name: 'string', opts:'width=600',height=600'}","The html file designated in the url must contain <code>ApocoCoreChild.js</code>","and when the document is loaded call <code>Apoco.childReady();</code>"]}]},
-                       
+
                           {node: "heading",size:"h4",text:"Live Example"},
                           {name: "Input_params",field: "textArea",
-                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"}, 
+                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                            
+
                                if(Apoco.Panel.get('TestPanel')){
                                    Apoco.Panel.delete('TestPanel');
                                }
@@ -1931,7 +1931,7 @@
                            }
                           }
                       ]
-                      
+
                     },
                       {display:"menu",
                        DOM: "left",
@@ -1949,7 +1949,7 @@
                     id: "TypesMenu",
                     //selected: "Menu",
                     heading:"Types",
-                    list: mkMenu(HThings.Types) 
+                    list: mkMenu(HThings.Types)
                    },
                    { display: "fieldset",
                      id:"Blurb",
@@ -1969,7 +1969,7 @@
                                                                         "type_data: string, object, or objectArray for multiple sort ordering, ", " <br> ",
                                                                         "See the utils page for more info and examples."
                                                                        ]}
-                                                         
+
                                                         ]},
                                ]
                    }
@@ -1987,7 +1987,7 @@
                           {node: "paragraph",text: "IO is usually controlled through the action function e.g <br> <code> { node: 'button', <br>" + mk_spaces(1) + " name: 'my_button',<br> " + mk_spaces(1) + "action: function(that){ <br> " + mk_spaces(4) + "  var data=get_data(); <br> " + mk_spaces(4) + "Apoco.IO.webSocket({},['logon',{user: data.user,password: data.password}]);<br> " + mk_spaces(2) + "}<br>};</code>"},
                           {node:"paragraph",text:"Or set up publish/listen in the initialisation of a field or display e.g <br> <br> <code> var tabs=Apoco.display['tabs']({id:'myTabs',DOM:'Content',tabs:[{name:'tab1'}],<br> " + mk_spaces(16) + "listen:[{name:'mySignal',<br> " + mk_spaces(22) + "action:function(that,data){<br>" + mk_spaces(26) + " that.addTab({name: data}); <br> " + mk_spaces(22) + "  } <br> "+ mk_spaces(20) + "}]    <br> " + mk_spaces(16) + "}); </code>"}
                       ]
-                      
+
                     },
                       {display:"menu",
                        DOM: "left",
@@ -1997,7 +1997,7 @@
                        list: mkMenu(HThings.IO)
                       },
                   ]
-            
+
            },
         Popups:{name: "Popups",
                 components:[
@@ -2006,7 +2006,7 @@
                     id: "PopupsMenu",
                     //selected: "Menu",
                     heading:"Popups",
-                    list: mkMenu(HThings.Popups) 
+                    list: mkMenu(HThings.Popups)
                    },
                     { display: "fieldset",
                       id:"Blurb",
@@ -2017,7 +2017,7 @@
                           {node: "heading",size: "h3",text:"Usage"},
                           {node: "paragraph",text:"<code>Apoco.popup[popup_name](params);</code>"}
                       ]
-                      
+
                     }
                   ]
               },
@@ -2030,19 +2030,19 @@
                           {node: "heading",size:"h2",text: "Apoco Utils"},
                           {node: "paragraph",text: "Utils.js"}
                       ]
-                      
+
                     },
                       {display:"menu",
                        DOM: "left",
                        id: "UtilsMenu",
                    //    selected: "Menu",
                        heading:"Utility Methods",
-                       list: mkMenu(HThings.Utils) 
+                       list: mkMenu(HThings.Utils)
                       }
                   ]
         }
     };
-                                           
+
     fieldManual.execute();
     mkNodes();
     mkDisplays();
@@ -2053,8 +2053,8 @@
     mkIO();
     mkUtils();
     mkWindows();
-    
+
     UI.start=["Tabs","About"];
     //console.log("UI.start is %j " + UI.start);
-    
+
 })();
