@@ -82,6 +82,9 @@ require("./DisplayBase");
                         that["stop"]();
                         return;
                     }
+                    if(icon.action === "step" && that.interval){
+                        that.stop();
+                    }
                     e.currentTarget.classList.add("ui-state-active");
                     sibs=Apoco.Utils.getSiblings(e.currentTarget);
                  //   console.log("got siblings length " + sibs.length);
@@ -297,6 +300,7 @@ require("./DisplayBase");
         },
         step: function(dir){
             var num=this.values.length;
+            
            // console.log("next is here len vals is " + num + " current is " + this.current);
             this.values[this.current].SSimage.style.position="relative";
             this.values[this.current].SSimage.style.visibility="hidden";

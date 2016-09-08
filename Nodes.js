@@ -68,6 +68,7 @@ require("./Types.js");
                     if(that.text){
                         that.element.textContent=that.text;
                     }
+                  
                 }
             }
             else{
