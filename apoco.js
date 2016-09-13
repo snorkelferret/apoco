@@ -2384,7 +2384,7 @@ require("./DisplayBase");
             f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
         this._execute();
-        document.addEventListener("visibilitychange", function(e){
+        document.addEventListener("visibilitychange", function(e){  // this is to stop weird flicker 
             if(document.hidden){
                 if(that.interval){
                     that.stop();
@@ -2392,11 +2392,14 @@ require("./DisplayBase");
             }
             else{
                 if(that.autoplay){
-                    that.element.querySelector("span.ui-icon-play").click();
-                    //that.play();
+                    var t;
+                    t=setInterval(function(){ //need this to stop race condition
+                        that.element.querySelector("span.ui-icon-play").click();
+                        clearInterval(t);
+                    },2000);
                 }
             }
-        }, false);
+        }, false); 
     };
 
     ApocoMakeSlideshow.prototype={
@@ -2677,20 +2680,21 @@ require("./DisplayBase");
                     clearInterval(timer);
                     that.values[prev].SSimage.style.position="relative";
                     that.values[prev].SSimage.style.visibility="hidden";
-                   
+                    that.values[prev].SSimage.style.opacity=1;
+                    that.values[prev].SSimage.style.filter = 'alpha(opacity=' + 100 + ")";
                 }
-                that.values[prev].SSimage.style.opacity = (1-op);
-                that.values[prev].SSimage.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
-                that.values[next].SSimage.style.opacity = op;
-                that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
-                op += op * inc;
+                else{
+                    that.values[prev].SSimage.style.opacity = (1-op);
+                    that.values[prev].SSimage.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                    that.values[next].SSimage.style.opacity = op;
+                    that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                    op += op * inc;
+                }
             }, step);
         },
         step: function(dir,caller){
             var num=this.values.length;
             var next,prev=this.current;
-           // console.log("next is here len vals is " + num + " current is " + this.current);
-        
             if(dir==="next"){
                 if(this.current>=(num-1)){
                     this.current=0;
