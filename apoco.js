@@ -2342,6 +2342,8 @@ require("./DisplayBase");
 	    element: null,
             editable: false, //unusual to make it uneditable
             thumbnails:false,
+            fade: false,
+            fadeDuration: 2000,
             current: 0,
             controls: true
 	};
@@ -2351,6 +2353,18 @@ require("./DisplayBase");
                 options[k]=defaults[k];
             }  
         }
+        
+        if(options.fade === true){
+            if(options.delay <= 250 ){
+                Apoco.popup.error("Slideshow: image delay is less than 1/4 second- setting fade to false");
+                options.fade=false;
+            }
+            else if(options.fadeDuration >= options.delay){
+                Apoco.popup.error("Slideshow: Fade Duration is greater than image delay - setting fade to  " + (options.delay -50));
+                options.fadeDuration=Math.max(options.delay -50,200);
+            }
+        }
+        
         //Apoco.mixinDeep(options,defaults);
 	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
@@ -2370,6 +2384,19 @@ require("./DisplayBase");
             f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
         this._execute();
+        document.addEventListener("visibilitychange", function(e){
+            if(document.hidden){
+                if(that.interval){
+                    that.stop();
+                }
+            }
+            else{
+                if(that.autoplay){
+                    that.element.querySelector("span.ui-icon-play").click();
+                    //that.play();
+                }
+            }
+        }, false);
     };
 
     ApocoMakeSlideshow.prototype={
@@ -2438,8 +2465,33 @@ require("./DisplayBase");
             that.element.appendChild(d);
             
         },
+        _calculateCover:function(i){
+            var that=this;
+            var ar=this.width/this.height;
+            that.values[i].SSimage.style.margin="0"; // reset the margin 
+            if(that.values[i].aspect_ratio > ar){   //wider than window - fit to width
+		var h=that.width/that.values[i].aspect_ratio;
+                //              console.log("new image height is " + h);
+                var w=((that.width).toString() + "px");
+                //              console.log("new image width is " + w);
+                that.values[i].SSimage.style.width=w;
+                that.values[i].SSimage.style.height=(h.toString() + "px");
+		h=(that.height-h)/2;
+		that.values[i].SSimage.style.marginTop=(h.toString() + "px"); 
+                that.values[i].SSimage.style.marginBottom=(h.toString() + "px");
+	    }
+	    else{  // - fit to height
+		var w=that.height*that.values[i].aspect_ratio;
+              //                console.log("new image width is " + w);
+                that.values[i].SSimage.style.width=(w + "px");
+                that.values[i].SSimage.style.height=(that.height + "px");
+		w=(that.width-w)/2;
+                that.values[i].SSimage.style.marginLeft=(w + "px");
+                that.values[i].SSimage.style.marginRight=(w + "px");
+	    }
+        },
         _afterShow:function(){ //set the width and height when it has been determined
-            var that=this,ar,lis=[];
+            var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
             
             this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
@@ -2447,7 +2499,7 @@ require("./DisplayBase");
            // console.log("slideshow container width " + this.width + " height " + this.height);
             this.width=parseFloat(this.width);
             this.height=parseFloat(this.height);
-            ar=this.width/this.height;
+ 
             
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
@@ -2468,26 +2520,7 @@ require("./DisplayBase");
                         }
               //          console.log("image asepect ratio is " + that.values[i].aspect_ratio);
               //          console.log("window aspect ratio is " + ar);
-	                if(that.values[i].aspect_ratio > ar){   //wider than window - fit to width
-		            var h=that.width/that.values[i].aspect_ratio;
-              //              console.log("new image height is " + h);
-                            var w=((that.width).toString() + "px");
-              //              console.log("new image width is " + w);
-                            that.values[i].SSimage.style.width=w;
-                            that.values[i].SSimage.style.height=(h.toString() + "px");
-		            h=(that.height-h)/2;
-		            that.values[i].SSimage.style.marginTop=(h.toString() + "px"); 
-                            that.values[i].SSimage.style.marginBottom=(h.toString() + "px");
-		        }
-		        else{  // - fit to height
-		            var w=that.height*that.values[i].aspect_ratio;
-             //               console.log("new image width is " + w);
-                            that.values[i].SSimage.style.width=(w + "px");
-                            that.values[i].SSimage.style.height=(that.height + "px");
-		            w=(that.width-w)/2;
-                            that.values[i].SSimage.style.marginLeft=(w + "px");
-                            that.values[i].SSimage.style.marginRight=(w + "px");
-		        }
+                        that._calculateCover(i);
                         if(that.current=== i){
                             that.values[i].SSimage.style.visibility="visible";
                         }
@@ -2519,20 +2552,7 @@ require("./DisplayBase");
 	    this.element.appendChild(this.slideshow_container);
             var car=document.createElement("ul");
             car.classList.add("carousel");
-           
-         /*   var left=document.createElement("span");
-            left.classList.add("carousel_left","ui-state-default","ui-corner-all");
-            var right=document.createElement("span");            
-            right.classList.add("carousel_right","ui-state-default","ui-corner-all");
-                    
-            left.addEventListener("click",function(e){e.stopPropagation();
-                                                      that.step("prev");},false);
-            right.addEventListener("click",function(e){e.stopPropagation();
-                                                       that.step("next");},false);
-
-            this.slideshow_container.appendChild(left);
-            this.slideshow_container.appendChild(right); */
-	    that.slideshow_container.appendChild(car);
+ 	    that.slideshow_container.appendChild(car);
             for(var i=0;i<this.values.length;i++){ //create containers for images
                 l=document.createElement("li");
                 l.classList.add("slide");
@@ -2602,6 +2622,7 @@ require("./DisplayBase");
                 c.style.position="";
                 c.style.top="";
                 c.style.left="";
+                
                 if(this.after){
                     t=document.getElementById(that.after);
                     if(t){
@@ -2619,8 +2640,9 @@ require("./DisplayBase");
         },
         play:function(){
             var that=this;
+            this.step("next"); // update immediately for user feedback
   //          console.log("play is here " + that);
-            this.interval=setInterval(function(){that.step("next");},this.delay);
+            this.interval=setInterval(function(){that.step("next","play");},this.delay);
         },
         stop:function(){
             var that=this;
@@ -2629,12 +2651,46 @@ require("./DisplayBase");
             }
             this.interval=null;
         },
-        step: function(dir){
-            var num=this.values.length;
+        _crossFade: function(prev,next){
+            var that=this;
+            var timer,op=0.05,inc=0.1,step=40;
+            // we want about 25 steps per second. i.e st=40
+            var n=parseInt(this.fadeDuration/step);
+            // calculate the increment for a given number of steps
+            inc=Math.pow(1/op,1/n) -1.0;
+            if(inc <= 0) return; // something has gone badly wrong
+          //  console.log("inc is " + inc);            
+            // calculate the number of steps for a given increment 
+//            var n=Math.log(1.0/op)/Math.log(1+inc);
+//            var step=parseInt(this.fadeDuration/n);
+
+         //   console.log("fade step is " + st + " fade duration  is " + n*st);
+            that.values[next].SSimage.style.visibility="visible";
+            that.values[next].SSimage.style.position="absolute";
+            that.values[next].SSimage.style.top=0;
+            that.values[next].SSimage.style.left=0;
+            that.values[next].SSimage.style.opacity = op;
+            that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
             
+            timer = setInterval(function() {
+                if (op >= 1.0) {
+                    clearInterval(timer);
+                    that.values[prev].SSimage.style.position="relative";
+                    that.values[prev].SSimage.style.visibility="hidden";
+                   
+                }
+                that.values[prev].SSimage.style.opacity = (1-op);
+                that.values[prev].SSimage.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                that.values[next].SSimage.style.opacity = op;
+                that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                op += op * inc;
+            }, step);
+        },
+        step: function(dir,caller){
+            var num=this.values.length;
+            var next,prev=this.current;
            // console.log("next is here len vals is " + num + " current is " + this.current);
-            this.values[this.current].SSimage.style.position="relative";
-            this.values[this.current].SSimage.style.visibility="hidden";
+        
             if(dir==="next"){
                 if(this.current>=(num-1)){
                     this.current=0;
@@ -2651,29 +2707,23 @@ require("./DisplayBase");
                     this.current--;
                 }
             }
-            this.values[this.current].SSimage.style.visibility="visible"; 
-            this.values[this.current].SSimage.style.position="absolute";
-            this.values[this.current].SSimage.style.top=0;
-            this.values[this.current].SSimage.style.left=0;
-          //  console.log("now current is " + this.current);
-        } /*,
-        getImages: function(data,settings){
-            if(!settings){
-                settings={};
+            next=this.current;
+           // console.log("step - prev " + prev + " next " + next);
+            if(this.fade === false  || caller !== "play"){  // don't do crossfade if just stepping thru the images
+                this.values[prev].SSimage.style.position="relative";
+                this.values[prev].SSimage.style.visibility="hidden";
+                this.values[next].SSimage.style.visibility="visible"; 
+                this.values[next].SSimage.style.position="absolute";
+                this.values[next].SSimage.style.opacity=1;
+                this.values[next].SSimage.style.filter = "alpha(opacity=100)";
+                this.values[next].SSimage.style.top=0;
+                this.values[next].SSimage.style.left=0;
             }
-            var promise=new Promise(function(resolve,reject){
-                Apoco.REST("GET",settings,data);
-            });
-            promise.then(function(rd){
-                for(var i=0;i<rd.length;i++){
-                    this.values.push(rd[i]);
-                }
-            }).catch(function(reason){
-                Apoco.popup.dialog("Slideshow: getImages could not load " + reason);
-            });
-
-            return promise;
-        } */
+            else{
+                this._crossFade(prev,next);
+            }
+          //  console.log("now current is " + this.current);
+        } 
     };
 
     Apoco.Utils.extend(ApocoMakeSlideshow,Apoco._DisplayBase);
@@ -5338,7 +5388,9 @@ require("./Window");
                // if(!$.contains(window.document.body,c[i].element)){
               //        c[i].DOM.append(c[i].element);
                 //  }
-                c[i].show();
+                if(c[i].hidden !== true){
+                    c[i].show();
+                }
             }
         },
         showAll:function(win){
@@ -5533,8 +5585,10 @@ require("./Window");
 	    var that=this;
             var d;
 	    var doit=function(that,index){
-              //  console.log("doit is here index is " + i);
-                if(!d.hidden){ /// hmmmm
+                //  console.log("doit is here index is " + i);
+                console.log("hidden is " + d.hidden);
+                if(!d.hidden  ||  d.hidden !== true){ /// hmmmm
+                    console.log("showing " + d.id);
         	    d.show();
                 }
 		that.components[index]=d;
@@ -5549,18 +5603,14 @@ require("./Window");
 		if(!d){
 		    throw new Error("could not create " + p);
 	        }
-	            /*	if(d.deferred){
-                    Apoco.popup.spinner(true);
-		    d.deferred.done(function(that){
-	//		console.log("deferred done");
-			doit(that,i);
-                        Apoco.popup.spinner(false);
-		    }(that));
-		}
-		else{
-		    doit(this,i);
-		     } */
-                doit(this,i);
+                //doit(this,i);
+            //    console.log("_addComponents id is " + d.id + " hidden is " + d.hidden);
+                if(d.hidden === undefined  ||  d.hidden !== true){ /// hmmmm
+              //      console.log("_addComponents showing " + d.id);
+        	    d.show();
+                }
+    
+		this.components[i]=d;
 	    }
 	},
 	addChild: function(display_object){ // to existing panel

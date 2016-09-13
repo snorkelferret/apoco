@@ -947,11 +947,11 @@
         var stuff={
             fieldset:{required:[{label:"components",descriptions:[ "An array of nodes and/or field objects","example",
                                                                    "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
-                      options:[]
+                      options:[{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}]
                      },
             form:{required:[{label:"components",descriptions:[ "An array of nodes and/or field objects","example",
                                                                "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
-                  options:[{label:"buttons",descriptions:["an array of button objects","example","<code> buttons: [{name: 'string',text:'string',action: function(that){ //some code }}]</code>"]},
+                  options:[{label:"buttons",descriptions:["an array of button objects","example","<code> buttons: [{name: 'string',text:'string',action: function(that){ //some code }}]</code>"]},{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                            {label:"draggable",descriptions:["type: boolean","default: true","if true the form is detached and can be dragged around the browser window"]},
                            {label: "label",description: "type: string"}]},
             grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1}]<code>"]},
@@ -961,17 +961,29 @@
                       {label:"sortOrder",descriptions:["type:stringArray","column names to sort the grid rows","example","<code>sortOrder:['colname1','colname2']<code","sort the rows first by colname1 and then colname2"]},
                       {label:"groupBy",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a label it will be used as a the subgrid seperator"]},
                       {label:"uniqueKey",descriptions:["type: string","the column name of the uniqueKey if it exists"]},
-                      {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]}
+                      {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]},
+                       {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                   ]},
             menu:{  required:[{label: "list",description:""}],
                     options:[{label: "label",description:""},
+                             {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                              {label: "heading",description:""},
                             ]},
-            slideshow:{options:[{label: "values",descriptions:["type: objectArray","array of Image objects","<code> var values=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]}],
+            slideshow:{options:[{label: "values",descriptions:["type: objectArray","array of Image objects","<code> var values=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]},
+                                {label: "delay",descriptions:["type: integer","default: 4000", "time in milliseconds to display each image"]},
+                                {label:"controls",descriptions:["type: Boolean","default: true","display the controls"]},
+                                {label:"thumbnails",descriptions:["type: Boolean","default: false","display the thumbnails"]},
+                                {label: "autoplay",descriptions:["type: Boolean","default: true","start playing immeditately"]},
+                                {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
+	                        {label:"fullscreen",descriptions:["type: Boolean","default: true","Allow images to be fullscreen"]},
+                                {label: "fade",descriptions:["type: Boolean","default: false","Crossfade between the images"]},
+                                {label: "fadeDuration",descriptions:["type: integer","default:2000","Length of fade in milliseconds- must be less than delay"]}
+                               ],
                        required:[]
                       },
             tabs:{required:[{label: "tabs",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label'},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'"]}],
-                  options:[]
+                  options:[{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
+                          ]
                  }
         };
         var command={

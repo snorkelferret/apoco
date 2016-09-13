@@ -142,7 +142,9 @@ require("./Window");
                // if(!$.contains(window.document.body,c[i].element)){
               //        c[i].DOM.append(c[i].element);
                 //  }
-                c[i].show();
+                if(c[i].hidden !== true){
+                    c[i].show();
+                }
             }
         },
         showAll:function(win){
@@ -337,8 +339,10 @@ require("./Window");
 	    var that=this;
             var d;
 	    var doit=function(that,index){
-              //  console.log("doit is here index is " + i);
-                if(!d.hidden){ /// hmmmm
+                //  console.log("doit is here index is " + i);
+                console.log("hidden is " + d.hidden);
+                if(!d.hidden  ||  d.hidden !== true){ /// hmmmm
+                    console.log("showing " + d.id);
         	    d.show();
                 }
 		that.components[index]=d;
@@ -353,18 +357,14 @@ require("./Window");
 		if(!d){
 		    throw new Error("could not create " + p);
 	        }
-	            /*	if(d.deferred){
-                    Apoco.popup.spinner(true);
-		    d.deferred.done(function(that){
-	//		console.log("deferred done");
-			doit(that,i);
-                        Apoco.popup.spinner(false);
-		    }(that));
-		}
-		else{
-		    doit(this,i);
-		     } */
-                doit(this,i);
+                //doit(this,i);
+            //    console.log("_addComponents id is " + d.id + " hidden is " + d.hidden);
+                if(d.hidden === undefined  ||  d.hidden !== true){ /// hmmmm
+              //      console.log("_addComponents showing " + d.id);
+        	    d.show();
+                }
+    
+		this.components[i]=d;
 	    }
 	},
 	addChild: function(display_object){ // to existing panel
