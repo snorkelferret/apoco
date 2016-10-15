@@ -2348,6 +2348,7 @@ require("./DisplayBase");
             controls: true
 	};
 	var f,that=this;
+         
         for(var k in defaults){
             if(options[k] === undefined){
                 options[k]=defaults[k];
@@ -2365,44 +2366,29 @@ require("./DisplayBase");
             }
         }
         
-        //Apoco.mixinDeep(options,defaults);
-	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+   	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
         if(this.thumbnails === true){
             this.thumbnails=document.createElement("div"); 
             this.thumbnails.classList.add("thumbnails");
         }
+        
+        // puts up file browser to select images  if editable is true
+        f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
+        if(!f){
+            throw new Error("Slideshow: cannot make imageArray");
+        }
+        
         if(this.values){  // start preloading images
-     //       console.log("got some values");
-            f=Apoco.field["imageArray"]({name:"slideshow"});
-            if(!f){
-                throw new Error("Slideshow: cannot make imageArray");
-            }
+          //  Apoco.popup.spinner(true);
+            //       console.log("got some values");    
             this.promise=f.loadImages(this.values);
         }
-        else if(this.editable === true){   // put up file browser to select images 
-            f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
-        }
         this._execute();
-        document.addEventListener("visibilitychange", function(e){  // this is to stop weird flicker 
-            if(document.hidden){
-                if(that.interval){
-                    that.stop();
-                }
-            }
-            else{
-                if(that.autoplay){
-                    var t;
-                    t=setInterval(function(){ //need this to stop race condition
-                        that.element.querySelector("span.ui-icon-play").click();
-                        clearInterval(t);
-                    },2000);
-                }
-            }
-        }, false); 
     };
 
-    ApocoMakeSlideshow.prototype={
+    ApocoMakeSlideshow.prototype={  
+    
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
@@ -2441,6 +2427,7 @@ require("./DisplayBase");
                     //    console.log("already in play mode");
                         e.currentTarget.classList.remove("ui-state-active");
                         that["stop"]();
+                        that.autoplay=false;
                         return;
                     }
                     if(icon.action === "step" && that.interval){
@@ -2468,85 +2455,79 @@ require("./DisplayBase");
             that.element.appendChild(d);
             
         },
-        _calculateCover:function(i){
+        _calculateCover:function(v){
             var that=this;
             var ar=this.width/this.height;
-            that.values[i].SSimage.style.margin="0"; // reset the margin 
-            if(that.values[i].aspect_ratio > ar){   //wider than window - fit to width
-		var h=that.width/that.values[i].aspect_ratio;
+            v.SSimage.style.margin="0"; // reset the margin 
+            if(v.aspect_ratio > ar){   //wider than window - fit to width
+		var h=that.width/v.aspect_ratio;
                 //              console.log("new image height is " + h);
                 var w=((that.width).toString() + "px");
                 //              console.log("new image width is " + w);
-                that.values[i].SSimage.style.width=w;
-                that.values[i].SSimage.style.height=(h.toString() + "px");
+                v.SSimage.style.width=w;
+                v.SSimage.style.height=(h.toString() + "px");
 		h=(that.height-h)/2;
-		that.values[i].SSimage.style.marginTop=(h.toString() + "px"); 
-                that.values[i].SSimage.style.marginBottom=(h.toString() + "px");
+		v.SSimage.style.marginTop=(h.toString() + "px"); 
+                v.SSimage.style.marginBottom=(h.toString() + "px");
 	    }
 	    else{  // - fit to height
-		var w=that.height*that.values[i].aspect_ratio;
+		var w=that.height*v.aspect_ratio;
               //                console.log("new image width is " + w);
-                that.values[i].SSimage.style.width=(w + "px");
-                that.values[i].SSimage.style.height=(that.height + "px");
+                v.SSimage.style.width=(w + "px");
+                v.SSimage.style.height=(that.height + "px");
 		w=(that.width-w)/2;
-                that.values[i].SSimage.style.marginLeft=(w + "px");
-                that.values[i].SSimage.style.marginRight=(w + "px");
+                v.SSimage.style.marginLeft=(w + "px");
+                v.SSimage.style.marginRight=(w + "px");
 	    }
         },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
-            
-            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
-            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
+            this.width=parseFloat(window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px"));
+            this.height=parseFloat(window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px"));
            // console.log("slideshow container width " + this.width + " height " + this.height);
-            this.width=parseFloat(this.width);
-            this.height=parseFloat(this.height);
- 
-            
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
-            if(this.promise){
-                this.promise.then(function(){
-                    lis=that.slideshow_container.querySelectorAll("li.slide");
-             //       console.log("lis is " + lis + " lis.length " + lis.length);
-                    if(lis.length !== that.values.length){
-	                throw new Error("Slideshow: slide lis do not exist");
-                    }
-                    for(var i=0;i<that.values.length;i++){
+            lis=that.slideshow_container.querySelectorAll("li.slide");
+            for(var i=0;i<this.values.length;i++){
                //         console.log("loading image " + i + " with aspect ratio " + that.values[i].aspect_ratio);
-               //         console.log("image width " + that.values[i].width + " height " + that.values[i].height);
-                        if(!lis[i].contains(that.values[i].SSimage)){
-                            that.values[i].SSimage=document.createElement("img");
-                            that.values[i].SSimage.src=that.values[i].src;
-                            lis[i].appendChild(that.values[i].SSimage);
-                        }
-              //          console.log("image asepect ratio is " + that.values[i].aspect_ratio);
-              //          console.log("window aspect ratio is " + ar);
-                        that._calculateCover(i);
-                        if(that.current=== i){
-                            that.values[i].SSimage.style.visibility="visible";
-                        }
-                        else{
-                            that.values[i].SSimage.style.visibility="hidden";
-                        }
-                    }
-                    if(that.autoplay === true){
-               //         console.log("trigger autoplay");
-                        if(that.interval){
-                            that.stop();
-                        }
-                        that.element.querySelector("span.ui-icon-play").click();
-                    }
-                }).catch(function(reason){
-                    //remove the lis
-                    Apoco.popup.error("Slideshow",("Could not load images" + reason));
-                }); 
+                //         console.log("image width " + that.values[i].width + " height " + that.values[i].height);
+                if(that.current=== i){
+                    that.values[i].SSimage.style.visibility="visible";
+                }
+                else{
+                    that.values[i].SSimage.style.visibility="hidden";
+                }
+            }
+            if(that.autoplay === true){
+                //         console.log("trigger autoplay");
+                if(that.interval){
+                    that.stop();
+                }
+                that.element.querySelector("span.ui-icon-play").click();
             }
         },
 	_execute: function(){
-            var that=this,l;
-	//    console.log("execute of DisplaySlideshow");
+            var that=this,l,temp;
+            var visibleCallback=function(e){
+                if(that.DOM.contains(that.element)){
+                    e.stopPropagation();
+                    // console.log("visibility change");
+                    if(document.hidden){
+                        //  console.log("hidden");
+                        if(that.interval){
+                            that.stop();
+                        }
+                    }
+                    else{
+                    //   console.log("visible");
+                        if(that.autoplay){
+                            that.element.querySelector("span.ui-icon-play").click();
+                        }
+                    }
+                }
+            };
+	 //   console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
             this.element.classList.add("Apoco_slideshow","ui-widget-content","ui-corner-all");
@@ -2560,10 +2541,26 @@ require("./DisplayBase");
                 l=document.createElement("li");
                 l.classList.add("slide");
                 car.appendChild(l);
+                this.values[i].SSimage=document.createElement("img");
+                l.appendChild(this.values[i].SSimage);
+                that.values[i].SSimage.style.visibility="hidden";
+                temp=document.createElement("h1");
+                temp.textContent="Loading....";
+                l.appendChild(temp);
+                
+                this.promise[i].then(function(v){
+                    var temp=Apoco.Utils.getSiblings(v.SSimage)[0];
+                    v.SSimage.src=v.src;
+                    // console.log("loaded images");
+                    that._calculateCover(v);
+                    temp.parentNode.removeChild(temp);
+                 });
             }
             if(that.controls === true){
                 that._controls();
             }
+            // stop weird flicker from stacks of images forming when not visible
+            document.addEventListener("visibilitychange",visibleCallback, false); 
         },
         deleteAll:function(){
             // delete all the images
@@ -2644,10 +2641,12 @@ require("./DisplayBase");
         play:function(){
             var that=this;
             this.step("next"); // update immediately for user feedback
-  //          console.log("play is here " + that);
+          //  console.log("play is here " + that);
+            this.autoplay=true;
             this.interval=setInterval(function(){that.step("next","play");},this.delay);
         },
         stop:function(){
+          //  console.log("stop is here");
             var that=this;
             if(this.interval){
                 clearInterval(that.interval);
@@ -2712,7 +2711,7 @@ require("./DisplayBase");
                 }
             }
             next=this.current;
-           // console.log("step - prev " + prev + " next " + next);
+         //  console.log("step - prev " + prev + " next " + next);
             if(this.fade === false  || caller !== "play"){  // don't do crossfade if just stepping thru the images
                 this.values[prev].SSimage.style.position="relative";
                 this.values[prev].SSimage.style.visibility="hidden";
@@ -3041,7 +3040,6 @@ require("./datepicker");
             l.appendChild(document.createTextNode(this.label));
             l.setAttribute("for",this.name);
 	    this.element.appendChild(l);
-            this.element.classList.add("label");
 	}
         
 	if(this.publish !== undefined){
@@ -4292,10 +4290,12 @@ require("./datepicker");
     var ImageArrayField=function(d,element){
         var that=this;
         var new_values=[];
+        this.promises=[];
         d.field="ImageArrayField";
         d.type="imageArray";
 	_Field.call(this,d,element);
 	this.popup=true;
+       
         this.width=this.width?this.width:120;
         this.height=this.height?this.height:90;
         if(!this.value){
@@ -4315,51 +4315,31 @@ require("./datepicker");
             this.input.setAttribute("multiple","multiple");
 	    this.element.appendChild(this.input);
 	    this.input.addEventListener("change",function(e){
-	        var file_promise=that._getImageFileSelect(e,new_values);
-	        file_promise.then(function(v){
-		    // Apoco.display.alert("Uploading done");
-                    console.log("ImageArray: Upload got " + new_values.length + " files");
-                    //for(var i=0;i<new_values.length;i++){
-                    that.value=that.value.concat(new_values);
-                    console.log("ImageArray: got new values " + that.value.length);
-		    if(that.thumbnails !== undefined){
-                        console.log("going to make thumbnails");
-		        that.mkThumbnails();
-		    }
-                    else{
-                        console.log("not making thumbnails");
-                    }
-	        }).catch(function(reason){
-                    console.log("could not load images " + reason);
-                });
+                that._getImageFileSelect(e);
             });
         }
         if(this.value && this.value.length>0){  // start pre-loading
-            var promise=this.loadImages(this.value);
-            promise.then(function(){
-                if(this.thumbnails !== undefined){
-                   this.mkThumbnails();
-                }
-            }).catch(function(reason){
-                console.log("mkthumbnails failed " + reason); 
-            });
+            this.loadImages();
         }
+        if(this.thumbnails === true){ 
+            this.mkThumbnails();
+        } 
     };
 
     ImageArrayField.prototype={
         _getImage: function(o){
             var that=this;
-            var imm=new Image();  // get the width and height - need to load in to image
-	    imm.src=o.src;
-            //console.log("getImage is here ");
+            var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
+            imm.src=o.src;
+	    //console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
 	          //  console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
-                    o.aspect_ratio=parseFloat(this.width/this.height);
                     o.image=imm;
+                    o.aspect_ratio=parseFloat(this.width/this.height);
                     resolve(o);
                 };
                 imm.onerror=function(){
@@ -4369,10 +4349,11 @@ require("./datepicker");
                 };
             });
             return promise;
-         },
-        _getImageFileSelect: function(evt,new_values){
+        }, 
+        _getImageFileSelect: function(evt){
             var that=this;
-   	    new_values.length=0; // reset array
+            var td=this.element.querySelector("div.thumbnails");
+   	    //new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = new Array; //evt.target.files;
 	  //  console.log("got " + files.length + " number of files");
@@ -4382,89 +4363,93 @@ require("./datepicker");
                     files.push(evt.target.files[i]);
                 }
             }
-	    var last=files.length;
-	    var count=0,finished=false;
-            var promise=new Promise(function(resolve,reject){
-	        for (var i=0; i<files.length; i++) {
-	//	    console.log("found file num " + i);
-		    var reader = new FileReader();
-		    reader.onload = (function(f,last,new_values) {
-		        return function(e) {
-                            var p;
-			    e.stopPropagation();
-	                   // console.log("FileSelect: going to load " + f.name);
-                           // console.log("FileSelect: last is " + last + " and count is " + count);
-                            new_values[count]={src: e.target.result,name:f.name};
-                            p=that._getImage(new_values[count]);
-                            p.then(function(v){
-                                //console.log("getFileSelect: assigned value");
-                                new_values[count]=v;
-                                count++;
-                                if(count===last){
-                                    //console.log("FileSelect: finished true");
-                                    resolve(last);
-	                        } 
-                            }).catch(function(reason){
-       //                         console.log("could not load image " + reason); 
-                                reject(reason);
+            var count=that.value.length;
+	    var last=count+files.length;
+          //  var promise=new Promise(function(resolve,reject){
+	    for (var i=count,j=0; i<last; i++,j++) {
+	        console.log("found file num " + i);
+		var reader = new FileReader();
+		reader.onload = (function(f,num) {
+                    console.log("getImagefileselect  file is  %j",f);
+		    return function(e) {
+                        var p;
+                        console.log("getImageFiles: that.value len is  " + that.value.length);
+			e.stopPropagation();
+	                console.log("FileSelect: going to load " + f.name);
+                        console.log("FileSelect: last is " + last + " and count is " + count);
+                        that.value[num]={src: e.target.result,name:f.name};
+                        console.log("that.value is %j",that.value[num]);
+                        that.promises[num]=that._getImage(that.value[num]);
+                        if(that.thumbnails === true){
+                            console.log("thumbnails is true");
+                            that.promises[num].then(function(v){
+                                that._addThumbnail(td,v);
                             });
-                            //console.log("getImageFiles: new values has " + new_values.length);
- 		        };
-		    })(files[i],last,new_values);
-		    reader.readAsDataURL(files[i]);
-	        }
-            });
-	    return promise;
+                        }
+                        console.log("getImageFiles: that.value len is  " + that.value.length);
+ 		    };
+		})(files[j],i);
+		reader.readAsDataURL(files[j]);
+	    }
+  
+           // });
+	   // return promise;
         },
         loadImages: function(values){
-            var i=0,p,last,that=this,num_loaded,promises=[],not_loaded;
+            var i=0,last,that=this;
             if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
                 i=this.value.length;
          //       console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
-            
             last=this.value.length;
-            num_loaded=i;
-            not_loaded=0;
-         //   console.log("loadImages last is " + last);
-            for(i; i<last;i++){   //aborts everything if one fails
-                promises.push(that._getImage(that.value[i]));
+            //   console.log("loadImages last is " + last);
+            for(i; i<last;i++){
+                var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
+                imm.src=this.value[i].src;
+	        //console.log("getImage is here ");
+                this.promises[i]=that._getImage(that.value[i]);
             }
-            
-            var promise=Promise.all(promises); // rejects on first fail
       
-            return promise;
+            return this.promises;
+        },
+        finishedLoading:function(){
+            return Promise.all(this.promises); // rejects on first fail
+        },
+        _addThumbnail:function(pp,v){
+            var t=v.title || v.name;
+            var el=pp.querySelector("div[title='" + t + "']");
+            console.log("add thumbnail is here");
+            if(!el){
+		var div=document.createElement("div");  
+                div.title=t;
+                if(this.width){
+                    div.style.width=(this.width.toString() + "px");
+                }
+                if(this.height){
+                    div.style.height=(this.height.toString() + "px");
+                }
+                if(!v.image){
+                    throw new Error("mkThumbnails: image does not exist");
+                }
+		div.appendChild(v.image);
+		pp.appendChild(div);
+            }
         },
         mkThumbnails: function(){
             var that=this,el;
 	//    console.log("mk_thumbnails got " + this.value.length + " number of files");
-            var td=this.element.querySelector("div.imageArray");
+            var td=this.element.querySelector("div.thumbnails");
             if(!td){
          //       console.log("making a new image gallery");
                 td=document.createElement("div");//"<div class='image_gallery'></div");
-                td.className="imageArray";
+                td.className="thumbnails";
                 this.element.appendChild(td);
 	    }
-	    for(var i=0;i<this.value.length;i++){ // each image
-//	        console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
-		var t=this.value[i].title || "";
-                el=td.querySelector("div[title='" + t + "']");
-                if(!el){
-		    var div=document.createElement("div");  
-                    div.title=t;
-                    if(this.width){
-                        div.style.width=(this.width.toString() + "px");
-                    }
-                    if(this.height){
-                        div.style.height=(this.height.toString() + "px");
-                    }
-                    if(!this.value[i].image){
-                        throw new Error("mkThumbnails: image does not exist");
-                    }
-		    div.appendChild(this.value[i].image);
-		    td.appendChild(div);
-	        }
+	    for(var i=0;i<this.promises.length;i++){ // each image
+                this.promises[i].then(function(v){   
+                    this._addThumbnail(td,v);
+                });
             }
   	},
         _resetValue:function(){
@@ -5901,13 +5886,13 @@ var Apoco=require('./declare').Apoco;
                 spinner.id="Apoco_spinner";
 		document.body.appendChild(spinner);
 	    }
-	    if(on){
-		//console.log("Apoco spinner on");
-                document.getElementById("Apoco_spinner").style.visibility="visible";
+	    if(on === true ){
+		console.log("Apoco spinner on");
+                document.getElementById("Apoco_spinner").style.display="inherit";
 	    }
 	    else{
 		console.log("Apoco spinner off");
-                document.getElementById("Apoco_spinner").style.visibility="hidden";
+                document.getElementById("Apoco_spinner").style.display="none";
 
 	    }
             return spinner;

@@ -27,3 +27,4 @@ body{ background-color: #223344}
 #left > div{padding:1em}
 #right{ margin-left: 16.25em; padding: 0; display: table} /*width: auto; top: 30em; position: absolute;   } */
 /* ul.apoco_menu_list li{font-size: 10pt} */
+div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }

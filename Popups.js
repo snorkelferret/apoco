@@ -142,13 +142,13 @@ var Apoco=require('./declare').Apoco;
                 spinner.id="Apoco_spinner";
 		document.body.appendChild(spinner);
 	    }
-	    if(on){
-		//console.log("Apoco spinner on");
-                document.getElementById("Apoco_spinner").style.visibility="visible";
+	    if(on === true ){
+		console.log("Apoco spinner on");
+                document.getElementById("Apoco_spinner").style.display="inherit";
 	    }
 	    else{
 		console.log("Apoco spinner off");
-                document.getElementById("Apoco_spinner").style.visibility="hidden";
+                document.getElementById("Apoco_spinner").style.display="none";
 
 	    }
             return spinner;

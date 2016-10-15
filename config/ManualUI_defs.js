@@ -63,6 +63,7 @@
         href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
         target: "_blank",
         nodeType: "ul",
+        thumbnails: "true",
         objectArray:[{label:"value",description: "describe value"},{label:"another_value",descriptions:["one","two","three"]}]
     };
 
@@ -226,7 +227,7 @@
             imageArray:{options:{value:{type:"imageArray",
                                         default: undefined,
                                         description: "key value javascript object"},
-                                 thumbnails:{type:"boolean",default: true,description:"Display the images as thumbnails" },
+                                 thumbnails:{type:"boolean",default:false,description:"Display the images as thumbnails" },
                                  width:{type:"integer",default: 120,description:"width of the thumbnails"},
                                  height:{type:"integer",default: 90,description:"height of the thumbnails"}
                                 },
@@ -389,7 +390,8 @@
                 stringArray:["value"],
                 float:["value"],
                 numberArray:["value","type"],
-                input:["value","type"]
+                input:["value","type"],
+                imageArray:["thumbnails"]
             };
             for(var i=0;i<HFields.length;i++){
                 f=HFields[i];
@@ -415,7 +417,6 @@
                     for(var j=0;j<fd.length;j++){
                         var n=this.fields[f].options[fd[j]];
                         //console.log("desirable field for " + fd[j] + " type " + n.type );
-
                         if(n){
                             c=c.concat(","+ fd[j] + ":");
                           //  console.log("adding desirable field " + fd[j] + " with type " + n.type);
@@ -547,14 +548,15 @@
                 getLabel:{descriptions:["<code>var r=field.getLabel();</code>","return string",
                                         "get the htmllabel element"]},
                 mkThumbnails:{descriptions:["<code>field.mkThumbnails();</code>","make thumbnails from values array"]},
-                loadImages:{descriptions:["<code>var promise=field.loadImages(valueArray);</code>","returns a javascript promise","valueArray: Object array e.g","<code>valueArray=[{src:'pathToImage',url:'',title:'my_title',width:'100px',height: '100px'}];</code>",
+                loadImages:{descriptions:["<code>var promisee=field.loadImages(valueArray);</code>","returns an array of javascript promises","valueArray: Object array e.g","<code>valueArray=[{src:'pathToImage',url:'',title:'my_title',width:'100px',height: '100px'}];</code>",
                                           "load images from the values array"]},
+                finishedLoading:{descriptions:["<code> var promise=field.finishedLoading();</code>","returns a promise"]},
                 reset:{descriptions:["<code>field.reset();</code>","set all the values to false"]}
             };
             var items=[];
 
             for(var i=0;i<HFields.length;i++){
-                // console.log("mkFieldMethods making " + HFields[i]);
+                console.log("mkFieldMethods making " + HFields[i]);
                 var k={};
                 items=[];
                 Apoco.sort(fm[HFields[i]],"string");
@@ -1748,7 +1750,7 @@
                                              {node:"paragraph", text:"Fields.js <br> depends on Utils.js,Sort.js,Types.js, datepicker.js"} ,
                                              {node: "heading", size: "h3", text: "Usage" },
                                              {node: "paragraph", text: "<code>var field=Apoco.field[fieldType](fieldData,parentNode);</code>"},
-                                             {node: "paragraph",text: "or as part of another object <br> <code>{field: fieldType, value: val, //etc }</code>"},
+                                             {node: "paragraph",text: "or as part of a config file <br> <code>{field: fieldType, value: val, //etc }</code>"},
                                              {node: "paragraph", text: "Returns a ApocoField object"},
                                              {node: "heading", size: "h5", text: "fieldType"},
                                              {node: "paragraph",text: "type: string -  Apoco field type"},
@@ -1836,6 +1838,8 @@
                           {node: "heading", size: "h3", text: "Usage" },
                           {node: "paragraph", text: "<code>var node=Apoco.node(nodeObject[,parentElement]);</code>"},
                           {node: "paragraph", text: "Returns a ApocoNode object"},
+                          {node: "paragraph",text: "or as part of a config file"},
+                          {node: "paragraph",text:"<code> {node: nodeType, ... options}"},
                          // {node: "heading", size: "h5", text: "nodeType"},
                          // {node: "paragraph",text: "type: string -  Apoco node type"},
                           {node: "heading",size: "h5", text:"nodeObject"},
@@ -1869,12 +1873,14 @@
                              {node: "paragraph", text: "Returns a ApocoDisplay object"},
                              {node: "paragraph",text: "display Objects are not automatically added to the DOM, To add the HTML object to the DOM, use "},
                              {node: "paragraph",text: "<code> my_display.show();</code>"},
+                             {node: "paragraph",text: "or to call as part of a config file"},
+                             {node: "paragraph",text:"<code> {display: displayType, ... display options}</code>"},
+                             {node:"paragraph",text:"(see panels tab for more information)" },
                              {node: "heading", size: "h5", text: "templateName"},
                              {node: "paragraph",text: "type: string -  Apoco  display template type"},
                              {node: "heading",size: "h5", text:"templateData"},
                              {node: "paragraph", text: "A javascript object that will be passed to the template"}
                             ]
-
                        }
                    ]},
         Windows:{ name: "Windows",
@@ -1895,11 +1901,11 @@
                              {node: "heading", size: "h4", text: "Usage" },
                              {node: "paragraph", text: "<code>var my_window=Apoco.Window.open(templateData);</code>"},
                              {node: "paragraph", text: "Returns a new browser window object"},
-                             {node: "paragraph",text: "d"},
+                             {node: "paragraph",text: "or as option in config file"},
+                             {node: "paragraph",text: "<code> MyPanel:{name:'MyPanel',window:{url:'stuff.html',name:'my_win'}<br> components: []}</code>"},
                              {node: "heading",size: "h5", text:"templateData"},
                              {node: "paragraph", text: "A javascript object that will be passed to the template"}
                             ]
-
                       }
                 ]},
         Panels:{ name: "Panels",
@@ -1943,7 +1949,6 @@
                            }
                           }
                       ]
-
                     },
                       {display:"menu",
                        DOM: "left",
@@ -1999,7 +2004,6 @@
                           {node: "paragraph",text: "IO is usually controlled through the action function e.g <br> <code> { node: 'button', <br>" + mk_spaces(1) + " name: 'my_button',<br> " + mk_spaces(1) + "action: function(that){ <br> " + mk_spaces(4) + "  var data=get_data(); <br> " + mk_spaces(4) + "Apoco.IO.webSocket({},['logon',{user: data.user,password: data.password}]);<br> " + mk_spaces(2) + "}<br>};</code>"},
                           {node:"paragraph",text:"Or set up publish/listen in the initialisation of a field or display e.g <br> <br> <code> var tabs=Apoco.display['tabs']({id:'myTabs',DOM:'Content',tabs:[{name:'tab1'}],<br> " + mk_spaces(16) + "listen:[{name:'mySignal',<br> " + mk_spaces(22) + "action:function(that,data){<br>" + mk_spaces(26) + " that.addTab({name: data}); <br> " + mk_spaces(22) + "  } <br> "+ mk_spaces(20) + "}]    <br> " + mk_spaces(16) + "}); </code>"}
                       ]
-
                     },
                       {display:"menu",
                        DOM: "left",

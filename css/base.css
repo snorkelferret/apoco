@@ -53,8 +53,9 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 
 .Apoco_slideshow div.pic_area{width: inherit; position: relative; height: 400px; overflow: hidden}
 .Apoco_slideshow div.pic_area_full{position:absolute; top: 0; left:0; z-index: 10}
-.Apoco_slideshow ul.carousel{padding: 0; margin: 0;position:relative;}
-.Apoco_slideshow ul.carousel li{position: absolute; top: 0; left:0; visibility:"hidden"};
+.Apoco_slideshow ul.carousel{padding: 0; margin: 0;position:relative; width:inherit; height:inherit;}
+.Apoco_slideshow ul.carousel li{position: absolute; top: 0; left:0; width:inherit; height: inherit; visibility:"hidden"}
+.Apoco_slideshow ul.carousel li.slide > h1{width:inherit; height: inherit; text-align:center;}
 .Apoco_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat #aaa; width: 48px; height: 48px; margin-left: 1em; top: 50%;left:0px; opacity:0 }
 .Apoco_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat #aaa; width: 48px; height: 48px;margin-right: 1em; top: 50%; right: 0px; opacity:0}
 .Apoco_slideshow span.carousel_left:hover{opacity: 1}
@@ -191,8 +192,9 @@ input.pending{
 .boolean {width: 4em;}
 .text { width: 12em}
 .imageArray{display:block;margin-top:1em; margin-bottom: 1em}
-.imageArray div{display: inline; width: 120px;height: 90px;}
-.imageArray img{width: inherit; height:inherit; border: 2px solid #999}
+.thumbnails{margin-top: 1em}
+.thumbnails div{display:inline}
+.thumbnails img{width: inherit; height:inherit; border: 2px solid #999}
 
 .check_box{width: 16px; height: 16px}
 .field_container textarea {font-family: monospace; width: 50em; height: 10em}
@@ -326,8 +328,7 @@ code{font-size: 10pt}
 #Apoco_trouble h2{position:fixed;font-size: 50pt; color: #fff; top: 33%; left:30%; margin:auto; opacity: 1.0}
 
 #Apoco_spinner
-{/* background:url('images/ajax-loader.gif');  */
-  position: fixed;
+{ position: fixed;
   top: 50%;
   left: 50%;
   margin: auto;
@@ -338,7 +339,7 @@ code{font-size: 10pt}
 }
 
 .Apoco_clock{border: 1px solid ;border-color: inherit; padding: 0.5em; width: 5em; margin-top:1em}
-div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
+
 #login_name { margin-right: 1em} 
 
 

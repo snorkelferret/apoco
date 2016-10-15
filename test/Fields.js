@@ -625,7 +625,17 @@ describe("ImageArrayField",function(){
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
-       document.getElementsByTagName("body")[0].appendChild(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+    it("can load images",function(){
+        var b=[{src:"../css/images/alchemist2.jpg"},{src:"../css/images/alchemist1.jpg"}];
+        var p=f.loadImages(b);
+        assert.strictEqual(p.length,2);
+    });
+    it("can make thumbnails",function(){
+        f.mkThumbnails();
+        var n=document.getElementsByClassName("imageArray");
+        assert.isObject(n[0]);
     });
 
 });

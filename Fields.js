@@ -92,7 +92,6 @@ require("./datepicker");
             l.appendChild(document.createTextNode(this.label));
             l.setAttribute("for",this.name);
 	    this.element.appendChild(l);
-            this.element.classList.add("label");
 	}
         
 	if(this.publish !== undefined){
@@ -1343,10 +1342,12 @@ require("./datepicker");
     var ImageArrayField=function(d,element){
         var that=this;
         var new_values=[];
+        this.promises=[];
         d.field="ImageArrayField";
         d.type="imageArray";
 	_Field.call(this,d,element);
 	this.popup=true;
+       
         this.width=this.width?this.width:120;
         this.height=this.height?this.height:90;
         if(!this.value){
@@ -1366,51 +1367,31 @@ require("./datepicker");
             this.input.setAttribute("multiple","multiple");
 	    this.element.appendChild(this.input);
 	    this.input.addEventListener("change",function(e){
-	        var file_promise=that._getImageFileSelect(e,new_values);
-	        file_promise.then(function(v){
-		    // Apoco.display.alert("Uploading done");
-                    console.log("ImageArray: Upload got " + new_values.length + " files");
-                    //for(var i=0;i<new_values.length;i++){
-                    that.value=that.value.concat(new_values);
-                    console.log("ImageArray: got new values " + that.value.length);
-		    if(that.thumbnails !== undefined){
-                        console.log("going to make thumbnails");
-		        that.mkThumbnails();
-		    }
-                    else{
-                        console.log("not making thumbnails");
-                    }
-	        }).catch(function(reason){
-                    console.log("could not load images " + reason);
-                });
+                that._getImageFileSelect(e);
             });
         }
         if(this.value && this.value.length>0){  // start pre-loading
-            var promise=this.loadImages(this.value);
-            promise.then(function(){
-                if(this.thumbnails !== undefined){
-                   this.mkThumbnails();
-                }
-            }).catch(function(reason){
-                console.log("mkthumbnails failed " + reason); 
-            });
+            this.loadImages();
         }
+        if(this.thumbnails === true){ 
+            this.mkThumbnails();
+        } 
     };
 
     ImageArrayField.prototype={
         _getImage: function(o){
             var that=this;
-            var imm=new Image();  // get the width and height - need to load in to image
-	    imm.src=o.src;
-            //console.log("getImage is here ");
+            var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
+            imm.src=o.src;
+	    //console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
 	          //  console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
-                    o.aspect_ratio=parseFloat(this.width/this.height);
                     o.image=imm;
+                    o.aspect_ratio=parseFloat(this.width/this.height);
                     resolve(o);
                 };
                 imm.onerror=function(){
@@ -1420,10 +1401,11 @@ require("./datepicker");
                 };
             });
             return promise;
-         },
-        _getImageFileSelect: function(evt,new_values){
+        }, 
+        _getImageFileSelect: function(evt){
             var that=this;
-   	    new_values.length=0; // reset array
+            var td=this.element.querySelector("div.thumbnails");
+   	    //new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = new Array; //evt.target.files;
 	  //  console.log("got " + files.length + " number of files");
@@ -1433,89 +1415,93 @@ require("./datepicker");
                     files.push(evt.target.files[i]);
                 }
             }
-	    var last=files.length;
-	    var count=0,finished=false;
-            var promise=new Promise(function(resolve,reject){
-	        for (var i=0; i<files.length; i++) {
-	//	    console.log("found file num " + i);
-		    var reader = new FileReader();
-		    reader.onload = (function(f,last,new_values) {
-		        return function(e) {
-                            var p;
-			    e.stopPropagation();
-	                   // console.log("FileSelect: going to load " + f.name);
-                           // console.log("FileSelect: last is " + last + " and count is " + count);
-                            new_values[count]={src: e.target.result,name:f.name};
-                            p=that._getImage(new_values[count]);
-                            p.then(function(v){
-                                //console.log("getFileSelect: assigned value");
-                                new_values[count]=v;
-                                count++;
-                                if(count===last){
-                                    //console.log("FileSelect: finished true");
-                                    resolve(last);
-	                        } 
-                            }).catch(function(reason){
-       //                         console.log("could not load image " + reason); 
-                                reject(reason);
+            var count=that.value.length;
+	    var last=count+files.length;
+          //  var promise=new Promise(function(resolve,reject){
+	    for (var i=count,j=0; i<last; i++,j++) {
+	        console.log("found file num " + i);
+		var reader = new FileReader();
+		reader.onload = (function(f,num) {
+                    console.log("getImagefileselect  file is  %j",f);
+		    return function(e) {
+                        var p;
+                        console.log("getImageFiles: that.value len is  " + that.value.length);
+			e.stopPropagation();
+	                console.log("FileSelect: going to load " + f.name);
+                        console.log("FileSelect: last is " + last + " and count is " + count);
+                        that.value[num]={src: e.target.result,name:f.name};
+                        console.log("that.value is %j",that.value[num]);
+                        that.promises[num]=that._getImage(that.value[num]);
+                        if(that.thumbnails === true){
+                            console.log("thumbnails is true");
+                            that.promises[num].then(function(v){
+                                that._addThumbnail(td,v);
                             });
-                            //console.log("getImageFiles: new values has " + new_values.length);
- 		        };
-		    })(files[i],last,new_values);
-		    reader.readAsDataURL(files[i]);
-	        }
-            });
-	    return promise;
+                        }
+                        console.log("getImageFiles: that.value len is  " + that.value.length);
+ 		    };
+		})(files[j],i);
+		reader.readAsDataURL(files[j]);
+	    }
+  
+           // });
+	   // return promise;
         },
         loadImages: function(values){
-            var i=0,p,last,that=this,num_loaded,promises=[],not_loaded;
+            var i=0,last,that=this;
             if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
                 i=this.value.length;
          //       console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
-            
             last=this.value.length;
-            num_loaded=i;
-            not_loaded=0;
-         //   console.log("loadImages last is " + last);
-            for(i; i<last;i++){   //aborts everything if one fails
-                promises.push(that._getImage(that.value[i]));
+            //   console.log("loadImages last is " + last);
+            for(i; i<last;i++){
+                var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
+                imm.src=this.value[i].src;
+	        //console.log("getImage is here ");
+                this.promises[i]=that._getImage(that.value[i]);
             }
-            
-            var promise=Promise.all(promises); // rejects on first fail
       
-            return promise;
+            return this.promises;
+        },
+        finishedLoading:function(){
+            return Promise.all(this.promises); // rejects on first fail
+        },
+        _addThumbnail:function(pp,v){
+            var t=v.title || v.name;
+            var el=pp.querySelector("div[title='" + t + "']");
+            console.log("add thumbnail is here");
+            if(!el){
+		var div=document.createElement("div");  
+                div.title=t;
+                if(this.width){
+                    div.style.width=(this.width.toString() + "px");
+                }
+                if(this.height){
+                    div.style.height=(this.height.toString() + "px");
+                }
+                if(!v.image){
+                    throw new Error("mkThumbnails: image does not exist");
+                }
+		div.appendChild(v.image);
+		pp.appendChild(div);
+            }
         },
         mkThumbnails: function(){
             var that=this,el;
 	//    console.log("mk_thumbnails got " + this.value.length + " number of files");
-            var td=this.element.querySelector("div.imageArray");
+            var td=this.element.querySelector("div.thumbnails");
             if(!td){
          //       console.log("making a new image gallery");
                 td=document.createElement("div");//"<div class='image_gallery'></div");
-                td.className="imageArray";
+                td.className="thumbnails";
                 this.element.appendChild(td);
 	    }
-	    for(var i=0;i<this.value.length;i++){ // each image
-//	        console.log("mk_thumbnails image num " + i + " name " + this.value[i].title);
-		var t=this.value[i].title || "";
-                el=td.querySelector("div[title='" + t + "']");
-                if(!el){
-		    var div=document.createElement("div");  
-                    div.title=t;
-                    if(this.width){
-                        div.style.width=(this.width.toString() + "px");
-                    }
-                    if(this.height){
-                        div.style.height=(this.height.toString() + "px");
-                    }
-                    if(!this.value[i].image){
-                        throw new Error("mkThumbnails: image does not exist");
-                    }
-		    div.appendChild(this.value[i].image);
-		    td.appendChild(div);
-	        }
+	    for(var i=0;i<this.promises.length;i++){ // each image
+                this.promises[i].then(function(v){   
+                    this._addThumbnail(td,v);
+                });
             }
   	},
         _resetValue:function(){
