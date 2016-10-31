@@ -20,7 +20,6 @@ require("./Fields");
 	    DOM: null,
             id: null
 	};
-       // var observer=null;
         var that=this,t;
        
         for(var k in defaults){

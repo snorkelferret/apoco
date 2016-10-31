@@ -11,28 +11,28 @@ require("./datepicker");
     "use strict";
 
     Apoco.dbToHtml={
-	integer:{html_type: "number", field: "input",check: "integer",sort:"integer"},
-	positiveInteger: {html_type:"number", field: "input",check:"positiveInteger",sort:"positiveInteger"},
-	negativeInteger:{html_type:"number", field: "input",check:"negativeInteger",sort:"negativeInteger" },
-	date: {html_type:"date", field: "date",check:"date",sort:"date"},
-	time: {html_type:"time",field: "time",check:"time",sort: "time"},
-	string: {html_type: "text", field: "input",check:"string",sort: "string"},
-	token: {html_type:"text", field: "input",check:"token",sort: "token"},
-	alphaNum: {html_type:"text", field: "input",check:"alphaNum",sort:"alphaNum" },
-	image: {html_type:"file", field: "input",check:"image",sort: null},
-	currency: {html_type:"number", field: "input",check:"currency",sort: "currency"},
-	email: {html_type:"email", field: "input",check:"email",sort:"email"},
-	float: {html_type:"number", field: "float",check:"float",sort:"float"},
-	integerArray: {html_type:"number", field: "numberArray",check:"integerArray",sort: null},
-	phoneNumber: {html_type:"tel", field: "input",check:"phoneNumber",sort:null},
-	floatArray: {html_type:"number", field: "numberArray",check:"floatArray",sort: null},
-	boolean: {html_type: "checkbox",field: "checkBox",check:"boolean",sort:"boolean"},
-	text: { html_type:"text",field: "textArea",check:"text",sort:null},
-	stringArray: {html_type: "text",field: "stringArray",check:null,sort: null},
-	imageArray: {html_type: "image", field: "imageArray",check:null,sort: null},
-	password: {html_type: "password", field:"input", check: "string",sort: null},
-        range:{html_type:"range",field: "slider",check: "number",sort:null},
-        any:{html_type:"text",field:"input",check: "string",sort:"string"} //default
+	integer:{html_type: "number", field: "input"}, 
+	positiveInteger: {html_type:"number", field: "input"},
+	negativeInteger:{html_type:"number", field: "input"},
+	date: {html_type:"date", field: "date"},
+	time: {html_type:"time",field: "time"},
+	string: {html_type: "text", field: "input"},
+	token: {html_type:"text", field: "input"},
+	alphaNum: {html_type:"text", field: "input"},
+	image: {html_type:"file", field: "input"},
+	currency: {html_type:"number", field: "input"},
+	email: {html_type:"email", field: "input"},
+	float: {html_type:"number", field: "float"},
+	integerArray: {html_type:"number", field: "numberArray"},
+	phoneNumber: {html_type:"tel", field: "input"},
+	floatArray: {html_type:"number", field: "numberArray"},
+	boolean: {html_type: "checkbox",field: "checkBox"},
+	text: { html_type:"text",field: "textArea"},
+	stringArray: {html_type: "text",field: "stringArray"},
+	imageArray: {html_type: "image", field: "imageArray"},
+	password: {html_type: "password", field:"input"},
+        range:{html_type:"range",field: "slider"},
+        any:{html_type:"text",field:"input"} //default
     };
 
 /*  Apoco.HtmlToType=function(field){
@@ -48,8 +48,8 @@ require("./datepicker");
         var defaults={
             required:false,
             editable: true,
-            value: "",
-            server_confirmation: false  // don't need server confirmation on field value change
+            type: "any",
+            value: ""
         };
         if(!d){
             throw new Error("Field: must have some options");
@@ -61,7 +61,7 @@ require("./datepicker");
             throw new Error("Apoco.field: must have a type");
 	}
      
-        for(var k in defaults){  // need this because mixinDeep overwrites first object
+        for(var k in defaults){  
             if(d[k] === undefined){
                 d[k]=defaults[k];
             }
@@ -69,6 +69,9 @@ require("./datepicker");
         
         for(var k in d){
             this[k]=d[k];
+        }
+        if(this.editable===false){
+            this.popup=false; // no popup editor if not editable
         }
         
 	this.html_type=Apoco.dbToHtml[this.type].html_type;
@@ -102,7 +105,7 @@ require("./datepicker");
 	    Apoco.IO.listen(this);
 	}
 
-	if(this.action){
+/*	if(this.action){
             var a=this.action;
             this.action=(function(that){
 		return function(e){
@@ -112,7 +115,8 @@ require("./datepicker");
                 };
 	    })(this);
             this.element.addEventListener("click", this.action,false);
-	}             
+ }     */
+     
     };
 
     _Field.prototype={
@@ -234,162 +238,16 @@ require("./datepicker");
                     return false;
                 }
             }
-            if(this.type){
-                
-                var check=Apoco.dbToHtml[this.type].check;
-             //   console.log("type to check is " + check);
-                if(!Apoco.checkType[check](v)){
-                  //  if(!array){
-                  //      this.input.setCustomValidity(("Input must be of type " + check));
-                 //   }
+            if(Apoco.checkType[this.type] !== undefined){
+                if(!Apoco.checkType[this.type](v)){
                     return false;
                 }
-             //   if(!array){
-             //       this.input.setCustomValidity("");
-              //  }
  	    }
-            else{
-                throw new Error("Field: checkType no field type specified");
-            }
 	    return true;
 	}
     };
 
-    var _mkStatic={
-        float: function(that){
-            var val,p=[];
-            if(that.value){
-                val=parseFloat(that.value).toFixed(that.precision);
-	        p=val.toString().split("."); // align to decimal point
-            }
-            else{
-                p[0]="";
-                p[1]="";
-            }
-	    //	this.element.empty();
-	    //this.element.append("<span class='float_left'>" + p[0] + "</span>");
-            var s=document.createElement("span");
-            s.textContent=p[0];
-            s.className="float_left";
-           // console.log("_________________________ mkStatic is " + p.length);
-          //  for(var i=0;i<p.length;i++){
-           //     console.log("got " + i + " vv " + p[i]);
-           // }
-            that.element.appendChild(s);
-	    if (p.length == 2){
-                s=document.createElement("span");
-                s.className="float_right";
-                s.textContent=("." + p[1]);
-                that.element.appendChild(s);
-	    }
-	    else{
-                s=document.createElement("span");
-                s.className="float_right";
-                s.textContent=(",00");
-		that.element.appendChild(s);
-	    }
-	    p.length=0;
-
-        },
-        integerArray:function(that){
-            var r,s,len=0;
-            if(that.value && that.value.length){
-                len=that.value.length;
-            }
-            else{
-                that.value=[];
-            }
-	    for(var i=0;i<len;i++){
-                r=document.createElement("span");
-                r.setAttribute("type", that.html_type);
-                r.className=that.type;
-                if( that.delimiter !== undefined){
-                    if(i>0 && i<len){
-                        s=document.createElement("span");
-                        s.textContent=that.delimiter;
-                        that.element.appendChild(s);
-                    }
-                }
-                that.element.appendChild(r);
-            }
-        }
-    };
-    var _setStatic={
-        float: function(that){
-            var p=parseFloat(that.value).toFixed(that.precision).toString().split(".");
-            that.element.getElementsByClassName("float_left")[0].textContent=p[0];
-            if(p.length !== 2){
-                throw new Error("not a floating point value");
-            }
-            if (p.length ==2){  
-                that.element.getElementsByClassName("float_right")[0].textContent=("." + p[1]);
-	    }
-	    else{
-	        //that.element.find("span.float_left").html(".00");
-                that.element.getElementsByClassName("float_right")[0].textContent=".00";
-	    }
-        },
-        integerArray:function(that){
-            var len=that.value;
-            var el=that.element.getElementsByClassName(that.type);
-            for(var i=0;i<len;i++){
-                el[i].textContent=that.value[i];
-            }
-        }
-    };
-
-    var StaticField=function(d,element){
-	//console.log("static field is here");
-        d.field="static";
-        if(d.type===undefined){
-            d.type="string";
-        }
-	_Field.call(this,d,element);
-   
-        if(_mkStatic[this.type]){
-            //console.log("got a method for " + this.type);
-            _mkStatic[this.type](this);
-        }
-        else{
-            if(this.value !== null){
-                this.element.textContent=this.value;
-            }
-        }
-    };
-
-    StaticField.prototype={
-	getValue: function(){
-	    return this.value;
-	},
-        getElement:function(){
-            return this.element;
-        },
-        delete:function(){
-            if(this.listen){
-                Apoco.IO.unsubscribe(this);
-            }
-            
-            if(this.element.parentNode){
-                this.element.parentNode.removeChild(this.element);
-            }
-        },
-	setValue: function(val){
-	    this.value=val;
-            if(this.value !== null){
-                if( _setStatic[this.type]){
-                    _setStatic[this.type](this);
-	        }
-                else{
-		    this.element.textContent=val;
-	        }
-            }
-	},
-        checkValue: function(){ //staticField always true 
-           // return Apoco.checkType[this.type](this.value);
-           return true;
-        },
-	popupEditor: null
-    };
+ 
 
     var InputField=function(d,element){
         var that=this;
@@ -432,6 +290,9 @@ require("./datepicker");
 	if(this.value !== null && this.value !== undefined){
             this.input.value=this.value;
 	}
+        if(this.editable === false){
+            this.input.readOnly=true;
+        }
 	return this;
     };
 
@@ -475,7 +336,11 @@ require("./datepicker");
             this.input[1].required=true;
             this.input[0].required=true;
         }
-        
+        if(this.editable === false){
+            this.input[0].readOnly=true;
+            this.input[0].readOnly=true;
+            this.spinner=false;
+        }
         if(this.spinner){
 	    el=document.createElement("li");
             list.appendChild(el);
@@ -679,6 +544,9 @@ require("./datepicker");
             this.input.required=true;
         }
         this.element.appendChild(this.input);
+        if(this.editable === false){
+            this.input.readOnly=true;
+        }
     };
 
     Apoco.Utils.extend(TimeField,_Field);
@@ -711,11 +579,11 @@ require("./datepicker");
 	},
         setValue:function(val){
             if(val === "true" || val === true || val === 1){
-	  //      console.log("setting checkbox value to true");
+	       // console.log("setting checkbox value to true");
                 this.input.setAttribute("checked","checked");
 	    }
 	    else {
-	    //    console.log("setting checkbox value to false");
+	        //console.log("setting checkbox value to false");
                 if(this.input.hasAttribute("checked")){
                     this.input.removeAttribute("checked");
                 }
@@ -787,17 +655,22 @@ require("./datepicker");
                     this.element[0].appendChild(s);
                 }
             }
-
-            if(this.min){
-                this.input[i].input.setAttribute("min", this.min);
+            if(this.editable === false){
+                this.input[i].input.readOnly=true;
             }
-            if(this.max){
-                this.input[i].input.setAttribute("max", this.max);
-            }
-            if(this.step){
-                this.input[i].input.setAttribute("step", this.step);
+            else{
+                if(this.min){
+                    this.input[i].input.setAttribute("min", this.min);
+                }
+                if(this.max){
+                    this.input[i].input.setAttribute("max", this.max);
+                }
+                if(this.step){
+                    this.input[i].input.setAttribute("step", this.step);
+                }
             }
  	    this.element.appendChild(this.input[i].input);
+            
         },
         deleteValue:function(value){
             var index = -1;
@@ -868,6 +741,10 @@ require("./datepicker");
 	if(this.value){
             this.input.value=this.value;
 	}
+        if(this.editable === false){
+            this.input.readOnly=true;
+            this.popup=false;
+        }
 	return this;
     };
 
@@ -1177,6 +1054,9 @@ require("./datepicker");
         }
         this.value=(this.value)?this.value: this.min;
         this.input.value=this.value;
+        if(this.editable === false){
+            this.input.readOnly=true;
+        }
     };
      
     Apoco.Utils.extend(SliderField,_Field);
@@ -1310,6 +1190,9 @@ require("./datepicker");
 	    if(this.value[i]){
 		this.input[i].input.value=this.value[i];
 	    }
+            if(this.editable === false){
+                this.input[i].input.readOnly=true;
+            }
 	},
 	checkValue:function(){
 	    var valid;
@@ -1339,7 +1222,7 @@ require("./datepicker");
 
     Apoco.Utils.extend(StringArrayField,_Field);
 
-    var ImageArrayField=function(d,element){
+    var ImageArrayField =function(d,element){
         var that=this;
         var new_values=[];
         this.promises=[];
@@ -1383,10 +1266,10 @@ require("./datepicker");
             var that=this;
             var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
             imm.src=o.src;
-	    //console.log("getImage is here ");
+	    console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
-	          //  console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
+	            console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
@@ -1397,7 +1280,7 @@ require("./datepicker");
                 imm.onerror=function(){
                     o.image=null;
                  //   console.log("ERROR loading image");
-                    reject("Field:ImageArray._getImage Could not load image");
+                    reject("Field:ImageArray._getImage Could not load image " + o.src);
                 };
             });
             return promise;
@@ -1451,7 +1334,7 @@ require("./datepicker");
             var i=0,last,that=this;
             if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
                 i=this.value.length;
-         //       console.log("loadImages " + "starting at " + i);
+                console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
             last=this.value.length;
@@ -1470,37 +1353,43 @@ require("./datepicker");
         },
         _addThumbnail:function(pp,v){
             var t=v.title || v.name;
-            var el=pp.querySelector("div[title='" + t + "']");
-            console.log("add thumbnail is here");
-            if(!el){
-		var div=document.createElement("div");  
-                div.title=t;
-                if(this.width){
-                    div.style.width=(this.width.toString() + "px");
-                }
-                if(this.height){
-                    div.style.height=(this.height.toString() + "px");
-                }
-                if(!v.image){
-                    throw new Error("mkThumbnails: image does not exist");
-                }
-		div.appendChild(v.image);
-		pp.appendChild(div);
+           // var el=pp.querySelector("div[title='" + t + "']");
+            console.log("add thumbnail is here - title is " + t);
+           // if(!el){
+	    var div=document.createElement("div");
+          
+            div.title=t;
+            if(this.width){
+                v.image.style.width=(this.width.toString() + "px");
             }
+            if(this.height){
+                v.image.style.height=(this.height.toString() + "px");
+            }
+            if(!v.image){
+                throw new Error("mkThumbnails: image does not exist");
+            }
+	    div.appendChild(v.image);
+	    pp.appendChild(div);
+            if(v.label){
+                var r=document.createElement("h5");
+                r.textContent=v.label;
+                div.appendChild(r);
+            }
+           // }
         },
         mkThumbnails: function(){
             var that=this,el;
-	//    console.log("mk_thumbnails got " + this.value.length + " number of files");
+	    console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.querySelector("div.thumbnails");
             if(!td){
-         //       console.log("making a new image gallery");
+                console.log("making a new image gallery");
                 td=document.createElement("div");//"<div class='image_gallery'></div");
                 td.className="thumbnails";
                 this.element.appendChild(td);
 	    }
 	    for(var i=0;i<this.promises.length;i++){ // each image
                 this.promises[i].then(function(v){   
-                    this._addThumbnail(td,v);
+                    that._addThumbnail(td,v);
                 });
             }
   	},
@@ -1654,80 +1543,43 @@ require("./datepicker");
 
     Apoco.Utils.extend(AutoCompleteField,_Field);
 
-    Apoco.field=(function(){
-  	var make_field_or_static = function(FieldType){
-	    return function(options,element) {
-		if (options.editable === false) {
-		    return new StaticField(options,element);
-		} else {
-		    return new FieldType(options,element);
-		}
-	    };
-	};
-
-
-	var r={
-            exists:function(field){
-                if(this[field]){
-                    return true;
-                }
-                return false;
-            },
-	    static: function(options,element) { // readonly for users , writeable by machine
-		return new StaticField(options,element);
-	    },
-	    input: make_field_or_static(InputField),
-	    float: make_field_or_static(FloatField),
-	    date: make_field_or_static(DateField),
-            time: make_field_or_static(TimeField),
-            numberArray: make_field_or_static(NumberArrayField),
-	  //  NumberArrayField:function(options,element){return new  NumberArrayField(options,element);},
-	    textArea:function(options,element){ return new  TextAreaField(options,element);},
-	    select:function(options,element){ return new  SelectField(options,element);},
-	    checkBox: function(options,element){return new CheckBoxField(options,element);},
-            slider:function(options,element){ return new  SliderField(options,element);},
-	    buttonSet:function(options,element){ return new  ButtonSetField(options,element);},
-	    stringArray:function(options,element){ return new  StringArrayField(options,element);},
-	    imageArray:function(options,element){ return new  ImageArrayField(options,element);},
-	    autoComplete: function(options,element){ return new AutoCompleteField(options,element);}
-	};
-	return r;
-    })();
-
-       // get all the methods on the Fields
-    Apoco.field._getMethods=function(){
-        var Methods={};
-        var ar={"static":StaticField,
-                "input":InputField,
-                "float":FloatField,
-                "date":DateField,
-                "time":TimeField,
-                "numberArray":NumberArrayField,
-                "textArea":TextAreaField,
-                "select":SelectField,
-                "checkBox":CheckBoxField,
-                "slider":SliderField,
-                "buttonSet":ButtonSetField,
-                "stringArray":StringArrayField,
-                "imageArray":ImageArrayField,
-                "autoComplete":AutoCompleteField
-               };
-
-
-        for(var n in  ar){
-          //  console.log("Field is " + n);
-            Methods[n]=[];
-            for(var k in ar[n].prototype){
-            //    console.log("========================= Method is " + k);
-                if(this[n].prototype[k] !== null && k !== "constructor"){
-                    if(!k.startsWith("_")){
-                        Methods[n].push(k);
-                    }
-                }
+    Apoco.field={
+        exists:function(field){
+            if(this[field]){
+                return true;
             }
-        }
-         return Methods;
-     };
+            return false;
+        },
+        input:function(options,element){return new InputField(options,element);},
+        inputMethods:function(){var n=[]; for(var k in InputField.prototype){  n.push(k);} return n;},
+        float:function(options,element){return new FloatField(options,element);},
+        floatMethods:function(){var n=[]; for(var k in FloatField.prototype){ n.push(k);} return n;},
+        date:function(options,element){return new DateField(options,element);},
+        dateMethods:function(){var n=[]; for(var k in DateField.prototype){  n.push(k);} return n;},
+        time:function(options,element){return new TimeField(options,element);},
+        timeMethods:function(){var n=[]; for(var k in TimeField.prototype){ n.push(k);} return n;},
+	numberArray:function(options,element){return new  NumberArrayField(options,element);},
+        numberArrayMethods:function(){var n=[]; for(var k in NumberArrayField.prototype){ n.push(k);} return n;},
+	textArea:function(options,element){ return new  TextAreaField(options,element);},
+        textAreaMethods:function(){var n=[]; for(var k in TextAreaField.prototype){ n.push(k);} return n;},
+	select:function(options,element){ return new  SelectField(options,element);},
+        selectMethods:function(){var n=[]; for(var k in SelectField.prototype){ n.push(k);} return n;},
+	checkBox: function(options,element){return new CheckBoxField(options,element);},
+        checkBoxMethods:function(){var n=[]; for(var k in CheckBoxField.prototype){ n.push(k);} return n;},
+        slider:function(options,element){ return new  SliderField(options,element);},
+        sliderMethods:function(){var n=[]; for(var k in SliderField.prototype){ n.push(k);} return n;},
+	buttonSet:function(options,element){ return new  ButtonSetField(options,element);},
+        buttonSetMethods:function(){var n=[]; for(var k in ButtonSetField.prototype){ n.push(k);} return n;},
+	stringArray:function(options,element){ return new  StringArrayField(options,element);},
+        stringArrayMethods:function(){var n=[]; for(var k in StringArrayField.prototype){ n.push(k);} return n;},
+        imageArray:function(options,element){ return new  ImageArrayField(options,element);},
+        imageArrayMethods:function(){var n=[]; for(var k in ImageArrayField.prototype){ n.push(k);} return n;},
+	autoComplete: function(options,element){ return new AutoCompleteField(options,element);},
+        autoCompleteMethods:function(){var n=[]; for(var k in AutoCompleteField.prototype){ n.push(k);} return n;}
+    };
+
+    
 
 
+    
 })();

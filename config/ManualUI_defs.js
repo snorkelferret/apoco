@@ -121,10 +121,10 @@
             for(var n in thing){
                 if(!n.startsWith("_")){
                     if(k === "Fields"){
-                        if(n !== "exists"){  // method  not a field
-                           HThings[k].push(n);
-                       }
-
+                        if(n !== "exists" &&  n.indexOf("Methods")<= -1){  // method  not a field
+                            HThings[k].push(n);
+                        }
+                        
                    }
                    else if(k==="Displays"){
                     //   console.log("got display " + n);
@@ -137,6 +137,7 @@
                    }
                }
             }
+           
             Apoco.sort(HThings[k],"string");
         }
 
@@ -160,7 +161,7 @@
             return{
             required:{name:{type: "string",descriptions:["tag used in Field methods"]}},
             common: {required:{type:"boolean",default: false,descriptions:["Is the cell allowed to be blank"]},
-                     editable:{type:"boolean",default:true,descriptions:["If false some fields become a StaticField"]},
+                     editable:{type:"boolean",default:true,descriptions:["If false user input is disabled"]},
                      label:{type: "string",default: undefined,descriptions:["added next to the input field"]},
                      title:{type: "string",default: undefined,descriptions:["add a tooltip"]}
                     },
@@ -251,9 +252,9 @@
                                   description:"A valid partial-time as defined in [RFC 3339]."}},
                   descriptions:[""]
                  },
-            static:{options:{value:{type:"any",params:["string","float","integer"]}},
+          /*  static:{options:{value:{type:"any",params:["string","float","integer"]}},
                     descriptions:[""]
-                   },
+                   }, */
             textArea:{options:{value:{type:"text",default: undefined}},
                       descriptions:[""]
                      },
@@ -386,7 +387,7 @@
 
             var field_desirable={
                 autoComplete:["options"],
-                static:["value"],
+               // static:["value"],
                 stringArray:["value"],
                 float:["value"],
                 numberArray:["value","type"],
@@ -503,10 +504,7 @@
                 UI.Panels.Fields.components.push(k);
             }
         },
-        mkFieldMethods:function(){
-            var fm=Apoco.field._getMethods();
-
-
+        mkFieldMethods: function(){
             var HFields=HThings.Fields;
             var fields=[];
             var field_methods_list={
@@ -553,17 +551,22 @@
                 finishedLoading:{descriptions:["<code> var promise=field.finishedLoading();</code>","returns a promise"]},
                 reset:{descriptions:["<code>field.reset();</code>","set all the values to false"]}
             };
-            var items=[];
-
+            var items=[],fm;
+              
+  
             for(var i=0;i<HFields.length;i++){
                 console.log("mkFieldMethods making " + HFields[i]);
                 var k={};
                 items=[];
-                Apoco.sort(fm[HFields[i]],"string");
-                for(var j=0;j<fm[HFields[i]].length;j++){
-                    var m=fm[HFields[i]][j];
-                    items[j]={label:m,
-                              descriptions:field_methods_list[m].descriptions};
+                fm=Apoco.field[HFields[i]+"Methods"]();
+                Apoco.sort(fm,"string");
+                for(var j=0;j<fm.length;j++){
+                    console.log("method is "+fm[j]);
+                    if(!fm[j].startsWith("_")){
+                        var m=fm[j];
+                        items.push({label:m,
+                                    descriptions:field_methods_list[m].descriptions});
+                    }
                 }
                 k.display="fieldset";
                 k.DOM="right";
@@ -586,11 +589,11 @@
                                    globalEval(f.getValue());
                                    var nf=that.parent.getChild("Result");
                                    // console.log("methods doit got " + value);
-                                   nf.setValue(JSON.stringify(value));
+                                   nf.setText(JSON.stringify(value));
 
                                }},
                               {node:"paragraph",text:"Result"},
-                              {field:"static",name:"Result",type:"string" }
+                              {node:"heading",name:"Result",size:"h5" }
 
                              ];
 
@@ -747,7 +750,7 @@
                                for(var i=0;i<results.length;i++){
                                    t=t.concat("" + test[i] + " is " + results[i] + "<br>");
                                }
-                               c.setText(t);
+                               c.textContent=t;
 
                            }},
                           {node:"heading",size:"h4", text:"Result"},
@@ -1182,11 +1185,11 @@
                                }
                                catch(e){
                                    console.log("methods doit got %j", v);
-                                   nf.setValue(v);
+                                   nf.textContent=v;
                                }
                             }},
                           {node:"paragraph",text:"Result"},
-                          {field:"static",name:"Result",type:"string" }
+                          {node:"heading",name:"Result",size:"h5" }
 
                          ];
 
@@ -1322,7 +1325,7 @@
                      },
             listen:{code: "<code>Apoco.IO.listen(object);</code>",
                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
-                    cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addField({field:'static',type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addNode({node:'paragraph',text: data});  }}]});  // press go to initialise",
+                    cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addField({field:'input',editable: false,type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addNode({node:'paragraph',text: data});  }}]});  // press go to initialise",
                     ret:"none",
                     des: "Listens for messages sent by publish,websocket or dispatch methods"
                    },
@@ -1441,7 +1444,7 @@
                                }
                                catch(e){
                                    console.log("methods doit got %j", v);
-                                  p.setText(v);
+                                   p.setText(v);
                                }
 
                           }},
@@ -1672,7 +1675,7 @@
                                   Apoco.Panel.get('Panels').deleteChild(("test"+n[0]));
                               }
                               window.v=null;
-                              that.parent.getChild("Result").setValue("");
+                              that.parent.getChild("Result").setText("");
                               //$.globalEval(f.getValue());
                               globalEval(f.getValue());
 
@@ -1683,15 +1686,15 @@
                              // console.log("methods doit got " + v);
                               if(v !== undefined){
                                   if(Apoco.checkType["object"](v)){
-                                      nf.setValue("Object");
+                                      nf.setText("Object");
                                   }
                                   else{
-                                      nf.setValue(JSON.stringify(v));
+                                      nf.setText(JSON.stringify(v));
                                   }
                               }
                           }},
                           {node:"paragraph",text:"Result"},
-                          {field:"static",name:"Result",type:"string" }
+                          {node:"heading",name:"Result",size:"h5" }
 
                          ];
            UI.Panels.Panels.components.push(k);
@@ -1735,12 +1738,6 @@
                                 id: "FieldsMenu",
                             //    selected: "StaticField",
                                 heading:"Field Types",
-                              /*  dependsOn:"AutoCompleteField",
-                                action: function(that){
-                                    if(that.selected){
-                                        var t=that.getMenu(that.selected);
-                                        t.element.trigger("click");
-                                    }},*/
                                 list: mkMenu(HThings.Fields)
                                },
                                { display: "fieldset",

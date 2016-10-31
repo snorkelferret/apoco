@@ -334,7 +334,7 @@ var Apoco=require('./declare').Apoco;
 	array: function(a){
 	    // var t=("testing  " + a + " is an array");
 	    if( Object.prototype.toString.call(a) === '[object Array]' ) {
-                if(a.length>0){
+                if(a.length>=0){
 		    return true;
                 }
 	    }

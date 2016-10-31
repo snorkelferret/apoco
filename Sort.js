@@ -93,7 +93,9 @@ require("./Types")
     };
     Apoco.sort=function(r,type_data){
 	var compare,fn,t;
-        
+        if(r === undefined){
+            throw new Error("Apoco.sort needs an input array");
+        }
         if(Apoco.checkType['array'](type_data)){
 	    for(var i=0;i<type_data.length;i++){ // multiple fields to order sort
 		if(!Apoco.isSortable(type_data[i].type)){

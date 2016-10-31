@@ -424,8 +424,8 @@ describe("CheckType(array)",function() {
     it("returns false on string",function(){
         assert.strictEqual(Apoco.checkType["array"]("dog"),false); 
     });
-    it("returns false on empty array",function(){
-        assert.strictEqual(Apoco.checkType["array"]([]),false); 
+    it("returns true on empty array",function(){
+        assert.strictEqual(Apoco.checkType["array"]([]),true); 
     });
     it("returns true on  array",function(){
         assert.strictEqual(Apoco.checkType["array"](["a"]),true); 
