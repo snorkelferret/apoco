@@ -70,6 +70,13 @@ require("./Types.js");
                     }
                   
                 }
+                if(that.attr){
+                    for(var i=0;i<that.attr.length;i++){
+                        for(var k in that.attr[i]){
+                            that.element.setAttribute(k,that.attr[i][k]);
+                        }
+                    }
+                }
             }
             else{
                 throw new Error ("Node: whatever no nodeType specified");
@@ -223,6 +230,7 @@ require("./Types.js");
             var t=that.text?that.text: that.name;
             that.element=document.createElement("button");
             that.element.type="button";
+            that.element.classList.add("ui-button");
             that.element.textContent=t;
             if(that.disabled === true){
                 that.element.setAttribute("disabled","disabled");

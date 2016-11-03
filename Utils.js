@@ -244,6 +244,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             if(destination === undefined){
                 destination=document.body;
             }
+            source.classList.add("isdraggable");
             
             var allowDrag=function(e){
               //  console.log("allow drag is here");

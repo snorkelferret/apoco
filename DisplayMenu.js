@@ -56,7 +56,8 @@ require("./DisplayBase");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){
-              //  console.log("Making menu item " + i);
+                //  console.log("Making menu item " + i);
+                this.list[i].parent=this;
                 this.addMenu(this.list[i],u);
             }
             this.list.length=0; // for garbage collection

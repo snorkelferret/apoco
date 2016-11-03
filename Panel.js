@@ -338,15 +338,7 @@ require("./Window");
 	_addComponents: function(){
 	    var that=this;
             var d;
-	    var doit=function(that,index){
-                //  console.log("doit is here index is " + i);
-                console.log("hidden is " + d.hidden);
-                if(!d.hidden  ||  d.hidden !== true){ /// hmmmm
-                    console.log("showing " + d.id);
-        	    d.show();
-                }
-		that.components[index]=d;
-	    };
+	 
 	    for(var i=0;i<this.components.length;i++){
                 // check that DOM parent exists
  		var p=this.components[i].display;
@@ -357,7 +349,7 @@ require("./Window");
 		if(!d){
 		    throw new Error("could not create " + p);
 	        }
-                //doit(this,i);
+               
             //    console.log("_addComponents id is " + d.id + " hidden is " + d.hidden);
                 if(d.hidden === undefined  ||  d.hidden !== true){ /// hmmmm
               //      console.log("_addComponents showing " + d.id);

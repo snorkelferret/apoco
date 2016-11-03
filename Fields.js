@@ -104,19 +104,21 @@ require("./datepicker");
 	    //console.log("field adding listener " + this.name);
 	    Apoco.IO.listen(this);
 	}
-
+        console.log("in Fields parent is " + this.parent + " original parm is " + d.parent);
 /*	if(this.action){
             var a=this.action;
-            this.action=(function(that){
+            var ea=(function(that){
+                console.log("Field action is here");
 		return function(e){
                     e.stopPropagation();
+                    console.log("event function is " +a);
                     //that.action(that);
-                    a(that);
+                   that.action(that);
                 };
 	    })(this);
-            this.element.addEventListener("click", this.action,false);
- }     */
-     
+            this.element.addEventListener("click", ea,false);
+        }     */
+   
     };
 
     _Field.prototype={
@@ -276,22 +278,15 @@ require("./datepicker");
             this.input.required=true;
         }
         this.element.appendChild(this.input);
-        /*       
-        if(this.server_confirmation){
-            console.log("server confirmation required");
-            this.input.addEventListener("mouseout",function(e){
-                if(that.input.value !== that.value){
-                    console.log("this.input value " + that.input.value + " != " + that.value);
-                    that.input.pending=true;
-                    that.input.classList.add("pending");
-                }
-            },false);
-        } */
+   
 	if(this.value !== null && this.value !== undefined){
             this.input.value=this.value;
 	}
         if(this.editable === false){
             this.input.readOnly=true;
+        }
+        if(this.action){
+            this.action(this);
         }
 	return this;
     };
@@ -431,7 +426,9 @@ require("./datepicker");
 	   	    
         };
 	this.element.appendChild(list);
-
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -528,6 +525,9 @@ require("./datepicker");
                 this.input.appendChild(this.picker);
             }
         }
+        if(this.action){
+            this.action(this);
+        }
  	return this;
     };
   
@@ -547,6 +547,10 @@ require("./datepicker");
         if(this.editable === false){
             this.input.readOnly=true;
         }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
 
     Apoco.Utils.extend(TimeField,_Field);
@@ -567,6 +571,9 @@ require("./datepicker");
         this.setValue(this.value);
         if(this.editable === false){
             this.input.setAttribute("disabled",true);
+        }
+        if(this.action){
+            this.action(this);
         }
 	return this;
     };
@@ -629,6 +636,9 @@ require("./datepicker");
             }
             this.addValue(i,"internal");
    	}
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -745,6 +755,9 @@ require("./datepicker");
             this.input.readOnly=true;
             this.popup=false;
         }
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -856,6 +869,9 @@ require("./datepicker");
             this.select.value=this.value;
 	}
         this.element.appendChild(this.select);
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -919,6 +935,9 @@ require("./datepicker");
 	    //console.log("adding label " + this.labels[i]);
 	    this.addValue(i);
 	};
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -1057,6 +1076,10 @@ require("./datepicker");
         if(this.editable === false){
             this.input.readOnly=true;
         }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
      
     Apoco.Utils.extend(SliderField,_Field);
@@ -1130,6 +1153,10 @@ require("./datepicker");
 	    });
 
 	}
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
     
     StringArrayField.prototype={
@@ -1222,6 +1249,7 @@ require("./datepicker");
 
     Apoco.Utils.extend(StringArrayField,_Field);
 
+
     var ImageArrayField =function(d,element){
         var that=this;
         var new_values=[];
@@ -1258,7 +1286,11 @@ require("./datepicker");
         }
         if(this.thumbnails === true){ 
             this.mkThumbnails();
-        } 
+        }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
 
     ImageArrayField.prototype={
@@ -1352,13 +1384,10 @@ require("./datepicker");
             return Promise.all(this.promises); // rejects on first fail
         },
         _addThumbnail:function(pp,v){
-            var t=v.title || v.name;
-           // var el=pp.querySelector("div[title='" + t + "']");
-            console.log("add thumbnail is here - title is " + t);
-           // if(!el){
-	    var div=document.createElement("div");
-          
-            div.title=t;
+            var div=document.createElement("div");
+            if(v.name){
+                div.setAttribute("name",v.name);
+            }
             if(this.width){
                 v.image.style.width=(this.width.toString() + "px");
             }
@@ -1535,6 +1564,10 @@ require("./datepicker");
             select.style.visibility="visible";
             this.value=v;
         });
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
 
     AutoCompleteField.prototype={

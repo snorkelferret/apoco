@@ -396,13 +396,14 @@ require("./Nodes.js");
 
     ApocoMakeFieldset.prototype={
 	_execute: function(){
-	    var el,p;
+	    var el,p,that=this;
 	    this.element=document.createElement("div");
             this.element.id=this.id;
             this.element.classList.add("field_container","ui-widget-content","ui-corner-all");
             
             if(this.components !== undefined){
                 for(var i=0;i<this.components.length;i++){
+                    this.components[i].parent=that;
                     el=document.createElement("div");
                     el.classList.add("fieldset");
                     if(this.components[i].class){
@@ -508,7 +509,6 @@ require("./Nodes.js");
             }
             if(n){
                 this.element.appendChild(n.element);
-                n.parent=this;
 	        this.nodes.push(n);
                 return n;
             }
@@ -564,8 +564,7 @@ require("./Nodes.js");
             else{
                 throw new Error("no field of type " + d.field + " exists");
             }
-            p.parent=this;
-	    this.fields.push(p);
+ 	    this.fields.push(p);
             //console.log("adding field " + d.name);
 	    this.element.appendChild(p.element);
             
@@ -743,6 +742,7 @@ require("./DisplayFieldset");
             
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
+                    this.components[i].parent=that;
 	            if(this.components[i].node){
                         this.addNode(this.components[i],fp);
 		    }
@@ -792,7 +792,7 @@ require("./DisplayFieldset");
                     throw new Error("DisplayForm.addNode element is null");
                 }
                 parent_element.appendChild(ll);
-                n.parent=this;
+              
 	        this.nodes.push(n);
                 return n;
             }
@@ -835,7 +835,7 @@ require("./DisplayFieldset");
             else{
                 throw new Error("no field of type " + d.field + " exists");
             }
-            p.parent=this;
+            
 	    this.fields.push(p);
 	    parent_element.appendChild(p.element);
             
@@ -2180,7 +2180,8 @@ require("./DisplayBase");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){
-              //  console.log("Making menu item " + i);
+                //  console.log("Making menu item " + i);
+                this.list[i].parent=this;
                 this.addMenu(this.list[i],u);
             }
             this.list.length=0; // for garbage collection
@@ -2328,6 +2329,7 @@ require("./DisplayBase");
 })();
 
 },{"./DisplayBase":2,"./declare":19}],7:[function(require,module,exports){
+
 var Apoco=require('./declare').Apoco;
 require("./DisplayBase");
 
@@ -2347,7 +2349,8 @@ require("./DisplayBase");
             controls: true
 	};
 	var f,that=this;
-         
+ 
+        
         for(var k in defaults){
             if(options[k] === undefined){
                 options[k]=defaults[k];
@@ -2365,29 +2368,61 @@ require("./DisplayBase");
             }
         }
         
-   	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+        //Apoco.mixinDeep(options,defaults);
+	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
         if(this.thumbnails === true){
             this.thumbnails=document.createElement("div"); 
             this.thumbnails.classList.add("thumbnails");
         }
-        
-        // puts up file browser to select images  if editable is true
-        f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
-        if(!f){
-            throw new Error("Slideshow: cannot make imageArray");
-        }
-        
         if(this.values){  // start preloading images
-          //  Apoco.popup.spinner(true);
-            //       console.log("got some values");    
-            this.promise=f.loadImages(this.values);
+     //       console.log("got some values");
+            f=Apoco.field["imageArray"]({name:"slideshow"});
+            if(!f){
+                throw new Error("Slideshow: cannot make imageArray");
+            }
+            this.promises=f.loadImages(this.values);
+        }
+        else if(this.editable === true){   // put up file browser to select images 
+            f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
         this._execute();
+      
+    
     };
 
-    ApocoMakeSlideshow.prototype={  
-    
+    ApocoMakeSlideshow.prototype={
+        _isVisible:function(e){
+            var that=this;
+            if(that.DOM.contains(that.element)){
+//                e.stopPropagation();
+               // console.log("element is " + that.getKey() + " element " + that.element);    
+                //e.preventDefault();
+               // console.log("visibility change");
+                if(document.hidden){
+                  //  console.log("hidden");
+                    if(that.interval){
+                        that.stop();
+                    }
+                }
+                else{
+                 //   console.log("visible");
+                    if(that.autoplay){
+                        //   var t;
+                        //    t=setInterval(function(){ //need this to stop race condition
+                        that.element.querySelector("span.ui-icon-play").click();
+                        //    clearInterval(t);
+                        // },2000);
+                    }
+                }
+            }
+        },
+        handleEvent:function(e){           
+          //  console.log("event handler is here event type is " + e.type);
+            if(e.type == "visibilitychange"){
+                this._isVisible(e);
+            }
+        },
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
@@ -2455,7 +2490,7 @@ require("./DisplayBase");
             
         },
         _calculateCover:function(v){
-            var that=this;
+             var that=this;
             var ar=this.width/this.height;
             v.SSimage.style.margin="0"; // reset the margin 
             if(v.aspect_ratio > ar){   //wider than window - fit to width
@@ -2482,20 +2517,25 @@ require("./DisplayBase");
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
-            this.width=parseFloat(window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px"));
-            this.height=parseFloat(window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px"));
+            
+            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
+            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
            // console.log("slideshow container width " + this.width + " height " + this.height);
+            this.width=parseFloat(this.width);
+            this.height=parseFloat(this.height);
+            lis=that.slideshow_container.querySelectorAll("li.slide");
+                  //  console.log("lis is " + lis + " lis.length " + lis.length);
+            if(lis.length !== that.values.length){
+	        throw new Error("Slideshow: slide lis do not exist");
+            }
+            
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
-            lis=that.slideshow_container.querySelectorAll("li.slide");
+    
             for(var i=0;i<this.values.length;i++){
-               //         console.log("loading image " + i + " with aspect ratio " + that.values[i].aspect_ratio);
-                //         console.log("image width " + that.values[i].width + " height " + that.values[i].height);
-                if(that.current=== i){
-                    that.values[i].SSimage.style.visibility="visible";
-                }
-                else{
-                    that.values[i].SSimage.style.visibility="hidden";
+                console.log("stc od " + this.values[i].image);
+                if(this.values[i].image ){ // image is loaded
+                    this._calculateCover(this.values[i]);
                 }
             }
             if(that.autoplay === true){
@@ -2503,29 +2543,18 @@ require("./DisplayBase");
                 if(that.interval){
                     that.stop();
                 }
-                that.element.querySelector("span.ui-icon-play").click();
-            }
+                if(that.controls){
+                    that.element.querySelector("span.ui-icon-play").click();
+                }
+                else{
+                    that.play();
+                }
+            };
+          
+            
         },
 	_execute: function(){
             var that=this,l,temp;
-            var visibleCallback=function(e){
-                if(that.DOM.contains(that.element)){
-                    e.stopPropagation();
-                    // console.log("visibility change");
-                    if(document.hidden){
-                        //  console.log("hidden");
-                        if(that.interval){
-                            that.stop();
-                        }
-                    }
-                    else{
-                    //   console.log("visible");
-                        if(that.autoplay){
-                            that.element.querySelector("span.ui-icon-play").click();
-                        }
-                    }
-                }
-            };
 	 //   console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
@@ -2547,19 +2576,19 @@ require("./DisplayBase");
                 temp.textContent="Loading....";
                 l.appendChild(temp);
                 
-                this.promise[i].then(function(v){
+                this.promises[i].then(function(v){
                     var temp=Apoco.Utils.getSiblings(v.SSimage)[0];
                     v.SSimage.src=v.src;
-                    // console.log("loaded images");
-                    that._calculateCover(v);
                     temp.parentNode.removeChild(temp);
-                 });
+                });/*.catch(function(reason){
+                     Apoco.popup.error("Slideshow",("Could not load images" + reason));
+                }); */
             }
             if(that.controls === true){
                 that._controls();
-            }
-            // stop weird flicker from stacks of images forming when not visible
-            document.addEventListener("visibilitychange",visibleCallback, false); 
+            }   
+            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images 
+     
         },
         deleteAll:function(){
             // delete all the images
@@ -2745,6 +2774,21 @@ require("./DisplayBase");
 
 })();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 },{"./DisplayBase":2,"./declare":19}],8:[function(require,module,exports){
 var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
 
@@ -2823,6 +2867,7 @@ require("./DisplayBase.js");
             t.element.appendChild(s);
 	    t.parent=this;
             this.tabs[index]=t;
+            this.tabs[index].parent=this;
             if(t.action){
 		t.element.addEventListener("click",
 					   function(tab,that,i){
@@ -3051,19 +3096,21 @@ require("./datepicker");
 	    //console.log("field adding listener " + this.name);
 	    Apoco.IO.listen(this);
 	}
-
+        console.log("in Fields parent is " + this.parent + " original parm is " + d.parent);
 /*	if(this.action){
             var a=this.action;
-            this.action=(function(that){
+            var ea=(function(that){
+                console.log("Field action is here");
 		return function(e){
                     e.stopPropagation();
+                    console.log("event function is " +a);
                     //that.action(that);
-                    a(that);
+                   that.action(that);
                 };
 	    })(this);
-            this.element.addEventListener("click", this.action,false);
- }     */
-     
+            this.element.addEventListener("click", ea,false);
+        }     */
+   
     };
 
     _Field.prototype={
@@ -3223,22 +3270,15 @@ require("./datepicker");
             this.input.required=true;
         }
         this.element.appendChild(this.input);
-        /*       
-        if(this.server_confirmation){
-            console.log("server confirmation required");
-            this.input.addEventListener("mouseout",function(e){
-                if(that.input.value !== that.value){
-                    console.log("this.input value " + that.input.value + " != " + that.value);
-                    that.input.pending=true;
-                    that.input.classList.add("pending");
-                }
-            },false);
-        } */
+   
 	if(this.value !== null && this.value !== undefined){
             this.input.value=this.value;
 	}
         if(this.editable === false){
             this.input.readOnly=true;
+        }
+        if(this.action){
+            this.action(this);
         }
 	return this;
     };
@@ -3378,7 +3418,9 @@ require("./datepicker");
 	   	    
         };
 	this.element.appendChild(list);
-
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -3475,6 +3517,9 @@ require("./datepicker");
                 this.input.appendChild(this.picker);
             }
         }
+        if(this.action){
+            this.action(this);
+        }
  	return this;
     };
   
@@ -3494,6 +3539,10 @@ require("./datepicker");
         if(this.editable === false){
             this.input.readOnly=true;
         }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
 
     Apoco.Utils.extend(TimeField,_Field);
@@ -3514,6 +3563,9 @@ require("./datepicker");
         this.setValue(this.value);
         if(this.editable === false){
             this.input.setAttribute("disabled",true);
+        }
+        if(this.action){
+            this.action(this);
         }
 	return this;
     };
@@ -3576,6 +3628,9 @@ require("./datepicker");
             }
             this.addValue(i,"internal");
    	}
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -3692,6 +3747,9 @@ require("./datepicker");
             this.input.readOnly=true;
             this.popup=false;
         }
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -3803,6 +3861,9 @@ require("./datepicker");
             this.select.value=this.value;
 	}
         this.element.appendChild(this.select);
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -3866,6 +3927,9 @@ require("./datepicker");
 	    //console.log("adding label " + this.labels[i]);
 	    this.addValue(i);
 	};
+        if(this.action){
+            this.action(this);
+        }
 	return this;
     };
 
@@ -4004,6 +4068,10 @@ require("./datepicker");
         if(this.editable === false){
             this.input.readOnly=true;
         }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
      
     Apoco.Utils.extend(SliderField,_Field);
@@ -4077,6 +4145,10 @@ require("./datepicker");
 	    });
 
 	}
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
     
     StringArrayField.prototype={
@@ -4169,6 +4241,7 @@ require("./datepicker");
 
     Apoco.Utils.extend(StringArrayField,_Field);
 
+
     var ImageArrayField =function(d,element){
         var that=this;
         var new_values=[];
@@ -4205,7 +4278,11 @@ require("./datepicker");
         }
         if(this.thumbnails === true){ 
             this.mkThumbnails();
-        } 
+        }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
 
     ImageArrayField.prototype={
@@ -4299,13 +4376,10 @@ require("./datepicker");
             return Promise.all(this.promises); // rejects on first fail
         },
         _addThumbnail:function(pp,v){
-            var t=v.title || v.name;
-           // var el=pp.querySelector("div[title='" + t + "']");
-            console.log("add thumbnail is here - title is " + t);
-           // if(!el){
-	    var div=document.createElement("div");
-          
-            div.title=t;
+            var div=document.createElement("div");
+            if(v.name){
+                div.setAttribute("name",v.name);
+            }
             if(this.width){
                 v.image.style.width=(this.width.toString() + "px");
             }
@@ -4482,6 +4556,10 @@ require("./datepicker");
             select.style.visibility="visible";
             this.value=v;
         });
+        if(this.action){
+            this.action(this);
+        }
+        return this;
     };
 
     AutoCompleteField.prototype={
@@ -4822,6 +4900,13 @@ require("./Types.js");
                     }
                   
                 }
+                if(that.attr){
+                    for(var i=0;i<that.attr.length;i++){
+                        for(var k in that.attr[i]){
+                            that.element.setAttribute(k,that.attr[i][k]);
+                        }
+                    }
+                }
             }
             else{
                 throw new Error ("Node: whatever no nodeType specified");
@@ -4975,6 +5060,7 @@ require("./Types.js");
             var t=that.text?that.text: that.name;
             that.element=document.createElement("button");
             that.element.type="button";
+            that.element.classList.add("ui-button");
             that.element.textContent=t;
             if(that.disabled === true){
                 that.element.setAttribute("disabled","disabled");
@@ -5424,15 +5510,7 @@ require("./Window");
 	_addComponents: function(){
 	    var that=this;
             var d;
-	    var doit=function(that,index){
-                //  console.log("doit is here index is " + i);
-                console.log("hidden is " + d.hidden);
-                if(!d.hidden  ||  d.hidden !== true){ /// hmmmm
-                    console.log("showing " + d.id);
-        	    d.show();
-                }
-		that.components[index]=d;
-	    };
+	 
 	    for(var i=0;i<this.components.length;i++){
                 // check that DOM parent exists
  		var p=this.components[i].display;
@@ -5443,7 +5521,7 @@ require("./Window");
 		if(!d){
 		    throw new Error("could not create " + p);
 	        }
-                //doit(this,i);
+               
             //    console.log("_addComponents id is " + d.id + " hidden is " + d.hidden);
                 if(d.hidden === undefined  ||  d.hidden !== true){ /// hmmmm
               //      console.log("_addComponents showing " + d.id);
@@ -6713,6 +6791,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             if(destination === undefined){
                 destination=document.body;
             }
+            source.classList.add("isdraggable");
             
             var allowDrag=function(e){
               //  console.log("allow drag is here");

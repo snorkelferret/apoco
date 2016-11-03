@@ -23,13 +23,14 @@ require("./Nodes.js");
 
     ApocoMakeFieldset.prototype={
 	_execute: function(){
-	    var el,p;
+	    var el,p,that=this;
 	    this.element=document.createElement("div");
             this.element.id=this.id;
             this.element.classList.add("field_container","ui-widget-content","ui-corner-all");
             
             if(this.components !== undefined){
                 for(var i=0;i<this.components.length;i++){
+                    this.components[i].parent=that;
                     el=document.createElement("div");
                     el.classList.add("fieldset");
                     if(this.components[i].class){
@@ -135,7 +136,6 @@ require("./Nodes.js");
             }
             if(n){
                 this.element.appendChild(n.element);
-                n.parent=this;
 	        this.nodes.push(n);
                 return n;
             }
@@ -191,8 +191,7 @@ require("./Nodes.js");
             else{
                 throw new Error("no field of type " + d.field + " exists");
             }
-            p.parent=this;
-	    this.fields.push(p);
+ 	    this.fields.push(p);
             //console.log("adding field " + d.name);
 	    this.element.appendChild(p.element);
             

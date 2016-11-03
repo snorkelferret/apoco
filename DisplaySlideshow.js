@@ -1,3 +1,4 @@
+
 var Apoco=require('./declare').Apoco;
 require("./DisplayBase");
 
@@ -17,7 +18,8 @@ require("./DisplayBase");
             controls: true
 	};
 	var f,that=this;
-         
+ 
+        
         for(var k in defaults){
             if(options[k] === undefined){
                 options[k]=defaults[k];
@@ -35,29 +37,61 @@ require("./DisplayBase");
             }
         }
         
-   	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+        //Apoco.mixinDeep(options,defaults);
+	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
 //	console.log("called display base");
         if(this.thumbnails === true){
             this.thumbnails=document.createElement("div"); 
             this.thumbnails.classList.add("thumbnails");
         }
-        
-        // puts up file browser to select images  if editable is true
-        f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
-        if(!f){
-            throw new Error("Slideshow: cannot make imageArray");
-        }
-        
         if(this.values){  // start preloading images
-          //  Apoco.popup.spinner(true);
-            //       console.log("got some values");    
-            this.promise=f.loadImages(this.values);
+     //       console.log("got some values");
+            f=Apoco.field["imageArray"]({name:"slideshow"});
+            if(!f){
+                throw new Error("Slideshow: cannot make imageArray");
+            }
+            this.promises=f.loadImages(this.values);
+        }
+        else if(this.editable === true){   // put up file browser to select images 
+            f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
         }
         this._execute();
+      
+    
     };
 
-    ApocoMakeSlideshow.prototype={  
-    
+    ApocoMakeSlideshow.prototype={
+        _isVisible:function(e){
+            var that=this;
+            if(that.DOM.contains(that.element)){
+//                e.stopPropagation();
+               // console.log("element is " + that.getKey() + " element " + that.element);    
+                //e.preventDefault();
+               // console.log("visibility change");
+                if(document.hidden){
+                  //  console.log("hidden");
+                    if(that.interval){
+                        that.stop();
+                    }
+                }
+                else{
+                 //   console.log("visible");
+                    if(that.autoplay){
+                        //   var t;
+                        //    t=setInterval(function(){ //need this to stop race condition
+                        that.element.querySelector("span.ui-icon-play").click();
+                        //    clearInterval(t);
+                        // },2000);
+                    }
+                }
+            }
+        },
+        handleEvent:function(e){           
+          //  console.log("event handler is here event type is " + e.type);
+            if(e.type == "visibilitychange"){
+                this._isVisible(e);
+            }
+        },
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
@@ -125,7 +159,7 @@ require("./DisplayBase");
             
         },
         _calculateCover:function(v){
-            var that=this;
+             var that=this;
             var ar=this.width/this.height;
             v.SSimage.style.margin="0"; // reset the margin 
             if(v.aspect_ratio > ar){   //wider than window - fit to width
@@ -152,20 +186,25 @@ require("./DisplayBase");
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
-            this.width=parseFloat(window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px"));
-            this.height=parseFloat(window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px"));
+            
+            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
+            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
            // console.log("slideshow container width " + this.width + " height " + this.height);
+            this.width=parseFloat(this.width);
+            this.height=parseFloat(this.height);
+            lis=that.slideshow_container.querySelectorAll("li.slide");
+                  //  console.log("lis is " + lis + " lis.length " + lis.length);
+            if(lis.length !== that.values.length){
+	        throw new Error("Slideshow: slide lis do not exist");
+            }
+            
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
-            lis=that.slideshow_container.querySelectorAll("li.slide");
+    
             for(var i=0;i<this.values.length;i++){
-               //         console.log("loading image " + i + " with aspect ratio " + that.values[i].aspect_ratio);
-                //         console.log("image width " + that.values[i].width + " height " + that.values[i].height);
-                if(that.current=== i){
-                    that.values[i].SSimage.style.visibility="visible";
-                }
-                else{
-                    that.values[i].SSimage.style.visibility="hidden";
+                console.log("stc od " + this.values[i].image);
+                if(this.values[i].image ){ // image is loaded
+                    this._calculateCover(this.values[i]);
                 }
             }
             if(that.autoplay === true){
@@ -173,29 +212,18 @@ require("./DisplayBase");
                 if(that.interval){
                     that.stop();
                 }
-                that.element.querySelector("span.ui-icon-play").click();
-            }
+                if(that.controls){
+                    that.element.querySelector("span.ui-icon-play").click();
+                }
+                else{
+                    that.play();
+                }
+            };
+          
+            
         },
 	_execute: function(){
             var that=this,l,temp;
-            var visibleCallback=function(e){
-                if(that.DOM.contains(that.element)){
-                    e.stopPropagation();
-                    // console.log("visibility change");
-                    if(document.hidden){
-                        //  console.log("hidden");
-                        if(that.interval){
-                            that.stop();
-                        }
-                    }
-                    else{
-                    //   console.log("visible");
-                        if(that.autoplay){
-                            that.element.querySelector("span.ui-icon-play").click();
-                        }
-                    }
-                }
-            };
 	 //   console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
@@ -217,19 +245,19 @@ require("./DisplayBase");
                 temp.textContent="Loading....";
                 l.appendChild(temp);
                 
-                this.promise[i].then(function(v){
+                this.promises[i].then(function(v){
                     var temp=Apoco.Utils.getSiblings(v.SSimage)[0];
                     v.SSimage.src=v.src;
-                    // console.log("loaded images");
-                    that._calculateCover(v);
                     temp.parentNode.removeChild(temp);
-                 });
+                });/*.catch(function(reason){
+                     Apoco.popup.error("Slideshow",("Could not load images" + reason));
+                }); */
             }
             if(that.controls === true){
                 that._controls();
-            }
-            // stop weird flicker from stacks of images forming when not visible
-            document.addEventListener("visibilitychange",visibleCallback, false); 
+            }   
+            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images 
+     
         },
         deleteAll:function(){
             // delete all the images
@@ -414,3 +442,18 @@ require("./DisplayBase");
 
 
 })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -75,6 +75,7 @@ require("./DisplayFieldset");
             
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
+                    this.components[i].parent=that;
 	            if(this.components[i].node){
                         this.addNode(this.components[i],fp);
 		    }
@@ -124,7 +125,7 @@ require("./DisplayFieldset");
                     throw new Error("DisplayForm.addNode element is null");
                 }
                 parent_element.appendChild(ll);
-                n.parent=this;
+              
 	        this.nodes.push(n);
                 return n;
             }
@@ -167,7 +168,7 @@ require("./DisplayFieldset");
             else{
                 throw new Error("no field of type " + d.field + " exists");
             }
-            p.parent=this;
+            
 	    this.fields.push(p);
 	    parent_element.appendChild(p.element);
             

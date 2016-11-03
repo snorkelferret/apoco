@@ -75,6 +75,7 @@ require("./DisplayBase.js");
             t.element.appendChild(s);
 	    t.parent=this;
             this.tabs[index]=t;
+            this.tabs[index].parent=this;
             if(t.action){
 		t.element.addEventListener("click",
 					   function(tab,that,i){
