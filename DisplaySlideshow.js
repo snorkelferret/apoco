@@ -60,6 +60,8 @@ require("./DisplayBase");
     
     };
 
+   
+    
     ApocoMakeSlideshow.prototype={
         _isVisible:function(e){
             var that=this;
@@ -79,7 +81,12 @@ require("./DisplayBase");
                     if(that.autoplay){
                         //   var t;
                         //    t=setInterval(function(){ //need this to stop race condition
-                        that.element.querySelector("span.ui-icon-play").click();
+                        if(that.controls){
+                            that.element.querySelector("span.ui-icon-play").click();
+                        }
+                        else{
+                            that.play();
+                        }
                         //    clearInterval(t);
                         // },2000);
                     }
@@ -124,31 +131,31 @@ require("./DisplayBase");
                 l=document.createElement("li");
                 l.classList.add("ui-state-default","ui-corner-all");
                 l.addEventListener("click",(function(icon,that){
-                return function(e){
-                    e.stopPropagation();
-                    if(icon.action === "play" && that.interval){
-                    //    console.log("already in play mode");
-                        e.currentTarget.classList.remove("ui-state-active");
-                        that["stop"]();
-                        that.autoplay=false;
-                        return;
-                    }
-                    if(icon.action === "step" && that.interval){
-                        that.stop();
-                    }
-                    e.currentTarget.classList.add("ui-state-active");
-                    sibs=Apoco.Utils.getSiblings(e.currentTarget);
-                 //   console.log("got siblings length " + sibs.length);
-                    for(var j=0;j<sibs.length;j++){
-                        sibs[j].classList.remove("ui-state-active");
-                    }
-                    if(icon.params){
-                        that[icon.action](icon.params);
-                    }
-                    else{
-                        that[icon.action](); 
-                    }
-                };
+                    return function(e){
+                        e.stopPropagation();
+                        if(icon.action === "play" && that.interval){
+                            //    console.log("already in play mode");
+                            e.currentTarget.classList.remove("ui-state-active");
+                            that["stop"]();
+                            that.autoplay=false;
+                            return;
+                        }
+                        if(icon.action === "step" && that.interval){
+                            that.stop();
+                        }
+                        e.currentTarget.classList.add("ui-state-active");
+                        sibs=Apoco.Utils.getSiblings(e.currentTarget);
+                        //   console.log("got siblings length " + sibs.length);
+                        for(var j=0;j<sibs.length;j++){
+                            sibs[j].classList.remove("ui-state-active");
+                        }
+                        if(icon.params){
+                            that[icon.action](icon.params);
+                        }
+                        else{
+                            that[icon.action](); 
+                        }
+                    };
                 })(icons[i],this),false);
                 s=document.createElement("span");
                 s.classList.add("ui-icon",icons[i].class);
@@ -159,14 +166,15 @@ require("./DisplayBase");
             
         },
         _calculateCover:function(v){
-             var that=this;
+            var that=this;
+            this._setWidth();
             var ar=this.width/this.height;
             v.SSimage.style.margin="0"; // reset the margin 
             if(v.aspect_ratio > ar){   //wider than window - fit to width
 		var h=that.width/v.aspect_ratio;
-                //              console.log("new image height is " + h);
+              //  console.log("new image height is " + h);
                 var w=((that.width).toString() + "px");
-                //              console.log("new image width is " + w);
+              //  console.log("new image width is " + w);
                 v.SSimage.style.width=w;
                 v.SSimage.style.height=(h.toString() + "px");
 		h=(that.height-h)/2;
@@ -175,7 +183,7 @@ require("./DisplayBase");
 	    }
 	    else{  // - fit to height
 		var w=that.height*v.aspect_ratio;
-              //                console.log("new image width is " + w);
+             //   console.log("new image width is " + w);
                 v.SSimage.style.width=(w + "px");
                 v.SSimage.style.height=(that.height + "px");
 		w=(that.width-w)/2;
@@ -183,15 +191,24 @@ require("./DisplayBase");
                 v.SSimage.style.marginRight=(w + "px");
 	    }
         },
+        _setWidth:function(){
+            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
+            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
+            //console.log("slideshow container width " + this.width + " height " + this.height);
+            this.height=parseInt(this.height);
+            this.width=parseInt(this.width);
+         
+         },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
             
-            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
-            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
-           // console.log("slideshow container width " + this.width + " height " + this.height);
-            this.width=parseFloat(this.width);
-            this.height=parseFloat(this.height);
+            this._setWidth();
+            for(var i=0;i<this.values.length;i++){
+                if(this.values[i].loaded){
+                    this._calculateCover(this.values[i]);
+                }
+            }
             lis=that.slideshow_container.querySelectorAll("li.slide");
                   //  console.log("lis is " + lis + " lis.length " + lis.length);
             if(lis.length !== that.values.length){
@@ -201,12 +218,12 @@ require("./DisplayBase");
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
     
-            for(var i=0;i<this.values.length;i++){
-                console.log("stc od " + this.values[i].image);
-                if(this.values[i].image ){ // image is loaded
+           /* for(var i=0;i<this.values.length;i++){
+                console.log("loaded is " + this.values[i].loaded);
+                if(this.values[i].loaded){ // image is loaded
                     this._calculateCover(this.values[i]);
-                }
-            }
+               }
+            } */
             if(that.autoplay === true){
                 //         console.log("trigger autoplay");
                 if(that.interval){
@@ -223,7 +240,7 @@ require("./DisplayBase");
             
         },
 	_execute: function(){
-            var that=this,l,temp;
+            var that=this,l,temp,pp;
 	 //   console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
@@ -240,15 +257,22 @@ require("./DisplayBase");
                 car.appendChild(l);
                 this.values[i].SSimage=document.createElement("img");
                 l.appendChild(this.values[i].SSimage);
-                that.values[i].SSimage.style.visibility="hidden";
-                temp=document.createElement("h1");
-                temp.textContent="Loading....";
-                l.appendChild(temp);
-                
+                that.values[i].SSimage.parentElement.style.visibility="hidden";
+               
+                if(this.values[i].text){
+                    temp=document.createElement("div");
+                    l.appendChild(temp);
+                    pp=document.createElement("p");
+                    pp.textContent=this.values[i].text;
+                    temp.appendChild(pp);
+                    this.hasText=true;
+                }
+                               
                 this.promises[i].then(function(v){
-                    var temp=Apoco.Utils.getSiblings(v.SSimage)[0];
+              //      console.log("image loaded" + v.src);
                     v.SSimage.src=v.src;
-                    temp.parentNode.removeChild(temp);
+                    that._calculateCover(v);
+                    v.loaded=true;
                 });/*.catch(function(reason){
                      Apoco.popup.error("Slideshow",("Could not load images" + reason));
                 }); */
@@ -256,7 +280,8 @@ require("./DisplayBase");
             if(that.controls === true){
                 that._controls();
             }   
-            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images 
+            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images
+          
      
         },
         deleteAll:function(){
@@ -364,26 +389,26 @@ require("./DisplayBase");
 //            var step=parseInt(this.fadeDuration/n);
 
          //   console.log("fade step is " + st + " fade duration  is " + n*st);
-            that.values[next].SSimage.style.visibility="visible";
-            that.values[next].SSimage.style.position="absolute";
-            that.values[next].SSimage.style.top=0;
-            that.values[next].SSimage.style.left=0;
-            that.values[next].SSimage.style.opacity = op;
-            that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+            that.values[next].SSimage.parentElement.style.visibility="visible";
+           // that.values[next].SSimage.parentElement.style.position="absolute";
+            that.values[next].SSimage.parentElement.style.top=0;
+            that.values[next].SSimage.parentElement.style.left=0;
+            that.values[next].SSimage.parentElement.style.opacity = op;
+            that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
             
             timer = setInterval(function() {
                 if (op >= 1.0) {
                     clearInterval(timer);
-                    that.values[prev].SSimage.style.position="relative";
-                    that.values[prev].SSimage.style.visibility="hidden";
-                    that.values[prev].SSimage.style.opacity=1;
-                    that.values[prev].SSimage.style.filter = 'alpha(opacity=' + 100 + ")";
+                   // that.values[prev].SSimage.parentElement.style.position="absolute";
+                    that.values[prev].SSimage.parentElement.style.visibility="hidden";
+                    that.values[prev].SSimage.parentElement.style.opacity=1;
+                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + 100 + ")";
                 }
                 else{
-                    that.values[prev].SSimage.style.opacity = (1-op);
-                    that.values[prev].SSimage.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
-                    that.values[next].SSimage.style.opacity = op;
-                    that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                    that.values[prev].SSimage.parentElement.style.opacity = (1-op);
+                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                    that.values[next].SSimage.parentElement.style.opacity = op;
+                    that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
                     op += op * inc;
                 }
             }, step);
@@ -410,14 +435,14 @@ require("./DisplayBase");
             next=this.current;
          //  console.log("step - prev " + prev + " next " + next);
             if(this.fade === false  || caller !== "play"){  // don't do crossfade if just stepping thru the images
-                this.values[prev].SSimage.style.position="relative";
-                this.values[prev].SSimage.style.visibility="hidden";
-                this.values[next].SSimage.style.visibility="visible"; 
-                this.values[next].SSimage.style.position="absolute";
-                this.values[next].SSimage.style.opacity=1;
-                this.values[next].SSimage.style.filter = "alpha(opacity=100)";
-                this.values[next].SSimage.style.top=0;
-                this.values[next].SSimage.style.left=0;
+               // this.values[prev].SSimage.parentElement.style.position="absolute";
+                this.values[prev].SSimage.parentElement.style.visibility="hidden";
+                this.values[next].SSimage.parentElement.style.visibility="visible"; 
+               // this.values[next].SSimage.parentElement.style.position="absolute";
+                this.values[next].SSimage.parentElement.style.opacity=1;
+                this.values[next].SSimage.parentElement.style.filter = "alpha(opacity=100)";
+                this.values[next].SSimage.parentElement.style.top=0;
+                this.values[next].SSimage.parentElement.style.left=0;
             }
             else{
                 this._crossFade(prev,next);

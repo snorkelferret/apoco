@@ -5,9 +5,9 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
     Apoco.IO={
         _subscribers:{},
         dispatch:function(name,args){  //pubsub
-            console.log("dispatch is here name is " + name);
+           // console.log("dispatch is here name is " + name);
 	    if(this._subscribers[name]){
-                console.log("found subscriber");
+           //     console.log("found subscriber");
 	        try{
 		    this._subscribers[name].forEach(function(s){
                         if(!s.action){
@@ -16,8 +16,8 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
                      //   for(var k in s.context){
                      //       console.log("before dispatch " + k);
                         //   }
-                        console.log("action is " + s.action);
-                        console.log("with args " + args);
+             //           console.log("action is " + s.action);
+               //         console.log("with args " + args);
 		        s.action(s.context,args);
 		    });
 	        } catch (err){
@@ -35,7 +35,7 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
             }
 	    for(var i=0; i< that.listen.length; i++){
 	        var n=that.listen[i].name;
-	        console.log("adding listener " + n );// + " to " + that.getKey());
+	    //   console.log("adding listener " + n );// + " to " + that.getKey());
 	        if(!this._subscribers[n]){
 		    this._subscribers[n]=[];
 	        }
@@ -46,7 +46,7 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
 	    var index=-1;
 
 	    for(var i=0; i< that.listen.length; i++){
-	        console.log("finding name " + that.listen[i].name);
+	     //   console.log("finding name " + that.listen[i].name);
 	        if(this._subscribers[that.listen[i].name]){
 		    for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
 		        if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){

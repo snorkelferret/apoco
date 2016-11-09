@@ -165,7 +165,7 @@ require("./Fields");
         }
 
 	if(this.listen !== undefined){
-          //  console.log("listen listen listen");
+       //    console.log("listen listen listen");
          //   for(var k in this){
          //       console.log("just before listen " + k);
         //    }
@@ -2391,6 +2391,8 @@ require("./DisplayBase");
     
     };
 
+   
+    
     ApocoMakeSlideshow.prototype={
         _isVisible:function(e){
             var that=this;
@@ -2410,7 +2412,12 @@ require("./DisplayBase");
                     if(that.autoplay){
                         //   var t;
                         //    t=setInterval(function(){ //need this to stop race condition
-                        that.element.querySelector("span.ui-icon-play").click();
+                        if(that.controls){
+                            that.element.querySelector("span.ui-icon-play").click();
+                        }
+                        else{
+                            that.play();
+                        }
                         //    clearInterval(t);
                         // },2000);
                     }
@@ -2455,31 +2462,31 @@ require("./DisplayBase");
                 l=document.createElement("li");
                 l.classList.add("ui-state-default","ui-corner-all");
                 l.addEventListener("click",(function(icon,that){
-                return function(e){
-                    e.stopPropagation();
-                    if(icon.action === "play" && that.interval){
-                    //    console.log("already in play mode");
-                        e.currentTarget.classList.remove("ui-state-active");
-                        that["stop"]();
-                        that.autoplay=false;
-                        return;
-                    }
-                    if(icon.action === "step" && that.interval){
-                        that.stop();
-                    }
-                    e.currentTarget.classList.add("ui-state-active");
-                    sibs=Apoco.Utils.getSiblings(e.currentTarget);
-                 //   console.log("got siblings length " + sibs.length);
-                    for(var j=0;j<sibs.length;j++){
-                        sibs[j].classList.remove("ui-state-active");
-                    }
-                    if(icon.params){
-                        that[icon.action](icon.params);
-                    }
-                    else{
-                        that[icon.action](); 
-                    }
-                };
+                    return function(e){
+                        e.stopPropagation();
+                        if(icon.action === "play" && that.interval){
+                            //    console.log("already in play mode");
+                            e.currentTarget.classList.remove("ui-state-active");
+                            that["stop"]();
+                            that.autoplay=false;
+                            return;
+                        }
+                        if(icon.action === "step" && that.interval){
+                            that.stop();
+                        }
+                        e.currentTarget.classList.add("ui-state-active");
+                        sibs=Apoco.Utils.getSiblings(e.currentTarget);
+                        //   console.log("got siblings length " + sibs.length);
+                        for(var j=0;j<sibs.length;j++){
+                            sibs[j].classList.remove("ui-state-active");
+                        }
+                        if(icon.params){
+                            that[icon.action](icon.params);
+                        }
+                        else{
+                            that[icon.action](); 
+                        }
+                    };
                 })(icons[i],this),false);
                 s=document.createElement("span");
                 s.classList.add("ui-icon",icons[i].class);
@@ -2490,14 +2497,15 @@ require("./DisplayBase");
             
         },
         _calculateCover:function(v){
-             var that=this;
+            var that=this;
+            this._setWidth();
             var ar=this.width/this.height;
             v.SSimage.style.margin="0"; // reset the margin 
             if(v.aspect_ratio > ar){   //wider than window - fit to width
 		var h=that.width/v.aspect_ratio;
-                //              console.log("new image height is " + h);
+              //  console.log("new image height is " + h);
                 var w=((that.width).toString() + "px");
-                //              console.log("new image width is " + w);
+              //  console.log("new image width is " + w);
                 v.SSimage.style.width=w;
                 v.SSimage.style.height=(h.toString() + "px");
 		h=(that.height-h)/2;
@@ -2506,7 +2514,7 @@ require("./DisplayBase");
 	    }
 	    else{  // - fit to height
 		var w=that.height*v.aspect_ratio;
-              //                console.log("new image width is " + w);
+             //   console.log("new image width is " + w);
                 v.SSimage.style.width=(w + "px");
                 v.SSimage.style.height=(that.height + "px");
 		w=(that.width-w)/2;
@@ -2514,15 +2522,24 @@ require("./DisplayBase");
                 v.SSimage.style.marginRight=(w + "px");
 	    }
         },
+        _setWidth:function(){
+            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
+            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
+            //console.log("slideshow container width " + this.width + " height " + this.height);
+            this.height=parseInt(this.height);
+            this.width=parseInt(this.width);
+         
+         },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
             
-            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
-            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
-           // console.log("slideshow container width " + this.width + " height " + this.height);
-            this.width=parseFloat(this.width);
-            this.height=parseFloat(this.height);
+            this._setWidth();
+            for(var i=0;i<this.values.length;i++){
+                if(this.values[i].loaded){
+                    this._calculateCover(this.values[i]);
+                }
+            }
             lis=that.slideshow_container.querySelectorAll("li.slide");
                   //  console.log("lis is " + lis + " lis.length " + lis.length);
             if(lis.length !== that.values.length){
@@ -2532,12 +2549,12 @@ require("./DisplayBase");
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
     
-            for(var i=0;i<this.values.length;i++){
-                console.log("stc od " + this.values[i].image);
-                if(this.values[i].image ){ // image is loaded
+           /* for(var i=0;i<this.values.length;i++){
+                console.log("loaded is " + this.values[i].loaded);
+                if(this.values[i].loaded){ // image is loaded
                     this._calculateCover(this.values[i]);
-                }
-            }
+               }
+            } */
             if(that.autoplay === true){
                 //         console.log("trigger autoplay");
                 if(that.interval){
@@ -2554,7 +2571,7 @@ require("./DisplayBase");
             
         },
 	_execute: function(){
-            var that=this,l,temp;
+            var that=this,l,temp,pp;
 	 //   console.log("execute of DisplaySlideshow");
 	    this.element=document.createElement("div"); 
             this.element.id=this.id;
@@ -2571,15 +2588,22 @@ require("./DisplayBase");
                 car.appendChild(l);
                 this.values[i].SSimage=document.createElement("img");
                 l.appendChild(this.values[i].SSimage);
-                that.values[i].SSimage.style.visibility="hidden";
-                temp=document.createElement("h1");
-                temp.textContent="Loading....";
-                l.appendChild(temp);
-                
+                that.values[i].SSimage.parentElement.style.visibility="hidden";
+               
+                if(this.values[i].text){
+                    temp=document.createElement("div");
+                    l.appendChild(temp);
+                    pp=document.createElement("p");
+                    pp.textContent=this.values[i].text;
+                    temp.appendChild(pp);
+                    this.hasText=true;
+                }
+                               
                 this.promises[i].then(function(v){
-                    var temp=Apoco.Utils.getSiblings(v.SSimage)[0];
+              //      console.log("image loaded" + v.src);
                     v.SSimage.src=v.src;
-                    temp.parentNode.removeChild(temp);
+                    that._calculateCover(v);
+                    v.loaded=true;
                 });/*.catch(function(reason){
                      Apoco.popup.error("Slideshow",("Could not load images" + reason));
                 }); */
@@ -2587,7 +2611,8 @@ require("./DisplayBase");
             if(that.controls === true){
                 that._controls();
             }   
-            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images 
+            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images
+          
      
         },
         deleteAll:function(){
@@ -2695,26 +2720,26 @@ require("./DisplayBase");
 //            var step=parseInt(this.fadeDuration/n);
 
          //   console.log("fade step is " + st + " fade duration  is " + n*st);
-            that.values[next].SSimage.style.visibility="visible";
-            that.values[next].SSimage.style.position="absolute";
-            that.values[next].SSimage.style.top=0;
-            that.values[next].SSimage.style.left=0;
-            that.values[next].SSimage.style.opacity = op;
-            that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+            that.values[next].SSimage.parentElement.style.visibility="visible";
+           // that.values[next].SSimage.parentElement.style.position="absolute";
+            that.values[next].SSimage.parentElement.style.top=0;
+            that.values[next].SSimage.parentElement.style.left=0;
+            that.values[next].SSimage.parentElement.style.opacity = op;
+            that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
             
             timer = setInterval(function() {
                 if (op >= 1.0) {
                     clearInterval(timer);
-                    that.values[prev].SSimage.style.position="relative";
-                    that.values[prev].SSimage.style.visibility="hidden";
-                    that.values[prev].SSimage.style.opacity=1;
-                    that.values[prev].SSimage.style.filter = 'alpha(opacity=' + 100 + ")";
+                   // that.values[prev].SSimage.parentElement.style.position="absolute";
+                    that.values[prev].SSimage.parentElement.style.visibility="hidden";
+                    that.values[prev].SSimage.parentElement.style.opacity=1;
+                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + 100 + ")";
                 }
                 else{
-                    that.values[prev].SSimage.style.opacity = (1-op);
-                    that.values[prev].SSimage.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
-                    that.values[next].SSimage.style.opacity = op;
-                    that.values[next].SSimage.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                    that.values[prev].SSimage.parentElement.style.opacity = (1-op);
+                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                    that.values[next].SSimage.parentElement.style.opacity = op;
+                    that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
                     op += op * inc;
                 }
             }, step);
@@ -2741,14 +2766,14 @@ require("./DisplayBase");
             next=this.current;
          //  console.log("step - prev " + prev + " next " + next);
             if(this.fade === false  || caller !== "play"){  // don't do crossfade if just stepping thru the images
-                this.values[prev].SSimage.style.position="relative";
-                this.values[prev].SSimage.style.visibility="hidden";
-                this.values[next].SSimage.style.visibility="visible"; 
-                this.values[next].SSimage.style.position="absolute";
-                this.values[next].SSimage.style.opacity=1;
-                this.values[next].SSimage.style.filter = "alpha(opacity=100)";
-                this.values[next].SSimage.style.top=0;
-                this.values[next].SSimage.style.left=0;
+               // this.values[prev].SSimage.parentElement.style.position="absolute";
+                this.values[prev].SSimage.parentElement.style.visibility="hidden";
+                this.values[next].SSimage.parentElement.style.visibility="visible"; 
+               // this.values[next].SSimage.parentElement.style.position="absolute";
+                this.values[next].SSimage.parentElement.style.opacity=1;
+                this.values[next].SSimage.parentElement.style.filter = "alpha(opacity=100)";
+                this.values[next].SSimage.parentElement.style.top=0;
+                this.values[next].SSimage.parentElement.style.left=0;
             }
             else{
                 this._crossFade(prev,next);
@@ -2808,7 +2833,9 @@ require("./DisplayBase.js");
     var ApocoMakeTabs=function(options,win){
 	this.DEBUG=true;
 	var that=this;
+    
 	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+      //  console.log("tabs this listen is " + this.listen);
 	//console.log("called display base");
         this._execute();
     };
@@ -2962,10 +2989,12 @@ require("./DisplayBase.js");
 	    for(var i=0;i<this.tabs.length;i++){
 		if(this.tabs[i].name == name){
                     this.selected=this.tabs[i];
-		    this.tabs[i].element.classList.add("ui-state-active","ui-tabs-active");
+		    this.tabs[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
+                    this.tabs[i].element.classList.remove("ui-state-default");
 		}
 		else{
-		    this.tabs[i].element.classList.remove("ui-state-active","ui-tabs-active");
+                    this.tabs[i].element.classList.add("ui-state-default");
+		    this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
 		}
 	    }
 	}
@@ -3096,7 +3125,7 @@ require("./datepicker");
 	    //console.log("field adding listener " + this.name);
 	    Apoco.IO.listen(this);
 	}
-        console.log("in Fields parent is " + this.parent + " original parm is " + d.parent);
+      //  console.log("in Fields parent is " + this.parent + " original parm is " + d.parent);
 /*	if(this.action){
             var a=this.action;
             var ea=(function(that){
@@ -4273,6 +4302,7 @@ require("./datepicker");
                 that._getImageFileSelect(e);
             });
         }
+  
         if(this.value && this.value.length>0){  // start pre-loading
             this.loadImages();
         }
@@ -4290,10 +4320,10 @@ require("./datepicker");
             var that=this;
             var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
             imm.src=o.src;
-	    console.log("getImage is here ");
+	 //   console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
-	            console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
+	         //   console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
@@ -4326,26 +4356,26 @@ require("./datepicker");
 	    var last=count+files.length;
           //  var promise=new Promise(function(resolve,reject){
 	    for (var i=count,j=0; i<last; i++,j++) {
-	        console.log("found file num " + i);
+	     //   console.log("found file num " + i);
 		var reader = new FileReader();
 		reader.onload = (function(f,num) {
                     console.log("getImagefileselect  file is  %j",f);
 		    return function(e) {
                         var p;
-                        console.log("getImageFiles: that.value len is  " + that.value.length);
+                     //   console.log("getImageFiles: that.value len is  " + that.value.length);
 			e.stopPropagation();
-	                console.log("FileSelect: going to load " + f.name);
-                        console.log("FileSelect: last is " + last + " and count is " + count);
+	               // console.log("FileSelect: going to load " + f.name);
+                       // console.log("FileSelect: last is " + last + " and count is " + count);
                         that.value[num]={src: e.target.result,name:f.name};
-                        console.log("that.value is %j",that.value[num]);
+                      //  console.log("that.value is %j",that.value[num]);
                         that.promises[num]=that._getImage(that.value[num]);
                         if(that.thumbnails === true){
-                            console.log("thumbnails is true");
-                            that.promises[num].then(function(v){
-                                that._addThumbnail(td,v);
-                            });
+                         //   console.log("thumbnails is true");
+                           // that.promises[num].then(function(v){
+                            that._addThumbnail(td,num);
+                           // });
                         }
-                        console.log("getImageFiles: that.value len is  " + that.value.length);
+                       // console.log("getImageFiles: that.value len is  " + that.value.length);
  		    };
 		})(files[j],i);
 		reader.readAsDataURL(files[j]);
@@ -4358,15 +4388,12 @@ require("./datepicker");
             var i=0,last,that=this;
             if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
                 i=this.value.length;
-                console.log("loadImages " + "starting at " + i);
+             //   console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
             last=this.value.length;
-            //   console.log("loadImages last is " + last);
+    
             for(i; i<last;i++){
-                var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
-                imm.src=this.value[i].src;
-	        //console.log("getImage is here ");
                 this.promises[i]=that._getImage(that.value[i]);
             }
       
@@ -4375,43 +4402,46 @@ require("./datepicker");
         finishedLoading:function(){
             return Promise.all(this.promises); // rejects on first fail
         },
-        _addThumbnail:function(pp,v){
-            var div=document.createElement("div");
-            if(v.name){
-                div.setAttribute("name",v.name);
+        _addThumbnail:function(pp,i){
+            var that=this,div=document.createElement("div");
+            if(this.value[i].name){
+                div.setAttribute("name",this.value[i].name);
             }
-            if(this.width){
-                v.image.style.width=(this.width.toString() + "px");
-            }
-            if(this.height){
-                v.image.style.height=(this.height.toString() + "px");
-            }
-            if(!v.image){
-                throw new Error("mkThumbnails: image does not exist");
-            }
-	    div.appendChild(v.image);
-	    pp.appendChild(div);
-            if(v.label){
+            pp.appendChild(div);
+            
+            if(this.value[i].label){
                 var r=document.createElement("h5");
-                r.textContent=v.label;
+                r.textContent=this.value[i].label;
                 div.appendChild(r);
             }
-           // }
+            this.promises[i].then((function(el){
+                return function(v){
+                    if(!v.image){
+                        throw new Error("mkThumbnails: image does not exist");
+                    }
+                    if(that.width){
+                        v.image.style.width=(that.width.toString() + "px");
+                    }
+                    if(that.height){
+                        v.image.style.height=(that.height.toString() + "px");
+                    }
+        	    el.appendChild(v.image); 
+                    //that._addThumbnail(td,v);
+                };
+            }(div))); 
         },
         mkThumbnails: function(){
             var that=this,el;
-	    console.log("mk_thumbnails got " + this.value.length + " number of files");
+	 //   console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.querySelector("div.thumbnails");
             if(!td){
-                console.log("making a new image gallery");
+           //     console.log("making a new image gallery");
                 td=document.createElement("div");//"<div class='image_gallery'></div");
                 td.className="thumbnails";
                 this.element.appendChild(td);
 	    }
-	    for(var i=0;i<this.promises.length;i++){ // each image
-                this.promises[i].then(function(v){   
-                    that._addThumbnail(td,v);
-                });
+	    for(var i=0;i<this.value.length;i++){ // each image
+                that._addThumbnail(td,i);
             }
   	},
         _resetValue:function(){
@@ -4617,9 +4647,9 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
     Apoco.IO={
         _subscribers:{},
         dispatch:function(name,args){  //pubsub
-            console.log("dispatch is here name is " + name);
+           // console.log("dispatch is here name is " + name);
 	    if(this._subscribers[name]){
-                console.log("found subscriber");
+           //     console.log("found subscriber");
 	        try{
 		    this._subscribers[name].forEach(function(s){
                         if(!s.action){
@@ -4628,8 +4658,8 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
                      //   for(var k in s.context){
                      //       console.log("before dispatch " + k);
                         //   }
-                        console.log("action is " + s.action);
-                        console.log("with args " + args);
+             //           console.log("action is " + s.action);
+               //         console.log("with args " + args);
 		        s.action(s.context,args);
 		    });
 	        } catch (err){
@@ -4647,7 +4677,7 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
             }
 	    for(var i=0; i< that.listen.length; i++){
 	        var n=that.listen[i].name;
-	        console.log("adding listener " + n );// + " to " + that.getKey());
+	    //   console.log("adding listener " + n );// + " to " + that.getKey());
 	        if(!this._subscribers[n]){
 		    this._subscribers[n]=[];
 	        }
@@ -4658,7 +4688,7 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
 	    var index=-1;
 
 	    for(var i=0; i< that.listen.length; i++){
-	        console.log("finding name " + that.listen[i].name);
+	     //   console.log("finding name " + that.listen[i].name);
 	        if(this._subscribers[that.listen[i].name]){
 		    for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
 		        if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){

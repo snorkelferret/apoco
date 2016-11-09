@@ -16,7 +16,9 @@ require("./DisplayBase.js");
     var ApocoMakeTabs=function(options,win){
 	this.DEBUG=true;
 	var that=this;
+    
 	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
+      //  console.log("tabs this listen is " + this.listen);
 	//console.log("called display base");
         this._execute();
     };
@@ -170,10 +172,12 @@ require("./DisplayBase.js");
 	    for(var i=0;i<this.tabs.length;i++){
 		if(this.tabs[i].name == name){
                     this.selected=this.tabs[i];
-		    this.tabs[i].element.classList.add("ui-state-active","ui-tabs-active");
+		    this.tabs[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
+                    this.tabs[i].element.classList.remove("ui-state-default");
 		}
 		else{
-		    this.tabs[i].element.classList.remove("ui-state-active","ui-tabs-active");
+                    this.tabs[i].element.classList.add("ui-state-default");
+		    this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
 		}
 	    }
 	}

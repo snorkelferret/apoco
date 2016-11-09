@@ -52,10 +52,10 @@
         boolean: true,
         text: "Some text",
         stringArray: ["some","string","array"],
-        imageArray: [{src:"css/images/alchemist1.jpg",url:"",width: "64px",height:"64px",title:"alchemist"},
-                     {src:"css/images/alchemist2.jpg",url:"",width: "64px",height:"64px",title:"another alchemist" },
-                     {src:"css/images/rabbit_img1.jpg",url:"",title:"A lovely rabbit"},
-                     {src:"css/images/alien1.jpg",url:"",title:"What is it?"}],
+        imageArray: [{src:"css/images/alchemist1.jpg",url:"",text:"alchemist"},
+                     {src:"css/images/alchemist2.jpg",url:"",text:"another alchemist" },
+                     {src:"css/images/rabbit_img1.jpg",url:"",text:"A lovely rabbit"},
+                     {src:"css/images/alien1.jpg",url:"",text:"What is it?"}],
         password: "MyBadPassword1",
         array: ["One","Two","Three","Four"],
         path: "css/images/rabbit_img1.jpg",
@@ -555,13 +555,13 @@
               
   
             for(var i=0;i<HFields.length;i++){
-                console.log("mkFieldMethods making " + HFields[i]);
+                //console.log("mkFieldMethods making " + HFields[i]);
                 var k={};
                 items=[];
                 fm=Apoco.field[HFields[i]+"Methods"]();
                 Apoco.sort(fm,"string");
                 for(var j=0;j<fm.length;j++){
-                    console.log("method is "+fm[j]);
+                 //   console.log("method is "+fm[j]);
                     if(!fm[j].startsWith("_")){
                         var m=fm[j];
                         items.push({label:m,
