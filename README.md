@@ -1,5 +1,8 @@
 # apoco
-spa javascript web framework
+## spa javascript web framework
+
+
+[Online manual](https://snorkelferret.github.io)
 
 Apoco is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. Apoco is arranged hierarchically.
 
@@ -18,6 +21,8 @@ You don't have to use the hierarchy, any of the components can be used independe
 Apoco panels are generally defined in a UI_defs.js file.,
 for example,
 
+```javascript
+
 UI.Panels={
     MyPanel:{name: 'MyPanel',
               components:[ {display: 'tabs',
@@ -31,4 +36,6 @@ UI.Panels={
                           ]
               }
               // add another panel here
-}; 
+};
+
+```
