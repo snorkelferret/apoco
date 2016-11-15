@@ -6,7 +6,7 @@ require("./Window");
 ;(function() {
     'use strict';
     function check(ar){
-	if(!Apoco.checkType["object"](ar)){
+	if(!Apoco.type["object"].check(ar)){
 	    throw new Error("This is not a window display object " + ar);
 	}
 	for(var i in ar){
@@ -240,7 +240,7 @@ require("./Window");
 	  //  console.log("Panel.add is here");
 	   //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
          
-            if(Apoco.checkType['string'](panel)){
+            if(Apoco.type['string'].check(panel)){
                 var w=this._UIGet(panel);
                 panel=w;
             }
@@ -401,12 +401,12 @@ require("./Window");
             if(!obj){
                 throw new Error("Apoco.Panel: deleteChild obj is null");
             }
-            if(Apoco.checkType['string'](obj)){
+            if(Apoco.type['string'].check(obj)){
               //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
            //console.log("deleteing child length is " + this.components.length);
-	   // console.log("Panel delete child is here");
+	   // console.log(Panel delete child is here");
             if(obj.listen){ // remove the listener
 		Apoco.unsubscribe(obj);
 	    }

@@ -242,7 +242,7 @@ jsonishData={
 //	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
 //	}
 	// see if the data has been put into subgrids
-	if(that.rows && Apoco.checkType["array"](that.rows)){ // not sorted into subgrids
+	if(that.rows && Apoco.type["array"].check(that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
 	    if(that.groupBy){
 		for(var i=0;i<that.rows.length;i++){
@@ -493,7 +493,7 @@ jsonishData={
         addCol:function(col){
             var that=this,index,r,t,rows;
             var was_hidden=this.isHidden();
-            if(Apoco.checkType["integer"](col)){
+            if(Apoco.type["integer"].check(col)){
                 index=col;
                 col=this.cols[index];
                 if(!col.name || !col.type){
@@ -539,8 +539,6 @@ jsonishData={
 	    if(this.cols[index].display !== false){
 		//console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
-	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
-                //  var h=document.createElement("th");
                 var h=document.createElement("div");
                 var s=document.createElement("soan");
                 h.appendChild(s);
@@ -550,13 +548,10 @@ jsonishData={
 		this.cols[index].element=h;
 		this.cols[index].sortable=Apoco.isSortable(this.cols[index].type);
 		if(this.cols[index].sortable && this.userSortable){
-		    //  var dec=$("<div class='arrows'></div>");
                     var dec=document.createElement("div");
                     dec.classList.add("arrows");
-		    //  var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
                     var up=document.createElement("span");
                     up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
-		    //  var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
                     var down=document.createElement("span");
                     down.classList.add("down","ui-icon","ui-icon-triangle-1-n");
 		    dec.appendChild(up);
@@ -722,8 +717,7 @@ jsonishData={
   	    c=document.createElement("td");
             c.className=col.type;
             
-            //console.log("c is " + JSON.stringify(c));
-            row[col.name]=Apoco.field[Apoco.dbToHtml[col.type].field](settings,c);
+            row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
             if(col.display !== false){
 		r.appendChild(row[col.name].element);
             
@@ -1035,12 +1029,10 @@ jsonishData={
            // console.log("name is " + c.name + " context " + c.context + " type " + c.type);
             row.push({context:c.context,name: c.name,
                       value:c.context.value });
-            //s=$(element).siblings();
             s=element.parentNode.childNodes;
            // console.log("got siblings " + s.length);   
             for(var i=0;i<s.length;i++){
                 if(s[i] !== element){
-                    //c= $(s[i]).data("apoco");
                     c=s[i].data.apoco;
              //       console.log( "sib " + c.name + " value " + c.context.value);
                     row.push({context: c.context,name: c.name,
@@ -1105,13 +1097,6 @@ jsonishData={
 		    if(textStatus === "success"){
 	//		if(this.DEBUG) console.log("Form.submit: deferred-resolve");
 			Apoco.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
-	    		// var cmd=that.getCreator().getCmd(that);
-
-			// cmd.undo();
-			//var crt=that.getCreator().find({"command": cmd})
-			// crt.element.removeClass("selected");
-			// that.getCreator().getCmd(that).undo();
-
 		    }
 		    else{
 			if(this.DEBUG) console.log("Form.submit: deferred-reject");

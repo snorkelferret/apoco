@@ -18,11 +18,11 @@ require("./Panel");
                 //throw new Error("Window.delete - could not find window " + win);
             }
            
-            console.log("deleting the panels for window " + win);
+           // console.log("deleting the panels for window " + win);
             var p=Apoco.Panel._list;
             for(var j=0;j<p.length;j++){
                 if(p[j].window && p[j].window === this._list[w].window){
-                    console.log("deleting " + p[j].name);
+             //       console.log("deleting " + p[j].name);
                     Apoco.Panel.delete(p[j].name);
                 }
             }
@@ -42,7 +42,7 @@ require("./Panel");
             this._list.splice(p,1);
         },
         _closeAll:function(){
-            console.log("Close all is here");
+          //  console.log("Close all is here");
             
             for(var i=0; i<this._list.length; i++){
                 this._list[i].window.close();
@@ -52,7 +52,7 @@ require("./Panel");
         get:function(p){
             var i=this._inList(p);
             if(i=== null){
-                console.log("return from inList is null");
+             //   console.log("return from inList is null");
                 return null;
             }
             return this._list[i];
@@ -62,22 +62,22 @@ require("./Panel");
             if(name === undefined){
                 throw new Error("no name given");
             }
-            if(Apoco.checkType["string"](name)){
+            if(Apoco.type["string"].check(name)){
                 str=true;
             }
-            console.log("is " + name + " in list?");
-            console.log("Window: inList length is " + this._list.length);
+         //   console.log("is " + name + " in list?");
+         //   console.log("Window: inList length is " + this._list.length);
             for(var i=0; i<this._list.length;i++){
-                console.log("testing list is " + i);
+           //     console.log("testing list is " + i);
                 if(str === true){
-                    console.log("str is true name is " + this._list[i].name + " to match " + name);
+             //       console.log("str is true name is " + this._list[i].name + " to match " + name);
                     if((this._list[i].name).toString() == (name).toString()){
-                        console.log("found it " + name);
+               //         console.log("found it " + name);
                         return i; //this._list[i].window;
                     }
                 }
                 else{
-                    console.log("str is false name is " + this._list[i].name + " to match " + name);
+                 //   console.log("str is false name is " + this._list[i].name + " to match " + name);
                     if(this._list[i].window === name){
                         return i; //this._list[i].window;
                     }
@@ -134,7 +134,7 @@ require("./Panel");
 	            return function(e){
 		        if(e.data === win){
                             var tt={name: d.name,window:win,promise:p};
-		            console.log("window equals e.data");
+		          //  console.log("window equals e.data");
                             that._list.push(tt);
                             resolve(tt);
 		        }

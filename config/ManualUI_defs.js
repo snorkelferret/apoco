@@ -96,7 +96,7 @@
                 thing=Apoco.popup;
                 break;
             case "Types":
-                thing= Apoco.dbToHtml;
+                thing= Apoco.type;
                 break;
             case "Windows":
                 thing=Apoco.Window;
@@ -149,8 +149,8 @@
     var fieldManual={
         get_types:function(field){
             var f=[];
-            for(var k in Apoco.dbToHtml){
-                if(Apoco.dbToHtml[k].field == field){
+            for(var k in Apoco.type){
+                if(Apoco.type[k].field == field){
                     f.push(k);
                 }
             }
@@ -166,7 +166,7 @@
                      title:{type: "string",default: undefined,descriptions:["add a tooltip"]}
                     },
             IO:{
-                action:{type:"function",default: undefined,descriptions:["Function fired on click of element<br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
+                action:{type:"function",default: undefined,descriptions:["Function run after field has beenn created <br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
                 listen:{type:"objectArray",default:undefined ,descriptions:["e.g <code> listen:[{name:'some_name',action:function(that,data){ alert('got data ' + data);}}]</code>"]},
                 publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that,name){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Apoco.IO.dispatch(name,data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
             },
@@ -485,7 +485,7 @@
                                 //   console.log("f.getValue is %j",f.getValue());
                                    globalEval(f.getValue());
                                    //         console.log("parms are " + dataObject);
-                                   if(Apoco.checkType["object"](dataObject)){
+                                   if(Apoco.type["object"].check(dataObject)){
                                        //             console.log("and it is an object");
                                        var name=dataObject.name;
                                        if(that.parent.getChild(name)){
@@ -511,11 +511,12 @@
                 getValue:{descriptions:[
                     "<code>var r=field.getValue();</code>",
                     "return: type",
-                    'if no value is set returns "undefined"']
+                    'returns the value currently displayed in the DOM <br> Use _reset() to set the values to the last setValue  <br>if no value is set returns "undefined"']
                          },
                 setValue:{descriptions:[
-                    "<code>var r=field.setValue(value);</code>",
-                    "return: void"
+                    "<code>var r=field.setValue(value[,index]);</code>",
+                    "return: void",
+                    "If the field is an array, value is an array, or a single value and index into the array<br> Set Value is the way to update values in memory"
                 ]},
                 checkValue:{descriptions:[
                     "<code>var r=field.checkValue();</code>",
@@ -536,6 +537,10 @@
                     "<code>var r=field.getInputElement()</code>",
                     "return:HTMLObject",
                     "The input node"
+                ]},
+                resetValue:{descriptions:[
+                    "<code>var r=field.resetValue()</code>",
+                    "set the values of the DOM to the last good setValue() call or initial values"
                 ]},
                 delete:{descriptions:["<code> field.delete();</code>",
                                       "return void","delete the field"]},
@@ -562,7 +567,7 @@
                 Apoco.sort(fm,"string");
                 for(var j=0;j<fm.length;j++){
                  //   console.log("method is "+fm[j]);
-                    if(!fm[j].startsWith("_")){
+                    if(!fm[j].startsWith("_") && fm[j] !== "constructor"){
                         var m=fm[j];
                         items.push({label:m,
                                     descriptions:field_methods_list[m].descriptions});
@@ -605,26 +610,26 @@
          }
     };
 
-        var select_menu=function(that){
-            var name=that.name;
-            var p=that.parent.getSibling();
-            //   console.log("selecting menu for " + name);
+    var select_menu=function(that){
+        var name=that.name;
+        var p=that.parent.getSibling();
+        //   console.log("selecting menu for " + name);
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
         }
         for(var i=0;i<p.length;i++){
-       //     console.log("siblings are " + p[i].id);
-        /*    if(p[i].id.indexOf(name) > -1){
-                p[i].show();
-            } */
-           if(p[i].id == name){
+            //     console.log("siblings are " + p[i].id);
+            /*    if(p[i].id.indexOf(name) > -1){
+             p[i].show();
+             } */
+            if(p[i].id == name){
                 p[i].show();
             }
             else if(p[i].id == (name + "Methods") ){
                 p[i].show();
             }
             else if(p[i].id === (name + "Display")){
-                   p[i].show();
+                p[i].show();
             }
             else if(p[i].id ==("test" + name)){
                 p[i].show();
@@ -656,69 +661,141 @@
     var mkTypes=function(){
         var HTypes=HThings.Types;
         var tests={
-            alphaNum: { test:'["gh&*","yu78h","YU90","777 90"]',
-                        items:[{label: "description",description:"Any combination of letters and numbers"}]},
-            boolean:{test:'[0,true,false,1,"true","uuio89"]',
-                     items:[{label:"description",description:"true,false,'true','false'"}]},
-            currency:{test:'["£39.00","$89.90","GBP78","udf90,67"]',
-                      items:[{label:"description",description:"currency with or without 3 letter currency code prefix"}]
-                     },
-            date:{test:'["20160623","3rd October 2016","2017-05-23","780","7878wewe"]',
-                  items:[{label:"description",description:"YYYY-MM-DD or YYYYMMDD"}]
-                 },
-            email:{test:'["junk@nowhere.com","uiui@op"]',
-                   items:[{label:"description",description:"e.g me@thisplace.com"}]
-                  },
-            float:{test:'[89.90,90,"89d", .90]',
-                   items:[{label:"description",description:"floating point number "}]
-                  },
-            floatArray:{test:'[[5.6,4.6,33.5],[444.55,"3wa",424]]',
-                        items:[{label:"description",description:"an array of floating point numbers"}]
-                       },
-            image:{test:'[{kiml:"ioioi"}]',
-                   items:[{label:"description",description:"checks an image element"}]
-                  },
-            imageArray:{test:'[[]]',
-                        items:[{label:"description",description:"an array of image elements"}]
-                       },
-            integer:{test:'[90,90.3,"ete","te5","-10","+23","-45/6"]',
-                     items:[{label:"description",description:"positive or negative whole number"}]
-                    },
-            integerArray:{test:'[[5,6,7,8],[89.5,45.76,34]]',
-                          items:[{label:"description",description:"array of integers"}]
-                         },
-            negativeInteger:{test:'[-45,9.5,-6.4,"rrr"]',
-                             items:[{label:"description",description:""}]
-                            },
-            password:{test:'["ioioioi","uiioouiu"]',
-                      items:[{label:"description",description:""}]
-                     },
-            phoneNumber:{test:'[89898998,"90wr54"]',
-                         items:[{label:"description",description:""}]
-                        },
-            positiveInteger:{test:'[90,"909ewr",666.4,-34]',
-                             items:[{label:"description",description:""}]
-                            },
-            string:{test:'["erre",78.6]',
-                    items:[{label:"description",description:""}]
-                   },
-            stringArray:{test:'[["6767",7878,"re"],["sss","uiui","dog"]]',
-                         items:[{label:"description",description:""}]},
-            text:{test:'["yuyuyuy",898.99]',
-                  items:[{label:"description",description:""}]
-                 },
-            time:{test:'[78,"10:02 PM","23:33:45","10:34"]',
-                  items:[{label:"description",description:""}]
-                 },
-            token:{test:'["7878","78fs-rte",65,"%4","^89"]',
-                   items:[{label:"description",description:""}]
-                  },
-            range:{test:'[42.55,"3wa",42,-10]',
-                   items:[{label:"description",description:""}]
-                  },
-            any:{test:'[34,"sdds","fs",104.4]',
-                 items:[{label:"description",description:""}]
-                }
+            alphaNum:{
+                test:'["gh&*","yu78h","YU90","777 90"]',
+                items:[{label: "description",description:"Any combination of letters and numbers"}]},
+            alphabetic:{
+                test:'["dfs8","fsfsd","667",66,";rr","/fs"]',
+                items:[{label:"description",description: "strict alphabetic characters"}]
+            },
+            any:{
+                test:'[34,"sdds","fs",104.4]',
+                items:[{label:"description",description:""}]
+            },
+            array:{
+                test:'[43,[3,4,5],"dddd",["ddd",55]]',
+                items:[{label:"description",description:"any array"}]
+            },
+            blank:{
+                test:'["",55,[1,3,4],null,false,undefined]',
+                items:[{label:"description",description:"empty value"}]
+            },
+            boolean:{
+                test:'[0,true,false,1,"true","uuio89"]',
+                items:[{label:"description",description:"true,false,'true','false'"}]
+            },
+            booleanArray:{
+                test:'[43,[3,4,5],[true,false],[0,1,0,0],"dddd",["ddd",55]]',
+                items:[{label:"description",description:"any array"}]
+            },
+            count:{
+                test:'[34,"sdds","fs",104.4]',
+                items:[{label:"description",description:""}]
+            },
+            currency:{
+                test:'["£39.00","$89.90","GBP78","udf90,67"]',
+                items:[{label:"description",description:"currency with or without 3 letter currency code prefix"}]
+            },
+            date:{
+                test:'["20160623","3rd October 2016","2017-05-23","780","7878wewe"]',
+                items:[{label:"description",description:"YYYY-MM-DD or YYYYMMDD"}]
+            },
+            decimal:{
+                test:'[34,"sdds","fs",104.4]',
+                items:[{label:"description",description:""}]
+            },            
+            email:{
+                test:'["junk@nowhere.com","uiui@op"]',
+                items:[{label:"description",description:"e.g me@thisplace.com"}]
+            },
+            file:{
+                test:'[34,"sdds","fs",104.4]',
+                items:[{label:"description",description:""}]
+            },
+            float:{
+                test:'[89.90,90,"89d", .90]',
+                items:[{label:"description",description:"floating point number "}]
+            },
+            floatArray:{
+                test:'[[5.6,4.6,33.5],[444.55,"3wa",424]]',
+                items:[{label:"description",description:"an array of floating point numbers"}]
+            },
+            function:{
+                test:'[89.90,function(){var a=1;},"89d", Apoco.Utils.dateNow]',
+                items:[{label:"description",description:"Any function "}]
+            },
+            image:{
+                test:'[{kiml:"ioioi"}]',
+                items:[{label:"description",description:"checks an image element"}]
+            },
+            imageArray:{
+                test:'[[]]',
+                items:[{label:"description",description:"an array of image elements"}]
+            },
+            integer:{
+                test:'[90,90.3,"ete","te5","-10","+23","-45/6"]',
+                items:[{label:"description",description:"positive or negative whole number"}]
+            },
+            integerArray:{
+                test:'[[5,6,7,8],[89.5,45.76,34]]',
+                items:[{label:"description",description:"array of integers"}]
+            },
+            negativeInteger:{
+                test:'[-45,9.5,-6.4,"rrr"]',
+                items:[{label:"description",description:""}]
+            },
+            number:{
+                test:'[-45,9.5,-6.4,"rrr"]',
+                items:[{label:"description",description:""}]
+            },
+            object:{
+                test:'[-45,9.5,-6.4,{s:"rrr"}]',
+                items:[{label:"description",description:""}]
+            },
+            objectArray:{
+                test:'[[5,6,7,8],[89.5,45.76,34],[{},{a:"ddd"}]]',
+                items:[{label:"description",description:"array of objects"}]
+            },
+            password:{
+                test:'["ioioioi","uiioouiu"]',
+                items:[{label:"description",description:""}]
+            },
+            phoneNumber:{
+                test:'[89898998,"90wr54"]',
+                items:[{label:"description",description:""}]
+            },
+            positiveInteger:{
+                test:'[90,"909ewr",666.4,-34]',
+                items:[{label:"description",description:""}]
+            },
+            range:{
+                test:'[42.55,"3wa",42,-10]',
+                items:[{label:"description",description:""}]
+            },
+            string:{
+                test:'["erre",78.6]',
+                items:[{label:"description",description:""}]
+            },
+            stringArray:{
+                test:'[["6767",7878,"re"],["sss","uiui","dog"]]',
+                items:[{label:"description",description:""}]},
+            text:{
+                test:'["yuyuyuy",898.99]',
+                items:[{label:"description",description:""}]
+            },
+            time:{
+                test:'[78,"10:02 PM","23:33:45","10:34"]',
+                items:[{label:"description",description:""}]
+            },
+            token:{
+                test:'["7878","78fs-rte",65,"%4","^89"]',
+                items:[{label:"description",description:""}]
+            },
+            url:{
+                test:'[42.55,"www.junk",42,"http://www.hybj.com"]',
+                items:[{label:"description",description:""}]
+            }
+ 
         };
 
         for(var i=0;i<HTypes.length;i++){
@@ -728,7 +805,11 @@
             k.DOM="right";
             k.id=HTypes[i];
             k.hidden=true;
-            var c=" var results=[]; var test= " + tests[HTypes[i]].test + ";  for(var i=0;i<test.length;i++){ results[i]=Apoco.checkType['" +  HTypes[i] + "'](test[i]);  }";
+            if(!tests[HTypes[i]]){
+                throw new Error("test for " + HTypes[i] + " does not exist");
+            }
+            var c=" var results=[]; var test= " + tests[HTypes[i]].test + ";  for(var i=0;i<test.length;i++){ results[i]=Apoco.type['" +  HTypes[i] + "'].check(test[i]);  }";
+            
             k.components=[{node: "heading",size: "h3", text: HTypes[i]},
                           {node: "descriptionList",items:tests[HTypes[i]].items},
                           {node:"paragraph", text: "Live tests"},
@@ -741,7 +822,7 @@
                                    throw new Error("can't get input params");
                                }
                                globalEval(f.getValue());
-                               //console.log("got " + JSON.stringify(results));
+                               console.log("got " + JSON.stringify(results));
                                var c=this.parent.getChild("result");
                                if(!c){
                                    throw new Error("Cannot find result node");
@@ -750,7 +831,9 @@
                                for(var i=0;i<results.length;i++){
                                    t=t.concat("" + test[i] + " is " + results[i] + "<br>");
                                }
-                               c.textContent=t;
+                               console.log("formatted results  " + JSON.stringify(t));
+                               console.log("paragraph node is " + c);
+                               c.setText(t);
 
                            }},
                           {node:"heading",size:"h4", text:"Result"},
@@ -917,7 +1000,7 @@
                                }
 
                                globalEval(f.getValue());
-                               if(Apoco.checkType["object"](node)){
+                               if(Apoco.type["object"].check(node)){
                       //             console.log("and it is an object");
                                    var name=node.name;
                                    if(that.parent.getChild(name)){
@@ -1059,7 +1142,7 @@
                                else{
                                    throw new Error("Display Object " + n + " not in the DOM");
                                }
-                               if(!Apoco.checkType['object'](dobj)){
+                               if(!Apoco.type['object'].check(dobj)){
                                    throw new Error("Cannot find display Object - Bad return");
                                }
                                Apoco.Panel.get("Displays").addChild(dobj);
@@ -1492,7 +1575,7 @@
                         params: "date of the form YYYY-MM-DD",
                         description:"",
                         cmd:"var v=Apoco.Utils.formatDate('2018-05-23')",
-                        ret: "string e.g '12th November 2017'"},
+                        ret: "string - e.g 'Wednesday 22rd May 2018'"},
             getCssValue:{p:"<code> var css_value=Apoco.Utils.getCssValue(css_class,rule,[filename]); </code>",
                          params:"css_class, rule e.g width, filename[optional] the name of the css file in the header- if not given the function will search through all the css files",
                          ret: "string - containing the rule or none",
@@ -1545,7 +1628,7 @@
                     }
                     globalEval(f.getValue());
                     var p=that.parent.getNode('Result');
-                    if(Apoco.checkType['function'](v)){
+                    if(Apoco.type['function'].check(v)){
                         p.setText(v);
                     }
                     else{
@@ -1685,7 +1768,7 @@
                               }
                              // console.log("methods doit got " + v);
                               if(v !== undefined){
-                                  if(Apoco.checkType["object"](v)){
+                                  if(Apoco.type["object"].check(v)){
                                       nf.setText("Object");
                                   }
                                   else{
@@ -1972,8 +2055,8 @@
                          {node: "heading",size:"h2",text: "Apoco Types"},
                          {node: "paragraph",text:"Types.js <br> Sort.js"},
                          {node:"heading",size: "h4",text: "Methods" },
-                         {node: "descriptionList",items:[{label:"checkType",
-                                                          descriptions:["<code>var t=Apoco.checkType[type](some_var);</code>","return boolean","params:","type is a Apoco type","some_var: a value whose type you want to check"]}]},
+                         {node: "descriptionList",items:[{label:"check",
+                                                          descriptions:["<code>var t=Apoco.type[type].check(some_var);</code>","return boolean","params:","type is a Apoco type","some_var: a value whose type you want to check"]}]},
                          {node: "descriptionList",items:[{label:"sort",
                                                           descriptions:["<code> Apoco.sort[type](array,type_data);</code>",
                                                                         "return null",

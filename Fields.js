@@ -10,40 +10,6 @@ require("./datepicker");
 ;(function(){
     "use strict";
 
-    Apoco.dbToHtml={
-	integer:{html_type: "number", field: "input"}, 
-	positiveInteger: {html_type:"number", field: "input"},
-	negativeInteger:{html_type:"number", field: "input"},
-	date: {html_type:"date", field: "date"},
-	time: {html_type:"time",field: "time"},
-	string: {html_type: "text", field: "input"},
-	token: {html_type:"text", field: "input"},
-	alphaNum: {html_type:"text", field: "input"},
-	image: {html_type:"file", field: "input"},
-	currency: {html_type:"number", field: "input"},
-	email: {html_type:"email", field: "input"},
-	float: {html_type:"number", field: "float"},
-	integerArray: {html_type:"number", field: "numberArray"},
-	phoneNumber: {html_type:"tel", field: "input"},
-	floatArray: {html_type:"number", field: "numberArray"},
-	boolean: {html_type: "checkbox",field: "checkBox"},
-	text: { html_type:"text",field: "textArea"},
-	stringArray: {html_type: "text",field: "stringArray"},
-	imageArray: {html_type: "image", field: "imageArray"},
-	password: {html_type: "password", field:"input"},
-        range:{html_type:"range",field: "slider"},
-        any:{html_type:"text",field:"input"} //default
-    };
-
-/*  Apoco.HtmlToType=function(field){
- 	for(var k in  Apoco.dbToHtml){
-	    if(Apoco.dbToHtml[k].field == field){
-		return Apoco.dbToHtml[k].html_type;
-	    }
-	}
-	return "";
-    };
-*/
     var _Field=function(d,element){
         var defaults={
             required:false,
@@ -74,7 +40,7 @@ require("./datepicker");
             this.popup=false; // no popup editor if not editable
         }
         
-	this.html_type=Apoco.dbToHtml[this.type].html_type;
+	this.html_type=Apoco.type[this.type].html_type;
         if(element === undefined){
             this.element=document.createElement("div");
         }
@@ -83,7 +49,6 @@ require("./datepicker");
         }
 	else {
             throw new Error("Field: element is not a html node");
-            //this.element=element;
         }
         this.element.classList.add(this.type);
 	this.element.setAttribute("name",this.name);
@@ -93,32 +58,15 @@ require("./datepicker");
 	if(this.label){
             var l=document.createElement("label");
             l.appendChild(document.createTextNode(this.label));
-            l.setAttribute("for",this.name);
-	    this.element.appendChild(l);
+ 	    this.element.appendChild(l);
 	}
         
 	if(this.publish !== undefined){
 	    Apoco.IO.publish(this);
 	}
 	if(this.listen !== undefined){
-	    //console.log("field adding listener " + this.name);
 	    Apoco.IO.listen(this);
 	}
-      //  console.log("in Fields parent is " + this.parent + " original parm is " + d.parent);
-/*	if(this.action){
-            var a=this.action;
-            var ea=(function(that){
-                console.log("Field action is here");
-		return function(e){
-                    e.stopPropagation();
-                    console.log("event function is " +a);
-                    //that.action(that);
-                   that.action(that);
-                };
-	    })(this);
-            this.element.addEventListener("click", ea,false);
-        }     */
-   
     };
 
     _Field.prototype={
@@ -156,10 +104,12 @@ require("./datepicker");
 	    return undefined;
 	},
 	setValue:function(v){
+            if(!Apoco.type[this.type].check(v)){
+                throw new Error("Field: setValue " + v  + " is the wrong type, expects " + this.type);
+            }
 	    this.value=v;
-            //console.log("setting value " + v);
             if(this.value === null){
-                this.input_value="";
+                this.input.value="";
             }
 	    else {
                 this.input.value=v;
@@ -194,54 +144,40 @@ require("./datepicker");
 		    return function(e){
 			e.stopPropagation();
 			if(e.which === 13){
-			    //var v=this.input.val();
-			    //console.log("editor got value " + that.input.val());
 			    func(that.input.val());
 			}
 		    };
 		}(this);
-	//	this.input.keypress(cb);
-	    //this.input.blur(func(this.input.val()));
 	    }
 	    else{
 		throw new Error("no input element for this type " + this.type);
 	    }
 	},
-        _resetValue:function(){
-            if(Apoco.Utils.checkType["array"](this.value)){
-                for(var i=0;i<this.value; i++){
+        resetValue:function(){
+            if(this.value === undefined){
+                this.input.value = "";
+                return null;
+            }
+           
+            if(Apoco.type["array"].check(this.value)){
+                for(var i=0;i<this.value.length; i++){
                     this.input[i].value=this.value[i];
                 }
-                return;
+                return this.value;
             }
             this.input.value=this.value;
+            return this.value;
         },
-/*	displayInvalid:function(element){
-	    if(!element){
-		element=this.element;
-	    }
-	    element.addClass("invalid");
-	    //element.prop("title","Invalid input- should be of type " + this.type);
-	},
-	resetInvalid:function(element){
-	    if(!element){
-		element=this.element;
-	    }
-	    element.removeClass("invalid");
-	    element.prop("title","");
-	    //element.tooltip("disable");
-	}, */
 	checkValue:function(){
-	    //console.log("_Field checking value " + this.getValue() + " of type " + this.type );
 	    var array=false;
             var v=this.getValue();
-            if(Apoco.checkType["blank"](v)){
+            if(Apoco.type["blank"].check(v)){
    	        if(this.required){
                     return false;
                 }
             }
-            if(Apoco.checkType[this.type] !== undefined){
-                if(!Apoco.checkType[this.type](v)){
+            if(Apoco.type[this.type].check !== undefined){
+                if(!Apoco.type[this.type].check(v)){
                     return false;
                 }
  	    }
@@ -253,13 +189,10 @@ require("./datepicker");
 
     var InputField=function(d,element){
         var that=this;
-	//console.log("INPUT FIELD IS HERE with required " + d.required);
         d.field="input";
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
-        //s.className=this.type;
-
         this.input=s;
         if(this.min){
             this.input.setAttribute("min",this.min);
@@ -296,7 +229,6 @@ require("./datepicker");
     var FloatField=function(d,element){
         var inp;
 	var that=this;
-	//console.log("FLOAT FIELD IS HERE");
         d.field="float";
         d.type="float";
 	_Field.call(this,d,element);
@@ -359,7 +291,7 @@ require("./datepicker");
 		    clearInterval(timer);
 		    return;
 	        }
-	        if(!Apoco.checkType.float(t)){
+	        if(!Apoco.type.float.check(t)){
 		    clearInterval(timer);
 		    throw new Error("stepfn return from getValue: this is not a floating point number");
 	        }
@@ -370,18 +302,11 @@ require("./datepicker");
 		    t=parseFloat(t,10)-that.step;
 	        }
 	        t=parseFloat(t,10).toFixed(that.precision);
-	        //console.log("step_fn: after inc to fixed " +  t);
 	        if(that.setValue(t) === null){
 		    clearInterval(timer);
 		    throw new Error("step_fn val is not floating point " + t);
 	        }
 	    };
-
-	 /*   var dispatch_change=function(){
-	        var e=new Event("change");
-                that.element.dispatchEvent(e);
-	    };
-*/
 	    var eObj={
 	        mouseover: function(e) {
                     e.stopPropagation();
@@ -416,7 +341,6 @@ require("./datepicker");
 		    if(timer){
 		        clearInterval(timer);
 		    }
-		   // dispatch_change();
 	        }
 	    };
             for(var k in eObj){
@@ -437,20 +361,16 @@ require("./datepicker");
 	getValue: function(){
             var a=this.input[0].value;
             var b=this.input[1].value;
-	    if(Apoco.checkType.blank(a)) {
-		//console.log("input integer is null");
-		if(Apoco.checkType.blank(b)){
+	    if(Apoco.type.blank.check(a)) {
+		if(Apoco.type.blank.check(b)){
 		    return this.value="";
 		}
 		else{
 		    this.value=parseFloat(("0."+b),10).toFixed(this.precision);
 		}
 	    }
-	    else if(Apoco.checkType.blank(b)){
-		//console.log("input decimal is null");
-		//console.log("getValue: integer part null, value b is " + b);
+	    else if(Apoco.type.blank.check(b)){
 		this.value=parseFloat((a + ".000"),10).toFixed(this.precision);
-		//console.log("getValue: integer part null, value is " + this.value);
 	    }
 	    else{
                 if(a<0){
@@ -460,25 +380,23 @@ require("./datepicker");
                     this.value=(parseInt(a,10)+parseFloat(("." + b),10)).toFixed(this.precision);
                 }
 	    }
-	    if(!Apoco.checkType.float(this.value)){
+	    if(!Apoco.type.float.check(this.value)){
 		throw new Error("getValue: this is not a floating point number " + this.value);
 		return null;
 	    }
 	    return this.value;
 	},
-        _resetValue:function(){
+        resetValue:function(){
             this.setValue(this.value);
         },
 	setValue: function(v){
-            // console.log("float setValue " + v);
-            
-	    if(Apoco.checkType.blank(v)){
+ 	    if(Apoco.type.blank.check(v)){
                 this.input[0].value="";
                 this.input[1].value="";
 		this.value="";
 		return;
 	    }
-            if(!Apoco.checkType["float"](v)){
+            if(!Apoco.type["float"].check(v)){
 		throw new Error("FloatField: setValue this value is not a float " + v);
 	    }
 	    v=parseFloat(v,10).toFixed(this.precision);  // not necessarily a number
@@ -487,7 +405,6 @@ require("./datepicker");
 		throw new Error("value is not a floating point number" + v);
 		return null;
 	    }
-            //console.log("setValue: value is " + p[0]);	  
             this.input[0].value=p[0];
             this.input[1].value=p[1];
 	    this.value=v;
@@ -504,8 +421,7 @@ require("./datepicker");
         _Field.call(this,d,element);
         this.input=document.createElement("input");
         this.input.type=this.html_type;
-        //this.input.className=this.type;
-         if(this.required === true){
+        if(this.required === true){
             this.input.required=true;
         }
         this.element.appendChild(this.input);
@@ -514,7 +430,6 @@ require("./datepicker");
 	}
 	if(this.editable !== false){
             if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
-              //  console.log("Making datepicker for Mozilla");
                 this.input.type="text";
                 this.input.setAttribute("placeholder","YYYY-MM-DD");
                 Apoco.datepicker.init(this.input);
@@ -567,7 +482,6 @@ require("./datepicker");
         if(this.required===true){
             this.input.required=true;
         }
-	//console.log("checkbox value is " + d.value);
         this.setValue(this.value);
         if(this.editable === false){
             this.input.setAttribute("disabled",true);
@@ -580,24 +494,19 @@ require("./datepicker");
 
     CheckBoxField.prototype={
 	getValue:function(){
-	   // console.log("value of checkbox is " + this.input.value + " and prop is " + this.input.getAttribute('checked') + " value is " + this.value);
-	   // console.log("this input.checked is " + this.input.checked);
             return this.input.checked;
 	},
         setValue:function(val){
             if(val === "true" || val === true || val === 1){
-	       // console.log("setting checkbox value to true");
                 this.input.setAttribute("checked","checked");
 	    }
 	    else {
-	        //console.log("setting checkbox value to false");
                 if(this.input.hasAttribute("checked")){
                     this.input.removeAttribute("checked");
                 }
 	    }
         },
 	popupEditor:function(func){
-	    //console.log("checkbox editor is here");
             if(this.editable === true){
 	        var cb=function(that){
 		    return function(e){
@@ -626,7 +535,7 @@ require("./datepicker");
         if(this.type === "floatArray" && this.step === undefined){
             this.step=0.1;
         }
-	if(this.value && !Apoco.checkType.array(this.value)){
+	if(this.value && !Apoco.type.array.check(this.value)){
 	    throw new Error("NumberArrayField: value is not an array");
 	}
 	for(var i=0;i<this.input.length;i++){
@@ -680,7 +589,7 @@ require("./datepicker");
                 }
             }
  	    this.element.appendChild(this.input[i].input);
-            
+            return true;
         },
         deleteValue:function(value){
             var index = -1;
@@ -726,7 +635,6 @@ require("./datepicker");
 		this.element.addEventListener("keypress",function(event){
 		    event.stopPropagation();
 		    if(event.which === 13){
-			//console.log("got value " + this.input.val());
 			func(r);
 		    }
 		},false);
@@ -738,7 +646,6 @@ require("./datepicker");
     Apoco.Utils.extend(NumberArrayField,_Field);
 
     var TextAreaField=function(d,element){
-        //var settings=checkDefaultOptions("TextAreaField",d);
         d.field="textArea";
         d.type="text";
 	_Field.call(this,d,element);
@@ -763,7 +670,6 @@ require("./datepicker");
 
     TextAreaField.prototype={
 	popupEditor:function(func,ok,cancel){
-
 	    if(ok && ok.length >0 && cancel && cancel.length >0){
 		var cb=function(that){
 		    return function(e){
@@ -791,7 +697,7 @@ require("./datepicker");
 
 
     var SelectField=function(d,element){
-	var i,o;
+	var i,o,that=this;
         d.field="select";
         d.type="string";
 	_Field.call(this,d,element);
@@ -801,62 +707,59 @@ require("./datepicker");
             options.required=true;
         }
 	for(i=0; i<this.options.length; i++){
-	    if(i===0 && this.blank_option !== undefined && this.blank_option === true){ // add a blank option at the head of the list
-                o=document.createElement("option");
-                o.value="";
-                options.appendChild(o);
-	    }
+
             o=document.createElement("option");
             o.value=this.options[i];
             o.textContent=this.options[i];
+            options.appendChild(o);
+	}
+	if(this.blank_option === true){ // add a blank option at the head of the list
+            o=document.createElement("option");
+            o.value="";
             options.appendChild(o);
 	}
         this.select=options;
 	var cd=function(that){
 		return function(e){
 		    e.stopPropagation();
-		    if(that.input.style.visibility === "visible"){ //}("visible")){
-			that.input.style.visibility= "hidden"; //hide();
-                        that.span.style.visibility="hidden";
-                        that.element.style.visibility="visible";
-		    }
+                    if(e.keyCode === 13){
+		        if(that.input.style.visibility === "visible"){ //}("visible")){
+			    that.input.style.visibility= "hidden"; //hide();
+                            that.select.style.visibility="visible";
+                            console.log("target value" + e.target.value);
+                            o=document.createElement("option");
+                            o.value=e.target.value;
+                            o.textContent=e.target.value;
+                            that.select.appendChild(o);
+                            that.options.push(that.select.value);
+                            that.select.value=e.target.value;
+		        }
+                    }
 		};
 	}(this);
 
 
         var mk_input=function(){
-            this.input=document.createElement("input");
-           // this.input.className=this.type;
-            this.input.setAttribute("type",this.html_type);
-            this.input.style.visibility="hidden";
-            this.span=document.createElement("span");
-            if(this.required===true){
-                this.input.required=true;
-            }
-            this.span.classList.add("ui-icon","ui-icon-triangle-1-s");
-            this.span.style.visibility="hidden";
-            this.element.appendChild(this.input);
-            this.element.appendChild(this.span);
-            this.span.addEventListener("click",cd);
+            that.input=document.createElement("input");
+            that.input.setAttribute("type",that.html_type);
+            that.element.appendChild(that.input);
+            that.input.addEventListener("keypress",cd);
         };
 
-        var that=this;
-	// if selection option is "Other" add a new input field
+        // if selection option is "Other" add a new input field
         this.select.addEventListener("change",function(){
-	    //console.log("select option has changed");
-            if(that.select.value === "Other"){      
-		if(!this.input){ 
+	    console.log("select option has changed");
+            if(that.select.value === ""){      
+		if(!that.input){ 
                     mk_input();
                 }
-                that.element.getElementsByTagName("select").style.visibility="hidden";
+                that.select.style.visibility="hidden";
 	        that.input.style.visibility="visible";
-	        that.span.style.visibility="visible";
 	        that.input.focus();
 	    }
 	    else if(that.edit_func){ //set for editor callback
 		var v=that.getValue();
 		that.value=v;
-		//console.log("got value " + v);
 		if(that.edit_func.context){
 		    that.edit_func.cmd.call(that.edit_func.context,v);
 		}
@@ -881,15 +784,17 @@ require("./datepicker");
             for(var i=0;i<this.options.length;i++){
                 if(this.options[i] == v){
                     this.select.value=v;
+                    this.value=v;
                     return;
                 }
             }
             if(this.input){
                 this.input.value=v;
+                this.value=v;
                 return;
             }
-            throw new Error("SelectField: Cannot set value to " + v + " options are " + this.options[0] + " " +  this.options[1] + " " + this.options[2] );
-            this.value=v;
+            throw new Error("SelectField: Cannot set value to " + v );
+           
         },
 	getValue:function(){
 	   
@@ -907,7 +812,11 @@ require("./datepicker");
 	},
 	popupEditor:function(func){
 	    this.edit_func=func;
-	}
+	},
+        resetValue:function(){
+            this.select.value=this.value;
+            return this.select.value;
+        }
 
     };
 
@@ -922,19 +831,27 @@ require("./datepicker");
           
 	_Field.call(this,d,element);
         this.input=[];
+        if(!this.value){
+            this.value=[];  
+        }
+        
         for(var i=0;i<this.labels.length;i++){
             this.input[i]={};
             this.input[i].label=this.labels[i];
-        }
+            if(!this.value[i]){
+                this.value[i]=false;
+            }
+         }
         this.labels.length=0;
 	this.popup=true;
         var u=document.createElement("ul");
         u.className="choice";
 	this.element.appendChild(u);
+        
 	for(var i=0;i<this.input.length;i++){
-	    //console.log("adding label " + this.labels[i]);
 	    this.addValue(i);
 	};
+        this.setValue(this.value);
         if(this.action){
             this.action(this);
         }
@@ -942,75 +859,98 @@ require("./datepicker");
     };
 
     ButtonSetField.prototype={
-	addValue:function(index){
+	addValue:function(index,value){
+            var l,p;
             if(index === undefined){
                 throw new Error("ButtonSetField: must supply a name");
             }
-            if(!Apoco.checkType["integer"](index)){
+            if(!Apoco.type["integer"].check(index)){
                 var label=index;
                 index=this.input.length;
                 this.input[index]={};
                 this.input[index].label=label;
+                this.value[index]=(value)?value:false;
             }
-            var l=document.createElement("li");
-            l.textContent=this.input[index].label;
-	    
-	    this.element.getElementsByTagName('ul')[0].appendChild(l);
-
-	    //console.log("buttonSet adding field " + p + " label " + this.labels[p]);
+            l=document.createElement("li");
+  	    this.element.getElementsByTagName('ul')[0].appendChild(l);
             this.input[index].input=document.createElement("input");
             if(this.checkbox === true ){
-                this.input[index].input.type="checkbox"; //setAttribute("type","checkbox");
+                this.input[index].input.type="checkbox";
             }
             else{
-                this.input[index].input.type="radio"; //setAttribute("type","radio"); 
+                this.input[index].input.type="radio"; 
             }
-            
+            this.input[index].input.checked=this.value[index];
 	    l.appendChild(this.input[index].input);
-
+            p=document.createElement("p");
+            p.textContent=this.input[index].label;
+            l.appendChild(p);
+       
             if(this.checkbox !== true){
 	        this.input[index].input.addEventListener("click",function(that,node){
 		    return function(e){
 		        e.stopPropagation();
-                        console.log("click for " + node.parentNode.text);
-                        console.log("current checked is " + node.checked);
-                        console.log("radio buttons");
                         for(var i=0;i<that.input.length;i++){
                             if(that.input[i].input !== node){
-                                console.log("setting checked for  " + that.input[i].input.parentNode.text);
-                                console.log("from  " + that.input[i].checked + " to false ");
                                 that.input[i].input.checked=false;
                             }
                         }
 		    };
 	        }(this,this.input[index].input)); 
-            }
+            } 
+            return true;
 	},
-	_resetValue:function(){
+	resetValue:function(){
             for(var i=0;i<this.input.length;i++){
-	        this.input[i].input.parentNode.classList.remove('selected');
-                this.input[i].input.checked=false;
+                this.input[i].input.checked=this.value[i];
             }
 	},
-        setValue: function(name){  
-            if(Apoco.checkType['string'](name)){
-                for(var i=0;i<this.input.length;i++){
-                    if(this.input[i].label === name){
-                        this.input[i].input.click();
-                        return;
+        setValue: function(value,index){
+            var t=0;
+            if(!Apoco.type["array"].check(value)){
+                if( index !== undefined && index<=this.input.length){
+                    if(this.checkbox !== true){
+                        if(value === true){ //set all the others to false
+                            for(var i=0;i<this.input.length;i++){
+                                this.input[i].input.checked=false;
+                                this.value[i]=false;
+                            }
+                        }
+                    }
+                    this.input[index].input.checked=value;
+                    this.value[index]=value;
+                    
+                }
+                else{
+                    throw new Error("ButtonSetField: value must be a boolean array");
+                }
+                return;
+            }
+            
+            if(value.length!== this.input.length){
+                throw new Error("ButtonSetField: values array length " + value.length + " does not match labels " + this.input.length);
+            }
+            else if(this.checkbox !== true){ //radio button only one true value
+                 for(var i=0;i<value.length;i++){
+                    if(value[i] === true){
+                        t++;
                     }
                 }
+                if(t> 1){
+                    throw new Error("ButtonSetField: only one true value for radio buttons");
+                }
             }
-            throw new Error("Buttonsetfield: setValue has no member called " + name);
+            for(var i=0;i<value.length;i++){
+                this.value[i]=value[i];
+                this.input[i].input.checked =value[i];
+            }
         },
 	deleteValue:function(label){
 	    var that=this;
 	    var index=null;
-	    //console.log("remove value is " + value);
 	    for(var i=0;i<this.input.length;i++){
 		if(this.input[i].label === label){
 		    index=i;
-		    //console.log("found value " + value + " with index " + index);
 		    break;
 		}
 	    }
@@ -1037,7 +977,6 @@ require("./datepicker");
 	checkValue:function(){
 	    if(this.required ){ // must have at least one value set to true.
                 for(var i=0; i<this.input.length; i++){
-                  //  console.log("checkbox value is " + this.value[i]);
                     if(this.input[i].input.checked === true){
                         return true;
                     }
@@ -1059,7 +998,6 @@ require("./datepicker");
 	this.popup=true;
 	this.input= document.createElement("input");
         this.input.setAttribute("type",this.type);
-        //this.input.className=this.type;
         this.element.appendChild(this.input);
 	var that=this;
 	if(this.min){
@@ -1091,8 +1029,7 @@ require("./datepicker");
 	this.popup=true;
 	var that=this;
 	var array_length=0;
-        //this.element.className="stringArray";
-	this.input=[];
+        this.input=[];
         var dv=document.createElement("div");
         dv.className="list_container";
         this.element.appendChild(dv);
@@ -1110,14 +1047,16 @@ require("./datepicker");
 	if(this.length === 0){
 	    this.length=4;
 	}
-
-	//console.log("len of array is " + d.len);
 	for(var i=0;i<this.length;i++){
-	    this.addValue(i);
+            if(this.value[i]){
+	        this.addValue(this.value[i],i);
+            }
+            else{
+                this.addValue("",i); 
+            }
 	}
 	// this adds an extra field if you press return in last field
 	if(this.editable !== false){
-
 	    // add a glyph
             var sp=document.createElement("span");
             sp.classList.add("plus","ui-icon","ui-icon-plusthick");
@@ -1131,7 +1070,7 @@ require("./datepicker");
                 sp.parentNode.removeChild(sp);
                 sm.parentNode.removeChild(sm);
                 if(add=== "add"){
-		    that.addValue(l);
+		    that.addValue("",l); // add a blank value
                 }
                 else{
                     that.deleteValue(l-1);
@@ -1143,7 +1082,6 @@ require("./datepicker");
             };
             
 	    sp.addEventListener("click",function(e){
-               // console.log("StringArrayField got click on plus");
 		e.stopPropagation();
 	        addremove("add");
 	    });
@@ -1161,7 +1099,7 @@ require("./datepicker");
     
     StringArrayField.prototype={
         setValue:function(v,index){
-            if(!Apoco.checkType["array"](v)){
+            if(!Apoco.type["array"].check(v)){
                 if( index !== undefined && index<this.length){
                     this.input[index].input.value=v;
                     this.value[index]=v;
@@ -1180,7 +1118,6 @@ require("./datepicker");
                 else{
                     throw new Error("StringArrayField: setValue array is too long");
                 } 
-                
             }
         },
 	getValue:function(){
@@ -1198,13 +1135,17 @@ require("./datepicker");
             if(this.input.length>1){
                 t=this.input[i].input.parentNode;
                 this.input.splice(i,1);
-                this.value.splice(i,1);
+                if(this.value[i]){
+                    this.value.splice(i,1);
+                }
                 t.parentNode.removeChild(t);
             }
         },
-	addValue:function(i){
-	    this.input[i]={};
-	   // console.log("trying to add a string field");
+	addValue:function(value,i){
+            if(i===undefined){
+                i=this.input.length;
+            }
+ 	    this.input[i]={};
             var element=document.createElement("li");
             element.className="string";
             this.input[i].input=document.createElement("input");
@@ -1214,9 +1155,8 @@ require("./datepicker");
             this.input[i].input.setAttribute("type","string");
             element.appendChild(this.input[i].input);
             this.element.getElementsByClassName("string_fieldset")[0].appendChild(element);
-	    if(this.value[i]){
-		this.input[i].input.value=this.value[i];
-	    }
+	   
+	    this.input[i].input.value=value;
             if(this.editable === false){
                 this.input[i].input.readOnly=true;
             }
@@ -1224,27 +1164,41 @@ require("./datepicker");
 	checkValue:function(){
 	    var valid;
 	    (this.required)?valid=false: valid=true;
-	    //console.log("string Array checkValue ");
 	    var v=this.getValue();
 	    for(var i=0;i<v.length;i++){
-		//console.log("checking inputs " + i + " for stringArray");
-		//console.log("got value " + v[i]);
 		if(this.required){
-		    if(!Apoco.checkType["blank"](v[i])){
+		    if(!Apoco.type["blank"].check(v[i])){
 			valid=true;   // at least one non blank value
 		    }
 		}
-		if(!Apoco.checkType["string"](v[i])){  
+		if(!Apoco.type["string"].check(v[i])){  
 		    valid=false;
 		    break;
 		}
 	    }
-	    //console.log("check field for string array returning valid = " + valid);
 	    if(!valid){
 		this.displayInvalid();
 	    }
 	    return valid;
-	}
+	},
+        resetValue:function(){
+            var v;
+            for(var i=0;i<this.length;i++){ // original length
+                v=(this.value[i])?this.value[i]:"";
+                if(this.input[i]){
+                    this.input[i].input.value=v;
+                }
+                else{  // value has been deleted
+                    this.addValue(v,i);
+                }
+            }
+            if(this.input.length > this.length && this.length>0){
+                console.log("this input length " + this.input.length + " original length " + this.length);
+                for(var i=this.input.length-1; i>this.length;i--){
+                    this.deleteValue(i);
+                }
+            }
+        }
     };
 
     Apoco.Utils.extend(StringArrayField,_Field);
@@ -1299,10 +1253,8 @@ require("./datepicker");
             var that=this;
             var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
             imm.src=o.src;
-	 //   console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
-	         //   console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
@@ -1312,7 +1264,6 @@ require("./datepicker");
                 };
                 imm.onerror=function(){
                     o.image=null;
-                 //   console.log("ERROR loading image");
                     reject("Field:ImageArray._getImage Could not load image " + o.src);
                 };
             });
@@ -1324,7 +1275,6 @@ require("./datepicker");
    	    //new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = new Array; //evt.target.files;
-	  //  console.log("got " + files.length + " number of files");
             //check that the files are images
             for(var i=0;i<evt.target.files.length;i++){
                 if (evt.target.files[i].type.match('image.*')) {
@@ -1333,41 +1283,27 @@ require("./datepicker");
             }
             var count=that.value.length;
 	    var last=count+files.length;
-          //  var promise=new Promise(function(resolve,reject){
 	    for (var i=count,j=0; i<last; i++,j++) {
-	     //   console.log("found file num " + i);
 		var reader = new FileReader();
 		reader.onload = (function(f,num) {
                     console.log("getImagefileselect  file is  %j",f);
 		    return function(e) {
                         var p;
-                     //   console.log("getImageFiles: that.value len is  " + that.value.length);
 			e.stopPropagation();
-	               // console.log("FileSelect: going to load " + f.name);
-                       // console.log("FileSelect: last is " + last + " and count is " + count);
                         that.value[num]={src: e.target.result,name:f.name};
-                      //  console.log("that.value is %j",that.value[num]);
                         that.promises[num]=that._getImage(that.value[num]);
                         if(that.thumbnails === true){
-                         //   console.log("thumbnails is true");
-                           // that.promises[num].then(function(v){
                             that._addThumbnail(td,num);
-                           // });
                         }
-                       // console.log("getImageFiles: that.value len is  " + that.value.length);
  		    };
 		})(files[j],i);
 		reader.readAsDataURL(files[j]);
 	    }
-  
-           // });
-	   // return promise;
         },
         loadImages: function(values){
             var i=0,last,that=this;
-            if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
+            if(values !==undefined && Apoco.type["array"].check(values)){ //loading more images after creation
                 i=this.value.length;
-             //   console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
             last=this.value.length;
@@ -1411,11 +1347,9 @@ require("./datepicker");
         },
         mkThumbnails: function(){
             var that=this,el;
-	 //   console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.querySelector("div.thumbnails");
             if(!td){
-           //     console.log("making a new image gallery");
-                td=document.createElement("div");//"<div class='image_gallery'></div");
+                td=document.createElement("div");
                 td.className="thumbnails";
                 this.element.appendChild(td);
 	    }
@@ -1423,7 +1357,7 @@ require("./datepicker");
                 that._addThumbnail(td,i);
             }
   	},
-        _resetValue:function(){
+        resetValue:function(){
             return;
         },
 	getValue:function(){ // images are in this.value[i].image
@@ -1460,10 +1394,8 @@ require("./datepicker");
             item=item.toLowerCase();
             for(var i=0;i<arr.length;i++){
                 a=arr[i].toLowerCase();
-           //     console.log("arr " + a + " item " + item);
-                if((a).indexOf(item) !== -1){
-                 //   console.log("Found one");
-                    n[count]=arr[i];
+                 if((a).indexOf(item) !== -1){
+                     n[count]=arr[i];
                     count++;
                 }
                 if(count ===4){
@@ -1493,14 +1425,10 @@ require("./datepicker");
             this.input.required=true;
         }
         this.input.setAttribute("type",this.html_type);
-        //this.input.className=this.type;
-        box.appendChild(this.input);  
+         box.appendChild(this.input);  
         //sort the options
         Apoco.sort(this.options,"string");
-       // for(var i=0;i<this.options.length;i++){
-       //     console.log("sort to " + this.options[i]);
-      //  }
-      
+       
         var select=document.createElement("ul");
         select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         select.style.visibility="hidden";
@@ -1508,10 +1436,8 @@ require("./datepicker");
             if(e.target.tagName === "LI"){
                 e.stopPropagation();
                 e.preventDefault();
-               // console.log("clicked " + e.target.textContent);
                 that.input.value=e.target.textContent;
                 select.style.visibility="hidden";
-                //console.log("setting select to hidden");
             }
         });
         select.addEventListener("mouseover",function(e){
@@ -1540,28 +1466,17 @@ require("./datepicker");
         this.input.addEventListener("keyup",function(e){
             var r;
             e.stopPropagation();
-            //  var v=e.currentTarget.value;
             v=that.input.value;
             offset={x:0,y:0};
             rect=that.input.getBoundingClientRect();
-            //select.style.left = e.clientX + 'px';
-            //select.style.top = e.clientY +  'px';
             getOffset(select,offset);
-            //  console.log("console getOffset " + offset.x + " " + offset.y);
             select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
             select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
-            // console.log("rect left " + rect.left + " bottom " + rect.bottom);
-            // console.log("rect right " + rect.right + " top " + rect.top);
-            // console.log("scroll is "+ window.scrollX  + " " + window.scrollY);
-            //  console.log("keypress is here with value " + v);
-            //console.log("this options length is " + that.options.length);
-            //console.log("keyup setting visibility to hidden");
             select.style.visibility="hidden";
             r=contains(that.options,v);
             for(var i=0;i<r.length;i++){
                 options[i].textContent=r[i];
             }
-            //console.log("keyup setting visibility to visible");
             select.style.visibility="visible";
             this.value=v;
         });

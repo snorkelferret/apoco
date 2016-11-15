@@ -41,7 +41,7 @@ require("./Popups.js");
            // console.log("++++++++++++++++++++++++++++++== Apoco start is here ");
           //  console.log("options are %j ",options);
             if(options){
-	        if(!Apoco.checkType["array"](options) && Apoco.checkType["object"](options)){
+	        if(!Apoco.type["array"].check(options) && Apoco.type["object"].check(options)){
 		    var p=Apoco.display[options.display](options);
 		    if(p){
 		        p.show();
@@ -50,7 +50,7 @@ require("./Popups.js");
 		        throw new Error("could not execute " + options.display);
 		    }
 	        }
-                else if(Apoco.checkType["array"](options)){
+                else if(Apoco.type["array"].check(options)){
                     Apoco.Panel.UIStart(options);
                 }
                 else{
@@ -443,11 +443,11 @@ require("./Nodes.js");
             var k;
             if(name !== undefined){
                 k=this.getField(name);
-                if(k !==null && !Apoco.checkType["array"](k)){
+                if(k !==null && !Apoco.type["array"].check(k)){
                     return k;
                 }
                 k=this.getNode(name);
-                if(k !==null && !Apoco.checkType["array"](k)){
+                if(k !==null && !Apoco.type["array"].check(k)){
                     return k;
                 }
             }
@@ -539,7 +539,7 @@ require("./Nodes.js");
             var p,parent_element;
             if(!d.field){
                 if(d.type){
-                    d.field=Apoco.dbToHtml[d.type].field;
+                    d.field=Apoco.type[d.type].field;
                 }
                 else{
                     throw new Error("Must supply either a field or a type");
@@ -809,7 +809,7 @@ require("./DisplayFieldset");
             }
             if(!d.field){
                 if(d.type){
-                    d.field=Apoco.dbToHtml[d.type].field;
+                    d.field=Apoco.type[d.type].field;
                 }
                 else{
                     throw new Error("Must supply either a field or a type");
@@ -1216,7 +1216,7 @@ jsonishData={
 //	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
 //	}
 	// see if the data has been put into subgrids
-	if(that.rows && Apoco.checkType["array"](that.rows)){ // not sorted into subgrids
+	if(that.rows && Apoco.type["array"].check(that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
 	    if(that.groupBy){
 		for(var i=0;i<that.rows.length;i++){
@@ -1467,7 +1467,7 @@ jsonishData={
         addCol:function(col){
             var that=this,index,r,t,rows;
             var was_hidden=this.isHidden();
-            if(Apoco.checkType["integer"](col)){
+            if(Apoco.type["integer"].check(col)){
                 index=col;
                 col=this.cols[index];
                 if(!col.name || !col.type){
@@ -1513,8 +1513,6 @@ jsonishData={
 	    if(this.cols[index].display !== false){
 		//console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
-	        //	var h=$("<th class='ui-state-default " +  this.cols[index].type + "' type= '" + this.cols[index].type + "'> " + label + " </th>");
-                //  var h=document.createElement("th");
                 var h=document.createElement("div");
                 var s=document.createElement("soan");
                 h.appendChild(s);
@@ -1524,13 +1522,10 @@ jsonishData={
 		this.cols[index].element=h;
 		this.cols[index].sortable=Apoco.isSortable(this.cols[index].type);
 		if(this.cols[index].sortable && this.userSortable){
-		    //  var dec=$("<div class='arrows'></div>");
                     var dec=document.createElement("div");
                     dec.classList.add("arrows");
-		    //  var up=$("<span class='up ui-icon ui-icon-triangle-1-n '></span>");
                     var up=document.createElement("span");
                     up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
-		    //  var down=$("<span class='down ui-icon ui-icon-triangle-1-s '></span>");
                     var down=document.createElement("span");
                     down.classList.add("down","ui-icon","ui-icon-triangle-1-n");
 		    dec.appendChild(up);
@@ -1696,8 +1691,7 @@ jsonishData={
   	    c=document.createElement("td");
             c.className=col.type;
             
-            //console.log("c is " + JSON.stringify(c));
-            row[col.name]=Apoco.field[Apoco.dbToHtml[col.type].field](settings,c);
+            row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
             if(col.display !== false){
 		r.appendChild(row[col.name].element);
             
@@ -2009,12 +2003,10 @@ jsonishData={
            // console.log("name is " + c.name + " context " + c.context + " type " + c.type);
             row.push({context:c.context,name: c.name,
                       value:c.context.value });
-            //s=$(element).siblings();
             s=element.parentNode.childNodes;
            // console.log("got siblings " + s.length);   
             for(var i=0;i<s.length;i++){
                 if(s[i] !== element){
-                    //c= $(s[i]).data("apoco");
                     c=s[i].data.apoco;
              //       console.log( "sib " + c.name + " value " + c.context.value);
                     row.push({context: c.context,name: c.name,
@@ -2079,13 +2071,6 @@ jsonishData={
 		    if(textStatus === "success"){
 	//		if(this.DEBUG) console.log("Form.submit: deferred-resolve");
 			Apoco.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
-	    		// var cmd=that.getCreator().getCmd(that);
-
-			// cmd.undo();
-			//var crt=that.getCreator().find({"command": cmd})
-			// crt.element.removeClass("selected");
-			// that.getCreator().getCmd(that).undo();
-
 		    }
 		    else{
 			if(this.DEBUG) console.log("Form.submit: deferred-reject");
@@ -3031,7 +3016,7 @@ require("./datepicker");
 ;(function(){
     "use strict";
 
-    Apoco.dbToHtml={
+  /*  Apoco.dbToHtml={
 	integer:{html_type: "number", field: "input"}, 
 	positiveInteger: {html_type:"number", field: "input"},
 	negativeInteger:{html_type:"number", field: "input"},
@@ -3049,13 +3034,14 @@ require("./datepicker");
 	floatArray: {html_type:"number", field: "numberArray"},
 	boolean: {html_type: "checkbox",field: "checkBox"},
 	text: { html_type:"text",field: "textArea"},
+        array:{html_type: "text",field: "stringArray"},
 	stringArray: {html_type: "text",field: "stringArray"},
 	imageArray: {html_type: "image", field: "imageArray"},
 	password: {html_type: "password", field:"input"},
         range:{html_type:"range",field: "slider"},
         any:{html_type:"text",field:"input"} //default
     };
-
+*/
 /*  Apoco.HtmlToType=function(field){
  	for(var k in  Apoco.dbToHtml){
 	    if(Apoco.dbToHtml[k].field == field){
@@ -3095,7 +3081,7 @@ require("./datepicker");
             this.popup=false; // no popup editor if not editable
         }
         
-	this.html_type=Apoco.dbToHtml[this.type].html_type;
+	this.html_type=Apoco.type[this.type].html_type;
         if(element === undefined){
             this.element=document.createElement("div");
         }
@@ -3104,7 +3090,6 @@ require("./datepicker");
         }
 	else {
             throw new Error("Field: element is not a html node");
-            //this.element=element;
         }
         this.element.classList.add(this.type);
 	this.element.setAttribute("name",this.name);
@@ -3114,32 +3099,15 @@ require("./datepicker");
 	if(this.label){
             var l=document.createElement("label");
             l.appendChild(document.createTextNode(this.label));
-            l.setAttribute("for",this.name);
-	    this.element.appendChild(l);
+ 	    this.element.appendChild(l);
 	}
         
 	if(this.publish !== undefined){
 	    Apoco.IO.publish(this);
 	}
 	if(this.listen !== undefined){
-	    //console.log("field adding listener " + this.name);
 	    Apoco.IO.listen(this);
 	}
-      //  console.log("in Fields parent is " + this.parent + " original parm is " + d.parent);
-/*	if(this.action){
-            var a=this.action;
-            var ea=(function(that){
-                console.log("Field action is here");
-		return function(e){
-                    e.stopPropagation();
-                    console.log("event function is " +a);
-                    //that.action(that);
-                   that.action(that);
-                };
-	    })(this);
-            this.element.addEventListener("click", ea,false);
-        }     */
-   
     };
 
     _Field.prototype={
@@ -3177,10 +3145,12 @@ require("./datepicker");
 	    return undefined;
 	},
 	setValue:function(v){
+            if(!Apoco.type[this.type].check(v)){
+                throw new Error("Field: setValue " + v  + " is the wrong type, expects " + this.type);
+            }
 	    this.value=v;
-            //console.log("setting value " + v);
             if(this.value === null){
-                this.input_value="";
+                this.input.value="";
             }
 	    else {
                 this.input.value=v;
@@ -3215,54 +3185,40 @@ require("./datepicker");
 		    return function(e){
 			e.stopPropagation();
 			if(e.which === 13){
-			    //var v=this.input.val();
-			    //console.log("editor got value " + that.input.val());
 			    func(that.input.val());
 			}
 		    };
 		}(this);
-	//	this.input.keypress(cb);
-	    //this.input.blur(func(this.input.val()));
 	    }
 	    else{
 		throw new Error("no input element for this type " + this.type);
 	    }
 	},
-        _resetValue:function(){
-            if(Apoco.Utils.checkType["array"](this.value)){
-                for(var i=0;i<this.value; i++){
+        resetValue:function(){
+            if(this.value === undefined){
+                this.input.value = "";
+                return null;
+            }
+           
+            if(Apoco.type["array"].check(this.value)){
+                for(var i=0;i<this.value.length; i++){
                     this.input[i].value=this.value[i];
                 }
-                return;
+                return this.value;
             }
             this.input.value=this.value;
+            return this.value;
         },
-/*	displayInvalid:function(element){
-	    if(!element){
-		element=this.element;
-	    }
-	    element.addClass("invalid");
-	    //element.prop("title","Invalid input- should be of type " + this.type);
-	},
-	resetInvalid:function(element){
-	    if(!element){
-		element=this.element;
-	    }
-	    element.removeClass("invalid");
-	    element.prop("title","");
-	    //element.tooltip("disable");
-	}, */
 	checkValue:function(){
-	    //console.log("_Field checking value " + this.getValue() + " of type " + this.type );
 	    var array=false;
             var v=this.getValue();
-            if(Apoco.checkType["blank"](v)){
+            if(Apoco.type["blank"].check(v)){
    	        if(this.required){
                     return false;
                 }
             }
-            if(Apoco.checkType[this.type] !== undefined){
-                if(!Apoco.checkType[this.type](v)){
+            if(Apoco.type[this.type].check !== undefined){
+                if(!Apoco.type[this.type].check(v)){
                     return false;
                 }
  	    }
@@ -3274,13 +3230,10 @@ require("./datepicker");
 
     var InputField=function(d,element){
         var that=this;
-	//console.log("INPUT FIELD IS HERE with required " + d.required);
         d.field="input";
 	_Field.call(this,d,element);
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
-        //s.className=this.type;
-
         this.input=s;
         if(this.min){
             this.input.setAttribute("min",this.min);
@@ -3317,7 +3270,6 @@ require("./datepicker");
     var FloatField=function(d,element){
         var inp;
 	var that=this;
-	//console.log("FLOAT FIELD IS HERE");
         d.field="float";
         d.type="float";
 	_Field.call(this,d,element);
@@ -3380,7 +3332,7 @@ require("./datepicker");
 		    clearInterval(timer);
 		    return;
 	        }
-	        if(!Apoco.checkType.float(t)){
+	        if(!Apoco.type.float.check(t)){
 		    clearInterval(timer);
 		    throw new Error("stepfn return from getValue: this is not a floating point number");
 	        }
@@ -3391,18 +3343,11 @@ require("./datepicker");
 		    t=parseFloat(t,10)-that.step;
 	        }
 	        t=parseFloat(t,10).toFixed(that.precision);
-	        //console.log("step_fn: after inc to fixed " +  t);
 	        if(that.setValue(t) === null){
 		    clearInterval(timer);
 		    throw new Error("step_fn val is not floating point " + t);
 	        }
 	    };
-
-	 /*   var dispatch_change=function(){
-	        var e=new Event("change");
-                that.element.dispatchEvent(e);
-	    };
-*/
 	    var eObj={
 	        mouseover: function(e) {
                     e.stopPropagation();
@@ -3437,7 +3382,6 @@ require("./datepicker");
 		    if(timer){
 		        clearInterval(timer);
 		    }
-		   // dispatch_change();
 	        }
 	    };
             for(var k in eObj){
@@ -3458,20 +3402,16 @@ require("./datepicker");
 	getValue: function(){
             var a=this.input[0].value;
             var b=this.input[1].value;
-	    if(Apoco.checkType.blank(a)) {
-		//console.log("input integer is null");
-		if(Apoco.checkType.blank(b)){
+	    if(Apoco.type.blank.check(a)) {
+		if(Apoco.type.blank.check(b)){
 		    return this.value="";
 		}
 		else{
 		    this.value=parseFloat(("0."+b),10).toFixed(this.precision);
 		}
 	    }
-	    else if(Apoco.checkType.blank(b)){
-		//console.log("input decimal is null");
-		//console.log("getValue: integer part null, value b is " + b);
+	    else if(Apoco.type.blank.check(b)){
 		this.value=parseFloat((a + ".000"),10).toFixed(this.precision);
-		//console.log("getValue: integer part null, value is " + this.value);
 	    }
 	    else{
                 if(a<0){
@@ -3481,25 +3421,23 @@ require("./datepicker");
                     this.value=(parseInt(a,10)+parseFloat(("." + b),10)).toFixed(this.precision);
                 }
 	    }
-	    if(!Apoco.checkType.float(this.value)){
+	    if(!Apoco.type.float.check(this.value)){
 		throw new Error("getValue: this is not a floating point number " + this.value);
 		return null;
 	    }
 	    return this.value;
 	},
-        _resetValue:function(){
+        resetValue:function(){
             this.setValue(this.value);
         },
 	setValue: function(v){
-            // console.log("float setValue " + v);
-            
-	    if(Apoco.checkType.blank(v)){
+ 	    if(Apoco.type.blank.check(v)){
                 this.input[0].value="";
                 this.input[1].value="";
 		this.value="";
 		return;
 	    }
-            if(!Apoco.checkType["float"](v)){
+            if(!Apoco.type["float"].check(v)){
 		throw new Error("FloatField: setValue this value is not a float " + v);
 	    }
 	    v=parseFloat(v,10).toFixed(this.precision);  // not necessarily a number
@@ -3508,7 +3446,6 @@ require("./datepicker");
 		throw new Error("value is not a floating point number" + v);
 		return null;
 	    }
-            //console.log("setValue: value is " + p[0]);	  
             this.input[0].value=p[0];
             this.input[1].value=p[1];
 	    this.value=v;
@@ -3525,8 +3462,7 @@ require("./datepicker");
         _Field.call(this,d,element);
         this.input=document.createElement("input");
         this.input.type=this.html_type;
-        //this.input.className=this.type;
-         if(this.required === true){
+        if(this.required === true){
             this.input.required=true;
         }
         this.element.appendChild(this.input);
@@ -3535,7 +3471,6 @@ require("./datepicker");
 	}
 	if(this.editable !== false){
             if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
-              //  console.log("Making datepicker for Mozilla");
                 this.input.type="text";
                 this.input.setAttribute("placeholder","YYYY-MM-DD");
                 Apoco.datepicker.init(this.input);
@@ -3588,7 +3523,6 @@ require("./datepicker");
         if(this.required===true){
             this.input.required=true;
         }
-	//console.log("checkbox value is " + d.value);
         this.setValue(this.value);
         if(this.editable === false){
             this.input.setAttribute("disabled",true);
@@ -3601,24 +3535,19 @@ require("./datepicker");
 
     CheckBoxField.prototype={
 	getValue:function(){
-	   // console.log("value of checkbox is " + this.input.value + " and prop is " + this.input.getAttribute('checked') + " value is " + this.value);
-	   // console.log("this input.checked is " + this.input.checked);
             return this.input.checked;
 	},
         setValue:function(val){
             if(val === "true" || val === true || val === 1){
-	       // console.log("setting checkbox value to true");
                 this.input.setAttribute("checked","checked");
 	    }
 	    else {
-	        //console.log("setting checkbox value to false");
                 if(this.input.hasAttribute("checked")){
                     this.input.removeAttribute("checked");
                 }
 	    }
         },
 	popupEditor:function(func){
-	    //console.log("checkbox editor is here");
             if(this.editable === true){
 	        var cb=function(that){
 		    return function(e){
@@ -3647,7 +3576,7 @@ require("./datepicker");
         if(this.type === "floatArray" && this.step === undefined){
             this.step=0.1;
         }
-	if(this.value && !Apoco.checkType.array(this.value)){
+	if(this.value && !Apoco.type.array.check(this.value)){
 	    throw new Error("NumberArrayField: value is not an array");
 	}
 	for(var i=0;i<this.input.length;i++){
@@ -3701,7 +3630,7 @@ require("./datepicker");
                 }
             }
  	    this.element.appendChild(this.input[i].input);
-            
+            return true;
         },
         deleteValue:function(value){
             var index = -1;
@@ -3747,7 +3676,6 @@ require("./datepicker");
 		this.element.addEventListener("keypress",function(event){
 		    event.stopPropagation();
 		    if(event.which === 13){
-			//console.log("got value " + this.input.val());
 			func(r);
 		    }
 		},false);
@@ -3759,7 +3687,6 @@ require("./datepicker");
     Apoco.Utils.extend(NumberArrayField,_Field);
 
     var TextAreaField=function(d,element){
-        //var settings=checkDefaultOptions("TextAreaField",d);
         d.field="textArea";
         d.type="text";
 	_Field.call(this,d,element);
@@ -3784,7 +3711,6 @@ require("./datepicker");
 
     TextAreaField.prototype={
 	popupEditor:function(func,ok,cancel){
-
 	    if(ok && ok.length >0 && cancel && cancel.length >0){
 		var cb=function(that){
 		    return function(e){
@@ -3812,7 +3738,7 @@ require("./datepicker");
 
 
     var SelectField=function(d,element){
-	var i,o;
+	var i,o,that=this;
         d.field="select";
         d.type="string";
 	_Field.call(this,d,element);
@@ -3822,62 +3748,59 @@ require("./datepicker");
             options.required=true;
         }
 	for(i=0; i<this.options.length; i++){
-	    if(i===0 && this.blank_option !== undefined && this.blank_option === true){ // add a blank option at the head of the list
-                o=document.createElement("option");
-                o.value="";
-                options.appendChild(o);
-	    }
+
             o=document.createElement("option");
             o.value=this.options[i];
             o.textContent=this.options[i];
+            options.appendChild(o);
+	}
+	if(this.blank_option === true){ // add a blank option at the head of the list
+            o=document.createElement("option");
+            o.value="";
             options.appendChild(o);
 	}
         this.select=options;
 	var cd=function(that){
 		return function(e){
 		    e.stopPropagation();
-		    if(that.input.style.visibility === "visible"){ //}("visible")){
-			that.input.style.visibility= "hidden"; //hide();
-                        that.span.style.visibility="hidden";
-                        that.element.style.visibility="visible";
-		    }
+                    if(e.keyCode === 13){
+		        if(that.input.style.visibility === "visible"){ //}("visible")){
+			    that.input.style.visibility= "hidden"; //hide();
+                            that.select.style.visibility="visible";
+                            console.log("target value" + e.target.value);
+                            o=document.createElement("option");
+                            o.value=e.target.value;
+                            o.textContent=e.target.value;
+                            that.select.appendChild(o);
+                            that.options.push(that.select.value);
+                            that.select.value=e.target.value;
+		        }
+                    }
 		};
 	}(this);
 
 
         var mk_input=function(){
-            this.input=document.createElement("input");
-           // this.input.className=this.type;
-            this.input.setAttribute("type",this.html_type);
-            this.input.style.visibility="hidden";
-            this.span=document.createElement("span");
-            if(this.required===true){
-                this.input.required=true;
-            }
-            this.span.classList.add("ui-icon","ui-icon-triangle-1-s");
-            this.span.style.visibility="hidden";
-            this.element.appendChild(this.input);
-            this.element.appendChild(this.span);
-            this.span.addEventListener("click",cd);
+            that.input=document.createElement("input");
+            that.input.setAttribute("type",that.html_type);
+            that.element.appendChild(that.input);
+            that.input.addEventListener("keypress",cd);
         };
 
-        var that=this;
-	// if selection option is "Other" add a new input field
+        // if selection option is "Other" add a new input field
         this.select.addEventListener("change",function(){
-	    //console.log("select option has changed");
-            if(that.select.value === "Other"){      
-		if(!this.input){ 
+	    console.log("select option has changed");
+            if(that.select.value === ""){      
+		if(!that.input){ 
                     mk_input();
                 }
-                that.element.getElementsByTagName("select").style.visibility="hidden";
+                that.select.style.visibility="hidden";
 	        that.input.style.visibility="visible";
-	        that.span.style.visibility="visible";
 	        that.input.focus();
 	    }
 	    else if(that.edit_func){ //set for editor callback
 		var v=that.getValue();
 		that.value=v;
-		//console.log("got value " + v);
 		if(that.edit_func.context){
 		    that.edit_func.cmd.call(that.edit_func.context,v);
 		}
@@ -3902,15 +3825,17 @@ require("./datepicker");
             for(var i=0;i<this.options.length;i++){
                 if(this.options[i] == v){
                     this.select.value=v;
+                    this.value=v;
                     return;
                 }
             }
             if(this.input){
                 this.input.value=v;
+                this.value=v;
                 return;
             }
-            throw new Error("SelectField: Cannot set value to " + v + " options are " + this.options[0] + " " +  this.options[1] + " " + this.options[2] );
-            this.value=v;
+            throw new Error("SelectField: Cannot set value to " + v );
+           
         },
 	getValue:function(){
 	   
@@ -3928,7 +3853,11 @@ require("./datepicker");
 	},
 	popupEditor:function(func){
 	    this.edit_func=func;
-	}
+	},
+        resetValue:function(){
+            this.select.value=this.value;
+            return this.select.value;
+        }
 
     };
 
@@ -3943,19 +3872,27 @@ require("./datepicker");
           
 	_Field.call(this,d,element);
         this.input=[];
+        if(!this.value){
+            this.value=[];  
+        }
+        
         for(var i=0;i<this.labels.length;i++){
             this.input[i]={};
             this.input[i].label=this.labels[i];
-        }
+            if(!this.value[i]){
+                this.value[i]=false;
+            }
+         }
         this.labels.length=0;
 	this.popup=true;
         var u=document.createElement("ul");
         u.className="choice";
 	this.element.appendChild(u);
+        
 	for(var i=0;i<this.input.length;i++){
-	    //console.log("adding label " + this.labels[i]);
 	    this.addValue(i);
 	};
+        this.setValue(this.value);
         if(this.action){
             this.action(this);
         }
@@ -3963,75 +3900,98 @@ require("./datepicker");
     };
 
     ButtonSetField.prototype={
-	addValue:function(index){
+	addValue:function(index,value){
+            var l,p;
             if(index === undefined){
                 throw new Error("ButtonSetField: must supply a name");
             }
-            if(!Apoco.checkType["integer"](index)){
+            if(!Apoco.type["integer"].check(index)){
                 var label=index;
                 index=this.input.length;
                 this.input[index]={};
                 this.input[index].label=label;
+                this.value[index]=(value)?value:false;
             }
-            var l=document.createElement("li");
-            l.textContent=this.input[index].label;
-	    
-	    this.element.getElementsByTagName('ul')[0].appendChild(l);
-
-	    //console.log("buttonSet adding field " + p + " label " + this.labels[p]);
+            l=document.createElement("li");
+  	    this.element.getElementsByTagName('ul')[0].appendChild(l);
             this.input[index].input=document.createElement("input");
             if(this.checkbox === true ){
-                this.input[index].input.type="checkbox"; //setAttribute("type","checkbox");
+                this.input[index].input.type="checkbox";
             }
             else{
-                this.input[index].input.type="radio"; //setAttribute("type","radio"); 
+                this.input[index].input.type="radio"; 
             }
-            
+            this.input[index].input.checked=this.value[index];
 	    l.appendChild(this.input[index].input);
-
+            p=document.createElement("p");
+            p.textContent=this.input[index].label;
+            l.appendChild(p);
+       
             if(this.checkbox !== true){
 	        this.input[index].input.addEventListener("click",function(that,node){
 		    return function(e){
 		        e.stopPropagation();
-                        console.log("click for " + node.parentNode.text);
-                        console.log("current checked is " + node.checked);
-                        console.log("radio buttons");
                         for(var i=0;i<that.input.length;i++){
                             if(that.input[i].input !== node){
-                                console.log("setting checked for  " + that.input[i].input.parentNode.text);
-                                console.log("from  " + that.input[i].checked + " to false ");
                                 that.input[i].input.checked=false;
                             }
                         }
 		    };
 	        }(this,this.input[index].input)); 
-            }
+            } 
+            return true;
 	},
-	_resetValue:function(){
+	resetValue:function(){
             for(var i=0;i<this.input.length;i++){
-	        this.input[i].input.parentNode.classList.remove('selected');
-                this.input[i].input.checked=false;
+                this.input[i].input.checked=this.value[i];
             }
 	},
-        setValue: function(name){  
-            if(Apoco.checkType['string'](name)){
-                for(var i=0;i<this.input.length;i++){
-                    if(this.input[i].label === name){
-                        this.input[i].input.click();
-                        return;
+        setValue: function(value,index){
+            var t=0;
+            if(!Apoco.type["array"].check(value)){
+                if( index !== undefined && index<=this.input.length){
+                    if(this.checkbox !== true){
+                        if(value === true){ //set all the others to false
+                            for(var i=0;i<this.input.length;i++){
+                                this.input[i].input.checked=false;
+                                this.value[i]=false;
+                            }
+                        }
+                    }
+                    this.input[index].input.checked=value;
+                    this.value[index]=value;
+                    
+                }
+                else{
+                    throw new Error("ButtonSetField: value must be a boolean array");
+                }
+                return;
+            }
+            
+            if(value.length!== this.input.length){
+                throw new Error("ButtonSetField: values array length " + value.length + " does not match labels " + this.input.length);
+            }
+            else if(this.checkbox !== true){ //radio button only one true value
+                 for(var i=0;i<value.length;i++){
+                    if(value[i] === true){
+                        t++;
                     }
                 }
+                if(t> 1){
+                    throw new Error("ButtonSetField: only one true value for radio buttons");
+                }
             }
-            throw new Error("Buttonsetfield: setValue has no member called " + name);
+            for(var i=0;i<value.length;i++){
+                this.value[i]=value[i];
+                this.input[i].input.checked =value[i];
+            }
         },
 	deleteValue:function(label){
 	    var that=this;
 	    var index=null;
-	    //console.log("remove value is " + value);
 	    for(var i=0;i<this.input.length;i++){
 		if(this.input[i].label === label){
 		    index=i;
-		    //console.log("found value " + value + " with index " + index);
 		    break;
 		}
 	    }
@@ -4058,7 +4018,6 @@ require("./datepicker");
 	checkValue:function(){
 	    if(this.required ){ // must have at least one value set to true.
                 for(var i=0; i<this.input.length; i++){
-                  //  console.log("checkbox value is " + this.value[i]);
                     if(this.input[i].input.checked === true){
                         return true;
                     }
@@ -4080,7 +4039,6 @@ require("./datepicker");
 	this.popup=true;
 	this.input= document.createElement("input");
         this.input.setAttribute("type",this.type);
-        //this.input.className=this.type;
         this.element.appendChild(this.input);
 	var that=this;
 	if(this.min){
@@ -4112,8 +4070,7 @@ require("./datepicker");
 	this.popup=true;
 	var that=this;
 	var array_length=0;
-        //this.element.className="stringArray";
-	this.input=[];
+        this.input=[];
         var dv=document.createElement("div");
         dv.className="list_container";
         this.element.appendChild(dv);
@@ -4131,14 +4088,16 @@ require("./datepicker");
 	if(this.length === 0){
 	    this.length=4;
 	}
-
-	//console.log("len of array is " + d.len);
 	for(var i=0;i<this.length;i++){
-	    this.addValue(i);
+            if(this.value[i]){
+	        this.addValue(this.value[i],i);
+            }
+            else{
+                this.addValue("",i); 
+            }
 	}
 	// this adds an extra field if you press return in last field
 	if(this.editable !== false){
-
 	    // add a glyph
             var sp=document.createElement("span");
             sp.classList.add("plus","ui-icon","ui-icon-plusthick");
@@ -4152,7 +4111,7 @@ require("./datepicker");
                 sp.parentNode.removeChild(sp);
                 sm.parentNode.removeChild(sm);
                 if(add=== "add"){
-		    that.addValue(l);
+		    that.addValue("",l); // add a blank value
                 }
                 else{
                     that.deleteValue(l-1);
@@ -4164,7 +4123,6 @@ require("./datepicker");
             };
             
 	    sp.addEventListener("click",function(e){
-               // console.log("StringArrayField got click on plus");
 		e.stopPropagation();
 	        addremove("add");
 	    });
@@ -4182,7 +4140,7 @@ require("./datepicker");
     
     StringArrayField.prototype={
         setValue:function(v,index){
-            if(!Apoco.checkType["array"](v)){
+            if(!Apoco.type["array"].check(v)){
                 if( index !== undefined && index<this.length){
                     this.input[index].input.value=v;
                     this.value[index]=v;
@@ -4201,7 +4159,6 @@ require("./datepicker");
                 else{
                     throw new Error("StringArrayField: setValue array is too long");
                 } 
-                
             }
         },
 	getValue:function(){
@@ -4219,13 +4176,17 @@ require("./datepicker");
             if(this.input.length>1){
                 t=this.input[i].input.parentNode;
                 this.input.splice(i,1);
-                this.value.splice(i,1);
+                if(this.value[i]){
+                    this.value.splice(i,1);
+                }
                 t.parentNode.removeChild(t);
             }
         },
-	addValue:function(i){
-	    this.input[i]={};
-	   // console.log("trying to add a string field");
+	addValue:function(value,i){
+            if(i===undefined){
+                i=this.input.length;
+            }
+ 	    this.input[i]={};
             var element=document.createElement("li");
             element.className="string";
             this.input[i].input=document.createElement("input");
@@ -4235,9 +4196,8 @@ require("./datepicker");
             this.input[i].input.setAttribute("type","string");
             element.appendChild(this.input[i].input);
             this.element.getElementsByClassName("string_fieldset")[0].appendChild(element);
-	    if(this.value[i]){
-		this.input[i].input.value=this.value[i];
-	    }
+	   
+	    this.input[i].input.value=value;
             if(this.editable === false){
                 this.input[i].input.readOnly=true;
             }
@@ -4245,27 +4205,41 @@ require("./datepicker");
 	checkValue:function(){
 	    var valid;
 	    (this.required)?valid=false: valid=true;
-	    //console.log("string Array checkValue ");
 	    var v=this.getValue();
 	    for(var i=0;i<v.length;i++){
-		//console.log("checking inputs " + i + " for stringArray");
-		//console.log("got value " + v[i]);
 		if(this.required){
-		    if(!Apoco.checkType["blank"](v[i])){
+		    if(!Apoco.type["blank"].check(v[i])){
 			valid=true;   // at least one non blank value
 		    }
 		}
-		if(!Apoco.checkType["string"](v[i])){  
+		if(!Apoco.type["string"].check(v[i])){  
 		    valid=false;
 		    break;
 		}
 	    }
-	    //console.log("check field for string array returning valid = " + valid);
 	    if(!valid){
 		this.displayInvalid();
 	    }
 	    return valid;
-	}
+	},
+        resetValue:function(){
+            var v;
+            for(var i=0;i<this.length;i++){ // original length
+                v=(this.value[i])?this.value[i]:"";
+                if(this.input[i]){
+                    this.input[i].input.value=v;
+                }
+                else{  // value has been deleted
+                    this.addValue(v,i);
+                }
+            }
+            if(this.input.length > this.length && this.length>0){
+                console.log("this input length " + this.input.length + " original length " + this.length);
+                for(var i=this.input.length-1; i>this.length;i--){
+                    this.deleteValue(i);
+                }
+            }
+        }
     };
 
     Apoco.Utils.extend(StringArrayField,_Field);
@@ -4320,10 +4294,8 @@ require("./datepicker");
             var that=this;
             var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
             imm.src=o.src;
-	 //   console.log("getImage is here ");
             var promise=new Promise(function(resolve,reject){
 	        imm.onload=function(){
-	         //   console.log("getImage: +++++ reader onload got width " + this.width + " " + this.height);
                     o.width=parseFloat(this.width);
                     o.height=parseFloat(this.height);
                     o.title=o.name;
@@ -4333,7 +4305,6 @@ require("./datepicker");
                 };
                 imm.onerror=function(){
                     o.image=null;
-                 //   console.log("ERROR loading image");
                     reject("Field:ImageArray._getImage Could not load image " + o.src);
                 };
             });
@@ -4345,7 +4316,6 @@ require("./datepicker");
    	    //new_values.length=0; // reset array
 	    evt.stopPropagation();
 	    var files = new Array; //evt.target.files;
-	  //  console.log("got " + files.length + " number of files");
             //check that the files are images
             for(var i=0;i<evt.target.files.length;i++){
                 if (evt.target.files[i].type.match('image.*')) {
@@ -4354,41 +4324,27 @@ require("./datepicker");
             }
             var count=that.value.length;
 	    var last=count+files.length;
-          //  var promise=new Promise(function(resolve,reject){
 	    for (var i=count,j=0; i<last; i++,j++) {
-	     //   console.log("found file num " + i);
 		var reader = new FileReader();
 		reader.onload = (function(f,num) {
                     console.log("getImagefileselect  file is  %j",f);
 		    return function(e) {
                         var p;
-                     //   console.log("getImageFiles: that.value len is  " + that.value.length);
 			e.stopPropagation();
-	               // console.log("FileSelect: going to load " + f.name);
-                       // console.log("FileSelect: last is " + last + " and count is " + count);
                         that.value[num]={src: e.target.result,name:f.name};
-                      //  console.log("that.value is %j",that.value[num]);
                         that.promises[num]=that._getImage(that.value[num]);
                         if(that.thumbnails === true){
-                         //   console.log("thumbnails is true");
-                           // that.promises[num].then(function(v){
                             that._addThumbnail(td,num);
-                           // });
                         }
-                       // console.log("getImageFiles: that.value len is  " + that.value.length);
  		    };
 		})(files[j],i);
 		reader.readAsDataURL(files[j]);
 	    }
-  
-           // });
-	   // return promise;
         },
         loadImages: function(values){
             var i=0,last,that=this;
-            if(values !==undefined && Apoco.checkType["array"](values)){ //loading more images after creation
+            if(values !==undefined && Apoco.type["array"].check(values)){ //loading more images after creation
                 i=this.value.length;
-             //   console.log("loadImages " + "starting at " + i);
                 this.value=this.value.concat(values);
             }
             last=this.value.length;
@@ -4432,11 +4388,9 @@ require("./datepicker");
         },
         mkThumbnails: function(){
             var that=this,el;
-	 //   console.log("mk_thumbnails got " + this.value.length + " number of files");
             var td=this.element.querySelector("div.thumbnails");
             if(!td){
-           //     console.log("making a new image gallery");
-                td=document.createElement("div");//"<div class='image_gallery'></div");
+                td=document.createElement("div");
                 td.className="thumbnails";
                 this.element.appendChild(td);
 	    }
@@ -4444,7 +4398,7 @@ require("./datepicker");
                 that._addThumbnail(td,i);
             }
   	},
-        _resetValue:function(){
+        resetValue:function(){
             return;
         },
 	getValue:function(){ // images are in this.value[i].image
@@ -4481,10 +4435,8 @@ require("./datepicker");
             item=item.toLowerCase();
             for(var i=0;i<arr.length;i++){
                 a=arr[i].toLowerCase();
-           //     console.log("arr " + a + " item " + item);
-                if((a).indexOf(item) !== -1){
-                 //   console.log("Found one");
-                    n[count]=arr[i];
+                 if((a).indexOf(item) !== -1){
+                     n[count]=arr[i];
                     count++;
                 }
                 if(count ===4){
@@ -4514,14 +4466,10 @@ require("./datepicker");
             this.input.required=true;
         }
         this.input.setAttribute("type",this.html_type);
-        //this.input.className=this.type;
-        box.appendChild(this.input);  
+         box.appendChild(this.input);  
         //sort the options
         Apoco.sort(this.options,"string");
-       // for(var i=0;i<this.options.length;i++){
-       //     console.log("sort to " + this.options[i]);
-      //  }
-      
+       
         var select=document.createElement("ul");
         select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         select.style.visibility="hidden";
@@ -4529,10 +4477,8 @@ require("./datepicker");
             if(e.target.tagName === "LI"){
                 e.stopPropagation();
                 e.preventDefault();
-               // console.log("clicked " + e.target.textContent);
                 that.input.value=e.target.textContent;
                 select.style.visibility="hidden";
-                //console.log("setting select to hidden");
             }
         });
         select.addEventListener("mouseover",function(e){
@@ -4561,28 +4507,17 @@ require("./datepicker");
         this.input.addEventListener("keyup",function(e){
             var r;
             e.stopPropagation();
-            //  var v=e.currentTarget.value;
             v=that.input.value;
             offset={x:0,y:0};
             rect=that.input.getBoundingClientRect();
-            //select.style.left = e.clientX + 'px';
-            //select.style.top = e.clientY +  'px';
             getOffset(select,offset);
-            //  console.log("console getOffset " + offset.x + " " + offset.y);
             select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
             select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
-            // console.log("rect left " + rect.left + " bottom " + rect.bottom);
-            // console.log("rect right " + rect.right + " top " + rect.top);
-            // console.log("scroll is "+ window.scrollX  + " " + window.scrollY);
-            //  console.log("keypress is here with value " + v);
-            //console.log("this options length is " + that.options.length);
-            //console.log("keyup setting visibility to hidden");
             select.style.visibility="hidden";
             r=contains(that.options,v);
             for(var i=0;i<r.length;i++){
                 options[i].textContent=r[i];
             }
-            //console.log("keyup setting visibility to visible");
             select.style.visibility="visible";
             this.value=v;
         });
@@ -5022,7 +4957,7 @@ require("./Types.js");
                     that.element.appendChild(d);
                 }
                 else  if(that.items[i].labels){
-                    if(Apoco.checkType['array'](that.items[i].labels)){
+                    if(Apoco.type['array'].check(that.items[i].labels)){
                         for(var j=0;j<that.items[i].labels.length;j++){
                             d=document.createElement("dt");
                             d.textContent=that.items[i].labels[j];
@@ -5036,7 +4971,7 @@ require("./Types.js");
                     that.element.appendChild(d);
                 }
                 else if (that.items[i].descriptions){
-                    if(Apoco.checkType['array'](that.items[i].descriptions)){
+                    if(Apoco.type['array'].check(that.items[i].descriptions)){
                         for(var j=0;j<that.items[i].descriptions.length;j++){
                             d=document.createElement("dd");
                             d.innerHTML=that.items[i].descriptions[j];
@@ -5208,7 +5143,7 @@ require("./Window");
 ;(function() {
     'use strict';
     function check(ar){
-	if(!Apoco.checkType["object"](ar)){
+	if(!Apoco.type["object"].check(ar)){
 	    throw new Error("This is not a window display object " + ar);
 	}
 	for(var i in ar){
@@ -5442,7 +5377,7 @@ require("./Window");
 	  //  console.log("Panel.add is here");
 	   //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
          
-            if(Apoco.checkType['string'](panel)){
+            if(Apoco.type['string'].check(panel)){
                 var w=this._UIGet(panel);
                 panel=w;
             }
@@ -5603,12 +5538,12 @@ require("./Window");
             if(!obj){
                 throw new Error("Apoco.Panel: deleteChild obj is null");
             }
-            if(Apoco.checkType['string'](obj)){
+            if(Apoco.type['string'].check(obj)){
               //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
            //console.log("deleteing child length is " + this.components.length);
-	   // console.log("Panel delete child is here");
+	   // console.log(Panel delete child is here");
             if(obj.listen){ // remove the listener
 		Apoco.unsubscribe(obj);
 	    }
@@ -5991,6 +5926,7 @@ require("./Types")
 	return tz;
     }
 
+    var default_compare=function(a){return a;};
     
     function generic_compare(a,b,fn){
 	var s=fn(a);
@@ -6054,7 +5990,7 @@ require("./Types")
 	return undefined;    
 	
     };
-    var default_compare=function(a){return a;};
+ 
     
     Apoco.isSortable=function(type){
 	if(sort_fn(type) !== undefined){
@@ -6067,7 +6003,7 @@ require("./Types")
         if(r === undefined){
             throw new Error("Apoco.sort needs an input array");
         }
-        if(Apoco.checkType['array'](type_data)){
+        if(Apoco.type['array'].check(type_data)){
 	    for(var i=0;i<type_data.length;i++){ // multiple fields to order sort
 		if(!Apoco.isSortable(type_data[i].type)){
 		    throw new Error("Apoco.sort:- Don't know how to sort type " + type_data[i].type);
@@ -6091,14 +6027,14 @@ require("./Types")
 	    });
         }
         else{
-            if(type_data && Apoco.checkType["object"](type_data)){
+            if(type_data && Apoco.type["object"].check(type_data)){
 	        compare=sort_fn(type_data.type);
                 if(!type_data.fn){
                     throw new Error("Apoco.sort needs a function to retrieve the array element");
                 }
 	        fn=type_data.fn;
             }
-            else if(Apoco.checkType["string"](type_data)){
+            else if(Apoco.type["string"].check(type_data)){
                 compare=sort_fn(type_data);
                 if(compare === undefined){
                     throw new Error("Sort: don't know how to sort " + type_data);
@@ -6125,7 +6061,525 @@ var Apoco=require('./declare').Apoco;
 
 ;(function(){
 
-    Apoco.checkType={
+    
+    Apoco.type={
+        alphaNum:{
+            html_type:"text",
+            field: "input",
+            check: function(s){
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+	        s=String(s);
+	        s=s.trim(); // trim leading and trailing whitespace
+	        var isAlphaNumeric =/^[a-zA-Z0-9]+$/;   // No spaces or underscores //: /[^a-zA-Z0-9_ ]/;  // /^[a-zA-Z0-9]*$/
+	        if(s.search(isAlphaNumeric) != -1){
+		    return  true;  //s.toString();
+	        }
+	        return false;
+            }},
+        alphabetic:{
+            html_type:"text",
+            field: "input",
+            check:function(s){
+	        if(Apoco.type.blank.check(String(s))){
+		    return false;
+	        }
+	        var isAlpha =/^[a-zA-Z]+$/;
+                s=String(s);
+	        if(s.search(isAlpha) != -1){
+		    return true;
+	        }
+	        return false;
+	}},
+        any:{
+            html_type:"text",
+            field: "input",
+            check:function(s){
+                return true;
+            }},
+        array:{
+            html_type: "text",
+            field: "stringArray",
+            check:function(a){
+	        // var t=("testing  " + a + " is an array");
+	        if( Object.prototype.toString.call(a) === '[object Array]' ) {
+                    if(a.length>=0){
+		        return true;
+                    }
+	        }
+	        return false;
+	}},
+        blank:{
+            check:function(s){
+                if(s == "undefined" || s == undefined){
+                    return true;
+                }
+                else if(s === null){
+                    return true;
+                }
+                else if(s === false){
+                    return null;
+                }
+                else{
+		    var isNonblank_re    = /\S/;  // has at least one character which is not tab space or newline
+		    var st=String(s);
+		    if(st.search(isNonblank_re) === -1){ // does not have any "real" characters
+		        return true;
+		    }
+		    else{
+		        return null;
+		    }
+                }
+	  	return true;
+	}},
+        boolean:{
+            html_type: "checkbox",
+            field: "checkBox",
+            check:function(s){
+	        //  console.log("check_field.boolean: value is " + s);
+                var rf=/^([Vv]+(erdade(iro)?)?|[Ff]+(als[eo])?|[Tt]+(rue)?|0|[\+\-]?1)$/;
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+	        s=String(s);
+                if(s.search(rf) !== -1){
+                    return true;
+                }
+	        return false;
+	}},
+        booleanArray:{
+            html_type:"checkbox",
+            field: "buttonSet",
+            check:function(a){
+            if(Apoco.type.array.check(a)){
+                for(var i=0;i<a.length;i++){
+                    if(!Apoco.type.boolean.check(a[i])){
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }},
+        count:{
+            html_type: "number",
+            field: "input",
+            check:function(s){
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+	        if(isNaN(parseFloat(s))){
+		    return false;
+	        }
+	        return true;
+	}},
+        currency:{
+            html_type:"number",
+            field: "input",
+            check:function(s){
+	        // Check if string is currency
+                
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+                }
+                //currency woth currency code prefix
+                var re=/^([A-Z]{0,3})?[ ]?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$/;
+	        //var re=/[\u0024\u20AC\u00A5A-Z\s]{0,4}[0-9.,]+[\s\u0024\u20AC\u00A5A-Z]{0,4}/;
+                var s=String(s);  
+	        if(s.search(re) != -1){
+                    return true;
+                }
+	        return false;
+	    }},
+        date: {
+            html_type:"date",
+            field: "date",
+            check:function(s){ // Gregorian calendar date
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+	        var yyyymmdd = new RegExp("^(?:(?:(?:(?:(?:[13579][26]|[2468][048])00)|(?:[0-9]{2}(?:(?:[13579][26])|(?:[2468][048]|0[48]))))(?:(?:(?:09|04|06|11)(?:0[1-9]|1[0-9]|2[0-9]|30))|(?:(?:01|03|05|07|08|10|12)(?:0[1-9]|1[0-9]|2[0-9]|3[01]))|(?:02(?:0[1-9]|1[0-9]|2[0-9]))))|(?:[0-9]{4}(?:(?:(?:09|04|06|11)(?:0[1-9]|1[0-9]|2[0-9]|30))|(?:(?:01|03|05|07|08|10|12)(?:0[1-9]|1[0-9]|2[0-9]|3[01]))|(?:02(?:[01][0-9]|2[0-8])))))$");
+	        s=String(s);
+	        if(s.search(yyyymmdd) !== -1){
+		        return true;
+	        }
+	        //	    var isDate_re=/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/; // dd/mm/yyyy
+	        var isDate_re=/^(19|20)?[0-9]{2}[- \/.](0?[1-9]|1[012])[- \/.](0?[1-9]|[12][0-9]|3[01])$/; // yyyy-mm-dd 1900-2099
+	        if(s.search(isDate_re) !== -1){
+		    return true;
+	        }
+	        return false;
+	    }},
+        decimal:{
+            html_type:"number",
+            field: "input",
+            check: function(s){  //Decimal numbers
+	        if(Apoco.type.blank.check(s) || isNaN(s)){
+		    return false;
+	        }
+	        s=String(s);
+                if(!s.search){
+                    return false;
+                }
+	        var isDecimal_re = /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
+	        if(s.search(isDecimal_re) != -1){
+		    s=parseFloat(s); //.toFixed(2); // 2 decimal places
+		    return true;
+	        }
+	        return false;
+	    }},
+        email:{
+            html_type:"email",
+            field: "input",
+            check: function(s){
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+	        s=String(s);
+	        s=s.trim(); // trim leading and trailing whitespace
+	        // checks that an input string looks like a valid email address.
+	        var isEmail_re= /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
+	        if(s.search(isEmail_re) != -1){
+		    return true;
+	        }
+	        return false;
+	    }},
+        file:{
+            html_type:"file",
+            field: "input",
+            check: function(s){
+                return true;
+            }},
+        float:{
+            html_type:"number",
+            field: "float",
+            check:function(s){   //IEEE 32-bit floating-point
+	        // Checks that an input string is a decimal number, with an optional +/- sign character.
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                if(isNaN(s)){
+                    return false;
+                }
+	        if(s==0){ return true;} // this regex below does not match 0.0 !!!!! AHGGG WHY ?????
+	        // console.log("float as string is " + s);
+	        s=String(s);
+                if(!s.search){
+                    return false;
+                }
+	        var isDecimal_re   =  /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
+	        if(s.search(isDecimal_re) != -1){
+		    s=parseFloat(s);  //.toFixed(6); // 6 decimal places
+		    return true;
+	        }
+	        return false;
+	    }},
+        floatArray:{
+            html_type:"number",
+            field: "numberArray",
+            check:function(s){
+	        if(Apoco.type.array.check(s)) {
+                    for(var i=0;i<s.length;i++){
+		        if(!Apoco.type.float.check(s[i])){
+		            return false;
+                        }
+		    }
+		    return true;
+	        }
+	        return false;
+	    }},
+        function:{
+            check: function(a){
+	        function isFunction(object) {
+                    var obj={};
+		    return !!(object && obj.toString.call(object) == '[object Function]');
+	        }
+	        // if(isFunction(a)){
+	        //	return true;
+	        //}
+                if(typeof a === "function"){
+                    return true;
+                }
+	        return false;
+	}},
+        image:{
+            html_type: "image",
+  
+            check:function(img){   // obviously need better checking than this!!!
+	        if(!img){
+		    return false;
+	        }
+                if(!img.naturalWidth){
+                    return false;
+                }
+                if(typeof img.naturalWidth != undefined && img.naturalWidth === 0){
+                    return false;
+                }
+                
+	        return true;
+	    }},
+        imageArray:{
+            html_type:"image",
+            field: "imageArray",
+            check:function(a){
+                if(Apoco.type.array.check(a)){
+                    for(var i=0;i<a.length;i++){
+                        if(!Apoco.type.object.check(a[i])){ // needs better than this
+                            return false;
+                        }
+                        else if(!Apoco.type.image.check(a)){
+                            return false;
+                        }
+                    }
+                }
+                else{
+                    return false;
+                }
+                return true;
+            }},
+        integer:{
+            html_type: "number",
+            field: "input",
+            check: function(s){  //32 bit signed integers
+	        // checks that an input string is an integer, with an optional +/- sign character.
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+	        var isInteger_re     = /^\s*(\+|-)?\d+\s*$/;
+	        if(s.search(isInteger_re) !== -1){
+		    return  true; //parseInt(s, 10);
+	        }
+                
+	        return false;
+            }},
+        integerArray:{
+            html_type:"number",
+            field: "numberArray",
+            check:function(a){
+                if(Apoco.type.array.check(a)){
+                    for(var i=0;i<a.length;i++){
+                        if(!Apoco.type.integer.check(a[i])){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }},
+        negativeInteger:{
+            html_type:"number",
+            field: "input",
+            check:function(s){  //strictly negative integers of arbitary length
+	        var isNegativeInteger_re     =  /-\s?\d+\s*$/; //  /^\s*(\-)?\d+\s*$/;
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);                
+	        if(s.search(isNegativeInteger_re) !== -1){
+		    return true; //parseInt(s,10); // base 10
+	        }
+                
+	        return false;
+	    }},
+        number:{
+            html_type: "number",
+            field: "input",
+            check:function(s){
+	        if(Apoco.type.blank.check(s) || isNaN(s)){
+		    return false;
+	        }
+                s=String(s);
+                return true;
+            }},
+        object:{
+            check: function(a){  // a string is an object if called with var s= new String();
+	        //var t=("testing  " + a + " is an object");
+                if(a === undefined){
+                    return false;
+                }
+	        if(a !== null && typeof a === 'object'){
+		    return true;
+	        }
+	        return false;
+	    }},
+        objectArray:{
+            check:function(a){
+                if(Apoco.type.array.check(a)){
+                    for(var i=0;i<a.length;i++){
+                        if(!Apoco.type.object.check(a[i])){
+                            return false;
+                        }
+                    }
+                }
+                else{
+                    return false;
+                }
+                return true;
+            }},
+        password:{
+            html_type:"password",
+            field: "input",
+            check:function(s){
+               // s=String(s);
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                if(Apoco.type.token.check(s)){
+                    return true;
+                }
+                return false;
+            }},
+        phoneNumber:{
+            html_type:"tel",
+            field:"input",
+            check:function(s){
+	        //console.log("checking phone number " + s);
+	        var pn_re=/^[\s()+-]*([0-9][\s()+-]*){6,20}$/;                    // /^(?:\+?\d{2}[ -]?\d{3}[ -]?\d{5}|\d{4})$/;
+               
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+	        if(s.search(pn_re) !== -1){
+		    return true;
+	        }
+                
+	        return false;
+
+	}},
+        positiveInteger:{
+            html_type:"number",
+            field: "input",
+            check:function(s){  //strictly positive integers of arbitary length
+	     	var isPositiveInteger_re= /^\s*\d+\s*$/;
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+	        if(s.search(isPositiveInteger_re) !== -1){
+		    return true; // parseInt(s,10); // base 10
+	        }
+	        return false;
+	    }},
+        range:{
+            html_type:"range",
+            field: "slider",
+            check:function(s){
+                if(Apoco.type.float.check(s)){
+                    return true;
+                }
+                if(Apoco.type.integer.check(s)){
+                    return true;
+                }
+                return false;
+            }},
+        string:{
+            html_type:"text",
+            field: "input",
+            alt: "autoComplete",
+            check:function(s){  // any non zero string
+                //  console.log("checkType string is " + s);
+                if(s==="") {
+                    return true;
+                }
+	        if(Apoco.type.blank.check(String(s))){
+		    return false;
+	        }
+	        if(typeof(s) === 'string' || s instanceof String ){
+		    return true;
+	        }
+ 	        return false; //   .toString();
+	    }},
+        stringArray:{
+            html_type: "text",
+            field: "stringArray",
+            alt: "select",
+            check:function(s){
+                if(Apoco.type.array.check(s)){
+                    for(var i=0;i<s.length;i++){
+                        if(!Apoco.type.string.check(s[i])){
+		            return false;
+	                }
+                    }
+                    return true;
+                }
+	        return false;
+	    }},
+        text:{
+            html_type:"text",
+            field: "textArea",
+            check:function(s){
+	        if(Apoco.type.blank.check(String(s))){
+		    return false;
+	        }
+	        return true;
+  	    }},
+        time:{
+            html_type:"time",
+            field: "input",
+            check: function(s){ //Instant of time (Gregorian calendar)
+	       
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+	        //  var isTime =/^([0-1][0-9]|[2][0-3]):([0-5][0-9])$/; // 24 hour clock HH:MM
+	        // var isTime_re = /^(\d{1,2}):(\d{2})(:00)?([ap]m)?$/;
+	        s=s.trim();
+	        var isTime=/^((([0]?[1-9]|1[0-2])(:|\.)[0-5][0-9]((:|\.)[0-5][0-9])?( )?(AM|am|aM|Am|PM|pm|pM|Pm))|(([0]?[0-9]|1[0-9]|2[0-3])(:|\.)[0-5][0-9]((:|\.)[0-5][0-9])?))$/;  // Matches 1:01 AM | 23:52:01 | 03.24.36 AM
+ 	        // var isDateTime=/?n:^(?=\d)((?<day>31(?!(.0?[2469]|11))|30(?!.0?2)|29(?(.0?2)(?=.{3,4}(1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(16|[2468][048]|[3579][26])00))|0?[1-9]|1\d|2[0-8])(?<sep>[/.-])(?<month>0?[1-9]|1[012])\2(?<year>(1[6-9]|[2-9]\d)\d{2})(?:(?=\x20\d)\x20|$))?(?<time>((0?[1-9]|1[012])(:[0-5]\d){0,2}(?i:\ [AP]M))|([01]\d|2[0-3])(:[0-5]\d){1,2})?$/;
+	        if(s.search(isTime) !== -1){
+		    return true;
+	        }
+	        else{
+		    return false;
+                }
+	}},
+        token:{
+            html_type:"text",
+            field: "input",
+            check:function(s){  // a token has no whitespace or special chars
+	        
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+	        //	var isSpecialChar= /^[@!#\$\^%&*()+=\-\[\]\\\';,\.\/\{\}\|\":<>\? ]+$/;
+	        // var isSpecialChar= /^[@!#\$\^%&*()+=\[\]\\\';,\/\{\}\|\":<>\? ]+$/; // except . -
+	        s=s.trim(); // trim leading and trailing whitespace
+	        var invalidChar = /[^A-Za-z0-9.#_\\-]/;
+	        //log("check_field token " + s);
+	        if(s.search(invalidChar) === -1){
+		    //log("check_field token " + s);
+		    return true;
+	        }
+                
+	        return false;
+	    }},
+        url:{
+            html_type:"url",
+            field: "input",
+            check: function(s){
+                
+	        if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                s=String(s);
+                var isURL=/^(ht|f)tp(s?)\:\/\/(([a-zA-Z0-9\-\._]+(\.[a-zA-Z0-9\-\._]+)+)|localhost)(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?([\d\w\.\/\%\+\-\=\&amp;\?\:\\\&quot;\'\,\|\~\;]*)$/;
+                
+                if(s.search(isURL) !== -1){
+		    //log("check_field token " + s);
+		    return true;
+	        }
+	        return false;  
+            }}
+    };
+    
+/*
+    Apoco.checkjhjhgType={
 	blank: function(s){
 	    // s=String(s);
 	    if(s){
@@ -6328,7 +6782,6 @@ var Apoco=require('./declare').Apoco;
 	    }
 	    return true;
 	},
-
 	alphaNum: function(s){
 	    s=String(s);
 	    if(this.blank(s)){
@@ -6439,7 +6892,7 @@ var Apoco=require('./declare').Apoco;
 	    return true;
 	},
 	boolean: function(s){
-	  //  console.log("check_field.boolean: value is " + s);
+	    //  console.log("check_field.boolean: value is " + s);
 	    s=String(s);
             var rf=/^([Vv]+(erdade(iro)?)?|[Ff]+(als[eo])?|[Tt]+(rue)?|0|[\+\-]?1)$/;
 	    if(this.blank(s)){
@@ -6450,8 +6903,8 @@ var Apoco=require('./declare').Apoco;
             }
 	    //if(s === true || s === "true" || s === 1 || s === false || s === "false" || s === 0){
 	    //if(s === "true" || s === "false"){
-	//	return s;
-	  //  }
+	    //	return s;
+	    //  }
 	    return false;
 	},
 	array: function(a){
@@ -6571,8 +7024,9 @@ var Apoco=require('./declare').Apoco;
 	    return false;
 	}
     };
-
+*/
 })();
+
 
 },{"./declare":19}],16:[function(require,module,exports){
 var Apoco=require('./declare').Apoco;
@@ -7047,11 +7501,11 @@ require("./Panel");
                 //throw new Error("Window.delete - could not find window " + win);
             }
            
-            console.log("deleting the panels for window " + win);
+           // console.log("deleting the panels for window " + win);
             var p=Apoco.Panel._list;
             for(var j=0;j<p.length;j++){
                 if(p[j].window && p[j].window === this._list[w].window){
-                    console.log("deleting " + p[j].name);
+             //       console.log("deleting " + p[j].name);
                     Apoco.Panel.delete(p[j].name);
                 }
             }
@@ -7071,7 +7525,7 @@ require("./Panel");
             this._list.splice(p,1);
         },
         _closeAll:function(){
-            console.log("Close all is here");
+          //  console.log("Close all is here");
             
             for(var i=0; i<this._list.length; i++){
                 this._list[i].window.close();
@@ -7081,7 +7535,7 @@ require("./Panel");
         get:function(p){
             var i=this._inList(p);
             if(i=== null){
-                console.log("return from inList is null");
+             //   console.log("return from inList is null");
                 return null;
             }
             return this._list[i];
@@ -7091,22 +7545,22 @@ require("./Panel");
             if(name === undefined){
                 throw new Error("no name given");
             }
-            if(Apoco.checkType["string"](name)){
+            if(Apoco.type["string"].check(name)){
                 str=true;
             }
-            console.log("is " + name + " in list?");
-            console.log("Window: inList length is " + this._list.length);
+         //   console.log("is " + name + " in list?");
+         //   console.log("Window: inList length is " + this._list.length);
             for(var i=0; i<this._list.length;i++){
-                console.log("testing list is " + i);
+           //     console.log("testing list is " + i);
                 if(str === true){
-                    console.log("str is true name is " + this._list[i].name + " to match " + name);
+             //       console.log("str is true name is " + this._list[i].name + " to match " + name);
                     if((this._list[i].name).toString() == (name).toString()){
-                        console.log("found it " + name);
+               //         console.log("found it " + name);
                         return i; //this._list[i].window;
                     }
                 }
                 else{
-                    console.log("str is false name is " + this._list[i].name + " to match " + name);
+                 //   console.log("str is false name is " + this._list[i].name + " to match " + name);
                     if(this._list[i].window === name){
                         return i; //this._list[i].window;
                     }
@@ -7163,7 +7617,7 @@ require("./Panel");
 	            return function(e){
 		        if(e.data === win){
                             var tt={name: d.name,window:win,promise:p};
-		            console.log("window equals e.data");
+		          //  console.log("window equals e.data");
                             that._list.push(tt);
                             resolve(tt);
 		        }

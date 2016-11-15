@@ -20,6 +20,7 @@ require("./Types")
 	return tz;
     }
 
+    var default_compare=function(a){return a;};
     
     function generic_compare(a,b,fn){
 	var s=fn(a);
@@ -83,7 +84,7 @@ require("./Types")
 	return undefined;    
 	
     };
-    var default_compare=function(a){return a;};
+ 
     
     Apoco.isSortable=function(type){
 	if(sort_fn(type) !== undefined){
@@ -96,7 +97,7 @@ require("./Types")
         if(r === undefined){
             throw new Error("Apoco.sort needs an input array");
         }
-        if(Apoco.checkType['array'](type_data)){
+        if(Apoco.type['array'].check(type_data)){
 	    for(var i=0;i<type_data.length;i++){ // multiple fields to order sort
 		if(!Apoco.isSortable(type_data[i].type)){
 		    throw new Error("Apoco.sort:- Don't know how to sort type " + type_data[i].type);
@@ -120,14 +121,14 @@ require("./Types")
 	    });
         }
         else{
-            if(type_data && Apoco.checkType["object"](type_data)){
+            if(type_data && Apoco.type["object"].check(type_data)){
 	        compare=sort_fn(type_data.type);
                 if(!type_data.fn){
                     throw new Error("Apoco.sort needs a function to retrieve the array element");
                 }
 	        fn=type_data.fn;
             }
-            else if(Apoco.checkType["string"](type_data)){
+            else if(Apoco.type["string"].check(type_data)){
                 compare=sort_fn(type_data);
                 if(compare === undefined){
                     throw new Error("Sort: don't know how to sort " + type_data);

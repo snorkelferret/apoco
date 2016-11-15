@@ -39,7 +39,7 @@ require("./Popups.js");
            // console.log("++++++++++++++++++++++++++++++== Apoco start is here ");
           //  console.log("options are %j ",options);
             if(options){
-	        if(!Apoco.checkType["array"](options) && Apoco.checkType["object"](options)){
+	        if(!Apoco.type["array"].check(options) && Apoco.type["object"].check(options)){
 		    var p=Apoco.display[options.display](options);
 		    if(p){
 		        p.show();
@@ -48,7 +48,7 @@ require("./Popups.js");
 		        throw new Error("could not execute " + options.display);
 		    }
 	        }
-                else if(Apoco.checkType["array"](options)){
+                else if(Apoco.type["array"].check(options)){
                     Apoco.Panel.UIStart(options);
                 }
                 else{

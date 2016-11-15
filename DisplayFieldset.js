@@ -70,11 +70,11 @@ require("./Nodes.js");
             var k;
             if(name !== undefined){
                 k=this.getField(name);
-                if(k !==null && !Apoco.checkType["array"](k)){
+                if(k !==null && !Apoco.type["array"].check(k)){
                     return k;
                 }
                 k=this.getNode(name);
-                if(k !==null && !Apoco.checkType["array"](k)){
+                if(k !==null && !Apoco.type["array"].check(k)){
                     return k;
                 }
             }
@@ -166,7 +166,7 @@ require("./Nodes.js");
             var p,parent_element;
             if(!d.field){
                 if(d.type){
-                    d.field=Apoco.dbToHtml[d.type].field;
+                    d.field=Apoco.type[d.type].field;
                 }
                 else{
                     throw new Error("Must supply either a field or a type");

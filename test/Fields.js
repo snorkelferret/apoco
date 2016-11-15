@@ -40,10 +40,7 @@ describe("setup",function(){
 
 describe("InputField",function(){
      
-  //  require("../Utils.js");
-  //  require("../Types.js");
     require("../Fields.js");
- //   require("../node_modules/jquery-ui");
     
     it("defines Apoco.field",function(){
         console.log("here is Apoco.field " + Apoco.field);
@@ -98,16 +95,26 @@ describe("InputField",function(){
         assert.strictEqual(t.checkValue(),true); 
     });
     it("rejects a value of the wrong type",function(){
-        t.setValue("dog");
-        assert.strictEqual(t.checkValue(),false);
-        t.setValue(6);
+        var fn=function(){
+            t.setValue("dog");
+        };
+        assert.throws(fn,"Field: setValue dog is the wrong type, expects integer");
     });
     it("has a getValue method that returns the value",function(){
+        t.setValue(6);
         assert.strictEqual(t.getValue(),'6'); 
     });
     it("has a getKey method that returns the name ",function(){
         assert.strictEqual(t.getKey(),"inputNode"); 
         //console.log("InputField is %j",t);
+    });
+    it("only changes internal value with setValue",function(){
+        var b=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];
+        t.setValue(10);
+        b.value="29";
+        assert.strictEqual(b.value,t.getValue());
+        var f=t.resetValue();
+        assert.notStrictEqual(b.value,f);
     });
    
     
@@ -176,6 +183,13 @@ describe("FloatField",function(){
         };
         assert.throws(fn, "FloatField: setValue this value is not a float");
         
+    });
+    it("only changes internal value with setValue",function(){
+        var b=(document.getElementsByName("floatField")[0]).getElementsByTagName("input");
+        b[0].value="29";
+        b[1].value="34";
+        assert.strictEqual("29.340",f.getValue());
+        assert.notStrictEqual(29.340,f.resetValue());
     });
     it("can delete itself",function(){
         f.delete();
@@ -258,9 +272,16 @@ describe("DateField",function(){
         assert.strictEqual(f.getValue(),"20160824"); 
     });
     it("rejects a value of the wrong type",function(){
-        f.setValue("dog");
-        assert.strictEqual(f.checkValue(),false);
-        f.setValue("");
+        var fn=function(){
+            f.setValue("dog");
+        };
+        assert.throws(fn,"Field: setValue dog is the wrong type, expects date");
+    });
+    it("only changes internal value with setValue",function(){
+        var b=(document.getElementsByName("dateField")[0]).getElementsByTagName("input")[0];
+        b.value="20230522";
+        assert.strictEqual(b.value,f.getValue());
+        assert.notStrictEqual(b.value,f.resetValue());
     });
 });
 
@@ -330,7 +351,13 @@ describe("NumberArrayField-Integer",function(){
         assert.strictEqual(e[1].value,"5");
         assert.strictEqual(e[2].value,"7");
         assert.strictEqual(e[3].value,"");
-    });  
+    });
+    it("only changes internal value with setValue",function(){
+        var b=(document.getElementsByName("numberArrayField")[0]).getElementsByTagName("input")[0];
+        b.value="2023";
+        var s=f.getValue();
+        assert.notStrictEqual(s,f.resetValue());
+    });
 });
 
 describe("TextAreaField",function(){
@@ -361,6 +388,13 @@ describe("TextAreaField",function(){
        // var e=$("body").find("div[name='textAreaField']").find("textarea").val();
         assert.equal(e.value,"some other text");
     });
+    it("only changes internal value with setValue",function(){
+        var b=(document.getElementsByName("textAreaField")[0]).getElementsByTagName("textarea")[0];
+        b.value="some user input";
+        var s=f.getValue();
+        assert.notStrictEqual(s,f.resetValue());
+    });
+    
 });
                                        
 describe("SelectField",function(){
@@ -405,6 +439,12 @@ describe("SelectField",function(){
         //var b=$("body").find("div[name='selectField']").find("select").val();
         var b=document.getElementsByName("selectField")[0].getElementsByTagName("select")[0].value;;
         assert.equal(b,"three");
+    });
+    it("only changes internal value with setValue",function(){
+        var b=(document.getElementsByName("selectField")[0]).getElementsByTagName("select")[0];
+        b.value="one";
+        var s=f.getValue();
+        assert.notStrictEqual(s,f.resetValue());
     });
     
 });
@@ -452,7 +492,7 @@ describe("ButtonSetField",function(){
     });
     it("uses a setter method for value",function(){
         var index=-1;
-        f.setValue("one");
+        f.setValue([true,false,false]);
         //var e=$("body").find("div[name='radioButtonSetField']").find("li:contains('one')").find("input");
         var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
         for(var i=0;i<e.length;i++){
@@ -495,15 +535,61 @@ describe("ButtonSetField",function(){
         //var b=$(e).find('input').prop("checked");
         assert.strictEqual(b.checked,true);
     });
-    it("rejects a value of the wrong type",function(){
+    it("rejects a set value of the wrong length",function(){
         var fn=function(){
-            f.setValue("dog");
+            f.setValue([true]);
         };
-        assert.throws(fn,"Buttonsetfield: setValue has no member called dog");
+        assert.throws(fn,"ButtonSetField: values array length 1 does not match labels 4");
+    });
+
+    it("has a set method",function(){
+        f.setValue([false,false,true,false]);
+        var b=f.getValue();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[0].one,false);
+            assert.strictEqual(b[1].two,false);
+            assert.strictEqual(b[2].three,true);
+            assert.strictEqual(b[3].four,false);
+        }
+        
+    });
+    it("has a set method to set a single value",function(){
+        f.setValue(true,1);
+        var b=f.getValue();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[0].one,false);
+            assert.strictEqual(b[1].two,true);
+            assert.strictEqual(b[2].three,false);
+            assert.strictEqual(b[3].four,false);
+        }
+        
+    });
+    it("only updates internal values with setValue",function(){
+        var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
+        e[0].click();
+        assert.strictEqual(e[0].checked,true);
+        var b=f.getValue();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[0].one,true);
+            assert.strictEqual(b[1].two,false);
+            assert.strictEqual(b[2].three,false);
+            assert.strictEqual(b[3].four,false);
+        }
+        f.resetValue();
+        b=f.getValue();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[0].one,false);
+            assert.strictEqual(b[1].two,true);
+            assert.strictEqual(b[2].three,false);
+            assert.strictEqual(b[3].four,false);
+        }
+        
     });
     it("can remove itself",function(){
         f.delete();
     });
+ 
+    
 });
 
 describe("ButtonSetField - as checkboxes",function(){
@@ -529,7 +615,7 @@ describe("ButtonSetField - as checkboxes",function(){
         assert.strictEqual(b[1].two,false);
         assert.strictEqual(b[2].three,false);
     });
-      it("allows multiple selects",function(){
+    it("allows multiple selects",function(){
         var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("input");
         //e[0].click();
         e[2].click(); 
@@ -539,6 +625,18 @@ describe("ButtonSetField - as checkboxes",function(){
         assert.strictEqual(b[1].two,false);
         assert.strictEqual(b[2].three,true);
     });
+    it("has a set method",function(){
+        f.setValue([true,false,true]);
+        var b=f.getValue();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[0].one,true);
+            assert.strictEqual(b[1].two,false);
+            assert.strictEqual(b[2].three,true);
+        }
+        
+    });
+    
+    
 });
 
 
@@ -563,9 +661,21 @@ describe("SliderField",function(){
         assert.strictEqual(r.value,"5");
     });
     it("rejects non-numeric values",function(){
-        f.setValue("dog");
-        assert.strictEqual(f.checkValue(),false);
+        var fn=function(){
+            f.setValue("dog");
+        };
+        assert.throws(fn,"Field: setValue dog is the wrong type, expects range");
     });
+    it("has a reset method",function(){
+        var r=document.getElementsByName("sliderField")[0].getElementsByTagName("input")[0];
+        r.value=4;
+        var p=f.getValue();
+        assert.strictEqual(p,"4");
+        f.resetValue();
+        p=f.getValue();
+        assert.strictEqual(p,"5");
+    });
+    
 });
 
 describe("StringArrayField",function(){
@@ -614,6 +724,21 @@ describe("StringArrayField",function(){
         assert.throws(fn,"StringArrayField: setValue not an array"); 
         //f.setValue(["big","small"]);
     });
+    it("can add a new value",function(){
+        f.addValue("hhhh");
+        var p=f.getValue();
+        assert.strictEqual(p.length,4);
+    });
+    it("has a reset method",function(){
+        f.resetValue();
+        var p=f.getValue();
+        for(var i=0;i<p.length;i++){
+            console.log("reset %j",p);
+        }
+        assert.strictEqual(p.length,3);
+    });
+
+    
 });
 
 describe("ImageArrayField",function(){

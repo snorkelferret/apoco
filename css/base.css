@@ -220,7 +220,9 @@ div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0.2em}
 div.apoco_autocomplete ul li{display: block; z-index:10; width: inherit}
 div.apoco_autocomplete input{margin-bottom: 0.2em}
 
-ul.choice {list-style-type: none  }
+ul.choice {list-style-type: none; min-width: 10em }
+ul.choice li{display: block}
+ul.choice li input{float: left}
 /* floats not using the input default */
 /* .form_style_div ul.aligned_float, */
 .float ul.aligned_float{display: flex; 
@@ -268,6 +270,7 @@ h4 {margin: 0em;  color: #404040; text-decoration: none; font-size: 14pt;
 text-align: left;  padding: 0em 0em .5em 0em}
 
 h5{color: #202020; font-size: 12pt}
+
 
 .disabled{ /*display: none;
            position: absolute;

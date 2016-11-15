@@ -8,7 +8,7 @@ body{ background-color: #223344}
 .Apoco_slideshow div.pic_area {height: 100%; min-height: 440px}
 .Apoco_slideshow div.pic_area img{}
 .Apoco_slideshow div.pic_area div{bottom: -4em}
-
+#test button{padding: 0 1em}
 #Head{background: url("images/apoco01.png") no-repeat; width: 300px; height: 140px}
 #Blurb{padding: 2em 3em 2em 3em }
 #Tabs{position: absolute; top: 160px}
@@ -27,7 +27,7 @@ body{ background-color: #223344}
 
 #test #menuDisplay{width: 10em}
 
-#left{ width: 16em; position: absolute }
+#left{ width: 16em; position: absolute;max-height:40em; overflow-y:auto }
 #left > div{padding:1em}
 #right{ margin-left: 16.25em; padding: 0; display: table} /*width: auto; top: 30em; position: absolute;   } */
 /* ul.apoco_menu_list li{font-size: 10pt} */

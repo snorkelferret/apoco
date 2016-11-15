@@ -6,15 +6,39 @@
 
 Apoco is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. Apoco is arranged hierarchically.
 
-Windows
+
+(SPA - Single Page Application. )
+
+
+(Definition of a SPA)[https://en.wikipedia.org/wiki/Single-page_application]
+
+
+
+##### Windows
+
+
     Windows contain
-Panels
+
+
+##### Panels
+
+
     Panels contain
-displays
+
+
+##### displays
+
+
     displays contain
-fields or nodes
+
+
+##### fields or nodes
+
+
     which contain
-types
+
+
+##### types
 
 You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) 
 
@@ -39,3 +63,8 @@ UI.Panels={
 };
 
 ```
+Although Apoco is primarily a desktop window replacemnet there are some
+Website's using apoco
+
+[Perluceo ](http://wwww.perluceo.com)
+[Online manual](https://snorkelferret.github.io)

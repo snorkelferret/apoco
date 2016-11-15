@@ -162,7 +162,7 @@ require("./Types.js");
                     that.element.appendChild(d);
                 }
                 else  if(that.items[i].labels){
-                    if(Apoco.checkType['array'](that.items[i].labels)){
+                    if(Apoco.type['array'].check(that.items[i].labels)){
                         for(var j=0;j<that.items[i].labels.length;j++){
                             d=document.createElement("dt");
                             d.textContent=that.items[i].labels[j];
@@ -176,7 +176,7 @@ require("./Types.js");
                     that.element.appendChild(d);
                 }
                 else if (that.items[i].descriptions){
-                    if(Apoco.checkType['array'](that.items[i].descriptions)){
+                    if(Apoco.type['array'].check(that.items[i].descriptions)){
                         for(var j=0;j<that.items[i].descriptions.length;j++){
                             d=document.createElement("dd");
                             d.innerHTML=that.items[i].descriptions[j];

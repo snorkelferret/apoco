@@ -142,7 +142,7 @@ require("./DisplayFieldset");
             }
             if(!d.field){
                 if(d.type){
-                    d.field=Apoco.dbToHtml[d.type].field;
+                    d.field=Apoco.type[d.type].field;
                 }
                 else{
                     throw new Error("Must supply either a field or a type");
