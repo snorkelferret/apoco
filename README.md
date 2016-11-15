@@ -10,7 +10,7 @@ Apoco is a data-driven enterprise level SPA library/Frontend framework. The comp
 (SPA - Single Page Application. )
 
 
-(Definition of a SPA)[https://en.wikipedia.org/wiki/Single-page_application]
+[Definition of a SPA](https://en.wikipedia.org/wiki/Single-page_application)
 
 
 
@@ -63,8 +63,10 @@ UI.Panels={
 };
 
 ```
-Although Apoco is primarily a desktop window replacemnet there are some
-Website's using apoco
+Although Apoco is primarily a desktop window replacememt, (because of realtime updating
+and dynamic elements), however,there are some "shop front" Website's using apoco
 
 [Perluceo ](http://wwww.perluceo.com)
+
+
 [Online manual](https://snorkelferret.github.io)
