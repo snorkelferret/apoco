@@ -81,8 +81,8 @@ require("./Fields");
                     }
                 }
                 var b=document.body;
-            //   Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
-             //   Apoco.Utils.observer.add(this.dependsOn, doit,this);
+                Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
+                Apoco.Utils.observer.add(this.dependsOn, doit,this);
             }
             else{ 
                 this.action(this);
