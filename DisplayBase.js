@@ -82,7 +82,8 @@ require("./Fields");
                         throw new Error("Np observer found");
                     }
                 }
-                var b=document.getElementsByTagName("body")[0];
+                // var b=document.getElementsByTagName("body")[0];
+                var b=document.body;
                 Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
                 Apoco.Utils.observer.add(this.dependsOn, doit,this);
                 // Apoco.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
