@@ -55,6 +55,13 @@ UI.Panels={
                             tabs:[{name: 'someName',label: 'Some Name'},
                                   {name:'another', label:'Another'}
                                   ]
+                            },
+                            {display:'fieldset',
+                            DOM:'right',
+                            id:'fieldsetDisplay',
+                            components:[{node:'heading',size:'h4',text:'Test'},
+                                        {field:'select',name:'select_test',options:['one','two','three']}
+                                        ]
                             }
                             // add another display template here
                           ]
@@ -66,7 +73,7 @@ UI.Panels={
 Although Apoco is primarily a desktop window replacememt, (because of realtime updating
 and dynamic elements), however,there are some "shop front" Website's using apoco
 
-[Perluceo ](http://wwww.perluceo.com)
+[Perluceo](http://www.perluceo.com)
 
 
 [Online manual](https://snorkelferret.github.io)
