@@ -74,19 +74,15 @@ require("./Fields");
         // if the execution depends on another node
         if(this.action){
             if(this.dependsOn && !dp){
-                //this.dependsOn).length === 0){ // watch for node
-                //console.log("in displayBase id is " + this.dependsOn);
                 if(!Apoco.Observer){    // create an observer- only need one
                     Apoco.Utils.observer.create();
                     if(!Apoco.Observer){ 
                         throw new Error("Np observer found");
                     }
                 }
-                // var b=document.getElementsByTagName("body")[0];
                 var b=document.body;
-                Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
-                Apoco.Utils.observer.add(this.dependsOn, doit,this);
-                // Apoco.Observer.observe(this.DOM,{childList: true,attributeFilter:["id"]});
+            //   Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
+             //   Apoco.Utils.observer.add(this.dependsOn, doit,this);
             }
             else{ 
                 this.action(this);
@@ -94,17 +90,9 @@ require("./Fields");
         }
 
 	if(this.listen !== undefined){
-       //    console.log("listen listen listen");
-         //   for(var k in this){
-         //       console.log("just before listen " + k);
-        //    }
 	    Apoco.IO.listen(this);  
 	}
-        // add the display type to the display_components list
-        
-      //  var d=(this.display).substr( 0, 1 ).toUpperCase() + this.display.substr( 1 );
-      //  console.log("d is " + d + " this.display " + this.display);
-    	//console.log("end of libbase");
+  
     };
 
     // var methods= {
