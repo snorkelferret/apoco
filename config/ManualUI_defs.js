@@ -1,11 +1,12 @@
 // WARNING this script contains evil eval !!!!!!
 
+var UI={};
 ;(function(){
-
+    "use strict";
     //UI.URL="/home/val";
     UI.webSocketURL=".";
+    UI.URL=",";
 
-    "use strict";
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
     var globalEval=function( code ) {
 	var script,indirect = eval;

@@ -1,16 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
-'use strict';
+"use strict";
 
 global.Apoco = require('./declare').Apoco;
-global.UI = require('./declare').UI;
 require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
 var PolyfillPromise = require('es6-promise').Promise;
-    Promise=undefined;
-    
+if (Promise === undefined) {
+    var Promise = PolyfillPromise;
+}
+
 (function () {
     'use strict';
 
@@ -2657,9 +2658,8 @@ require('./Types');
 require("./datepicker");
 var PolyfillPromise = require('es6-promise').Promise;
 
-    console.log("Promise is " + Promise + " polyfill " + PolyfillPromise);
 if (Promise === undefined) {
-    var Promise = PolyfillPromise;
+    Promise = PolyfillPromise;
 }
 
 
@@ -4236,8 +4236,7 @@ if (Promise === undefined) {
 },{"./Sort":14,"./Types":15,"./Utils":16,"./datepicker":18,"./declare":19,"es6-promise":43}],10:[function(require,module,exports){
 'use strict';
 
-var Apoco = require('./declare').Apoco,
-    UI = require('./declare').UI;
+var Apoco = require('./declare').Apoco;
 var PolyfillPromise = require('es6-promise').Promise;
 
 if (Promise === undefined) {
@@ -4317,7 +4316,11 @@ if (Promise === undefined) {
         },
         webSocket: function webSocket(options, data) {
             var that = this;
-            var defaults = { url: UI.webSocketURL };
+            if (UI && UI.webSocketURL) {
+                var defaults = { url: UI.webSocketURL };
+            } else {
+                var defaults = { url: "." };
+            }
             var settings = {};
             var sendMessage = function sendMessage(data) {
                 var msg = JSON.stringify(data);
@@ -4376,7 +4379,12 @@ if (Promise === undefined) {
             };
         },
         REST: function REST(type, options, data) {
-            var defaults = { url: UI.URL, dataType: 'json', mimeType: 'application/json' };
+            var defaults = { dataType: 'json', mimeType: 'application/json' };
+            if (UI && UI.URL) {
+                defaults.url = UI.URL;
+            } else {
+                defaults.url = ".";
+            }
 
             if (type !== "GET" && type !== "POST") {
                 throw new Error("REST: only knows about GET and POST not " + type);
@@ -4737,10 +4745,9 @@ require("./Types.js");
 })();
 
 },{"./Types.js":15,"./declare":19}],12:[function(require,module,exports){
-'use strict';
+"use strict";
 
-var Apoco = require('./declare').Apoco,
-    UI = require('./declare').UI;
+var Apoco = require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Window");
@@ -4816,6 +4823,9 @@ require("./Window");
         _UIGet: function _UIGet(name) {
             if (name === undefined) {
                 throw new Error("Panel._UIGet: panel name is undefined");
+            }
+            if (!UI) {
+                throw new Error("Panels: UIGet needs UI.Panels to be defined");
             }
             for (var k in UI.Panels) {
                 if (k == name) {
@@ -6963,7 +6973,7 @@ var Apoco = require('./declare').Apoco;
 },{"./declare":19}],19:[function(require,module,exports){
 "use strict";
 
-module.exports = { Apoco: {}, UI: {} };
+module.exports = { Apoco: {} };
 
 },{}],20:[function(require,module,exports){
 "use strict";

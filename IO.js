@@ -1,4 +1,4 @@
-var Apoco=require('./declare').Apoco,UI=require('./declare').UI; 
+var Apoco=require('./declare').Apoco;
 var PolyfillPromise=require('es6-promise').Promise; //polyfill for ie11
 
 if(Promise === undefined){ // for ie11
@@ -93,7 +93,12 @@ if(Promise === undefined){ // for ie11
         },
         webSocket:function(options,data){
             var that=this;
-            var defaults={url: UI.webSocketURL};
+            if(UI && UI.webSocketURL){
+                var defaults={url: UI.webSocketURL};     
+            }
+            else{
+                 var defaults={url: "."}; 
+            }
             var settings={};
             var sendMessage=function(data){
               //  console.log("Trying to send message ___________________________________");
@@ -163,7 +168,13 @@ if(Promise === undefined){ // for ie11
 
         },
         REST:function(type,options,data){
-            var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};
+            var defaults={dataType: 'json',mimeType: 'application/json'};
+            if(UI && UI.URL){
+                defaults.url=UI.URL;
+            }
+            else{
+                defaults.url=".";
+            }
             //type=type.toString();
             if(type !== "GET" && type !== "POST"){
                 throw new Error("REST: only knows about GET and POST not " + type);

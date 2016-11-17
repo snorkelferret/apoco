@@ -1,4 +1,4 @@
-var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
+var Apoco=require('./declare').Apoco; 
 require("./DisplayBase.js");
 require("./Sort.js");
 

@@ -1,16 +1,12 @@
-var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
+var Apoco=require('./declare').Apoco; 
 
 require("./DisplayBase.js");
 // Menu display object
-//  requires ApocoDisplayBase.js
-//
 
 
 ;(function(){
 
   "use strict";
-
-
 // create the tabs display
 
     var ApocoMakeTabs=function(options,win){

@@ -1,4 +1,4 @@
-var Apoco=require('./declare').Apoco,UI=require('./declare').UI; 
+var Apoco=require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Window");
@@ -88,6 +88,9 @@ require("./Window");
          //   console.log("UIGet Panels " + UI.Panels);
             if(name === undefined){
                 throw new Error("Panel._UIGet: panel name is undefined");
+            }
+            if(!UI){
+                throw new Error("Panels: UIGet needs UI.Panels to be defined");
             }
             for(var k in UI.Panels){
             //     console.log("trying to get panel " + name + " from " + k);

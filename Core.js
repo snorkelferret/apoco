@@ -1,5 +1,4 @@
 global.Apoco=require('./declare').Apoco;
-global.UI=require('./declare').UI;
 require("./index.js");
 require("./Utils.js");
 require("./Panel.js");

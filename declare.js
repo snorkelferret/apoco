@@ -1,4 +1,4 @@
-module.exports = {Apoco:{},UI:{}};
+module.exports = {Apoco:{}};
 /*var fs = require('fs');
 var browserify = require('browserify');
 
