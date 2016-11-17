@@ -1,462 +1,404 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
-global.Apoco=require('./declare').Apoco;
-global.UI=require('./declare').UI;
+'use strict';
+
+global.Apoco = require('./declare').Apoco;
+global.UI = require('./declare').UI;
 require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
-
-
-// Apoco is a singleton 
-
-(function(){
+var PolyfillPromise = require('es6-promise').Promise;
+    Promise=undefined;
+    
+(function () {
     'use strict';
 
-    var DEBUG=false;
-    var that=this;
-    window.onerror=function(msg,url,lineno,col_no,error){
-   	Apoco.popup.error(url, ("line number " + lineno + " " + msg));
+    var that = this;
+    window.onerror = function (msg, url, lineno, col_no, error) {
+        Apoco.popup.error(url, "line number " + lineno + " " + msg);
     };
 
-    window.addEventListener('beforeunload',function(e){  
-        Apoco.stop(); 
-      /*  var t;
-        var d=new Promise(function(resolve,reject){
-            t=window.setTimeout(function(){
-            Apoco.Panel.deleteAll(resolve);// },500000);
-        });
-        d.then( function(){
-            console.log("got to then for beforeunload");
-            window.clearTimeout(t);
-        }).catch(function(result){
-            Apoco.popup.error(result);
-        }); */
-      
+    window.addEventListener('beforeunload', function (e) {
+        Apoco.stop();
     });
-   
-    //Apoco.mixinDeep(Apoco,{
-    Apoco.start=function(options) {
-	    // Apoco.popup.spinner(true);
-           // console.log("++++++++++++++++++++++++++++++== Apoco start is here ");
-          //  console.log("options are %j ",options);
-            if(options){
-	        if(!Apoco.type["array"].check(options) && Apoco.type["object"].check(options)){
-		    var p=Apoco.display[options.display](options);
-		    if(p){
-		        p.show();
-		    }
-		    else {
-		        throw new Error("could not execute " + options.display);
-		    }
-	        }
-                else if(Apoco.type["array"].check(options)){
-                    Apoco.Panel.UIStart(options);
+
+    Apoco.start = function (options) {
+        if (options) {
+            if (!Apoco.type["array"].check(options) && Apoco.type["object"].check(options)) {
+                var p = Apoco.display[options.display](options);
+                if (p) {
+                    p.show();
+                } else {
+                    throw new Error("could not execute " + options.display);
                 }
-                else{
-                    throw new Error("Apoco.start: Unknown options");
-                }
+            } else if (Apoco.type["array"].check(options)) {
+                Apoco.Panel.UIStart(options);
+            } else {
+                throw new Error("Apoco.start: Unknown options");
             }
+        }
     };
-    Apoco.stop=function(){
+    Apoco.stop = function () {
         Apoco.Panel.deleteAll();
-        if(Apoco.webSocket){
+        if (Apoco.webSocket) {
             Apoco.webSocket.close();
         }
-
-    };    //});
- 
+    };
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Panel.js":12,"./Popups.js":13,"./Utils.js":16,"./declare":19,"./index.js":20}],2:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+},{"./Panel.js":12,"./Popups.js":13,"./Utils.js":16,"./declare":19,"./index.js":20,"es6-promise":43}],2:[function(require,module,exports){
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Fields");
 
-;(function(){
+;(function () {
 
     'use strict';
-    // these are the components allowed in display objects
-  
-    var _display_components=["Field","Node","Tab","Grid","Menu"];
 
-    Apoco.display={};  //setup container for display Objects
-    
+    var _display_components = ["Field", "Node", "Tab", "Grid", "Menu"];
+
+    Apoco.display = {};
+
     var dp;
-    Apoco._DisplayBase=function(options,win){
-	var defaults={
-	    parent: null,
-	    element: null,
-	    DOM: null,
+    Apoco._DisplayBase = function (options, win) {
+        var defaults = {
+            parent: null,
+            element: null,
+            DOM: null,
             id: null
-	};
-        var that=this,t;
-       
-        for(var k in defaults){
-            if(options[k] === undefined){
-                options[k]=defaults[k];
+        };
+        var that = this,
+            t;
+
+        for (var k in defaults) {
+            if (options[k] === undefined) {
+                options[k] = defaults[k];
             }
         }
-        for(var k in options){
-            this[k]=options[k];
+        for (var k in options) {
+            this[k] = options[k];
         }
 
-        //console.log("DisplayBase parent is " + this.parent);
-        if(this.DOM === null){
+        if (this.DOM === null) {
             throw new Error(this.display + ": Must supply a DOM id for an existing node");
         }
-        if(this.id === null){
+        if (this.id === null) {
             throw new Error(this.display + ": Must supply a unique id string");
         }
-    
-        if(win){
-          //  console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
-          //  console.log("adding to DOM " + this.DOM);
-	    this.DOM=win.document.getElementById(this.DOM);
-            t=win.document.getElementById(this.id);
-            if(this.dependsOn){
-                dp=win.document.getElementById(this.dependsOn);
+
+        if (win) {
+            this.DOM = win.document.getElementById(this.DOM);
+            t = win.document.getElementById(this.id);
+            if (this.dependsOn) {
+                dp = win.document.getElementById(this.dependsOn);
+            }
+        } else {
+            t = document.getElementById(this.id);
+            this.DOM = document.getElementById(this.DOM);
+            if (this.dependsOn) {
+                dp = document.getElementById(this.dependsOn);
             }
         }
-        else{
-            t=document.getElementById(this.id); 
-	    this.DOM=document.getElementById(this.DOM);
-            if(this.dependsOn){
-                dp=document.getElementById(this.dependsOn);
-            }
-            // console.log("hpy  %j" , this.DOM);
-            //console.log("length is " + this.DOM.length);
+        if (!this.DOM) {
+            throw new Error("_ApocoDisplayBase DOM element does not exist " + this.DOM);
         }
-	if(!this.DOM){
-	    throw new Error("_ApocoDisplayBase DOM element does not exist " + this.DOM);
-	}
 
-	if(t){
-	   t.parentNode.removeChild(t);
-	}
+        if (t) {
+            t.parentNode.removeChild(t);
+        }
 
-        var doit=function(context){
-           // console.log("DOIT IS HERE");
-            if(context.action){
-	 	context.action(context);
-	    }
+        var doit = function doit(context) {
+            if (context.action) {
+                context.action(context);
+            }
         };
-        // if the execution depends on another node
-        if(this.action){
-            if(this.dependsOn && !dp){
-                if(!Apoco.Observer){    // create an observer- only need one
+
+        if (this.action) {
+            if (this.dependsOn && !dp) {
+                if (!Apoco.Observer) {
                     Apoco.Utils.observer.create();
-                    if(!Apoco.Observer){ 
+                    if (!Apoco.Observer) {
                         throw new Error("Np observer found");
                     }
                 }
-                var b=document.body;
-                Apoco.Observer.observe(b,{childList:true,subtree:true,attributeFilter:["id"]});
-                Apoco.Utils.observer.add(this.dependsOn, doit,this);
-            }
-            else{ 
+                var b = document.body;
+                Apoco.Observer.observe(b, { childList: true, subtree: true, attributeFilter: ["id"] });
+                Apoco.Utils.observer.add(this.dependsOn, doit, this);
+            } else {
                 this.action(this);
             }
         }
 
-	if(this.listen !== undefined){
-	    Apoco.IO.listen(this);  
-	}
-  
+        if (this.listen !== undefined) {
+            Apoco.IO.listen(this);
+        }
     };
 
-    // var methods= {
-    Apoco._DisplayBase.prototype={
-	getChildren: function(){
-	    var comp=[];
+    Apoco._DisplayBase.prototype = {
+        getChildren: function getChildren() {
+            var comp = [];
             var k;
-            for(var i=0; i< _display_components.length;i++){
-                k=("get" + _display_components[i]);
-	        if(this[k]){
-                    if(comp.length === 0){
-                        comp=this[k]();
-                    }
-                    else{
+            for (var i = 0; i < _display_components.length; i++) {
+                k = "get" + _display_components[i];
+                if (this[k]) {
+                    if (comp.length === 0) {
+                        comp = this[k]();
+                    } else {
                         comp.concat(this[k]());
                     }
-                  //  console.log("getChildren got " + comp.length);
-                    return comp; //this[k];
-	        }
+
+                    return comp;
+                }
             }
             return null;
         },
-        getChild:function(name){
+        getChild: function getChild(name) {
             var k;
-            if(name !== undefined){
-                for(var i=0; i< _display_components.length;i++){
-                    var k=("get" + _display_components[i]);
-                    if(this[k]){
-                        return  this[k](name);
+            if (name !== undefined) {
+                for (var i = 0; i < _display_components.length; i++) {
+                    var k = "get" + _display_components[i];
+                    if (this[k]) {
+                        return this[k](name);
                     }
                 }
                 return null;
             }
             return null;
         },
-        deleteChild:function(name,no_splice){
+        deleteChild: function deleteChild(name, no_splice) {
             var k;
-            if(name !== undefined){
-                for(var i=0; i< _display_components.length;i++){
-                    k=("delete"+_display_components[i]); 
-                    if(this[k]){
+            if (name !== undefined) {
+                for (var i = 0; i < _display_components.length; i++) {
+                    k = "delete" + _display_components[i];
+                    if (this[k]) {
                         this[k](name);
                         return true;
                     }
                 }
-            }
-            else{
+            } else {
                 throw new Error("deleteChild- needs a name");
             }
             return null;
         },
-        _getMethods:function(){
-            var m=[];
-            for(var k in this){
+        _getMethods: function _getMethods() {
+            var m = [];
+            for (var k in this) {
                 m.push(k);
             }
             return m;
         },
-	getElement: function(){
-	    return this.element;
-	},
-	getDisplayType: function(){
-	    return this.display;
-	},
-	getName: function(){
-	    if(this.name){
-		return this.name;
-	    }
-	    return null;
-	},
-	getKey: function(){  
-	    if(this.name){  // if this is a real instance
-		return this.name;
-	    }
-	    if(this.id){
-		return this.id;
-	    }
-	    return null;
-	},
-	getParent: function(){
-	    return this.parent;  // DisplaySet to which this element belongs
-	},
-	getSibling: function(name){
-	    if(this.parent){
-		var t=this.parent.getChildren();
-                var c=[];
-		//console.log("getSiblings: creator has " + this.parent.Components.length + " elements");
-		for(var i=0;i<t.length;i++){
-		    if(t[i] !== this){
-			//console.log("getSiblings: found " + t[i].getKey());
-                        if(name && t[i].getKey() === name){
+        getElement: function getElement() {
+            return this.element;
+        },
+        getDisplayType: function getDisplayType() {
+            return this.display;
+        },
+        getName: function getName() {
+            if (this.name) {
+                return this.name;
+            }
+            return null;
+        },
+        getKey: function getKey() {
+            if (this.name) {
+                return this.name;
+            }
+            if (this.id) {
+                return this.id;
+            }
+            return null;
+        },
+        getParent: function getParent() {
+            return this.parent;
+        },
+        getSibling: function getSibling(name) {
+            if (this.parent) {
+                var t = this.parent.getChildren();
+                var c = [];
+
+                for (var i = 0; i < t.length; i++) {
+                    if (t[i] !== this) {
+                        if (name && t[i].getKey() === name) {
                             return t[i];
-                        }
-			else{
+                        } else {
                             c.push(t[i]);
                         }
-		    }
-		}
-                if(name){  // not found
+                    }
+                }
+                if (name) {
                     return null;
                 }
-		return c;
-	    }
-	    else{
-		throw new Error("Parent is not defined for " + this.name);
-	    }
-	},
-	_execute: function( data ) {
-	    return null;  // if function has not been overwritten - bad return null
-	},
-	show: function(){
-          // console.log("ApocoDisplayBase: showing " + this.id);
-	    if(this.publish !== undefined){
-	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
-	        Apoco.IO.publish(this);
-	    }
-            if(!this.DOM.contains(this.element)){
-              //  console.log("Showing element that is not in DOM");
-	        if(this.element){
-		  //  console.log("show found non null element");
-                    if(this.after){
-                        var a=document.getElementById(this.after);
-                        if(a && a.nextSibling){    // && $.contains(this.DOM[0],a[0])){ //insert after
-                            a.parentNode.insertBefore(this.element,a.nextSibling);
-                            //$("#" + this.after).after(this.element);
-                        }
-                        else{
+                return c;
+            } else {
+                throw new Error("Parent is not defined for " + this.name);
+            }
+        },
+        _execute: function _execute(data) {
+            return null;
+        },
+        show: function show() {
+            if (this.publish !== undefined) {
+                Apoco.IO.publish(this);
+            }
+            if (!this.DOM.contains(this.element)) {
+                if (this.element) {
+                    if (this.after) {
+                        var a = document.getElementById(this.after);
+                        if (a && a.nextSibling) {
+                            a.parentNode.insertBefore(this.element, a.nextSibling);
+                        } else {
                             this.DOM.appendChild(this.element);
-                            //throw new Error("Apoco.display.show: cannot find element " + this.after );
                         }
-                    }
-                    else{
+                    } else {
                         this.DOM.appendChild(this.element);
                     }
-                    if(this._afterShow !== undefined){
-                     //   console.log("DisplayBase: calling afterShow ");
+                    if (this._afterShow !== undefined) {
                         this._afterShow();
                     }
-		}
-	        else {
-		    //console.log(" --- invalid element");
-		    throw new Error("No valid element for " + this.getKey());
-		    return null;
-	        }
-             }
+                } else {
+                    throw new Error("No valid element for " + this.getKey());
+                    return null;
+                }
+            }
             return true;
- 	},
-        isHidden:function(){
-            if(this.DOM.contains(this.element)){
+        },
+        isHidden: function isHidden() {
+            if (this.DOM.contains(this.element)) {
                 return false;
             }
             return true;
         },
-        displayType: function(){
+        displayType: function displayType() {
             return this.displayType;
         },
-        hide:function(){
-          //  console.log("trying to hide " + this.id);
-            if(this.DOM.contains(this.element)){
-             //   console.log("Hiding element that is in dom");
+        hide: function hide() {
+            if (this.DOM.contains(this.element)) {
                 this.DOM.removeChild(this.element);
                 return;
             }
-//           console.log("Can't hide element that is NOT in dom");
         },
-	delete: function(msg_from_parent){
-	    //console.log("delete display object is here");
-            if(this.listen){
+        delete: function _delete(msg_from_parent) {
+            if (this.listen) {
                 Apoco.IO.unsubscribe(this);
             }
-            if(this.draggable){
-                //this.draggable.delete(); // FIX THIS
+            if (this.draggable) {
                 console.log("Need method to delete draggable");
             }
             this.deleteAll();
-            if(this.element && this.element.parentNode){
-                this.element.parentNode.removeChild(this.element);  //removes events and data as well
-                this.element=null;
-            }
-	    else{
+            if (this.element && this.element.parentNode) {
+                this.element.parentNode.removeChild(this.element);
+                this.element = null;
+            } else {
                 console.log("this element should not be null " + this.id);
             }
-          
-	    if(this.parent && msg_from_parent === undefined){
-		//console.log("WE have a parent");
-		this.parent.deleteChild(this);
-	    }
-            //this.element=null;
-            
-	}
-    };
 
+            if (this.parent && msg_from_parent === undefined) {
+                this.parent.deleteChild(this);
+            }
+        }
+    };
 })();
 
 },{"./Fields":9,"./Popups":13,"./Utils":16,"./declare":19}],3:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./DisplayBase.js");
 require("./Nodes.js");
 
-
-// requires ApocoDisplayBase.js
-
-;(function(){
+;(function () {
 
     "use strict";
 
-    var ApocoMakeFieldset=function(options,win){
-	//console.log("display.fieldset is here");
-	this.DEBUG=true;
-	var that=this;
-        this.nodes=[];
-        this.fields=[];
-	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-        if(this.display=="fieldset"){
+    var ApocoMakeFieldset = function ApocoMakeFieldset(options, win) {
+        this.DEBUG = true;
+        var that = this;
+        this.nodes = [];
+        this.fields = [];
+        Apoco._DisplayBase.call(this, options, win);
+        if (this.display == "fieldset") {
             this._execute();
         }
     };
 
-    ApocoMakeFieldset.prototype={
-	_execute: function(){
-	    var el,p,that=this;
-	    this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("field_container","ui-widget-content","ui-corner-all");
-            
-            if(this.components !== undefined){
-                for(var i=0;i<this.components.length;i++){
-                    this.components[i].parent=that;
-                    el=document.createElement("div");
+    ApocoMakeFieldset.prototype = {
+        _execute: function _execute() {
+            var el,
+                p,
+                that = this;
+            this.element = document.createElement("div");
+            this.element.id = this.id;
+            this.element.classList.add("field_container", "ui-widget-content", "ui-corner-all");
+
+            if (this.components !== undefined) {
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].parent = that;
+                    el = document.createElement("div");
                     el.classList.add("fieldset");
-                    if(this.components[i].class){
+                    if (this.components[i].class) {
                         el.classList.add(this.components[i].class);
                     }
- 	            if(this.components[i].node){
-                        this.addNode(this.components[i],el);
-		    }
-	            else if(this.components[i].field || this.components[i].type){
-	                p=this.addField(this.components[i],el);
-		    }
+                    if (this.components[i].node) {
+                        this.addNode(this.components[i], el);
+                    } else if (this.components[i].field || this.components[i].type) {
+                        p = this.addField(this.components[i], el);
+                    }
                 }
-                this.components.length=0; // delete
-            }
-            else{
+                this.components.length = 0;
+            } else {
                 console.log("components for " + this.id + " is undefined");
             }
-	},
-        _afterShow:function(){
-            // put the focus on the first field
-            if(this.fields && this.fields.length>0){
-                var e=this.fields[0].getElement();
-                var d=e.getElementsByTagName("input")[0];
-                if(d){
+        },
+        _afterShow: function _afterShow() {
+            if (this.fields && this.fields.length > 0) {
+                var e = this.fields[0].getElement();
+                var d = e.getElementsByTagName("input")[0];
+                if (d) {
                     d.focus();
                 }
             }
         },
-	getChildren: function(){
-	    var comp;
-            var comp=this.getField();
-            var c=this.getNode();
+        getChildren: function getChildren() {
+            var comp;
+            var comp = this.getField();
+            var c = this.getNode();
             comp.concat(c);
             return comp;
         },
-        getChild:function(name){
+        getChild: function getChild(name) {
             var k;
-            if(name !== undefined){
-                k=this.getField(name);
-                if(k !==null && !Apoco.type["array"].check(k)){
+            if (name !== undefined) {
+                k = this.getField(name);
+                if (k !== null && !Apoco.type["array"].check(k)) {
                     return k;
                 }
-                k=this.getNode(name);
-                if(k !==null && !Apoco.type["array"].check(k)){
+                k = this.getNode(name);
+                if (k !== null && !Apoco.type["array"].check(k)) {
                     return k;
                 }
             }
             return null;
         },
-	getField: function(name){
-            if(name !== undefined){
-                for(var i=0;i<this.fields.length;i++){
-                    if(this.fields[i].name === name){
+        getField: function getField(name) {
+            if (name !== undefined) {
+                for (var i = 0; i < this.fields.length; i++) {
+                    if (this.fields[i].name === name) {
                         return this.fields[i];
                     }
                 }
                 return null;
             }
-	    return this.fields;
-	},
-        getNode:function(name){  //nodes don't have to have a name
-            if(name !== undefined){
-                for(var i=0;i<this.nodes.length;i++){
-                    if(this.nodes[i].name !== undefined && this.nodes[i].name === name){
+            return this.fields;
+        },
+        getNode: function getNode(name) {
+            if (name !== undefined) {
+                for (var i = 0; i < this.nodes.length; i++) {
+                    if (this.nodes[i].name !== undefined && this.nodes[i].name === name) {
                         return this.nodes[i];
                     }
                 }
@@ -464,402 +406,364 @@ require("./Nodes.js");
             }
             return this.nodes;
         },
-        deleteChild:function(name){
-            if(name !== undefined){
-                //is it a node or a field?
-                if(this.getNode(name)!== null){
+        deleteChild: function deleteChild(name) {
+            if (name !== undefined) {
+                if (this.getNode(name) !== null) {
                     this.deleteNode(name);
-                }
-                else if(this.getField(name)!== null){
+                } else if (this.getField(name) !== null) {
                     this.deleteField(name);
-                }
-                else {
+                } else {
                     throw new Error("DisplayFieldset: deleteChild cannot find " + name);
                 }
-            }
-            else{
+            } else {
                 throw new Error("deleteChild- needs a name");
-            }              
-
+            }
         },
-        addNode:function(d,el){
-            var n,parent_element;
-            if(d.name && this.getNode(d.name)!==null){
+        addNode: function addNode(d, el) {
+            var n, parent_element;
+            if (d.name && this.getNode(d.name) !== null) {
                 throw new Error("Cannot add node with non-unique name");
             }
-            if(d.element){
-                if(!d.node){
+            if (d.element) {
+                if (!d.node) {
                     throw new Error("Apoco.displayFieldset: addNode - object is not a node");
                 }
-                n=d;
+                n = d;
+            } else {
+                n = Apoco.node(d, el);
             }
-            else{
-                n=Apoco.node(d,el);
-            }
-            if(n){
+            if (n) {
                 this.element.appendChild(n.element);
-	        this.nodes.push(n);
+                this.nodes.push(n);
                 return n;
-            }
-            else{
+            } else {
                 throw new Error("Apoco,fieldset, doesn't know how to make " + d.node);
             }
             return null;
         },
-        deleteNode: function(name){
-            var n,index=-1;
-            if(name === undefined){
+        deleteNode: function deleteNode(name) {
+            var n,
+                index = -1;
+            if (name === undefined) {
                 throw new Error("DisplayFieldset: deleteNode - must supply a name");
             }
-            for(var i=0;i<this.nodes.length;i++){
-                if(this.nodes[i].name === name){
-                    index=i;
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].name === name) {
+                    index = i;
                     break;
                 }
             }
-            if(index===-1){
+            if (index === -1) {
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
             this.nodes[index].element.parentNode.removeChild(this.nodes[index].element);
-            this.nodes[index].element=null;
-            this.nodes.splice(index,1);
+            this.nodes[index].element = null;
+            this.nodes.splice(index, 1);
         },
-        addField: function(d,el){
-            var p,parent_element;
-            if(!d.field){
-                if(d.type){
-                    d.field=Apoco.type[d.type].field;
-                }
-                else{
+        addField: function addField(d, el) {
+            var p, parent_element;
+            if (!d.field) {
+                if (d.type) {
+                    d.field = Apoco.type[d.type].field;
+                } else {
                     throw new Error("Must supply either a field or a type");
                 }
             }
-           // console.log("making field " + d.field);
-            if(this.getField(d.name)!== null){
+
+            if (this.getField(d.name) !== null) {
                 throw new Error("Cannot add field with non-unique name " + d.name);
             }
-            if(Apoco.field.exists(d.field)){
-                // check that the field has not already been created
-                if(d.element){
-		    p=d;
+            if (Apoco.field.exists(d.field)) {
+                if (d.element) {
+                    p = d;
+                } else {
+                    p = Apoco.field[d.field](d, el);
                 }
-                else{
-                    p=Apoco.field[d.field](d,el);
+                if (!p) {
+                    throw new Error("Cannot make field " + d.field);
                 }
-		if(!p){
-		    throw new Error("Cannot make field " + d.field);
-		}
-            }
-            else{
+            } else {
                 throw new Error("no field of type " + d.field + " exists");
             }
- 	    this.fields.push(p);
-            //console.log("adding field " + d.name);
-	    this.element.appendChild(p.element);
-            
+            this.fields.push(p);
+
+            this.element.appendChild(p.element);
+
             return p;
         },
-        deleteAll:function(){
-            for(var i=0;i<this.fields.length;i++){
-               /* if(this.fields[i].listen){
-                    Apoco.unsubscribe(this.fields[i]);
-                }
-                //this.fields[i].element.empty();
-                this.fields[i].element.parentNode.removeChild(this.fields[i].element); */
+        deleteAll: function deleteAll() {
+            for (var i = 0; i < this.fields.length; i++) {
                 this.fields[i].delete();
             }
-            this.fields.length=0;
-            for(var i=0;i<this.nodes.length;i++){
-                if(this.nodes[i].listen){
+            this.fields.length = 0;
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].listen) {
                     Apoco.unsubscribe(this.nodes[i]);
                 }
-                if(this.nodes[i].element.parentNode){
-                    //this.nodes[i].element.empty();
-                    //this.nodes[i].element.remove();
+                if (this.nodes[i].element.parentNode) {
                     this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
                 }
             }
-            this.nodes.length=0;
+            this.nodes.length = 0;
         },
-        deleteField:function(name){
-            var n,index=-1;
-            if(name === undefined){
+        deleteField: function deleteField(name) {
+            var n,
+                index = -1;
+            if (name === undefined) {
                 throw new Error("DisplayFieldset: deleteNode - must supply a name");
             }
-            for(var i=0;i<this.fields.length;i++){
-                if(this.fields[i].name === name){
-                    index=i;
+            for (var i = 0; i < this.fields.length; i++) {
+                if (this.fields[i].name === name) {
+                    index = i;
                     break;
                 }
             }
-            if(this.fields[index].listen){
-                    Apoco.unsubscribe(this.fields[i]);
+            if (this.fields[index].listen) {
+                Apoco.unsubscribe(this.fields[i]);
             }
-            if(index===-1){
+            if (index === -1) {
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
-            //this.fields[index].element.remove();
+
             this.fields[index].element.parentNode.removeChild(this.fields[index].element);
-            this.fields[index].element=null;
-            this.fields.splice(index,1);
+            this.fields[index].element = null;
+            this.fields.splice(index, 1);
         },
-        getJSON: function(){
-            var js={};
-	    for(var i=0; i<this.fields.length; i++){
-             //   console.log("this field required is " + this.fields[i].required);
-                if(this.fields[i].required){
-                    if(this.fields[i].checkValue() !== true){
+        getJSON: function getJSON() {
+            var js = {};
+            for (var i = 0; i < this.fields.length; i++) {
+                if (this.fields[i].required) {
+                    if (this.fields[i].checkValue() !== true) {
                         return null;
                     }
                 }
-		js[ this.fields[i].getKey()]=this.fields[i].getValue();
-	    }
+                js[this.fields[i].getKey()] = this.fields[i].getValue();
+            }
             return js;
         },
-	check: function(){
-            var valid=true;
+        check: function check() {
+            var valid = true;
 
-	    for(var i=0;i<this.fields.length;i++){
-		//console.log("check components " + i);
-		if(!this.fields[i].checkValue()){
-		    //console.log("Value for " +  this.fields[i].getValue() + " is wrong");
-		    valid=false;
-		}
-	    }
-	    return valid;
+            for (var i = 0; i < this.fields.length; i++) {
+                if (!this.fields[i].checkValue()) {
+                    valid = false;
+                }
+            }
+            return valid;
         },
-	submit: function(url){
-            var j=this.getJSON();
-            Apoco.IO.REST("POST",j,url);
-	}
+        submit: function submit(url) {
+            var j = this.getJSON();
+            Apoco.IO.REST("POST", j, url);
+        }
     };
 
-    Apoco.Utils.extend(ApocoMakeFieldset,Apoco._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeFieldset, Apoco._DisplayBase);
 
-    Apoco.display.fieldset=function(opts,win){
-        opts.display="fieldset";
-        return new ApocoMakeFieldset(opts,win);
+    Apoco.display.fieldset = function (opts, win) {
+        opts.display = "fieldset";
+        return new ApocoMakeFieldset(opts, win);
     };
-    Apoco.display.fieldsetMethods=function(){
-        //   console.log("Apoco.display.fieldsetMethods: getting methods for fieldset");
-        var ar=[];
-        for(var k in ApocoMakeFieldset.prototype){
+    Apoco.display.fieldsetMethods = function () {
+        var ar = [];
+        for (var k in ApocoMakeFieldset.prototype) {
             ar.push(k);
         }
         return ar;
     };
-    Apoco.display._fieldsetBase=ApocoMakeFieldset;
-
-
+    Apoco.display._fieldsetBase = ApocoMakeFieldset;
 })();
 
 },{"./DisplayBase.js":2,"./Nodes.js":11,"./declare":19}],4:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./DisplayFieldset");
 
-// create a form dynamically from json
-
-
-
-;(function() {
+;(function () {
     "use strict";
 
-    var DEBUG=true;
+    var DEBUG = true;
 
-    var ApocoMakeForm=function(options,win){
-	this.DEBUG=true;
-	var that=this;
-        Apoco.display._fieldsetBase.call(this,options,win);
+    var ApocoMakeForm = function ApocoMakeForm(options, win) {
+        this.DEBUG = true;
+        var that = this;
+        Apoco.display._fieldsetBase.call(this, options, win);
         this._execute();
-
     };
 
+    ApocoMakeForm.prototype = {
+        _execute: function _execute() {
+            var that = this,
+                fp,
+                header,
+                container,
+                fc,
+                h;
 
-    // overwrite methods from base class
-    ApocoMakeForm.prototype={
-	_execute: function(){
-	    var that=this,fp,header,container,fc,h;
-            
-            this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("apoco_form","resizable","ui-widget-content","ui-corner-all");
-            if(this.class !== undefined){
+            this.element = document.createElement("div");
+            this.element.id = this.id;
+            this.element.classList.add("apoco_form", "resizable", "ui-widget-content", "ui-corner-all");
+            if (this.class !== undefined) {
                 this.element.classList.add(this.class);
             }
-            if(!this.height){
-                this.height=400;
+            if (!this.height) {
+                this.height = 400;
             }
-            if(!this.width){
-                this.width=Math.floor(this.height*0.75);
+            if (!this.width) {
+                this.width = Math.floor(this.height * 0.75);
             }
-            this.element.innerHeight=this.height;
-            this.element.innerWidth=this.width;
-            header=document.createElement("div");
-            header.classList.add("form_header","ui-state-default", "ui-widget-header","ui-corner-all");
-	    this.element.appendChild(header);
-	    if(this.draggable !== false){
-                this.draggable=Apoco.Utils.draggable(this.element);
-	    }
-            container=document.createElement("div");
+            this.element.innerHeight = this.height;
+            this.element.innerWidth = this.width;
+            header = document.createElement("div");
+            header.classList.add("form_header", "ui-state-default", "ui-widget-header", "ui-corner-all");
+            this.element.appendChild(header);
+            if (this.draggable !== false) {
+                this.draggable = Apoco.Utils.draggable(this.element);
+            }
+            container = document.createElement("div");
             container.classList.add("form_scroll");
-            fc=document.createElement("div");
+            fc = document.createElement("div");
             fc.classList.add("form_content");
-	    this.element.appendChild(fc);
+            this.element.appendChild(fc);
             fc.appendChild(container);
-            h=document.createElement("h5");
-            if(this.label){
-                h.textContent=this.label;
-	    }
-	    header.appendChild(h);
-            var close=document.createElement("span");
-            close.classList.add("ui-icon","ui-icon-close");
+            h = document.createElement("h5");
+            if (this.label) {
+                h.textContent = this.label;
+            }
+            header.appendChild(h);
+            var close = document.createElement("span");
+            close.classList.add("ui-icon", "ui-icon-close");
             header.appendChild(close);
-	    var c=function(e){
-	        //	return function(e){
-		e.stopPropagation();
-		   // if(!cmd){
-	//		throw new Error("command for " +  this.getKey + " does not exist");
-	        //	    }
-		that.delete();
-	    };
-	    //}(this));
-	    close.addEventListener("click",c,false);
+            var c = function c(e) {
+                e.stopPropagation();
 
-            fp=document.createElement("ul");
+                that.delete();
+            };
+
+            close.addEventListener("click", c, false);
+
+            fp = document.createElement("ul");
             fp.classList.add("apoco_form_list");
             container.appendChild(fp);
-            
-            if(this.components){
-                for(var i=0;i<this.components.length;i++){
-                    this.components[i].parent=that;
-	            if(this.components[i].node){
-                        this.addNode(this.components[i],fp);
-		    }
-	            else if(this.components[i].field || this.components[i].type){
-	                this.addField(this.components[i],fp);
-		    }
-                }                   
-                this.components.length=0; // delete
+
+            if (this.components) {
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].parent = that;
+                    if (this.components[i].node) {
+                        this.addNode(this.components[i], fp);
+                    } else if (this.components[i].field || this.components[i].type) {
+                        this.addField(this.components[i], fp);
+                    }
+                }
+                this.components.length = 0;
             }
-        
-	    if(this.buttons){
-                var button_container=document.createElement("div");
-                button_container.classList.add("form_button_container","ui-widget-content");
-		this.element.appendChild(button_container);
-		for(var i=0;i<this.buttons.length;i++){
-                    this.buttons[i].node="button";
-                    this.buttons[i]=Apoco.node(this.buttons[i]);
-                    this.buttons[i].parent=this;
-		    button_container.appendChild(this.buttons[i].element);
-		}
-	    }
-            else{
-                this.buttons=[];
+
+            if (this.buttons) {
+                var button_container = document.createElement("div");
+                button_container.classList.add("form_button_container", "ui-widget-content");
+                this.element.appendChild(button_container);
+                for (var i = 0; i < this.buttons.length; i++) {
+                    this.buttons[i].node = "button";
+                    this.buttons[i] = Apoco.node(this.buttons[i]);
+                    this.buttons[i].parent = this;
+                    button_container.appendChild(this.buttons[i].element);
+                }
+            } else {
+                this.buttons = [];
             }
-	},
-        addNode:function(d,parent_element){
+        },
+        addNode: function addNode(d, parent_element) {
             var n;
-            var ll=document.createElement("li");
-            if(parent_element === undefined){
-                parent_element=this.element.querySelector("ul.apoco_form_list");
+            var ll = document.createElement("li");
+            if (parent_element === undefined) {
+                parent_element = this.element.querySelector("ul.apoco_form_list");
             }
-            if(d.name && this.getNode(d.name)!==null){
-                    throw new Error("Cannot add node with non-unique name");
+            if (d.name && this.getNode(d.name) !== null) {
+                throw new Error("Cannot add node with non-unique name");
             }
-            if(d.element && d.element.length>0){
-                //console.log("ELEMENT ALREADY EXISTS");
-                if(!d.node){
+            if (d.element && d.element.length > 0) {
+                if (!d.node) {
                     throw new Error("Apoco.displayFieldset: addNode - object is not a node");
                 }
-                n=d;
+                n = d;
+            } else {
+                n = Apoco.node(d, ll);
             }
-            else{
-                n=Apoco.node(d,ll);
-            }
-            if(n){
-                if(!n.element){
+            if (n) {
+                if (!n.element) {
                     throw new Error("DisplayForm.addNode element is null");
                 }
                 parent_element.appendChild(ll);
-              
-	        this.nodes.push(n);
+
+                this.nodes.push(n);
                 return n;
-            }
-            else{
+            } else {
                 throw new Error("Apoco,fieldset, doesn't know how to make " + d.node);
             }
             return n;
         },
-        addField: function(d,parent_element){
+        addField: function addField(d, parent_element) {
             var p;
-            var ll=document.createElement("li");
-            if(parent_element === undefined){
-                parent_element=this.element.querySelector("ul.apoco_form_list");
+            var ll = document.createElement("li");
+            if (parent_element === undefined) {
+                parent_element = this.element.querySelector("ul.apoco_form_list");
             }
-            if(!d.field){
-                if(d.type){
-                    d.field=Apoco.type[d.type].field;
-                }
-                else{
+            if (!d.field) {
+                if (d.type) {
+                    d.field = Apoco.type[d.type].field;
+                } else {
                     throw new Error("Must supply either a field or a type");
                 }
             }
-           // console.log("making field " + d.field);
-            if(this.getField(d.name)!== null){
+
+            if (this.getField(d.name) !== null) {
                 throw new Error("Cannot add field with non-unique name " + d.name);
             }
-            if(Apoco.field.exists(d.field)){
-                // check that the field has not already been created
-                if(d.element){
-                   // console.log("ELEMENT ALREADY EXISTS");
-		    p=d;
+            if (Apoco.field.exists(d.field)) {
+                if (d.element) {
+                    p = d;
+                } else {
+                    p = Apoco.field[d.field](d, ll);
                 }
-                else{
-                    p=Apoco.field[d.field](d,ll);
+                if (!p) {
+                    throw new Error("Cannot make field " + d.field);
                 }
-		if(!p){
-		    throw new Error("Cannot make field " + d.field);
-		}
-            }
-            else{
+            } else {
                 throw new Error("no field of type " + d.field + " exists");
             }
-            
-	    this.fields.push(p);
-	    parent_element.appendChild(p.element);
-            
+
+            this.fields.push(p);
+            parent_element.appendChild(p.element);
+
             return p;
         },
-        addButton:function(d){
-            var index,r,b;
-            d.node="button";
-            b=Apoco.node(d);
-            index=this.buttons.length;
-            if(b){
-                this.buttons[index]=b;
-                this.buttons[index].parent=this;
-            }
-            else{
+        addButton: function addButton(d) {
+            var index, r, b;
+            d.node = "button";
+            b = Apoco.node(d);
+            index = this.buttons.length;
+            if (b) {
+                this.buttons[index] = b;
+                this.buttons[index].parent = this;
+            } else {
                 throw new Error("DisplayForm: Could not make button");
             }
-            if(index ===0){
-	        // no buttons so create button_container
-                r=document.createElement("div");
-		r.classList.add("form_button_container","ui-widget-content");
+            if (index === 0) {
+                r = document.createElement("div");
+                r.classList.add("form_button_container", "ui-widget-content");
                 this.element.appendChild(r);
+            } else {
+                r = this.element.querySelector("div.form_button_container");
             }
-            else{
-                r=this.element.querySelector("div.form_button_container");
-            }
-            if(r.length === 0){
+            if (r.length === 0) {
                 throw new Error("DisplayForm: addButton cannot find button container");
             }
             r.appendChild(this.buttons[index].element);
         },
-        getButton:function(name){
-            if(name !== undefined){
-                for(var i=0;i<this.buttons.length;i++){
-                    if(this.buttons[i].name === name){
+        getButton: function getButton(name) {
+            if (name !== undefined) {
+                for (var i = 0; i < this.buttons.length; i++) {
+                    if (this.buttons[i].name === name) {
                         return this.buttons[i];
                     }
                 }
@@ -867,2040 +771,1795 @@ require("./DisplayFieldset");
             }
             return this.buttons;
         },
-        deleteAll:function(){
-            for(var i=0;i<this.fields.length;i++){
+        deleteAll: function deleteAll() {
+            for (var i = 0; i < this.fields.length; i++) {
                 this.fields[i].delete();
             }
-            this.fields.length=0;
-            for(var i=0;i<this.nodes.length;i++){
-                if(this.nodes[i].element.parentNode){
+            this.fields.length = 0;
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].element.parentNode) {
                     this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
                 }
             }
-            this.nodes.length=0;
-	    for(var i=0;i<this.buttons.length;i++){
-                if(this.buttons[i].element.parentNode){
+            this.nodes.length = 0;
+            for (var i = 0; i < this.buttons.length; i++) {
+                if (this.buttons[i].element.parentNode) {
                     this.buttons[i].element.parentNode.removeChild(this.buttons[i].element);
                 }
             }
-            this.buttons.length=0;
+            this.buttons.length = 0;
         },
-        deleteButton:function(name){
-            var n,index=-1;
-            if(name === undefined){
+        deleteButton: function deleteButton(name) {
+            var n,
+                index = -1;
+            if (name === undefined) {
                 throw new Error("DisplayForm: deleteButton - must supply a name");
             }
-            for(var i=0;i<this.buttons.length;i++){
-                if(this.buttons[i].name === name){
-                    index=i;
+            for (var i = 0; i < this.buttons.length; i++) {
+                if (this.buttons[i].name === name) {
+                    index = i;
                     break;
                 }
             }
-            if(index===-1){
+            if (index === -1) {
                 throw new Error("DisplayFieldset: deleteNode cannot find " + name);
             }
             this.buttons[index].element.parentNode.removeChild(this.buttons[index].element);
-            this.buttons[index].element=null;
-            this.buttons.splice(index,1);
+            this.buttons[index].element = null;
+            this.buttons.splice(index, 1);
         },
-	resetInvalid: function(){
-	    for(var i=0;i< this.fields.length;i++){
-		if(this.fields[i].required){
-		    this.fields[i]._resetValue();
-		}
-	    }
-	},
+        resetInvalid: function resetInvalid() {
+            for (var i = 0; i < this.fields.length; i++) {
+                if (this.fields[i].required) {
+                    this.fields[i]._resetValue();
+                }
+            }
+        },
 
-	print: function(){
-	    var w=this.element.width();
-	    var h=this.element.height();
-	    var opts=("height=300 ,width=300, status=no" );
-	    var win=window.open("","print",opts);
-	    this.win=win;
-	    win.document.write('<html><head><title></title>');
-	    win.document.write('<link rel="stylesheet" href="css/form.css" type="text/css" media="print" >');
-	    win.document.write('</head><body>');
-	    var data=this.element.html();
-	    win.document.write("<div id='" + this.id + "' class='apoco_form'>"); // this.element
-	    win.document.write(data);
-	    win.document.write("</div>");
-	    win.document.write('</body></html>');
-	    win.print();
-	    win.close();
-	},
-	check: function(){
-	    var valid=true;
+        print: function print() {
+            var w = this.element.width();
+            var h = this.element.height();
+            var opts = "height=300 ,width=300, status=no";
+            var win = window.open("", "print", opts);
+            this.win = win;
+            win.document.write('<html><head><title></title>');
+            win.document.write('<link rel="stylesheet" href="css/form.css" type="text/css" media="print" >');
+            win.document.write('</head><body>');
+            var data = this.element.html();
+            win.document.write("<div id='" + this.id + "' class='apoco_form'>");
+            win.document.write(data);
+            win.document.write("</div>");
+            win.document.write('</body></html>');
+            win.print();
+            win.close();
+        },
+        check: function check() {
+            var valid = true;
 
-	    for(var i=0;i<this.fields.length;i++){
-		//console.log("check components " + i);
-		if(!this.fields[i].checkValue()){
-		    //console.log("Value for " +  this.fields[i].getValue() + " is wrong");
-		    valid=false;
-		}
-	    }
-	    return valid;
-	}
+            for (var i = 0; i < this.fields.length; i++) {
+                if (!this.fields[i].checkValue()) {
+                    valid = false;
+                }
+            }
+            return valid;
+        }
     };
 
-   
-    Apoco.Utils.extend(ApocoMakeForm,Apoco.display._fieldsetBase);
-  
-    Apoco.display.form=function(opts,win){
-        opts.display="form";
-        return new ApocoMakeForm(opts,win);
+    Apoco.Utils.extend(ApocoMakeForm, Apoco.display._fieldsetBase);
+
+    Apoco.display.form = function (opts, win) {
+        opts.display = "form";
+        return new ApocoMakeForm(opts, win);
     };
-    Apoco.display.formMethods=function(){
-        var ar=[];
-        for(var k in ApocoMakeForm.prototype ){
+    Apoco.display.formMethods = function () {
+        var ar = [];
+        for (var k in ApocoMakeForm.prototype) {
             ar.push(k);
         }
         return ar;
     };
-
-
 })();
 
 },{"./DisplayFieldset":3,"./declare":19}],5:[function(require,module,exports){
-var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./DisplayBase.js");
 require("./Sort.js");
 
-/*
- * Copyright (c) Pooka Ltd.2012-2016
- * Distributed under MIT license.
- * All rights reserved.
- */
-
-/*
-  TODO 
-   right mouse buton - add functionality to add/remove columns
-   resizable does not reappear after the element has been detached
-   add support for displaying/ uploading images
-
-Data Format
-jsonishData={
-      DOM: "Content",
-      sortOrder: [cols[i].name,cols[j].name],
-      groupby: some column name,
-
-      cols:  // have these keys
-      {  name: string, // required key
-         type: // see ApocoTypes  // required key
-         editable: boolean, (default true)
-         unique: boolean,(default false)
-         hidden: boolean,(default false)
-         display: boolean, (default true) // setting to false means no dom element is created.
-         userSortable: boolean (default: false)
-         required: boolean (default: true)
-         step: float, default(0.1) // FloatField only
-         precision: integer, default(2) // FloatField only
- },
- rows:  // must have the same number of keys matching the names of the cols
- [ { key: matching cols name above, value, key: value ...},
- { ....}
- ]
- };
-
-*/
-
-
-;(function(){
+;(function () {
     "use strict";
- 
-    function rmouse_popup(element){
 
-	element.bind("contextmenu", function(e){
-	    var x,y;
-	    x=e.pageX;
-	    y=e.pageY;
-	    log("got mouse co-ords x " + x + " y " + y);
-	    if(e.which === 3){
-                //		alert("right mouse button");
-		var p=$(this).parent().position();
-		x=x-Math.floor(p.left);
-		y=y-Math.floor(p.top);
-		log("NEW mouse co-ords x " + x + " y " + y);
-		log("parent position is " + p.top + " " + p.left);
-		var d=$(this).parent().find('#grid_popup');
-		if(d && d.length>0){
-		    d.css({'position': "absolute",'top':(y + "px"), 'left': (x + "px")});
-		}
-		else {
-		    var d=$("<div class='popup' id='grid_popup'> </div>").css({'position': "absolute",'top':(y + "px"), 'left': (x + "px")});
-		    var cc=$("<div></div>").css({'width': '100px','height': '100px','background':'#101010'});
+    function rmouse_popup(element) {
 
-		    d.append(cc);
-		    var ok=$("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
-		    var cancel=$("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
-		    d.append(ok);
-		    d.append(cancel);
-		    $(this).parent().append(d);
+        element.bind("contextmenu", function (e) {
+            var x, y;
+            x = e.pageX;
+            y = e.pageY;
+            log("got mouse co-ords x " + x + " y " + y);
+            if (e.which === 3) {
+                var p = $(this).parent().position();
+                x = x - Math.floor(p.left);
+                y = y - Math.floor(p.top);
+                log("NEW mouse co-ords x " + x + " y " + y);
+                log("parent position is " + p.top + " " + p.left);
+                var d = $(this).parent().find('#grid_popup');
+                if (d && d.length > 0) {
+                    d.css({ 'position': "absolute", 'top': y + "px", 'left': x + "px" });
+                } else {
+                    var d = $("<div class='popup' id='grid_popup'> </div>").css({ 'position': "absolute", 'top': y + "px", 'left': x + "px" });
+                    var cc = $("<div></div>").css({ 'width': '100px', 'height': '100px', 'background': '#101010' });
 
-		    var cb=function(that){
-			return function(e){
-			    e.stopPropagation();
-			    //func(that.textarea.val());
-			};
-		    }(this);
-		    var bb=function(d){
-			return function(e){
-			    e.stopPropagation();
-			    d.remove();
-			};
-		    }(d);
-		    ok.on("click",cb);
-		    cancel.on("click",bb);
-		}
-		d.focus();
-	    }
-	    return false;
-	});
+                    d.append(cc);
+                    var ok = $("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
+                    var cancel = $("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
+                    d.append(ok);
+                    d.append(cancel);
+                    $(this).parent().append(d);
+
+                    var cb = function (that) {
+                        return function (e) {
+                            e.stopPropagation();
+                        };
+                    }(this);
+                    var bb = function (d) {
+                        return function (e) {
+                            e.stopPropagation();
+                            d.remove();
+                        };
+                    }(d);
+                    ok.on("click", cb);
+                    cancel.on("click", bb);
+                }
+                d.focus();
+            }
+            return false;
+        });
     }
 
-    function stop_edits(that){
-	if(that.DEBUG) console.log("stop allowing edits");
-	that.allowEdit=false;
+    function stop_edits(that) {
+        if (that.DEBUG) console.log("stop allowing edits");
+        that.allowEdit = false;
     }
 
-    function start_edits(that){
-	if(that.DEBUG) console.log("start allowing edits");
-	that.allowEdit=true;
+    function start_edits(that) {
+        if (that.DEBUG) console.log("start allowing edits");
+        that.allowEdit = true;
     }
 
-    function update_column(that,val,update){
-	var p,cell;
-	if(that.cellEdit){
-	    console.log("undo_cellEDIT: text in restore is " + val);
-	    if(that.selection_list){
-		for(var i=0;i< that.selection_list.length;i++){
-		    console.log("value was " + that.selection_list[i].textContent);
-		    if(update){
-			p=that.selection_list[i].data["apoco"];
-			cell=that.rows[p.row][that.cols[p.col].name];
-			cell.setValue(val);
-		    }
-		     // just remove the class
-		    that.selection_list[i].classList.remove("ui-selected");
-		}
-	    }
-	    else{
-		that.cellEdit.setValue(val);
-		that.cellEdit=null;
-	    }
-	}
+    function update_column(that, val, update) {
+        var p, cell;
+        if (that.cellEdit) {
+            console.log("undo_cellEDIT: text in restore is " + val);
+            if (that.selection_list) {
+                for (var i = 0; i < that.selection_list.length; i++) {
+                    console.log("value was " + that.selection_list[i].textContent);
+                    if (update) {
+                        p = that.selection_list[i].data["apoco"];
+                        cell = that.rows[p.row][that.cols[p.col].name];
+                        cell.setValue(val);
+                    }
+
+                    that.selection_list[i].classList.remove("ui-selected");
+                }
+            } else {
+                that.cellEdit.setValue(val);
+                that.cellEdit = null;
+            }
+        }
     }
 
+    function do_edit(e, that) {
+        if (that == null) {
+            throw new Error("that is null");
+        }
+        if (!that.allowEdit) {
+            console.log("Not allowing editing " + that.allowEdit);
+            return;
+        }
+        if (that.selection_list.length === 0) {
+            return;
+        }
 
-    function do_edit(e,that){
-	if(that == null){
-	    throw new Error("that is null");
-	}
-	if(!that.allowEdit) {
-	    console.log("Not allowing editing " + that.allowEdit);
-	    return;
-	}
-	if(that.selection_list.length === 0){
-	    return;
-	}
-	// select the last in the column and make it active
-	var cell=that.selection_list[that.selection_list.length-1];
-	if(!cell){
-	    throw new Error("grid cell is null");
-	}
+        var cell = that.selection_list[that.selection_list.length - 1];
+        if (!cell) {
+            throw new Error("grid cell is null");
+        }
 
-	if( that.cellEdit &&  that.cellEdit.getElement() === cell){
-	     console.log("already editing this" + cell);
-	    return;
-	}
-	that.cellEdit=cell.data("apoco").context;
+        if (that.cellEdit && that.cellEdit.getElement() === cell) {
+            console.log("already editing this" + cell);
+            return;
+        }
+        that.cellEdit = cell.data("apoco").context;
 
-	if(that.cellEdit === null){
-	    console.log("cell is null");
-	    throw new Error("cell is null");
-	}
-	console.log("do_cell edit got  " + that.selection_list.length + " number of cells");
-	var type=that.cellEdit["type"];
-	if(!type){
-	    throw new Error("edit cannot find field type");
-	}
-	var old_value=that.cellEdit.getValue();
-	console.log("cell has value " + old_value + " and type " + type);
-	// convert to html type
-
-	var n=that.cellEdit.html_type;
-
-	// if the col has options then it is a selectField
-	//if( that.cellEdit.options){ //horrible
-	//  n="SelectField";
-	//}
-	var input=that.cellEdit.input.detach();
-	that.cellEdit.getElement().empty();
-	that.cellEdit.getElement().append(input);
-	that.cellEdit.setValue(old_value);
-	that.cellEdit.input.show();
+        if (that.cellEdit === null) {
+            console.log("cell is null");
+            throw new Error("cell is null");
+        }
+        console.log("do_cell edit got  " + that.selection_list.length + " number of cells");
+        var type = that.cellEdit["type"];
+        if (!type) {
+            throw new Error("edit cannot find field type");
+        }
+        var old_value = that.cellEdit.getValue();
+        console.log("cell has value " + old_value + " and type " + type);
 
 
-	if(that.cellEdit.popup){
-	    console.log("popup is here for " + n);
-	    var d=$("<div class='popup' id='grid_popup'> </div>");
-	    that.field=Apoco.field[n](that.cellEdit.data["apoco"],d);
-	    that.cellEdit.getEelement().append(d);
-	    var ok=$("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
-	    var cancel=$("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
-	    d.append(ok);
-	    d.append(cancel);
-	    that.field.element.focus();
-	    that.field.editor(edit_callback,ok,cancel);
-	}
-	else{
-	    that.cellEdit.editor(edit_callback);
-	    that.cellEdit.input.focus();
-	   // that.cellEdit.input.off("focus");
-	}
+        var n = that.cellEdit.html_type;
 
-	function edit_callback(value){
-	    console.log("edit_callback got value " + value);
-	    if(value === null){
-		// restore the original value
-		update_column(that,old_value,false);
-		return;
-	    }
-	    if(that.cellEdit.checkValue()){  // check that there is a real value
-		update_column(that,value,true);
-	    }
-	    else{
-		Apoco.display.dialog("Invalid Input","Incorrect type for this field should be a " + type);
-	    }
-	}
+        var input = that.cellEdit.input.detach();
+        that.cellEdit.getElement().empty();
+        that.cellEdit.getElement().append(input);
+        that.cellEdit.setValue(old_value);
+        that.cellEdit.input.show();
 
+        if (that.cellEdit.popup) {
+            console.log("popup is here for " + n);
+            var d = $("<div class='popup' id='grid_popup'> </div>");
+            that.field = Apoco.field[n](that.cellEdit.data["apoco"], d);
+            that.cellEdit.getEelement().append(d);
+            var ok = $("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
+            var cancel = $("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
+            d.append(ok);
+            d.append(cancel);
+            that.field.element.focus();
+            that.field.editor(edit_callback, ok, cancel);
+        } else {
+            that.cellEdit.editor(edit_callback);
+            that.cellEdit.input.focus();
+        }
 
+        function edit_callback(value) {
+            console.log("edit_callback got value " + value);
+            if (value === null) {
+                update_column(that, old_value, false);
+                return;
+            }
+            if (that.cellEdit.checkValue()) {
+                update_column(that, value, true);
+            } else {
+                Apoco.display.dialog("Invalid Input", "Incorrect type for this field should be a " + type);
+            }
+        }
     }
 
+    function sort_callback(col_num, that, dir) {
+        var type = that.cols[col_num].type;
+        if (that.DEBUG) console.log("START SORT =======================  got sort type " + type);
+        stop_edits(that);
+        for (var k in that.grids) {
+            Apoco.sort(that.grids[k].rows, { type: type,
+                fn: function fn(a) {
+                    return a[col_num];
+                }
+            });
+            if (dir === "down") {
+                that.grids[k].rows.reverse();
+            }
+            that.redrawRows(k);
+            that.grids[k].sorted = true;
+        }
 
-    function sort_callback(col_num,that,dir){ //user sort
-	// turn it into an array
-	var type=that.cols[col_num].type;
-	if(that.DEBUG) console.log("START SORT =======================  got sort type " + type);
-	stop_edits(that);
-	for(var k in that.grids){
-	    Apoco.sort(that.grids[k].rows,{ type: type,
-			                     fn: function(a){ return a[col_num];}
-                                           });
-	    if(dir === "down"){
-		that.grids[k].rows.reverse();
-	    }
-	    that.redrawRows(k);
-            that.grids[k].sorted=true;
-	}
-
-	for(var i=0;i<that.cols.length;i++){
-	    that.cols[i].sorted=false;
-	}
-	that.cols[col_num].sorted=true;
-	start_edits(that);
+        for (var i = 0; i < that.cols.length; i++) {
+            that.cols[i].sorted = false;
+        }
+        that.cols[col_num].sorted = true;
+        start_edits(that);
     }
 
-    function sort_into_subGrids(that){
-//	if(that.rows){
-//	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
-//	}
-	// see if the data has been put into subgrids
-	if(that.rows && Apoco.type["array"].check(that.rows)){ // not sorted into subgrids
-	    var n,tg,subgrid= new Object;
-	    if(that.groupBy){
-		for(var i=0;i<that.rows.length;i++){
-		    n=that.rows[i][that.groupBy];
-                    if(!n){
+    function sort_into_subGrids(that) {
+        if (that.rows && Apoco.type["array"].check(that.rows)) {
+            var n,
+                tg,
+                subgrid = new Object();
+            if (that.groupBy) {
+                for (var i = 0; i < that.rows.length; i++) {
+                    n = that.rows[i][that.groupBy];
+                    if (!n) {
                         throw new Error("Grid - sort_into_subGrids field " + that.groupBy + " does not exist");
                     }
-                    n=n.toString();
-		    if (!subgrid[n]){
-			subgrid[n]={};
-			subgrid[n].name = that.rows[i][that.groupBy];
-			subgrid[n].rows = new Array;
-		    }
-		    subgrid[n]["rows"].push(that.rows[i]); 
-		}
-                that.rows.length=0; //
-	    }
-	    else{
-                subgrid["all"]=new Object;
-		subgrid["all"].rows=that.rows;
-	    }
-	    that.grids=new Array;
-	    var i=0;
-	    for(var k in subgrid){
-		that.grids[i]=subgrid[k];
-		i++;
-	    }
-	}
-       	// that.rows.length=0; // delete rows array
-	if(!that.grids){
-	    throw new Error("Apoco.display.grid: no rows or grids in " + that.id);
-	}
+                    n = n.toString();
+                    if (!subgrid[n]) {
+                        subgrid[n] = {};
+                        subgrid[n].name = that.rows[i][that.groupBy];
+                        subgrid[n].rows = new Array();
+                    }
+                    subgrid[n]["rows"].push(that.rows[i]);
+                }
+                that.rows.length = 0;
+            } else {
+                subgrid["all"] = new Object();
+                subgrid["all"].rows = that.rows;
+            }
+            that.grids = new Array();
+            var i = 0;
+            for (var k in subgrid) {
+                that.grids[i] = subgrid[k];
+                i++;
+            }
+        }
+
+        if (!that.grids) {
+            throw new Error("Apoco.display.grid: no rows or grids in " + that.id);
+        }
     }
 
-    var ApocoMakeGrid=function(options,win){
-	var DEBUG=true;
-	var that=this,found,not_found=[];
+    var ApocoMakeGrid = function ApocoMakeGrid(options, win) {
+        var DEBUG = true;
+        var that = this,
+            found,
+            not_found = [];
 
-       	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-	this.selection_list=[];
-	this.cellEdit=null; // cell currently being edited- this is of type Apoco.field
-	this.allowEdit=true;  // are edits allowed?
-        
-	if(this.sortOrder && this.userSortable){
-	    throw new Error("Cannot specify both sortOrder and sortable");
-	}
-        if(this.cols === undefined || this.cols.length === 0){
+        Apoco._DisplayBase.call(this, options, win);
+        this.selection_list = [];
+        this.cellEdit = null;
+        this.allowEdit = true;
+
+        if (this.sortOrder && this.userSortable) {
+            throw new Error("Cannot specify both sortOrder and sortable");
+        }
+        if (this.cols === undefined || this.cols.length === 0) {
             throw new Error("DisplayGrid: need to supply a least one column");
         }
-        if(this.uniqueKey){
-          //  console.log("this,uniquekey length is " + this.uniqueKey.length);
-            this.sortOrderUnique=true;
-            if(this.sortOrder){
-            //    console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
-                // to determine the absolute ordering is unique
-                // uniqueKey must be a subset of sortOrder
-                for(var i=0;i<this.uniqueKey.length;i++){
-                    found=false;
-                    for(var j=0;j<this.sortOrder.length;j++){
-                        if(this.uniqueKey[i] == this.sortOrder[j]){
-                            found=true;
+        if (this.uniqueKey) {
+            this.sortOrderUnique = true;
+            if (this.sortOrder) {
+                for (var i = 0; i < this.uniqueKey.length; i++) {
+                    found = false;
+                    for (var j = 0; j < this.sortOrder.length; j++) {
+                        if (this.uniqueKey[i] == this.sortOrder[j]) {
+                            found = true;
                         }
                     }
-                    if(!found){
-                    //    console.log("not found was " + this.uniqueKey[i]);
+                    if (!found) {
                         not_found.push(this.uniqueKey[i]);
                     }
                 }
-               // if(found !== this.uniqueKey.length){
-                for(var i=0;i<not_found.length;i++){
-                   // console.log("not found is pushing " + not_found[i]);
+
+                for (var i = 0; i < not_found.length; i++) {
                     this.sortOrder.push(not_found[i]);
                 }
-               // }
-               // console.log("After MakeGrid sortOrder length is " + this.sortOrder.length);
             }
         }
-        
-  
+
         this._execute();
     };
 
+    ApocoMakeGrid.prototype = {
 
-    ApocoMakeGrid.prototype={
+        _select_data: function _select_data() {
+            var that = this;
+        },
+        _afterShow: function _afterShow() {
+            var v,
+                c,
+                width = 0,
+                d,
+                t;
+            var that = this;
 
-	_select_data: function(){
-	    var that=this;
-	 /*   return{
-		selected: function(event,ui){
-		    console.log("selected is here");
-		    for(var k in ui){
-			console.log("got key " + k + " value " + ui[k]);
-			that.selection_list.push(ui[k]);
-		    }
-		},
-		selecting: function(event,ui){
-		    if(that.current_index === null){
-			that.current_index=$(ui["selecting"]).index();
-			return;
-		    }
-		    if( $(ui["selecting"]).index() !== that.current_index){
-			console.log("undo selecting " );
-			$(ui["selecting"]).removeClass("ui-selecting");
-		    }
-		},
-		start: function(event,ui){
-		    that.selection_list.length=0; // empty out the selection list
-		    that.current_index=null;
-		    console.log("start got " + event.target);
-
-		    console.log(" cellEdit is " + that.cellEdit);
-		    if(that.cellEdit !== null){   // moved focus without updating cell
-			var old_value=that.cellEdit.getValue();
-			console.log("value in field is " +  old_value);
-			if(that.cellEdit.checkValue(old_value)){
-			    console.log("setting text to cellEdit value " + old_value);
-			    update_column(that,old_value,false);
-			}
-			// else text=null;
-			// update_column(that,old_value,true);
-		    }
-
-		},
-		stop: function(event,ui){
-		    console.log("stop event is here");
-		    if(that.cellEdit){
-			console.log("cellEdit is here");
-		    }
-		    else {
-			console.log("cellEdit is null");
-		    }
-		    //make_cellEdit(event,that);
-		    do_edit(event,that);
-		    //		that.selection_list.length=0;
-		},
-		filter: ".editable"
-		// filter: 'td:not(:first-child)'
-	    }; */
-	},
-        _afterShow:function(){
-            var v,c,width=0,d,t;
-            var that=this;
-            //console.log("After show is here");
-            if(!this.grids){
+            if (!this.grids) {
                 return;
             }
-            v=that.element.getElementsByClassName("head")[0];
-            if(v){
-                c=v.getElementsByTagName("div");
-                // adding up child widths because window may be smaller than grid width
-                if(c){
-                    for(var i=0; i<c.length;i++){
-              //          console.log("found child " + i);
-                        d=window.getComputedStyle(c[i],null).getPropertyValue("width");
-                //        console.log("width of child is " + d);
-                        if(d.indexOf("px")>=0){
-                            t=d.split("px");
-                        }
-                        else{
+            v = that.element.getElementsByClassName("head")[0];
+            if (v) {
+                c = v.getElementsByTagName("div");
+
+                if (c) {
+                    for (var i = 0; i < c.length; i++) {
+                        d = window.getComputedStyle(c[i], null).getPropertyValue("width");
+
+                        if (d.indexOf("px") >= 0) {
+                            t = d.split("px");
+                        } else {
                             return;
                         }
-                        width+=parseFloat(t[0]);
+                        width += parseFloat(t[0]);
                     }
-                   // var width=window.getComputedStyle(v,null).getPropertyValue("width");
-                    //var width=v.style.width;
-                    width=(Math.ceil(width).toString() + "px");
-                    for(var i=0;i<this.grids.length;i++){
-                        //console.log("setting grid " + i + " to " + width);
-                        this.grids[i].element.style.width=width;
+
+                    width = Math.ceil(width).toString() + "px";
+                    for (var i = 0; i < this.grids.length; i++) {
+                        this.grids[i].element.style.width = width;
                     }
-                    v.style.width=width;
+                    v.style.width = width;
                 }
-                // now add all the grids                
+
                 this.element.appendChild(this.grid_container);
-            }
-            else{
+            } else {
                 console.log("cannot find head element ");
             }
         },
-	sort: function(grid){
-	    var isSortable=false,grids=[],sortOrder=[];
-           
-            if(this.sortOrder){
+        sort: function sort(grid) {
+            var isSortable = false,
+                grids = [],
+                sortOrder = [];
+
+            if (this.sortOrder) {
                 console.log("this.sortOrder.length is " + this.sortOrder.length);
-                sortOrder=this.sortOrder.slice();
+                sortOrder = this.sortOrder.slice();
+            } else if (this.uniqueKey) {
+                sortOrder[0] = this.uniqueKey;
             }
-            else if(this.uniqueKey){
-                sortOrder[0]=this.uniqueKey;
-            }
-	    if(sortOrder.length > 0){
-		var ar=[],t,s;
+            if (sortOrder.length > 0) {
+                var ar = [],
+                    t,
+                    s;
                 console.log("sortOrder.length is " + sortOrder.length);
-		for(var i=0; i< sortOrder.length; i++){
+                for (var i = 0; i < sortOrder.length; i++) {
                     console.log("this is sortOrder " + sortOrder[i]);
-		    t=this.getColIndex(sortOrder[i]);
-		    console.log("col index is " + t);
-		    s=this.sortOrder[i];  // name of the column in the row
-		    console.log("name is " + s);
-		    if(this.cols){
-			ar.push({type: this.cols[t].type,
-				 fn:(function(s){
-				     return function (a){
-					 return  a[s]; };
-				 })(s)
-				});
-		    }
-		    this.cols[t].sorted=true;
-		}
-                isSortable=true;
-	    }
-	    if(isSortable){
-                if(grid){
-                    grids[0]=grid;
+                    t = this.getColIndex(sortOrder[i]);
+                    console.log("col index is " + t);
+                    s = this.sortOrder[i];
+                    console.log("name is " + s);
+                    if (this.cols) {
+                        ar.push({ type: this.cols[t].type,
+                            fn: function (s) {
+                                return function (a) {
+                                    return a[s];
+                                };
+                            }(s)
+                        });
+                    }
+                    this.cols[t].sorted = true;
                 }
-                else{
-                    grids=this.grids;
+                isSortable = true;
+            }
+            if (isSortable) {
+                if (grid) {
+                    grids[0] = grid;
+                } else {
+                    grids = this.grids;
                 }
-		for(var j=0;j<grids.length;j++){
-		    Apoco.sort(grids[j].rows,ar);
-                    grids[j].sorted=true;
-		}
-	    }
-	},
-        addGrid:function(grid){
-            var div,h;
-	    var name=grid.name;
-	    var rows=grid.rows;
-            div=document.createElement("div");
-            div.classList.add("inner_table");
-	    if(name !== undefined){
-	        div.id=name;
-                h=document.createElement("h4");
-                h.classList.add("ui-widget-header");
-                h.textContent=name;
-                div.appendChild(h);
-	    }
-	    
-	    var table=document.createElement("table");
-            //table.style.width=this.element.style.width;
-	    div.appendChild(table);
-	    //var body=$("<tbody class='selectable'></tbody>");
-	    var body=document.createElement("tbody");//$("<tbody class=''></tbody>");
-	    table.appendChild(body);
-           
-	    this.grid_container.appendChild(div);
-            grid.element=div;
-        },
-        addCol:function(col){
-            var that=this,index,r,t,rows;
-            var was_hidden=this.isHidden();
-            if(Apoco.type["integer"].check(col)){
-                index=col;
-                col=this.cols[index];
-                if(!col.name || !col.type){
-                    throw new Error("column must have type and name");
+                for (var j = 0; j < grids.length; j++) {
+                    Apoco.sort(grids[j].rows, ar);
+                    grids[j].sorted = true;
                 }
             }
-            else{ // adding a column after creation
-                if(!col.name || !col.type){
+        },
+        addGrid: function addGrid(grid) {
+            var div, h;
+            var name = grid.name;
+            var rows = grid.rows;
+            div = document.createElement("div");
+            div.classList.add("inner_table");
+            if (name !== undefined) {
+                div.id = name;
+                h = document.createElement("h4");
+                h.classList.add("ui-widget-header");
+                h.textContent = name;
+                div.appendChild(h);
+            }
+
+            var table = document.createElement("table");
+
+            div.appendChild(table);
+
+            var body = document.createElement("tbody");
+            table.appendChild(body);
+
+            this.grid_container.appendChild(div);
+            grid.element = div;
+        },
+        addCol: function addCol(col) {
+            var that = this,
+                index,
+                r,
+                t,
+                rows;
+            var was_hidden = this.isHidden();
+            if (Apoco.type["integer"].check(col)) {
+                index = col;
+                col = this.cols[index];
+                if (!col.name || !col.type) {
                     throw new Error("column must have type and name");
                 }
-                index=this.getColIndex(col.name);
-                if(index===null){
-                    index=this.cols.length;
-                    this.cols[index]=col;
+            } else {
+                if (!col.name || !col.type) {
+                    throw new Error("column must have type and name");
                 }
-                else{
+                index = this.getColIndex(col.name);
+                if (index === null) {
+                    index = this.cols.length;
+                    this.cols[index] = col;
+                } else {
                     throw new Error("Columns must have unique names");
                 }
-                if(!was_hidden){
+                if (!was_hidden) {
                     Apoco.popup.spinner("true");
-                    this.hide(); // hide whilst adding column
+                    this.hide();
                 }
             }
-         
-            // col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
-            col.options={};
-            for(var k in col){
-                col.options[k]=col[k];
+
+            col.options = {};
+            for (var k in col) {
+                col.options[k] = col[k];
             }
-             if(this.grids){ // add the column rows
-                for(var i=0;i<this.grids.length;i++){
-                    rows=this.grids[i].rows;
-                    if(rows){
-                        for(var j=0;j<rows.length;j++){
-                            t=Object.keys(rows[j])[0];
-                            r=rows[j][t].element.parentNode;
-                            rows[j][col.name]=null;
-                            this._addCell(rows[j],col,r);
+            if (this.grids) {
+                for (var i = 0; i < this.grids.length; i++) {
+                    rows = this.grids[i].rows;
+                    if (rows) {
+                        for (var j = 0; j < rows.length; j++) {
+                            t = Object.keys(rows[j])[0];
+                            r = rows[j][t].element.parentNode;
+                            rows[j][col.name] = null;
+                            this._addCell(rows[j], col, r);
                         }
                     }
                 }
             }
-	    if(this.cols[index].display !== false){
-		//console.log("grid col " + this.cols[index].name);
-		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
-                var h=document.createElement("div");
-                var s=document.createElement("soan");
+            if (this.cols[index].display !== false) {
+                var label = this.cols[index].label ? this.cols[i].label : this.cols[index].name;
+                var h = document.createElement("div");
+                var s = document.createElement("soan");
                 h.appendChild(s);
                 h.classList.add(this.cols[index].type);
-                h.type=this.cols[index].type;
-                s.textContent=label;
-		this.cols[index].element=h;
-		this.cols[index].sortable=Apoco.isSortable(this.cols[index].type);
-		if(this.cols[index].sortable && this.userSortable){
-                    var dec=document.createElement("div");
+                h.type = this.cols[index].type;
+                s.textContent = label;
+                this.cols[index].element = h;
+                this.cols[index].sortable = Apoco.isSortable(this.cols[index].type);
+                if (this.cols[index].sortable && this.userSortable) {
+                    var dec = document.createElement("div");
                     dec.classList.add("arrows");
-                    var up=document.createElement("span");
-                    up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
-                    var down=document.createElement("span");
-                    down.classList.add("down","ui-icon","ui-icon-triangle-1-n");
-		    dec.appendChild(up);
-		    dec.appendChild(down);
-		    h.appendChild(dec);
+                    var up = document.createElement("span");
+                    up.classList.add("up", "ui-icon", "ui-icon-triangle-1-n");
+                    var down = document.createElement("span");
+                    down.classList.add("down", "ui-icon", "ui-icon-triangle-1-n");
+                    dec.appendChild(up);
+                    dec.appendChild(down);
+                    h.appendChild(dec);
 
-		    up.addEventListener("click",function(col_num,that){
-			return function(e){
+                    up.addEventListener("click", function (col_num, that) {
+                        return function (e) {
                             e.stopPropagation();
                             e.preventDefault();
                             console.log("got that.cols " + that.cols[col_num].name);
-			    sort_callback(col_num,that,"up");
-			};
-		    }(i,that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
-		    down.addEventListener("click",function(col_num,that){
-			return function(e){
+                            sort_callback(col_num, that, "up");
+                        };
+                    }(i, that), false);
+                    down.addEventListener("click", function (col_num, that) {
+                        return function (e) {
                             e.stopPropagation();
                             e.preventDefault();
                             console.log("got that.cols " + that.cols[col_num].name);
-			    sort_callback(col_num,that,"down");
-			};
-		    }(index,that),false);
-		    
-		    h.addEventListener("mouseover",function(e){
+                            sort_callback(col_num, that, "down");
+                        };
+                    }(index, that), false);
+
+                    h.addEventListener("mouseover", function (e) {
                         e.stopPropagation();
-		        e.target.classList.add('ui-state-hover');
+                        e.target.classList.add('ui-state-hover');
                     }, false);
-		    h.addEventListener("mouseout",function(e){
+                    h.addEventListener("mouseout", function (e) {
                         e.stopPropagation();
-			e.target.classList.remove('ui-state-hover');
+                        e.target.classList.remove('ui-state-hover');
                     }, false);
                 }
- 		this.colElement.appendChild(h);
-		if(this.cols[index].hidden){
-		    h.visibility="hidden";
-		}
-	    }
-            
-            if(!was_hidden){
-                Apoco.popup.spinner(false);   
+                this.colElement.appendChild(h);
+                if (this.cols[index].hidden) {
+                    h.visibility = "hidden";
+                }
+            }
+
+            if (!was_hidden) {
+                Apoco.popup.spinner(false);
                 this.show();
             }
         },
-        deleteCol:function(name){
-            var el,index=this.getColIndex(name);
-            //var was_hidden=this.isHidden();
-            if(index>0){
-                //chepck that the col is not used as unique key or sortOrder
-                for(var i=0;i<this.sortOrder.length;i++){
-                    if(this.sortOrder[i] == name){
+        deleteCol: function deleteCol(name) {
+            var el,
+                index = this.getColIndex(name);
+
+            if (index > 0) {
+                for (var i = 0; i < this.sortOrder.length; i++) {
+                    if (this.sortOrder[i] == name) {
                         throw new Error("Cannot delete col used for sorting");
                     }
                 }
-                // remove the associated rows
-                for(var i=0;i<this.grids.length;i++){
-                    for(var j=0;j<this.grids[i].rows.length;j++){
-                        el=this.grids[i].rows[j][name].getElement();
+
+                for (var i = 0; i < this.grids.length; i++) {
+                    for (var j = 0; j < this.grids[i].rows.length; j++) {
+                        el = this.grids[i].rows[j][name].getElement();
                         el.parentNode.removeChild(el);
-                        el=null;
+                        el = null;
                         delete this.grids[i].rows[j][name];
                     }
                 }
-                // remove the col from the DOM
+
                 this.colElement.removeChild(this.cols[index].element);
-                this.cols[index].element=null;
-                // remove the original data copied into col.options
-                this.cols.splice(index,1);
-            }
-            else{
+                this.cols[index].element = null;
+
+                this.cols.splice(index, 1);
+            } else {
                 throw new Error("cannot find column " + name);
             }
         },
-	getColIndex: function(name){
-            if(name === undefined){
+        getColIndex: function getColIndex(name) {
+            if (name === undefined) {
                 return null;
             }
-	    for(var i=0; i< this.cols.length;i++){
-		if (this.cols[i].name === name){
-		    return i;
-		}
-	    }
-	    return null;
-	},
-	getCol: function(name){ //grid_name){
-	    // console.log("getting columns");
-	    var index=-1,col=new Array;
-            if(name !== undefined){
-	        for(var i=0;i< this.cols.length;i++){
-	            //	console.log("col is " + this.cols[i].name);
-		    if(this.cols[i].name == name){
-		        return(this.cols[i]);
-		    }
-	        }
-      	    }
+            for (var i = 0; i < this.cols.length; i++) {
+                if (this.cols[i].name === name) {
+                    return i;
+                }
+            }
+            return null;
+        },
+        getCol: function getCol(name) {
+            var index = -1,
+                col = new Array();
+            if (name !== undefined) {
+                for (var i = 0; i < this.cols.length; i++) {
+                    if (this.cols[i].name == name) {
+                        return this.cols[i];
+                    }
+                }
+            }
             return this.cols;
- 	},
-	_execute:function(){
-            var rows,body,r,that=this;
-            // var t0=performance.now();
-            this.element=document.createElement("div"); 
-            this.element.id=this.id;
-            this.element.classList.add("grid","ui-widget-content");
-            // make the header
-            this.colElement=document.createElement("div");
+        },
+        _execute: function _execute() {
+            var rows,
+                body,
+                r,
+                that = this;
+
+            this.element = document.createElement("div");
+            this.element.id = this.id;
+            this.element.classList.add("grid", "ui-widget-content");
+
+            this.colElement = document.createElement("div");
             this.colElement.classList.add("head");
             this.element.appendChild(this.colElement);
 
-            this.grid_container=document.createElement("div");
+            this.grid_container = document.createElement("div");
             this.grid_container.classList.add("grid_content");
 
-            if(this.resizable){
+            if (this.resizable) {
                 this.element.classList.add("resizable");
             }
-         //   console.log("this.rows is " + this.rows)
+
             this.element.appendChild(this.grid_container);
-            //body.selectable(this.select_data()); // allow multiple cells to be selected
-	    for(var i=0; i< this.cols.length; i++){
+
+            for (var i = 0; i < this.cols.length; i++) {
                 this.addCol(i);
             }
-            
-            if(this.rows !== undefined){
-             //   console.log("sorting into subgrids");
+
+            if (this.rows !== undefined) {
                 sort_into_subGrids(this);
                 this.sort();
-	        for(var i=0;i<this.grids.length;i++){
-                  //  console.log("this is grid " + i);
+                for (var i = 0; i < this.grids.length; i++) {
                     this.addGrid(this.grids[i]);
-                    body=this.grids[i].element.getElementsByTagName("tbody")[0]; //.find("tbody");
-                    rows=this.grids[i].rows;
-                //    console.log("grid has " + rows.length + " number of rows");
-                    for(var j=0;j<rows.length;j++){
-                      //  console.log("adding row");
-                        r=document.createElement("tr");
-                        for(var k=0;k<this.cols.length;k++){
-                         //   console.log("adding cell");
-                            this._addCell(rows[j],this.cols[k],r);
+                    body = this.grids[i].element.getElementsByTagName("tbody")[0];
+                    rows = this.grids[i].rows;
+
+                    for (var j = 0; j < rows.length; j++) {
+                        r = document.createElement("tr");
+                        for (var k = 0; k < this.cols.length; k++) {
+                            this._addCell(rows[j], this.cols[k], r);
                         }
                         body.appendChild(r);
                     }
                 }
             }
-        //   if(this.sortOrder){
-       //         console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
-        //   }
-   
-   	},
-        _addCell:function(row,col,r){
-            var c,type,settings={};
-            
-	    //settings=$.extend({},col.options);
-            for(var k in col.options){
-                settings[k]=col.options[k];
+        },
+        _addCell: function _addCell(row, col, r) {
+            var c,
+                type,
+                settings = {};
+
+            for (var k in col.options) {
+                settings[k] = col.options[k];
             }
-            if(row[col.name] === undefined){  // row[col_name] can be null
-                if(this.required === true){
-                    
+            if (row[col.name] === undefined) {
+                if (this.required === true) {
+
                     throw new Error("Field " + col.name + "is required");
                 }
-                row[col.name]=null;
+                row[col.name] = null;
             }
-	    //console.log("value is " + row[col_name]);
-	    settings.value=row[col.name];
-  	    c=document.createElement("td");
-            c.className=col.type;
-            
-            row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
-            if(col.display !== false){
-		r.appendChild(row[col.name].element);
-            
-                row[col.name].element.data={};
-                row[col.name].element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
-	    }
-	    if(col.hidden){
-		row[col.name].element.visibility="hidden";
-	    }
+
+            settings.value = row[col.name];
+            c = document.createElement("td");
+            c.className = col.type;
+
+            row[col.name] = Apoco.field[Apoco.type[col.type].field](settings, c);
+            if (col.display !== false) {
+                r.appendChild(row[col.name].element);
+
+                row[col.name].element.data = {};
+                row[col.name].element.data.apoco = { name: col.name, "context": row[col.name], "type": col.type };
+            }
+            if (col.hidden) {
+                row[col.name].element.visibility = "hidden";
+            }
         },
-        addRow: function(row_data){
-	    var row=null,r,grid,name,l,t,sortOrder=[],e;
-            var closest={val:-1};
-	    if(this.groupBy){
-                if(row_data[this.groupBy] === undefined){
-		    throw new Error("no field in row data matches " + this.groupBy);
-		}
-                name=row_data[this.groupBy];
-	    }
-	    else{
-                name="all";
-	    }
-            grid=this.getGrid(name);
-            console.log("addRow grid is " + grid);
-            if(grid===null || grid === undefined){  // create a new grid
-                console.log("creating grid");
-                if(this.grids){
-                    l=this.grids.length;
+        addRow: function addRow(row_data) {
+            var row = null,
+                r,
+                grid,
+                name,
+                l,
+                t,
+                sortOrder = [],
+                e;
+            var closest = { val: -1 };
+            if (this.groupBy) {
+                if (row_data[this.groupBy] === undefined) {
+                    throw new Error("no field in row data matches " + this.groupBy);
                 }
-                else{
-                    this.grids=[];
-                    l=0;
-                }	
-                this.grids[l]={name:name,rows:[]};
-                this.addGrid(this.grids[l]);
-                grid=this.grids[l];
-                
+                name = row_data[this.groupBy];
+            } else {
+                name = "all";
             }
-	    if(grid.sorted ){
-               // console.log("addRow calling getRow length is " + this.sortOrder.length);
-                row=this.getRow(row_data,name,closest);
-                if(row!==null){
+            grid = this.getGrid(name);
+            console.log("addRow grid is " + grid);
+            if (grid === null || grid === undefined) {
+                console.log("creating grid");
+                if (this.grids) {
+                    l = this.grids.length;
+                } else {
+                    this.grids = [];
+                    l = 0;
+                }
+                this.grids[l] = { name: name, rows: [] };
+                this.addGrid(this.grids[l]);
+                grid = this.grids[l];
+            }
+            if (grid.sorted) {
+                row = this.getRow(row_data, name, closest);
+                if (row !== null) {
                     throw new Error("row already exists");
                 }
-	    }
-            r=document.createElement("tr");
-	    for(var i=0;i<this.cols.length;i++){
-                this._addCell(row_data,this.cols[i],r);
             }
-         
-            if(!grid.sorted){
-            //    console.log("adding row to end");
+            r = document.createElement("tr");
+            for (var i = 0; i < this.cols.length; i++) {
+                this._addCell(row_data, this.cols[i], r);
+            }
+
+            if (!grid.sorted) {
                 grid.rows.push(row_data);
-                grid.element.getElementsByTagName("tbody")[0].appendChild(r);//.find("tbody").append(r);
-            }
-            else{
-              //  console.log("grid element is %j ", closest.val);//grid.rows[index]);
-              //  console.log("slosest index is " + closest.index);
-                t=Object.keys(grid.rows[closest.index])[0];
-              //  console.log("key is " + t);
-                if(closest.dir === "after"){
+                grid.element.getElementsByTagName("tbody")[0].appendChild(r);
+            } else {
+                t = Object.keys(grid.rows[closest.index])[0];
+
+                if (closest.dir === "after") {
                     closest.index++;
-                    //grid.rows.splice(closest.index,0,row_data); //insert row
-                    // grid.rows[closest.index][t].element.parent().after(r); // insert the element
-                    e= grid.rows[closest.index][t].element;
-                    
-                    e.parentNode.insertBefore(e,r.nextSibling); // insert after r
-                    grid.rows.splice(closest.index,0,row_data); //insert row
-                }
-                else{
-                    // grid.rows.splice(closest.index,0,row_data);
-                    e=grid.rows[closest.index][t].element;
-                    e.parentNode.insertBefore(r,e); // insert the element
-                    grid.rows.splice(closest.index,0,row_data);
+
+                    e = grid.rows[closest.index][t].element;
+
+                    e.parentNode.insertBefore(e, r.nextSibling);
+                    grid.rows.splice(closest.index, 0, row_data);
+                } else {
+                    e = grid.rows[closest.index][t].element;
+                    e.parentNode.insertBefore(r, e);
+                    grid.rows.splice(closest.index, 0, row_data);
                 }
             }
             return row_data;
         },
-        deleteRow:function(key,group){
-            var closest={},g,parent,el;
-            var row=this.getRow(key,group,closest);
-            if(row === null){
+        deleteRow: function deleteRow(key, group) {
+            var closest = {},
+                g,
+                parent,
+                el;
+            var row = this.getRow(key, group, closest);
+            if (row === null) {
                 throw new Error("deleteRow: cannot find row ");
             }
-            if(group!==undefined){
-                g=this.getGrid(group);
+            if (group !== undefined) {
+                g = this.getGrid(group);
+            } else if (this.groupBy && key[this.groupBy]) {
+                g = this.getGrid(key[this.groupBy]);
+            } else {
+                g = this.grids[0];
             }
-            else if(this.groupBy && key[this.groupBy]){
-                g=this.getGrid(key[this.groupBy]);
-            }
-            else{
-                g=this.grids[0];
-            }
-            if(g===null){
+            if (g === null) {
                 throw new Error("Cannot find group");
             }
-            // remove from dom
-            for(var i=0;i<this.cols.length;i++){
-              //  console.log("deleting col " + this.cols[i].name);
-                if(!row[this.cols[i].name]){
+
+            for (var i = 0; i < this.cols.length; i++) {
+                if (!row[this.cols[i].name]) {
                     throw new Error("row is undefined");
                 }
-                if(!parent){
-                    parent=row[this.cols[i].name].getElement().parentNode;
+                if (!parent) {
+                    parent = row[this.cols[i].name].getElement().parentNode;
                 }
-                if(this.cols[i].display !== false){
-                    el=row[this.cols[i].name].getElement();
+                if (this.cols[i].display !== false) {
+                    el = row[this.cols[i].name].getElement();
                     el.parentNode.removeChild(el);
-                    el=null;
+                    el = null;
                 }
             }
             parent.parentNode.removeChild(parent);
-            g.rows.splice(closest.index,1);
+            g.rows.splice(closest.index, 1);
         },
-        getRow:function(key,group,closest){
-            var grid=[],row,sortOrder=[];
-            if(!closest && this.sortOrderUnique !== true){
+        getRow: function getRow(key, group, closest) {
+            var grid = [],
+                row,
+                sortOrder = [];
+            if (!closest && this.sortOrderUnique !== true) {
                 throw new Error("No unique key to find row");
             }
-            if(group && group !== null){
-                grid[0]=this.getGrid(group);
-            }
-            else{
-                if(this.groupBy && key[this.groupBy] ){
-                    grid[0]=this.getGrid(key[this.groupBy]);
-                    if(!grid[0]){
+            if (group && group !== null) {
+                grid[0] = this.getGrid(group);
+            } else {
+                if (this.groupBy && key[this.groupBy]) {
+                    grid[0] = this.getGrid(key[this.groupBy]);
+                    if (!grid[0]) {
                         throw new Error("Cannot find grid " + this.groupBy);
                     }
-                }
-                else{
-                    grid=this.grids;
+                } else {
+                    grid = this.grids;
                 }
             }
-            //console.log("getRow this.sortOrder length is " + this.sortOrder.length);
-            for(var i=0;i<grid.length;i++){
-               // console.log("searching grid ",grid[i].name);
-                if(grid[i].sorted){
-                    if(this.closest){
-                        if(this.sortOrder === undefined){
-                            for(var k=0; k<this.cols.length;k++){
-                                if(this.cols[k].sorted=== true){
+
+            for (var i = 0; i < grid.length; i++) {
+                if (grid[i].sorted) {
+                    if (this.closest) {
+                        if (this.sortOrder === undefined) {
+                            for (var k = 0; k < this.cols.length; k++) {
+                                if (this.cols[k].sorted === true) {
                                     sortOrder.push(this.cols[k].name);
                                 }
                             }
                         }
-                    }
-                    else{
-                        sortOrder=this.sortOrder;
-                        for(var j=0;j<sortOrder.length; j++){
-                            if(key[sortOrder[j]] === undefined || key[sortOrder[j]]===null){
-                                throw new Error("getRow: key is not unique needs " + this.sortOrder[j] );
+                    } else {
+                        sortOrder = this.sortOrder;
+                        for (var j = 0; j < sortOrder.length; j++) {
+                            if (key[sortOrder[j]] === undefined || key[sortOrder[j]] === null) {
+                                throw new Error("getRow: key is not unique needs " + this.sortOrder[j]);
                             }
                         }
-                        for(var j=0;j<grid[i].rows.length;j++){
-                            for(k=0;k<this.cols.length;k++){
-                                var v=this.cols[k].name;
-                                //console.log("val is " + grid[i].rows[j][v].getValue());
+                        for (var j = 0; j < grid[i].rows.length; j++) {
+                            for (k = 0; k < this.cols.length; k++) {
+                                var v = this.cols[k].name;
                             }
                         }
                     }
-		    row=Apoco.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
-                    if(row){
+                    row = Apoco.Utils.binarySearch(grid[i].rows, sortOrder, key, closest);
+                    if (row) {
                         return row;
                     }
-                }
-                else{
-                     throw new Error("grid is not sorted");
+                } else {
+                    throw new Error("grid is not sorted");
                 }
             }
             return null;
         },
-	updateRow: function(cell_data){
-	    var row,subGrid,index,g;
-	    if(this.groupBy){
-		g=cell_data[this.groupBy];
-		if(g === undefined){
+        updateRow: function updateRow(cell_data) {
+            var row, subGrid, index, g;
+            if (this.groupBy) {
+                g = cell_data[this.groupBy];
+                if (g === undefined) {
                     throw new Error("No subGrid called " + this.groupBy + " in cell update data " + g);
-		}
-	    }
-	    var grid=this.getGrid(g);
-            if(grid.sorted){  // grids have a sort order and have been sorted
-                row=this.getRow(cell_data,g);
-                if(row === null){
-	            throw new Error("UpdateRow: cannot find row");
                 }
-	    }
-	    else{
-		// use a dumb way of finding this....
-		throw new Error("No method available to find this cell");
-	    }
-	  //  console.log("UpdateRow: found row %j" ,row);
-	    if(row){   // need to check that we are not overwritting a sortOrder key, making sort invalid
-		var to,cell;
-		for(var k in cell_data){               
- 		    row[k].setValue(cell_data[k]);
-                    var cl="cell_updated";
-		    if(row[k].display !== false){
-                        cell=row[k].getElement();
-			if(cell.classList.contains(cl)){  // add colours to the cells to show update frequency
-			    cell.classList.remove(cl);
+            }
+            var grid = this.getGrid(g);
+            if (grid.sorted) {
+                row = this.getRow(cell_data, g);
+                if (row === null) {
+                    throw new Error("UpdateRow: cannot find row");
+                }
+            } else {
+                throw new Error("No method available to find this cell");
+            }
+
+            if (row) {
+                var to, cell;
+                for (var k in cell_data) {
+                    row[k].setValue(cell_data[k]);
+                    var cl = "cell_updated";
+                    if (row[k].display !== false) {
+                        cell = row[k].getElement();
+                        if (cell.classList.contains(cl)) {
+                            cell.classList.remove(cl);
                             cell.classList.add("cell_updated_fast");
-			    cl="cell_updated_fast";
-			}
-			else{
-			    row[k].getElement().classList.add(cl);
-			}
-			if(to){ clearTimeout(to);}
-			to=setTimeout(function(){
-			    row[k].getElement().classList.remove(cl);},15000);
-		    }
-		}
-	    }
-	    else{
-		throw new Error("No matching entry found in grid data");
-	    }
-	},
-	getGrid: function(name){
-            if(!this.grids){
+                            cl = "cell_updated_fast";
+                        } else {
+                            row[k].getElement().classList.add(cl);
+                        }
+                        if (to) {
+                            clearTimeout(to);
+                        }
+                        to = setTimeout(function () {
+                            row[k].getElement().classList.remove(cl);
+                        }, 15000);
+                    }
+                }
+            } else {
+                throw new Error("No matching entry found in grid data");
+            }
+        },
+        getGrid: function getGrid(name) {
+            if (!this.grids) {
+                return null;
+            } else if (this.grids.length === 1) {
+                return this.grids[0];
+            }
+            if (name !== undefined) {
+                for (var i = 0; i < this.grids.length; i++) {
+                    if (this.grids[i].name == name) {
+                        return this.grids[i];
+                    }
+                }
                 return null;
             }
-	    else if(this.grids.length === 1 ){
-		return this.grids[0];
-	    }
-            if(name !== undefined){
-	        for(var i=0;i<this.grids.length;i++){
-		    if(this.grids[i].name == name){
-		        return this.grids[i];
-		    }
-	        }
-	        return null;
-            }
             return this.grids;
-	},
-	deleteAll:function(){
-            var el,parent,row;
-            if(this.grids){
-                for(var i=0;i<this.grids.length;i++){
-                    for(var j=0;j<this.grids[i].rows.length;j++){
-                        row=this.grids[i].rows[j];
-                        for(var k=0;k<this.cols.length;k++){
-                            el=row[this.cols[k].name].element;
-                            if(this.cols[k].display !== false){
-                                if(k===0){
-                                    parent=el.parentNode;
+        },
+        deleteAll: function deleteAll() {
+            var el, parent, row;
+            if (this.grids) {
+                for (var i = 0; i < this.grids.length; i++) {
+                    for (var j = 0; j < this.grids[i].rows.length; j++) {
+                        row = this.grids[i].rows[j];
+                        for (var k = 0; k < this.cols.length; k++) {
+                            el = row[this.cols[k].name].element;
+                            if (this.cols[k].display !== false) {
+                                if (k === 0) {
+                                    parent = el.parentNode;
                                 }
                                 parent.removeChild(el);
                             }
                         }
-                        if(parent){
+                        if (parent) {
                             parent.parentNode.removeChild(parent);
                         }
                     }
-                    this.grids[i].rows.length=0;
+                    this.grids[i].rows.length = 0;
                     this.grids[i].element.parentNode.removeChild(this.grids[i].element);
                 }
-                this.grids.length=0;
+                this.grids.length = 0;
             }
         },
-	showGrid: function(name){
+        showGrid: function showGrid(name) {
             var g;
-            var p=this.element.querySelector("div.grid_content");
-	    if(this.grids.length === 1 || name === undefined){
-		name="all";
-	    }
-	    //console.log("show grid is here");
-	    for(var i=0; i< this.grids.length;i++){
-                g=this.grids[i];
-                if(document.contains(this.grids[i].element)){
-		    p.removeChild(g.element);
-                }
-		if(g.name == name || name == "all"){
-                    if(!document.contains(g.element)){
-		       p.appendChild(g.element);
-                    }
-		}
-	    }
-	},
-	hideGrid: function(name){
-	    if(this.grids.length === 1){
-		name="all";
-	    }
-	    for(var i=0; i< this.grids.length;i++){
-		if(this.grids[i].name == name || name == "all"){
-		    this.grids[i].element.visibility="hidden";
-		}
-	    }
-	},
-	redrawRows: function(grid_name){
-	    if(!grid_name){
-		if(this.grids.length === 1){
-		    grid_name="all";
-		}
-		else{
-		    throw new Error("redrawRows: must specify the grid group name");
-		    return null;
-		}
-	    }
-	    var b=this.grids[grid_name].element.getElementsByTagName("tbody")[0];
-	    b.innerHTML="";
+            var p = this.element.querySelector("div.grid_content");
+            if (this.grids.length === 1 || name === undefined) {
+                name = "all";
+            }
 
-	    for(var i=0; i<this.grids[grid_name].rows.length; i++){
-		b.appendChild(this.grids[grid_name].rows[i].element);
-	    }
-	},
-        getRowFromElement: function(element){  
-            var s,row=[];
-            var c=element.data.apoco;
-            //element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
-           // console.log("name is " + c.name + " context " + c.context + " type " + c.type);
-            row.push({context:c.context,name: c.name,
-                      value:c.context.value });
-            s=element.parentNode.childNodes;
-           // console.log("got siblings " + s.length);   
-            for(var i=0;i<s.length;i++){
-                if(s[i] !== element){
-                    c=s[i].data.apoco;
-             //       console.log( "sib " + c.name + " value " + c.context.value);
-                    row.push({context: c.context,name: c.name,
-                              value: c.context.value });
+            for (var i = 0; i < this.grids.length; i++) {
+                g = this.grids[i];
+                if (document.contains(this.grids[i].element)) {
+                    p.removeChild(g.element);
+                }
+                if (g.name == name || name == "all") {
+                    if (!document.contains(g.element)) {
+                        p.appendChild(g.element);
+                    }
+                }
+            }
+        },
+        hideGrid: function hideGrid(name) {
+            if (this.grids.length === 1) {
+                name = "all";
+            }
+            for (var i = 0; i < this.grids.length; i++) {
+                if (this.grids[i].name == name || name == "all") {
+                    this.grids[i].element.visibility = "hidden";
+                }
+            }
+        },
+        redrawRows: function redrawRows(grid_name) {
+            if (!grid_name) {
+                if (this.grids.length === 1) {
+                    grid_name = "all";
+                } else {
+                    throw new Error("redrawRows: must specify the grid group name");
+                    return null;
+                }
+            }
+            var b = this.grids[grid_name].element.getElementsByTagName("tbody")[0];
+            b.innerHTML = "";
+
+            for (var i = 0; i < this.grids[grid_name].rows.length; i++) {
+                b.appendChild(this.grids[grid_name].rows[i].element);
+            }
+        },
+        getRowFromElement: function getRowFromElement(element) {
+            var s,
+                row = [];
+            var c = element.data.apoco;
+
+            row.push({ context: c.context, name: c.name,
+                value: c.context.value });
+            s = element.parentNode.childNodes;
+
+            for (var i = 0; i < s.length; i++) {
+                if (s[i] !== element) {
+                    c = s[i].data.apoco;
+
+                    row.push({ context: c.context, name: c.name,
+                        value: c.context.value });
                 }
             }
             return row;
-        }, 
-        getJSON: function(){
-            var c,t,m;
-            var n={rows:[]};
-            for(var i=0;i<this.grids.length; i++){
-                m=this.grids[i].rows.length;
-                for(var j=0;j<m;j++){
-                    t=i*m+j;
-                    n.rows[t]={};
-                    for(var k=0;k<this.cols.length;k++){
-                        c=this.cols[k].name;
-                        n.rows[t][c]=this.grids[i].rows[j][c].value;
+        },
+        getJSON: function getJSON() {
+            var c, t, m;
+            var n = { rows: [] };
+            for (var i = 0; i < this.grids.length; i++) {
+                m = this.grids[i].rows.length;
+                for (var j = 0; j < m; j++) {
+                    t = i * m + j;
+                    n.rows[t] = {};
+                    for (var k = 0; k < this.cols.length; k++) {
+                        c = this.cols[k].name;
+                        n.rows[t][c] = this.grids[i].rows[j][c].value;
                     }
                 }
             }
             return n;
         },
-	submit: function(row,field_name){
-	    var cols,rk,rv;
+        submit: function submit(row, field_name) {
+            var cols, rk, rv;
 
-	    var jsq=this.submitDefaults;
-	    jsq.type="POST";
+            var jsq = this.submitDefaults;
+            jsq.type = "POST";
 
-	    if(row && field_name){
-		if(this.uniqueKey){
-		    rk=(row[this.uniqueKey].name).toString();
-		    rv=(row[field_name].name).toString();
-		    jsq.data.push({rk: row[this.uniqueKey].getValue(),
-			       rv: row[field_name].getValue()});
-		}
-		else{
-		    for(var i=0;i<row.length;i++){
-			rk=row[i].name;
-			jsq.data.push({rk: row[i].getValue()});
-	//		console.log("value is " + row[i].getValue());
-	//		console.log("key is " + row[i].name);
-		    }
-		    return;
-		}
-	    }
-	    else { // submit the whole thing
+            if (row && field_name) {
+                if (this.uniqueKey) {
+                    rk = row[this.uniqueKey].name.toString();
+                    rv = row[field_name].name.toString();
+                    jsq.data.push({ rk: row[this.uniqueKey].getValue(),
+                        rv: row[field_name].getValue() });
+                } else {
+                    for (var i = 0; i < row.length; i++) {
+                        rk = row[i].name;
+                        jsq.data.push({ rk: row[i].getValue() });
+                    }
+                    return;
+                }
+            } else {}
+            if (this.DEBUG) console.log("jsq is " + JSON.stringify(jsq));
 
-	    }
-	    if(this.DEBUG) console.log("jsq is " + JSON.stringify(jsq));
+            var submit_promise = Apoco.ajax.jsq(jsq, { url: "/JSQ/cbm",
+                type: "POST",
+                dataType: 'json',
+                contentType: "application/json" });
 
-	    var submit_promise=Apoco.ajax.jsq(jsq,{url:"/JSQ/cbm",
-						    type:"POST",
-						    dataType:'json',
-						    contentType:"application/json"});
+            submit_promise.done(function (that, p) {
+                return function (jq, textStatus) {
+                    if (this.DEBUG) console.log("Form.submit: promise success");
+                    if (textStatus === "success") {
+                        Apoco.display.dialog(that.options.action + " of " + that.template, p.name + " has been successfully committed to the Database");
+                    } else {
+                        if (this.DEBUG) console.log("Form.submit: deferred-reject");
+                    }
+                };
+            }(this, jsq.properties));
 
-
-	    submit_promise.done(function(that,p){
-		return function(jq,textStatus){
-		    if(this.DEBUG) console.log("Form.submit: promise success");
-		    if(textStatus === "success"){
-	//		if(this.DEBUG) console.log("Form.submit: deferred-resolve");
-			Apoco.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
-		    }
-		    else{
-			if(this.DEBUG) console.log("Form.submit: deferred-reject");
-			//	deferred.reject();
-		    }
-		};
-	    }(this,jsq.properties));
-
-	    submit_promise.fail(function(jq, textStatus){
-	//	console.log(" textStatus is " + textStatus);
-		var msg=("callback Fail- status  " +  jq.status + "  "+ jq.statusText + " "  + jq.responseText );
-		Apoco.display.dialog("Update Failed",msg);
-		// highlight from components which were not accepted
-	//	if(this.DEBUG) console.log("grid.submit: failed to commit to db");
-	    });
-	}
+            submit_promise.fail(function (jq, textStatus) {
+                var msg = "callback Fail- status  " + jq.status + "  " + jq.statusText + " " + jq.responseText;
+                Apoco.display.dialog("Update Failed", msg);
+            });
+        }
     };
 
+    Apoco.Utils.extend(ApocoMakeGrid, Apoco._DisplayBase);
 
-    Apoco.Utils.extend(ApocoMakeGrid,Apoco._DisplayBase);
-
-    Apoco.display.grid=function(opts,win){
-        opts.display="grid";
-        return new ApocoMakeGrid(opts,win);
+    Apoco.display.grid = function (opts, win) {
+        opts.display = "grid";
+        return new ApocoMakeGrid(opts, win);
     };
-    Apoco.display.gridMethods=function(){
-        var ar=[];
-        for(var k in ApocoMakeGrid.prototype ){
+    Apoco.display.gridMethods = function () {
+        var ar = [];
+        for (var k in ApocoMakeGrid.prototype) {
             ar.push(k);
         }
-        return ar; 
+        return ar;
     };
-
 })();
 
 },{"./DisplayBase.js":2,"./Sort.js":14,"./declare":19}],6:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 
 require("./DisplayBase");
 
-;(function(){
+;(function () {
 
     "use strict";
-// create the  display
 
-    var ApocoMakeMenu=function(options,win){
-	this.DEBUG=true;
-	var that=this;
-	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-//	console.log("called display base");
+    var ApocoMakeMenu = function ApocoMakeMenu(options, win) {
+        this.DEBUG = true;
+        var that = this;
+        Apoco._DisplayBase.call(this, options, win);
         this._execute();
     };
 
-
-    var select_menu=function(that,index){
-        var name=that.menu[index].name;
-        var p=that.getSiblings();
-        if(!p){
+    var select_menu = function select_menu(that, index) {
+        var name = that.menu[index].name;
+        var p = that.getSiblings();
+        if (!p) {
             throw new Error("Could not find siblings of " + that.parent.name);
         }
-        for(var i=0;i<p.length;i++){
-            if(p[i].id == name){
+        for (var i = 0; i < p.length; i++) {
+            if (p[i].id == name) {
                 p[i].show();
-            }
-            else{
+            } else {
                 p[i].hide();
             }
         }
     };
 
-    ApocoMakeMenu.prototype={
-	_execute: function(){
-            var s,u;
-	    //console.log("execute of DisplayMenu");
-            this.selected=undefined;
-            this.menu=[];
-            this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("menu","ui-widget-content","ui-corner-all");
-            if(this.heading){
-                s=document.createElement("span");
-                s.textContent=this.heading;
+    ApocoMakeMenu.prototype = {
+        _execute: function _execute() {
+            var s, u;
+
+            this.selected = undefined;
+            this.menu = [];
+            this.element = document.createElement("div");
+            this.element.id = this.id;
+            this.element.classList.add("menu", "ui-widget-content", "ui-corner-all");
+            if (this.heading) {
+                s = document.createElement("span");
+                s.textContent = this.heading;
                 this.element.appendChild(s);
             }
-	    if(this.list === undefined){
-                this.list=[];
-	    }
-//	    console.log("Menus creating new element");
-	    u=document.createElement("ul");
-            u.role="menubar";
-            u.classList.add("apoco_menu_list","ui-menu","ui-widget-content");
-            this.element.appendChild(u);
-            
-	    for(var i=0;i<this.list.length;i++){
-                //  console.log("Making menu item " + i);
-                this.list[i].parent=this;
-                this.addMenu(this.list[i],u);
+            if (this.list === undefined) {
+                this.list = [];
             }
-            this.list.length=0; // for garbage collection
-	   // return true;
-	},
-	update:function(name){
-	    var p=this.getMenu(name);
-	    if(p !== null){
-		p.element.click();
-	    }
-	    else{
-		throw new Error("Apoco.menu Could not find element " + name);
-	    }
-	},
-        getSelected: function(){
-            if(this.selected){
+
+            u = document.createElement("ul");
+            u.role = "menubar";
+            u.classList.add("apoco_menu_list", "ui-menu", "ui-widget-content");
+            this.element.appendChild(u);
+
+            for (var i = 0; i < this.list.length; i++) {
+                this.list[i].parent = this;
+                this.addMenu(this.list[i], u);
+            }
+            this.list.length = 0;
+        },
+        update: function update(name) {
+            var p = this.getMenu(name);
+            if (p !== null) {
+                p.element.click();
+            } else {
+                throw new Error("Apoco.menu Could not find element " + name);
+            }
+        },
+        getSelected: function getSelected() {
+            if (this.selected) {
                 return this.selected;
             }
             return null;
         },
-        reset: function(){
-            this.selected=null;
-            var p=this.element.getElementsByTagName("li");
-            for(var i=0;i<p.length;i++){
+        reset: function reset() {
+            this.selected = null;
+            var p = this.element.getElementsByTagName("li");
+            for (var i = 0; i < p.length; i++) {
                 p[i].classList.remove("ui-state-active");
             }
         },
-	getMenu: function(name){
-            if(name !== undefined){
-	        for(var i=0;i<this.menu.length;i++){
-		    if(this.menu[i].name == name){
-		        return this.menu[i];
-		    }
-	        }
+        getMenu: function getMenu(name) {
+            if (name !== undefined) {
+                for (var i = 0; i < this.menu.length; i++) {
+                    if (this.menu[i].name == name) {
+                        return this.menu[i];
+                    }
+                }
                 return null;
             }
-	    return this.menu;
-	},
-        addMenu:function(d,parent_element){
-            var index,s,l,that=this;
-            if(parent_element === undefined){
-                parent_element=this.element.getElementsByClassName("apoco_menu_list")[0];
+            return this.menu;
+        },
+        addMenu: function addMenu(d, parent_element) {
+            var index,
+                s,
+                l,
+                that = this;
+            if (parent_element === undefined) {
+                parent_element = this.element.getElementsByClassName("apoco_menu_list")[0];
             }
-            index=this.menu.length;
-           // console.log("addMenu index is " + index);
-            d.element=document.createElement("li");
-            if(d.seperator !== undefined){
+            index = this.menu.length;
+
+            d.element = document.createElement("li");
+            if (d.seperator !== undefined) {
                 d.element.classList.add("seperator");
-                s=document.createElement("span");
-                s.className="seperator";
-                s.textContent=d.seperator;
+                s = document.createElement("span");
+                s.className = "seperator";
+                s.textContent = d.seperator;
                 d.element.appendChild(s);
                 parent_element.appendChild(d.element);
-            }
-            else{
-                l=d.label? d.label: d.name;
-                if(this.getMenu(l) !== null){
+            } else {
+                l = d.label ? d.label : d.name;
+                if (this.getMenu(l) !== null) {
                     throw new Error("DisplayMenu: get Menu - menu already exists " + l);
                 }
-	        d.element.classList.add("ui-menu-item");
-                d.element.setAttribute("role","menuitem");
-                d.element.textContent=l;
-                //console.log("menu text is "+ d.element.textContent);
-	        d.parent=this;
+                d.element.classList.add("ui-menu-item");
+                d.element.setAttribute("role", "menuitem");
+                d.element.textContent = l;
+
+                d.parent = this;
                 parent_element.appendChild(d.element);
-                this.menu[index]=d;
-               
-                               
-                if(d.action !==undefined){
-                    //console.log("menu has action " + this.menu[index].action);
-	            d.element.addEventListener("click",
-                                 function(t,that){
-                                     return function(e){
-                                         e.stopPropagation();
-                      //                   console.log("menu name is " + t.name);
-                      //                   console.log("menu has action " + t.action);
-                                         t.action(t);
-                                         that.select(t.name);
-                                     };
-                                 }(d,that),false);//,false);
-	            // }(that,index),false);
+                this.menu[index] = d;
+
+                if (d.action !== undefined) {
+                    d.element.addEventListener("click", function (t, that) {
+                        return function (e) {
+                            e.stopPropagation();
+
+                            t.action(t);
+                            that.select(t.name);
+                        };
+                    }(d, that), false);
                 }
-	    }
+            }
         },
-        deleteAll:function(){
-            for(var i=0;i<this.menu.length;i++){
-                if(this.menu[i].listen){
+        deleteAll: function deleteAll() {
+            for (var i = 0; i < this.menu.length; i++) {
+                if (this.menu[i].listen) {
                     Apoco.unsubscribe(this.menu[i]);
                 }
                 this.menu[i].element.parentNode.removeChild(this.menu[i].element);
             }
-            this.menu.length=0;
+            this.menu.length = 0;
         },
-        deleteMenu:function(name){
-            var n,index=-1;
-            if(name === undefined){
+        deleteMenu: function deleteMenu(name) {
+            var n,
+                index = -1;
+            if (name === undefined) {
                 throw new Error("DisplayMenu: deleteMenu needs a name");
             }
-            for(var i=0;i<this.menu.length;i++){
-                if(this.menu[i].name === name){
-                    index=i;
-                  //  console.log("Found menu to delete " + name + " with index " + index);
+            for (var i = 0; i < this.menu.length; i++) {
+                if (this.menu[i].name === name) {
+                    index = i;
+
                     break;
                 }
             }
-            if(index === -1){
+            if (index === -1) {
                 throw new Error("DisplayMenu: deleteMenu Cannot find menu" + name);
             }
             this.menu[index].element.parentNode.removeChild(this.menu[index].element);
-            this.menu[index].element=null;
-            this.menu.splice(index,1);
+            this.menu[index].element = null;
+            this.menu.splice(index, 1);
         },
-	select: function(val){
+        select: function select(val) {
             var c;
-            for(var i=0;i<this.menu.length;i++){
-                if (this.menu[i].name == val){
-                    this.selected=this.menu[i];
-                    //           var el=this.element.find("ul li:nth-child(" + (i+1) + ")");
-                    c=this.selected.element.parentNode.children;
-                    for(var j=0;j<c.length;j++){
+            for (var i = 0; i < this.menu.length; i++) {
+                if (this.menu[i].name == val) {
+                    this.selected = this.menu[i];
+
+                    c = this.selected.element.parentNode.children;
+                    for (var j = 0; j < c.length; j++) {
                         c[j].classList.remove("ui-state-active");
                     }
                     this.selected.element.classList.add("ui-state-active");
                     return;
                 }
             }
-	}
+        }
     };
 
-    Apoco.Utils.extend(ApocoMakeMenu,Apoco._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeMenu, Apoco._DisplayBase);
 
-    Apoco.display.menu=function(opts,win){
-        opts.display="menu";
-        return new ApocoMakeMenu(opts,win);
+    Apoco.display.menu = function (opts, win) {
+        opts.display = "menu";
+        return new ApocoMakeMenu(opts, win);
     };
-    Apoco.display.menuMethods=function(){
-        var ar=[];
-        for(var k in ApocoMakeMenu.prototype){
+    Apoco.display.menuMethods = function () {
+        var ar = [];
+        for (var k in ApocoMakeMenu.prototype) {
             ar.push(k);
         }
         return ar;
     };
-
-
 })();
 
 },{"./DisplayBase":2,"./declare":19}],7:[function(require,module,exports){
+"use strict";
 
-var Apoco=require('./declare').Apoco;
+var Apoco = require('./declare').Apoco;
 require("./DisplayBase");
 
-;(function(){
+;(function () {
     "use strict";
-    var ApocoMakeSlideshow=function(options,win){
-        var defaults={
-	    autoplay: true,
-	    fullscreen: true,
+
+    var ApocoMakeSlideshow = function ApocoMakeSlideshow(options, win) {
+        var defaults = {
+            autoplay: true,
+            fullscreen: true,
             delay: 4000,
-	    element: null,
-            editable: false, //unusual to make it uneditable
-            thumbnails:false,
+            element: null,
+            editable: false,
+            thumbnails: false,
             fade: false,
             fadeDuration: 2000,
             current: 0,
             controls: true
-	};
-	var f,that=this;
- 
-        
-        for(var k in defaults){
-            if(options[k] === undefined){
-                options[k]=defaults[k];
-            }  
+        };
+        var f,
+            that = this;
+
+        for (var k in defaults) {
+            if (options[k] === undefined) {
+                options[k] = defaults[k];
+            }
         }
-        
-        if(options.fade === true){
-            if(options.delay <= 250 ){
+
+        if (options.fade === true) {
+            if (options.delay <= 250) {
                 Apoco.popup.error("Slideshow: image delay is less than 1/4 second- setting fade to false");
-                options.fade=false;
-            }
-            else if(options.fadeDuration >= options.delay){
-                Apoco.popup.error("Slideshow: Fade Duration is greater than image delay - setting fade to  " + (options.delay -50));
-                options.fadeDuration=Math.max(options.delay -50,200);
+                options.fade = false;
+            } else if (options.fadeDuration >= options.delay) {
+                Apoco.popup.error("Slideshow: Fade Duration is greater than image delay - setting fade to  " + (options.delay - 50));
+                options.fadeDuration = Math.max(options.delay - 50, 200);
             }
         }
-        
-        //Apoco.mixinDeep(options,defaults);
-	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-//	console.log("called display base");
-        if(this.thumbnails === true){
-            this.thumbnails=document.createElement("div"); 
+
+        Apoco._DisplayBase.call(this, options, win);
+        if (this.thumbnails === true) {
+            this.thumbnails = document.createElement("div");
             this.thumbnails.classList.add("thumbnails");
         }
-        if(this.values){  // start preloading images
-     //       console.log("got some values");
-            f=Apoco.field["imageArray"]({name:"slideshow"});
-            if(!f){
+        if (this.values) {
+            f = Apoco.field["imageArray"]({ name: "slideshow" });
+            if (!f) {
                 throw new Error("Slideshow: cannot make imageArray");
             }
-            this.promises=f.loadImages(this.values);
-        }
-        else if(this.editable === true){   // put up file browser to select images 
-            f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
+            this.promises = f.loadImages(this.values);
+        } else if (this.editable === true) {
+            f = Apoco.field["imageArray"]({ name: "slideshow", editable: this.editable });
         }
         this._execute();
-      
-    
     };
 
-   
-    
-    ApocoMakeSlideshow.prototype={
-        _isVisible:function(e){
-            var that=this;
-            if(that.DOM.contains(that.element)){
-//                e.stopPropagation();
-               // console.log("element is " + that.getKey() + " element " + that.element);    
-                //e.preventDefault();
-               // console.log("visibility change");
-                if(document.hidden){
-                  //  console.log("hidden");
-                    if(that.interval){
+    ApocoMakeSlideshow.prototype = {
+        _isVisible: function _isVisible(e) {
+            var that = this;
+            if (that.DOM.contains(that.element)) {
+                if (document.hidden) {
+                    if (that.interval) {
                         that.stop();
                     }
-                }
-                else{
-                 //   console.log("visible");
-                    if(that.autoplay){
-                        //   var t;
-                        //    t=setInterval(function(){ //need this to stop race condition
-                        if(that.controls){
+                } else {
+                    if (that.autoplay) {
+                        if (that.controls) {
                             that.element.querySelector("span.ui-icon-play").click();
-                        }
-                        else{
+                        } else {
                             that.play();
                         }
-                        //    clearInterval(t);
-                        // },2000);
                     }
                 }
             }
         },
-        handleEvent:function(e){           
-          //  console.log("event handler is here event type is " + e.type);
-            if(e.type == "visibilitychange"){
+        handleEvent: function handleEvent(e) {
+            if (e.type == "visibilitychange") {
                 this._isVisible(e);
             }
         },
-        _controls:function(){
-            var that=this;
-            var d,u,l,s,sibs;
-            var icons=[{class:"ui-icon-seek-prev",action: "step",params:"prev"},
-                       {class:"ui-icon-play",action: "play"},
-                       {class:"ui-icon-pause",action: "stop"},
-                       {class:"ui-icon-seek-next",action: "step",params: "next"},
-                       {class:"ui-icon-arrow-4-diag",action:"showFullscreen"}];
-            d=document.createElement("div");
+        _controls: function _controls() {
+            var that = this;
+            var d, u, l, s, sibs;
+            var icons = [{ class: "ui-icon-seek-prev", action: "step", params: "prev" }, { class: "ui-icon-play", action: "play" }, { class: "ui-icon-pause", action: "stop" }, { class: "ui-icon-seek-next", action: "step", params: "next" }, { class: "ui-icon-arrow-4-diag", action: "showFullscreen" }];
+            d = document.createElement("div");
             d.classList.add("slideshow_controls");
-            u=document.createElement("ul");
+            u = document.createElement("ul");
             d.appendChild(u);
-            u.addEventListener("mouseover",function(e){
-                if(e.target.tagName === "LI"){
+            u.addEventListener("mouseover", function (e) {
+                if (e.target.tagName === "LI") {
                     e.stopPropagation();
                     e.target.classList.add("ui-icon-hover");
                 }
             });
-            u.addEventListener("mouseout",function(e){
-                if(e.target.tagName === "LI"){
+            u.addEventListener("mouseout", function (e) {
+                if (e.target.tagName === "LI") {
                     e.stopPropagation();
                     e.target.classList.remove("ui-icon-hover");
                 }
             });
-            
-            for(var i=0;i<icons.length;i++){
-                if(icons[i].action === "showFullscreen" && this.fullscreen !== true){
-                    continue;  //don't show the fullscreen icon
+
+            for (var i = 0; i < icons.length; i++) {
+                if (icons[i].action === "showFullscreen" && this.fullscreen !== true) {
+                    continue;
                 }
-                l=document.createElement("li");
-                l.classList.add("ui-state-default","ui-corner-all");
-                l.addEventListener("click",(function(icon,that){
-                    return function(e){
+                l = document.createElement("li");
+                l.classList.add("ui-state-default", "ui-corner-all");
+                l.addEventListener("click", function (icon, that) {
+                    return function (e) {
                         e.stopPropagation();
-                        if(icon.action === "play" && that.interval){
-                            //    console.log("already in play mode");
+                        if (icon.action === "play" && that.interval) {
                             e.currentTarget.classList.remove("ui-state-active");
                             that["stop"]();
-                            that.autoplay=false;
+                            that.autoplay = false;
                             return;
                         }
-                        if(icon.action === "step" && that.interval){
+                        if (icon.action === "step" && that.interval) {
                             that.stop();
                         }
                         e.currentTarget.classList.add("ui-state-active");
-                        sibs=Apoco.Utils.getSiblings(e.currentTarget);
-                        //   console.log("got siblings length " + sibs.length);
-                        for(var j=0;j<sibs.length;j++){
+                        sibs = Apoco.Utils.getSiblings(e.currentTarget);
+
+                        for (var j = 0; j < sibs.length; j++) {
                             sibs[j].classList.remove("ui-state-active");
                         }
-                        if(icon.params){
+                        if (icon.params) {
                             that[icon.action](icon.params);
-                        }
-                        else{
-                            that[icon.action](); 
+                        } else {
+                            that[icon.action]();
                         }
                     };
-                })(icons[i],this),false);
-                s=document.createElement("span");
-                s.classList.add("ui-icon",icons[i].class);
+                }(icons[i], this), false);
+                s = document.createElement("span");
+                s.classList.add("ui-icon", icons[i].class);
                 l.appendChild(s);
                 u.appendChild(l);
             }
             that.element.appendChild(d);
-            
         },
-        _calculateCover:function(v){
-            var that=this;
+        _calculateCover: function _calculateCover(v) {
+            var that = this;
             this._setWidth();
-            var ar=this.width/this.height;
-            v.SSimage.style.margin="0"; // reset the margin 
-            if(v.aspect_ratio > ar){   //wider than window - fit to width
-		var h=that.width/v.aspect_ratio;
-              //  console.log("new image height is " + h);
-                var w=((that.width).toString() + "px");
-              //  console.log("new image width is " + w);
-                v.SSimage.style.width=w;
-                v.SSimage.style.height=(h.toString() + "px");
-		h=(that.height-h)/2;
-		v.SSimage.style.marginTop=(h.toString() + "px"); 
-                v.SSimage.style.marginBottom=(h.toString() + "px");
-	    }
-	    else{  // - fit to height
-		var w=that.height*v.aspect_ratio;
-             //   console.log("new image width is " + w);
-                v.SSimage.style.width=(w + "px");
-                v.SSimage.style.height=(that.height + "px");
-		w=(that.width-w)/2;
-                v.SSimage.style.marginLeft=(w + "px");
-                v.SSimage.style.marginRight=(w + "px");
-	    }
+            var ar = this.width / this.height;
+            v.SSimage.style.margin = "0";
+            if (v.aspect_ratio > ar) {
+                var h = that.width / v.aspect_ratio;
+
+                var w = that.width.toString() + "px";
+
+                v.SSimage.style.width = w;
+                v.SSimage.style.height = h.toString() + "px";
+                h = (that.height - h) / 2;
+                v.SSimage.style.marginTop = h.toString() + "px";
+                v.SSimage.style.marginBottom = h.toString() + "px";
+            } else {
+                var w = that.height * v.aspect_ratio;
+
+                v.SSimage.style.width = w + "px";
+                v.SSimage.style.height = that.height + "px";
+                w = (that.width - w) / 2;
+                v.SSimage.style.marginLeft = w + "px";
+                v.SSimage.style.marginRight = w + "px";
+            }
         },
-        _setWidth:function(){
-            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
-            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
-            //console.log("slideshow container width " + this.width + " height " + this.height);
-            this.height=parseInt(this.height);
-            this.width=parseInt(this.width);
-         
-         },
-        _afterShow:function(){ //set the width and height when it has been determined
-            var that=this,lis=[];
-           // console.log("AFTER SHOW IS HERE ");
-            
+        _setWidth: function _setWidth() {
+            this.width = window.getComputedStyle(this.slideshow_container, null).getPropertyValue("width").split("px");
+            this.height = window.getComputedStyle(this.slideshow_container, null).getPropertyValue("height").split("px");
+
+            this.height = parseInt(this.height);
+            this.width = parseInt(this.width);
+        },
+        _afterShow: function _afterShow() {
+            var that = this,
+                lis = [];
+
+
             this._setWidth();
-            for(var i=0;i<this.values.length;i++){
-                if(this.values[i].loaded){
+            for (var i = 0; i < this.values.length; i++) {
+                if (this.values[i].loaded) {
                     this._calculateCover(this.values[i]);
                 }
             }
-            lis=that.slideshow_container.querySelectorAll("li.slide");
-                  //  console.log("lis is " + lis + " lis.length " + lis.length);
-            if(lis.length !== that.values.length){
-	        throw new Error("Slideshow: slide lis do not exist");
+            lis = that.slideshow_container.querySelectorAll("li.slide");
+
+            if (lis.length !== that.values.length) {
+                throw new Error("Slideshow: slide lis do not exist");
             }
-            
-            // get the slide container
-            var car=this.slideshow_container.getElementsByTagName("ul")[0];
-    
-           /* for(var i=0;i<this.values.length;i++){
-                console.log("loaded is " + this.values[i].loaded);
-                if(this.values[i].loaded){ // image is loaded
-                    this._calculateCover(this.values[i]);
-               }
-            } */
-            if(that.autoplay === true){
-                //         console.log("trigger autoplay");
-                if(that.interval){
+
+            var car = this.slideshow_container.getElementsByTagName("ul")[0];
+
+            if (that.autoplay === true) {
+                if (that.interval) {
                     that.stop();
                 }
-                if(that.controls){
+                if (that.controls) {
                     that.element.querySelector("span.ui-icon-play").click();
-                }
-                else{
+                } else {
                     that.play();
                 }
             };
-          
-            
         },
-	_execute: function(){
-            var that=this,l,temp,pp;
-	 //   console.log("execute of DisplaySlideshow");
-	    this.element=document.createElement("div"); 
-            this.element.id=this.id;
-            this.element.classList.add("Apoco_slideshow","ui-widget-content","ui-corner-all");
-            this.slideshow_container=document.createElement("div");
-            this.slideshow_container.classList.add("slideshow","pic_area");
-	    this.element.appendChild(this.slideshow_container);
-            var car=document.createElement("ul");
+        _execute: function _execute() {
+            var that = this,
+                l,
+                temp,
+                pp;
+
+            this.element = document.createElement("div");
+            this.element.id = this.id;
+            this.element.classList.add("Apoco_slideshow", "ui-widget-content", "ui-corner-all");
+            this.slideshow_container = document.createElement("div");
+            this.slideshow_container.classList.add("slideshow", "pic_area");
+            this.element.appendChild(this.slideshow_container);
+            var car = document.createElement("ul");
             car.classList.add("carousel");
- 	    that.slideshow_container.appendChild(car);
-            for(var i=0;i<this.values.length;i++){ //create containers for images
-                l=document.createElement("li");
+            that.slideshow_container.appendChild(car);
+            for (var i = 0; i < this.values.length; i++) {
+                l = document.createElement("li");
                 l.classList.add("slide");
                 car.appendChild(l);
-                this.values[i].SSimage=document.createElement("img");
+                this.values[i].SSimage = document.createElement("img");
                 l.appendChild(this.values[i].SSimage);
-                that.values[i].SSimage.parentElement.style.visibility="hidden";
-               
-                if(this.values[i].text){
-                    temp=document.createElement("div");
+                that.values[i].SSimage.parentElement.style.visibility = "hidden";
+
+                if (this.values[i].text) {
+                    temp = document.createElement("div");
                     l.appendChild(temp);
-                    pp=document.createElement("p");
-                    pp.textContent=this.values[i].text;
+                    pp = document.createElement("p");
+                    pp.textContent = this.values[i].text;
                     temp.appendChild(pp);
-                    this.hasText=true;
+                    this.hasText = true;
                 }
-                               
-                this.promises[i].then(function(v){
-              //      console.log("image loaded" + v.src);
-                    v.SSimage.src=v.src;
+
+                this.promises[i].then(function (v) {
+                    v.SSimage.src = v.src;
                     that._calculateCover(v);
-                    v.loaded=true;
-                });/*.catch(function(reason){
-                     Apoco.popup.error("Slideshow",("Could not load images" + reason));
-                }); */
+                    v.loaded = true;
+                });
             }
-            if(that.controls === true){
+            if (that.controls === true) {
                 that._controls();
-            }   
-            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images
-          
-     
+            }
+            document.addEventListener("visibilitychange", this, false);
         },
-        deleteAll:function(){
-            // delete all the images
-            if(this.values){
-                for(var i=0;i<this.values;i++){
+        deleteAll: function deleteAll() {
+            if (this.values) {
+                for (var i = 0; i < this.values; i++) {
                     this.slideshow_container.removeChild(this.values[i].SSimage);
                 }
             }
-            while(this.element.firstChild){
+            while (this.element.firstChild) {
                 this.element.removeChild(this.element.firstChild);
             }
         },
-        showFullscreen: function(){
-	    // get the window width and height
-	    var that=this,c,t;
-	   // var width=$(window).width()-60; //innerWidth();
-	    //var height=$(window).height()-60; //innerHeight();
-            var width=parseInt(window.innerWidth-36);
-            var height=parseInt(window.innerHeight-48);
-            //if this node is in the DOM we are already in fullscreen mode
-            var r=document.getElementsByClassName("slideshow_cover")[0];
-     //       console.log("showFullscreen got width " + width + " height " + height);
-	    that.element.parentNode.removeChild(this.element); 
-     //       console.log("slideshow cover is " + r);
-            // that.hide();
+        showFullscreen: function showFullscreen() {
+            var that = this,
+                c,
+                t;
+
+            var width = parseInt(window.innerWidth - 36);
+            var height = parseInt(window.innerHeight - 48);
+
+            var r = document.getElementsByClassName("slideshow_cover")[0];
+
+            that.element.parentNode.removeChild(this.element);
+
             that.stop();
-	    if(!document.contains(r)){
-//	        console.log("Fullscreen is truE- so do it");
-	        that.element.style.width=(width.toString() + "px"); 
-                that.element.style.height=(height.toString() + "px");
-	        that.slideshow_container.style.width=(width.toString() + "px");
-                that.slideshow_container.style.height=((height).toString() + "px");
-	        //console.log("remove class pic_area");
-	        that.slideshow_container.classList.remove("pic_area");
-	        that.slideshow_container.classList.add("pic_area_full");
-	        that.element.classList.add("show_full_screen");
+            if (!document.contains(r)) {
+                that.element.style.width = width.toString() + "px";
+                that.element.style.height = height.toString() + "px";
+                that.slideshow_container.style.width = width.toString() + "px";
+                that.slideshow_container.style.height = height.toString() + "px";
+
+                that.slideshow_container.classList.remove("pic_area");
+                that.slideshow_container.classList.add("pic_area_full");
+                that.element.classList.add("show_full_screen");
                 document.body.appendChild(that.element);
-                c=that.element.querySelector("div.slideshow_controls");
-                c.style.position="absolute";
-                c.style.top=(height.toString() + "px");
-                c.style.left=((width/2 -70).toString() + "px");
-                t=document.createElement("div"); // add a big div to cover everything
+                c = that.element.querySelector("div.slideshow_controls");
+                c.style.position = "absolute";
+                c.style.top = height.toString() + "px";
+                c.style.left = (width / 2 - 70).toString() + "px";
+                t = document.createElement("div");
                 t.classList.add("slideshow_cover");
                 document.body.appendChild(t);
                 that._afterShow();
-                window.scrollTo(0,0);
-	    }
-	    else{
-                document.body.removeChild(r); // remove slideshow_cover
-                // console.log("Fullscreen is falsE- so undo it");
-	        that.element.style.width=""; 
-                that.element.style.height="";
-	        that.slideshow_container.style.width=""; 
-                that.slideshow_container.style.height=""; 
-	        that.element.classList.remove("show_full_screen");
-	        that.slideshow_container.classList.remove("pic_area_full");
-	        that.slideshow_container.classList.add("pic_area");
-                c=that.element.querySelector("div.slideshow_controls");
-                c.style.position="";
-                c.style.top="";
-                c.style.left="";
-                
-                if(this.after){
-                    t=document.getElementById(that.after);
-                    if(t){
-                        t.parentNode.insertBefore(that.element,t.nextSibling);
-                    }
-                    else{
+                window.scrollTo(0, 0);
+            } else {
+                document.body.removeChild(r);
+                that.element.style.width = "";
+                that.element.style.height = "";
+                that.slideshow_container.style.width = "";
+                that.slideshow_container.style.height = "";
+                that.element.classList.remove("show_full_screen");
+                that.slideshow_container.classList.remove("pic_area_full");
+                that.slideshow_container.classList.add("pic_area");
+                c = that.element.querySelector("div.slideshow_controls");
+                c.style.position = "";
+                c.style.top = "";
+                c.style.left = "";
+
+                if (this.after) {
+                    t = document.getElementById(that.after);
+                    if (t) {
+                        t.parentNode.insertBefore(that.element, t.nextSibling);
+                    } else {
                         this.DOM.appendChild(that.element);
                     }
-                }
-                else{
+                } else {
                     that.DOM.appendChild(that.element);
                 }
                 that._afterShow();
-	    }
+            }
         },
-        play:function(){
-            var that=this;
-            this.step("next"); // update immediately for user feedback
-          //  console.log("play is here " + that);
-            this.autoplay=true;
-            this.interval=setInterval(function(){that.step("next","play");},this.delay);
+        play: function play() {
+            var that = this;
+            this.step("next");
+            this.autoplay = true;
+            this.interval = setInterval(function () {
+                that.step("next", "play");
+            }, this.delay);
         },
-        stop:function(){
-          //  console.log("stop is here");
-            var that=this;
-            if(this.interval){
+        stop: function stop() {
+            var that = this;
+            if (this.interval) {
                 clearInterval(that.interval);
             }
-            this.interval=null;
+            this.interval = null;
         },
-        _crossFade: function(prev,next){
-            var that=this;
-            var timer,op=0.05,inc=0.1,step=40;
-            // we want about 25 steps per second. i.e st=40
-            var n=parseInt(this.fadeDuration/step);
-            // calculate the increment for a given number of steps
-            inc=Math.pow(1/op,1/n) -1.0;
-            if(inc <= 0) return; // something has gone badly wrong
-          //  console.log("inc is " + inc);            
-            // calculate the number of steps for a given increment 
-//            var n=Math.log(1.0/op)/Math.log(1+inc);
-//            var step=parseInt(this.fadeDuration/n);
+        _crossFade: function _crossFade(prev, next) {
+            var that = this;
+            var timer,
+                op = 0.05,
+                inc = 0.1,
+                step = 40;
 
-         //   console.log("fade step is " + st + " fade duration  is " + n*st);
-            that.values[next].SSimage.parentElement.style.visibility="visible";
-           // that.values[next].SSimage.parentElement.style.position="absolute";
-            that.values[next].SSimage.parentElement.style.top=0;
-            that.values[next].SSimage.parentElement.style.left=0;
+            var n = parseInt(this.fadeDuration / step);
+
+            inc = Math.pow(1 / op, 1 / n) - 1.0;
+            if (inc <= 0) return;
+            that.values[next].SSimage.parentElement.style.visibility = "visible";
+
+            that.values[next].SSimage.parentElement.style.top = 0;
+            that.values[next].SSimage.parentElement.style.left = 0;
             that.values[next].SSimage.parentElement.style.opacity = op;
-            that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
-            
-            timer = setInterval(function() {
+            that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")";
+
+            timer = setInterval(function () {
                 if (op >= 1.0) {
                     clearInterval(timer);
-                   // that.values[prev].SSimage.parentElement.style.position="absolute";
-                    that.values[prev].SSimage.parentElement.style.visibility="hidden";
-                    that.values[prev].SSimage.parentElement.style.opacity=1;
+
+                    that.values[prev].SSimage.parentElement.style.visibility = "hidden";
+                    that.values[prev].SSimage.parentElement.style.opacity = 1;
                     that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + 100 + ")";
-                }
-                else{
-                    that.values[prev].SSimage.parentElement.style.opacity = (1-op);
-                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                } else {
+                    that.values[prev].SSimage.parentElement.style.opacity = 1 - op;
+                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + (1 - op) * 100 + ")";
                     that.values[next].SSimage.parentElement.style.opacity = op;
-                    that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                    that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")";
                     op += op * inc;
                 }
             }, step);
         },
-        step: function(dir,caller){
-            var num=this.values.length;
-            var next,prev=this.current;
-            if(dir==="next"){
-                if(this.current>=(num-1)){
-                    this.current=0;
-                }
-                else{
+        step: function step(dir, caller) {
+            var num = this.values.length;
+            var next,
+                prev = this.current;
+            if (dir === "next") {
+                if (this.current >= num - 1) {
+                    this.current = 0;
+                } else {
                     this.current++;
                 }
-            }
-            else{
-                if(this.current <= 0){
-                    this.current=num-1;
-                }
-                else{
+            } else {
+                if (this.current <= 0) {
+                    this.current = num - 1;
+                } else {
                     this.current--;
                 }
             }
-            next=this.current;
-         //  console.log("step - prev " + prev + " next " + next);
-            if(this.fade === false  || caller !== "play"){  // don't do crossfade if just stepping thru the images
-               // this.values[prev].SSimage.parentElement.style.position="absolute";
-                this.values[prev].SSimage.parentElement.style.visibility="hidden";
-                this.values[next].SSimage.parentElement.style.visibility="visible"; 
-               // this.values[next].SSimage.parentElement.style.position="absolute";
-                this.values[next].SSimage.parentElement.style.opacity=1;
+            next = this.current;
+
+            if (this.fade === false || caller !== "play") {
+                this.values[prev].SSimage.parentElement.style.visibility = "hidden";
+                this.values[next].SSimage.parentElement.style.visibility = "visible";
+
+                this.values[next].SSimage.parentElement.style.opacity = 1;
                 this.values[next].SSimage.parentElement.style.filter = "alpha(opacity=100)";
-                this.values[next].SSimage.parentElement.style.top=0;
-                this.values[next].SSimage.parentElement.style.left=0;
+                this.values[next].SSimage.parentElement.style.top = 0;
+                this.values[next].SSimage.parentElement.style.left = 0;
+            } else {
+                this._crossFade(prev, next);
             }
-            else{
-                this._crossFade(prev,next);
-            }
-          //  console.log("now current is " + this.current);
-        } 
+        }
     };
 
-    Apoco.Utils.extend(ApocoMakeSlideshow,Apoco._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeSlideshow, Apoco._DisplayBase);
 
-    Apoco.display.slideshow=function(opts,win){
-        opts.display="slideshow";
-        return new ApocoMakeSlideshow(opts,win);
+    Apoco.display.slideshow = function (opts, win) {
+        opts.display = "slideshow";
+        return new ApocoMakeSlideshow(opts, win);
     };
-    Apoco.display.slideshowMethods=function(){
-        var ar=[];
-        for(var k in ApocoMakeSlideshow.prototype){
+    Apoco.display.slideshowMethods = function () {
+        var ar = [];
+        for (var k in ApocoMakeSlideshow.prototype) {
             ar.push(k);
         }
-        return ar; 
+        return ar;
     };
-
-
 })();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 },{"./DisplayBase":2,"./declare":19}],8:[function(require,module,exports){
-var Apoco=require('./declare').Apoco; //,UI=require('./declare').UI; //jQuery=require('jquery');
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 
 require("./DisplayBase.js");
-// Menu display object
-//  requires ApocoDisplayBase.js
-//
 
 
-;(function(){
+;(function () {
 
-  "use strict";
+    "use strict";
 
+    var ApocoMakeTabs = function ApocoMakeTabs(options, win) {
+        this.DEBUG = true;
+        var that = this;
 
-// create the tabs display
-
-    var ApocoMakeTabs=function(options,win){
-	this.DEBUG=true;
-	var that=this;
-    
-	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-      //  console.log("tabs this listen is " + this.listen);
-	//console.log("called display base");
+        Apoco._DisplayBase.call(this, options, win);
         this._execute();
     };
 
-
-    var default_select_tabs_action=function (that){
-        var name=that.selected.name;
+    var default_select_tabs_action = function default_select_tabs_action(that) {
+        var name = that.selected.name;
         Apoco.Panel.hideAll();
         Apoco.Panel.show(name);
-        
     };
 
-    ApocoMakeTabs.prototype={
-	_execute: function(){
-            var tt=[],tablist;
-	    // console.log("execute of DisplayTabs");
-	   
-            this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("tab_container","ui-tabs","ui-widget-content","ui-corner-all");
-	    if(!this.tabs){
-	        this.tabs=[];
-	    }
-	    //console.log("Tabs creating new element");
-	    
-            tablist=document.createElement("ul");
-            tablist.role="tablist";
-            tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
-            // make a copy of the tabs
-            for(var i=0;i<this.tabs.length;i++){
-                tt[i]=this.tabs[i];
+    ApocoMakeTabs.prototype = {
+        _execute: function _execute() {
+            var tt = [],
+                tablist;
+
+
+            this.element = document.createElement("div");
+            this.element.id = this.id;
+            this.element.classList.add("tab_container", "ui-tabs", "ui-widget-content", "ui-corner-all");
+            if (!this.tabs) {
+                this.tabs = [];
             }
-            this.tabs.length=0;  // so we can put them back in clean container
+
+
+            tablist = document.createElement("ul");
+            tablist.role = "tablist";
+            tablist.classList.add("ui-tabs-nav", "ui-helper-reset", "ui-helper-clearfix", "ui-widget-header", "ui-corner-all", "tabs");
+
+            for (var i = 0; i < this.tabs.length; i++) {
+                tt[i] = this.tabs[i];
+            }
+            this.tabs.length = 0;
             this.element.appendChild(tablist);
-            for(var i=0;i<tt.length;i++){
-            //    console.log("add a tab with index " + i);
-                this.addTab(tt[i],tablist);
-	    }
-            if(this.selected){
+            for (var i = 0; i < tt.length; i++) {
+                this.addTab(tt[i], tablist);
+            }
+            if (this.selected) {
                 this.select(this.selected);
             }
-	    return true;
-	},
-        addTab:function(t,tablist){
-            var label,index,s;
-            t.label?label=t.label: label=t.name;
-            if(tablist === undefined){
-                tablist=this.element.querySelector("ul.ui-tabs-nav");
-            }
-            index=this.tabs.length;
-	    //if(this.DEBUG)console.log("tabs.execute creating tab  " );
-            t.element=document.createElement("li");
-            t.element.classList.add("ui-state-default","ui-corner-top");
-            s=document.createElement("span");
-            s.textContent=label;
-            t.element.appendChild(s);
-	    t.parent=this;
-            this.tabs[index]=t;
-            this.tabs[index].parent=this;
-            if(t.action){
-		t.element.addEventListener("click",
-					   function(tab,that,i){
-					       return function(e){
-						   e.preventDefault();
-						   e.stopPropagation();
-						   tab.action(t,i);
-                                                   that.select(tab.name);
-					       };
-					   }(t,this,index),false);
-            }
-            t.element.addEventListener("mouseover",function(e){
-               // if(e.currentTarget.tagName === "LI"){
-                    e.stopPropagation();
-                    e.preventDefault();
-                    e.currentTarget.classList.add("ui-state-hover");
-                //}
-            },false);
-            t.element.addEventListener("mouseout",function(e){
-               // if(e.target.tagName === "LI"){
-                    e.stopPropagation();
-                    e.preventDefault();
-                    e.currentTarget.classList.remove("ui-state-hover");
-                //}
-            },false);
-        
-	    tablist.appendChild(t.element);
+            return true;
         },
-        getTab:function(name){
-            if(name !== undefined){
-                for(var i=0;i<this.tabs.length;i++){
-                    if(this.tabs[i].name === name){
+        addTab: function addTab(t, tablist) {
+            var label, index, s;
+            t.label ? label = t.label : label = t.name;
+            if (tablist === undefined) {
+                tablist = this.element.querySelector("ul.ui-tabs-nav");
+            }
+            index = this.tabs.length;
+
+            t.element = document.createElement("li");
+            t.element.classList.add("ui-state-default", "ui-corner-top");
+            s = document.createElement("span");
+            s.textContent = label;
+            t.element.appendChild(s);
+            t.parent = this;
+            this.tabs[index] = t;
+            this.tabs[index].parent = this;
+            if (t.action) {
+                t.element.addEventListener("click", function (tab, that, i) {
+                    return function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        tab.action(t, i);
+                        that.select(tab.name);
+                    };
+                }(t, this, index), false);
+            }
+            t.element.addEventListener("mouseover", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.currentTarget.classList.add("ui-state-hover");
+            }, false);
+            t.element.addEventListener("mouseout", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                e.currentTarget.classList.remove("ui-state-hover");
+            }, false);
+
+            tablist.appendChild(t.element);
+        },
+        getTab: function getTab(name) {
+            if (name !== undefined) {
+                for (var i = 0; i < this.tabs.length; i++) {
+                    if (this.tabs[i].name === name) {
                         return this.tabs[i];
                     }
                 }
@@ -2908,1835 +2567,1860 @@ require("./DisplayBase.js");
             }
             return this.tabs;
         },
-        deleteAll:function(){
-            for(var i=0;i<this.tabs.length;i++){
-                if(this.tabs[i].listen){
+        deleteAll: function deleteAll() {
+            for (var i = 0; i < this.tabs.length; i++) {
+                if (this.tabs[i].listen) {
                     Apoco.unsubscribe(this.tabs[i]);
                 }
                 this.tabs[i].element.parentNode.removeChild(this.tabs[i].element);
-                this.tabs[i].element=null;
+                this.tabs[i].element = null;
             }
-            this.tabs.length=0;
+            this.tabs.length = 0;
         },
-        deleteTab:function(name){
-            var index=-1;
-            if(name === undefined){
+        deleteTab: function deleteTab(name) {
+            var index = -1;
+            if (name === undefined) {
                 throw new Error("DisplayTabs: deleteTab - needs a name");
             }
-            for(var i=0;i<this.tabs.length;i++){
-                if(this.tabs[i].name === name){
-                    index=i;
+            for (var i = 0; i < this.tabs.length; i++) {
+                if (this.tabs[i].name === name) {
+                    index = i;
                     break;
                 }
             }
-            if(index === -1){
+            if (index === -1) {
                 throw new Error("DisplayTabs: deleteTab - cannot find name " + name);
             }
-            if(this.tabs[i].listen){
-                    Apoco.unsubscribe(this.tabs[i]);
+            if (this.tabs[i].listen) {
+                Apoco.unsubscribe(this.tabs[i]);
             }
             this.tabs[index].element.parentNode.removeChild(this.tabs[index].element);
-            this.tabs[index].element=null;
-            this.tabs.splice(index,1);
+            this.tabs[index].element = null;
+            this.tabs.splice(index, 1);
         },
-	update:function(name){
-	    for(var i=0;i<this.tabs.length;i++){
-		if(this.tabs[i].name == name){
-		    var p=this.tabs[i].name;
-		    break;
-		}
-	    }
-	    if(p){
-		p.element.click();
-	    }
-	    else{
-		throw new Error("Apoco.tabs Could not find element " + name);
-	    }
-	},
-        getSelected:function(){
-            if(this.selected){
+        update: function update(name) {
+            for (var i = 0; i < this.tabs.length; i++) {
+                if (this.tabs[i].name == name) {
+                    var p = this.tabs[i].name;
+                    break;
+                }
+            }
+            if (p) {
+                p.element.click();
+            } else {
+                throw new Error("Apoco.tabs Could not find element " + name);
+            }
+        },
+        getSelected: function getSelected() {
+            if (this.selected) {
                 return this.selected;
             }
             return null;
         },
-	select: function(name){
-	    for(var i=0;i<this.tabs.length;i++){
-		if(this.tabs[i].name == name){
-                    this.selected=this.tabs[i];
-		    this.tabs[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
+        select: function select(name) {
+            for (var i = 0; i < this.tabs.length; i++) {
+                if (this.tabs[i].name == name) {
+                    this.selected = this.tabs[i];
+                    this.tabs[i].element.classList.add("selected", "ui-state-active", "ui-tabs-active");
                     this.tabs[i].element.classList.remove("ui-state-default");
-		}
-		else{
+                } else {
                     this.tabs[i].element.classList.add("ui-state-default");
-		    this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
-		}
-	    }
-	}
+                    this.tabs[i].element.classList.remove("selected", "ui-state-active", "ui-tabs-active");
+                }
+            }
+        }
     };
 
-    Apoco.Utils.extend(ApocoMakeTabs,Apoco._DisplayBase);
+    Apoco.Utils.extend(ApocoMakeTabs, Apoco._DisplayBase);
 
-    Apoco.display.tabs=function(opts,win){
-        opts.display="tabs";
-        // console.log("tabs: window is " + win);
-        return new ApocoMakeTabs(opts,win);
+    Apoco.display.tabs = function (opts, win) {
+        opts.display = "tabs";
+
+        return new ApocoMakeTabs(opts, win);
     };
-    Apoco.display.tabsMethods=function(){
-        var ar=[];
-        for(var k in ApocoMakeTabs.prototype){
+    Apoco.display.tabsMethods = function () {
+        var ar = [];
+        for (var k in ApocoMakeTabs.prototype) {
             ar.push(k);
         }
         return ar;
     };
-
-
 })();
 
 },{"./DisplayBase.js":2,"./declare":19}],9:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+'use strict';
+
+var Apoco = require('./declare').Apoco;
 require('./Utils');
 require("./Sort");
 require('./Types');
 require("./datepicker");
+var PolyfillPromise = require('es6-promise').Promise;
 
-// editable: true by default
-// required: false by default
+    console.log("Promise is " + Promise + " polyfill " + PolyfillPromise);
+if (Promise === undefined) {
+    var Promise = PolyfillPromise;
+}
 
-;(function(){
+
+;(function () {
     "use strict";
 
-    var _Field=function(d,element){
-        var defaults={
-            required:false,
+    var _Field = function _Field(d, element) {
+        var defaults = {
+            required: false,
             editable: true,
             type: "any",
             value: ""
         };
-        if(!d){
+        if (!d) {
             throw new Error("Field: must have some options");
         }
-        if(!d.name){
+        if (!d.name) {
             throw new Error("Apoco.field: Field must have a name");
         }
-        if(!d.type){
+        if (!d.type) {
             throw new Error("Apoco.field: must have a type");
-	}
-     
-        for(var k in defaults){  
-            if(d[k] === undefined){
-                d[k]=defaults[k];
+        }
+
+        for (var k in defaults) {
+            if (d[k] === undefined) {
+                d[k] = defaults[k];
             }
         }
-        
-        for(var k in d){
-            this[k]=d[k];
+
+        for (var k in d) {
+            this[k] = d[k];
         }
-        if(this.editable===false){
-            this.popup=false; // no popup editor if not editable
+        if (this.editable === false) {
+            this.popup = false;
         }
-        
-	this.html_type=Apoco.type[this.type].html_type;
-        if(element === undefined){
-            this.element=document.createElement("div");
-        }
-	else if(element){
-            this.element=element;
-        }
-	else {
+
+        this.html_type = Apoco.type[this.type].html_type;
+        if (element === undefined) {
+            this.element = document.createElement("div");
+        } else if (element) {
+            this.element = element;
+        } else {
             throw new Error("Field: element is not a html node");
         }
         this.element.classList.add(this.type);
-	this.element.setAttribute("name",this.name);
-        if(this.title !== undefined){
-            this.element.title=this.title;
+        this.element.setAttribute("name", this.name);
+        if (this.title !== undefined) {
+            this.element.title = this.title;
         }
-	if(this.label){
-            var l=document.createElement("label");
+        if (this.label) {
+            var l = document.createElement("label");
             l.appendChild(document.createTextNode(this.label));
- 	    this.element.appendChild(l);
-	}
-        
-	if(this.publish !== undefined){
-	    Apoco.IO.publish(this);
-	}
-	if(this.listen !== undefined){
-	    Apoco.IO.listen(this);
-	}
+            this.element.appendChild(l);
+        }
+
+        if (this.publish !== undefined) {
+            Apoco.IO.publish(this);
+        }
+        if (this.listen !== undefined) {
+            Apoco.IO.listen(this);
+        }
     };
 
-    _Field.prototype={
-	getElement:function(){
-	    return this.element;
-	},
-	getInputElement: function(){
-	    if(this.input){
-		return this.input;
-	    }
-	    return null;
-	},
-        getLabel:function(){
-            var t=this.element.getElementsByTagName("label")[0];
-            if(t){
+    _Field.prototype = {
+        getElement: function getElement() {
+            return this.element;
+        },
+        getInputElement: function getInputElement() {
+            if (this.input) {
+                return this.input;
+            }
+            return null;
+        },
+        getLabel: function getLabel() {
+            var t = this.element.getElementsByTagName("label")[0];
+            if (t) {
                 return t;
             }
             return null;
         },
-	getKey:function(){
-            var k=(this.name)?this.name: this.label;
-	    if(k){
-		return k;
-	    }
-	    return null;
-	},
-	getValue:function(){
-            if(this.input.pending){
+        getKey: function getKey() {
+            var k = this.name ? this.name : this.label;
+            if (k) {
+                return k;
+            }
+            return null;
+        },
+        getValue: function getValue() {
+            if (this.input.pending) {
                 return undefined;
             }
-	    var v=this.input.value;
-	    if( v && v.length > 0){
-		return this.input.value;
-	    }
-	    return undefined;
-	},
-	setValue:function(v){
-            if(!Apoco.type[this.type].check(v)){
-                throw new Error("Field: setValue " + v  + " is the wrong type, expects " + this.type);
+            var v = this.input.value;
+            if (v && v.length > 0) {
+                return this.input.value;
             }
-	    this.value=v;
-            if(this.value === null){
-                this.input.value="";
+            return undefined;
+        },
+        setValue: function setValue(v) {
+            if (!Apoco.type[this.type].check(v)) {
+                throw new Error("Field: setValue " + v + " is the wrong type, expects " + this.type);
             }
-	    else {
-                this.input.value=v;
+            this.value = v;
+            if (this.value === null) {
+                this.input.value = "";
+            } else {
+                this.input.value = v;
             }
-            if(this.input.pending){
+            if (this.input.pending) {
                 this.input.classList.remove("pending");
-                this.input.pending=false;
+                this.input.pending = false;
             }
-	},
-        delete:function(){
-            // remove all the nodes
+        },
+        delete: function _delete() {
             while (this.element.lastChild) {
                 this.element.removeChild(this.element.lastChild);
             }
-            if(this.element.parentNode){
+            if (this.element.parentNode) {
                 this.element.parentNode.removeChild(this.element);
             }
-            if(this.action){ // cannot do if this.action is  wrapped in anonymous function
-                this.element.removeEventListener("click",this.action,false);
-            } 
-            if(this.listen){
+            if (this.action) {
+                this.element.removeEventListener("click", this.action, false);
+            }
+            if (this.listen) {
                 Apoco.IO.unsubscribe(this);
             }
-            this.element=null;
-            this.input=null;
-            this.value=null;
+            this.element = null;
+            this.input = null;
+            this.value = null;
         },
-	popupEditor:function(func){
-            if(!this.editable){ return;}
-	    if(this.input.length >0){ // element exists
-		var cb=function(that){
-		    return function(e){
-			e.stopPropagation();
-			if(e.which === 13){
-			    func(that.input.val());
-			}
-		    };
-		}(this);
-	    }
-	    else{
-		throw new Error("no input element for this type " + this.type);
-	    }
-	},
-        resetValue:function(){
-            if(this.value === undefined){
+        popupEditor: function popupEditor(func) {
+            if (!this.editable) {
+                return;
+            }
+            if (this.input.length > 0) {
+                var cb = function (that) {
+                    return function (e) {
+                        e.stopPropagation();
+                        if (e.which === 13) {
+                            func(that.input.val());
+                        }
+                    };
+                }(this);
+            } else {
+                throw new Error("no input element for this type " + this.type);
+            }
+        },
+        resetValue: function resetValue() {
+            if (this.value === undefined) {
                 this.input.value = "";
                 return null;
             }
-           
-            if(Apoco.type["array"].check(this.value)){
-                for(var i=0;i<this.value.length; i++){
-                    this.input[i].value=this.value[i];
+
+            if (Apoco.type["array"].check(this.value)) {
+                for (var i = 0; i < this.value.length; i++) {
+                    this.input[i].value = this.value[i];
                 }
                 return this.value;
             }
-            this.input.value=this.value;
+            this.input.value = this.value;
             return this.value;
         },
-	checkValue:function(){
-	    var array=false;
-            var v=this.getValue();
-            if(Apoco.type["blank"].check(v)){
-   	        if(this.required){
+        checkValue: function checkValue() {
+            var array = false;
+            var v = this.getValue();
+            if (Apoco.type["blank"].check(v)) {
+                if (this.required) {
                     return false;
                 }
             }
-            if(Apoco.type[this.type].check !== undefined){
-                if(!Apoco.type[this.type].check(v)){
+            if (Apoco.type[this.type].check !== undefined) {
+                if (!Apoco.type[this.type].check(v)) {
                     return false;
                 }
- 	    }
-	    return true;
-	}
+            }
+            return true;
+        }
     };
 
- 
-
-    var InputField=function(d,element){
-        var that=this;
-        d.field="input";
-	_Field.call(this,d,element);
-        var s=document.createElement("input");
-        s.setAttribute("type",this.html_type);
-        this.input=s;
-        if(this.min){
-            this.input.setAttribute("min",this.min);
+    var InputField = function InputField(d, element) {
+        var that = this;
+        d.field = "input";
+        _Field.call(this, d, element);
+        var s = document.createElement("input");
+        s.setAttribute("type", this.html_type);
+        this.input = s;
+        if (this.min) {
+            this.input.setAttribute("min", this.min);
         }
-        if(this.max){
-            this.input.setAttribute("min",this.max);
+        if (this.max) {
+            this.input.setAttribute("min", this.max);
         }
-        if(this.step){
-            this.input.setAttribute("step",this.step);
+        if (this.step) {
+            this.input.setAttribute("step", this.step);
         }
-        if(this.precision){
+        if (this.precision) {
             this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
         }
 
-        if(this.required === true){
-            this.input.required=true;
+        if (this.required === true) {
+            this.input.required = true;
         }
         this.element.appendChild(this.input);
-   
-	if(this.value !== null && this.value !== undefined){
-            this.input.value=this.value;
-	}
-        if(this.editable === false){
-            this.input.readOnly=true;
-        }
-        if(this.action){
-            this.action(this);
-        }
-	return this;
-    };
 
-    Apoco.Utils.extend(InputField,_Field);
-
-    var FloatField=function(d,element){
-        var inp;
-	var that=this;
-        d.field="float";
-        d.type="float";
-	_Field.call(this,d,element);
-	this.input=new Array(2);
-        if(this.precision===undefined){
-            this.precision=2;
+        if (this.value !== null && this.value !== undefined) {
+            this.input.value = this.value;
         }
-	var list=document.createElement("ul"); 
-        list.classList.add('aligned_float');
-	var el=document.createElement("li");
-	var dec=document.createElement("div");
-        dec.className='values';
-        inp=document.createElement("input");
-        inp.className="float_left";
-        inp.setAttribute("pattern",'^[-+]?[0-9]*$');
-        this.input[0]=inp;
-        inp=document.createElement("input");
-        inp.className="float_right";
-       // inp.setAttribute("pattern",("'^[0-9]*.{0}|.{"+ this.precision + "}$'"));
-        inp.setAttribute("type","text");
-        this.input[1]=inp;
-	this.setValue(this.value);
-
-	dec.appendChild(this.input[0]);
-        var s=document.createElement("span");
-        s.textContent=".";//("&#46");
-        dec.appendChild(s); // add the .
-	dec.appendChild(this.input[1]);
-	el.appendChild(dec);
-	list.appendChild(el);
-        if(this.required === true){
-            this.input[1].required=true;
-            this.input[0].required=true;
+        if (this.editable === false) {
+            this.input.readOnly = true;
         }
-        if(this.editable === false){
-            this.input[0].readOnly=true;
-            this.input[0].readOnly=true;
-            this.spinner=false;
-        }
-        if(this.spinner){
-	    el=document.createElement("li");
-            list.appendChild(el);
-            dec=document.createElement("div");
-            dec.className="arrows";
-            el.appendChild(dec);
-            var up=document.createElement("span");
-            up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
-            var down=document.createElement("span");
-            down.classList.add("down","ui-icon","ui-icon-triangle-1-s");
-            dec.appendChild(up);
-	    dec.appendChild(down);
-            if(this.step === undefined){
-                this.step=0.1;
-            }
-            
-	    var timer;
-	    var step_fn=function (direction){
-	        var t=that.getValue();
-	        if(t=== null || t===""){
-		    clearInterval(timer);
-		    return;
-	        }
-	        if(!Apoco.type.float.check(t)){
-		    clearInterval(timer);
-		    throw new Error("stepfn return from getValue: this is not a floating point number");
-	        }
-	        if(direction==="up"){
-		    t=parseFloat(t,10)+that.step;
-	        }
-	        else{
-		    t=parseFloat(t,10)-that.step;
-	        }
-	        t=parseFloat(t,10).toFixed(that.precision);
-	        if(that.setValue(t) === null){
-		    clearInterval(timer);
-		    throw new Error("step_fn val is not floating point " + t);
-	        }
-	    };
-	    var eObj={
-	        mouseover: function(e) {
-                    e.stopPropagation();
-		    e.currentTarget.parentNode.classList.add('ui-state-hover');
-	        },
-	        mouseout: function(e) {
-                    e.stopPropagation();
-		    e.currentTarget.parentNode.classList.remove('ui-state-hover');
-	        },
-                click:function(e){
-                    e.preventDefault();
-		    e.stopPropagation();
-		    if(e.currentTarget === down){
-		       step_fn("down");
-		    }
-		    else{
-		        step_fn("up");
-		    }
-                },
-	        mousedown: function(e){
-		    e.preventDefault();
-		    e.stopPropagation();
-		    if(e.currentTarget === down){
-		        timer=setInterval(function(){step_fn("down");},100);
-		    }
-		    else{
-		        timer=setInterval(function(){step_fn("up");},100);
-		    }
-	        },
- 	        mouseup: function(e){
-                    e.stopPropagation();
-		    if(timer){
-		        clearInterval(timer);
-		    }
-	        }
-	    };
-            for(var k in eObj){
-                up.addEventListener(k,eObj[k],false);
-                down.addEventListener(k,eObj[k],false);
-            }
-	   	    
-        };
-	this.element.appendChild(list);
-        if(this.action){
-            this.action(this);
-        }
-	return this;
-    };
-
-
-    FloatField.prototype={
-	getValue: function(){
-            var a=this.input[0].value;
-            var b=this.input[1].value;
-	    if(Apoco.type.blank.check(a)) {
-		if(Apoco.type.blank.check(b)){
-		    return this.value="";
-		}
-		else{
-		    this.value=parseFloat(("0."+b),10).toFixed(this.precision);
-		}
-	    }
-	    else if(Apoco.type.blank.check(b)){
-		this.value=parseFloat((a + ".000"),10).toFixed(this.precision);
-	    }
-	    else{
-                if(a<0){
-		    this.value=(parseInt(a,10)-parseFloat(("." + b),10)).toFixed(this.precision);
-                }
-                else{
-                    this.value=(parseInt(a,10)+parseFloat(("." + b),10)).toFixed(this.precision);
-                }
-	    }
-	    if(!Apoco.type.float.check(this.value)){
-		throw new Error("getValue: this is not a floating point number " + this.value);
-		return null;
-	    }
-	    return this.value;
-	},
-        resetValue:function(){
-            this.setValue(this.value);
-        },
-	setValue: function(v){
- 	    if(Apoco.type.blank.check(v)){
-                this.input[0].value="";
-                this.input[1].value="";
-		this.value="";
-		return;
-	    }
-            if(!Apoco.type["float"].check(v)){
-		throw new Error("FloatField: setValue this value is not a float " + v);
-	    }
-	    v=parseFloat(v,10).toFixed(this.precision);  // not necessarily a number
-	    var p=v.toString().split(".");
-	    if(p.length !== 2){
-		throw new Error("value is not a floating point number" + v);
-		return null;
-	    }
-            this.input[0].value=p[0];
-            this.input[1].value=p[1];
-	    this.value=v;
-	},
-        popupEditor: null
-    };
-
-    Apoco.Utils.extend(FloatField,_Field);
-
-    var DateField=function(d,element){
-        var that=this;
-        d.field="date";
-        d.type="date";
-        _Field.call(this,d,element);
-        this.input=document.createElement("input");
-        this.input.type=this.html_type;
-        if(this.required === true){
-            this.input.required=true;
-        }
-        this.element.appendChild(this.input);
-        if(this.value){
-            this.input.value=this.value;
-	}
-	if(this.editable !== false){
-            if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
-                this.input.type="text";
-                this.input.setAttribute("placeholder","YYYY-MM-DD");
-                Apoco.datepicker.init(this.input);
-            }
-            else{
-                this.picker=document.createElement("datepicker");
-                this.picker.setAttribute("type","grid");
-                this.input.appendChild(this.picker);
-            }
-        }
-        if(this.action){
-            this.action(this);
-        }
- 	return this;
-    };
-  
-    Apoco.Utils.extend(DateField,_Field);
-
-    var TimeField=function(d,element){
-        d.field="time";
-        d.type="time";
-
-	_Field.call(this,d,element);
-        this.input=document.createElement("input");
-        this.input.setAttribute("type",this.html_type);
-        if(this.required === true){
-            this.input.required=true;
-        }
-        this.element.appendChild(this.input);
-        if(this.editable === false){
-            this.input.readOnly=true;
-        }
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
         return this;
     };
 
-    Apoco.Utils.extend(TimeField,_Field);
+    Apoco.Utils.extend(InputField, _Field);
 
-    var CheckBoxField=function(d,element){
-        d.field="checkBox";
-        d.type="boolean";
-  	_Field.call(this,d,element);
-        this.input=document.createElement("input");
-        this.input.setAttribute("type",this.html_type);
-        this.input.className="check_box";
-        
+    var FloatField = function FloatField(d, element) {
+        var inp;
+        var that = this;
+        d.field = "float";
+        d.type = "float";
+        _Field.call(this, d, element);
+        this.input = new Array(2);
+        if (this.precision === undefined) {
+            this.precision = 2;
+        }
+        var list = document.createElement("ul");
+        list.classList.add('aligned_float');
+        var el = document.createElement("li");
+        var dec = document.createElement("div");
+        dec.className = 'values';
+        inp = document.createElement("input");
+        inp.className = "float_left";
+        inp.setAttribute("pattern", '^[-+]?[0-9]*$');
+        this.input[0] = inp;
+        inp = document.createElement("input");
+        inp.className = "float_right";
+
+        inp.setAttribute("type", "text");
+        this.input[1] = inp;
+        this.setValue(this.value);
+
+        dec.appendChild(this.input[0]);
+        var s = document.createElement("span");
+        s.textContent = ".";
+        dec.appendChild(s);
+        dec.appendChild(this.input[1]);
+        el.appendChild(dec);
+        list.appendChild(el);
+        if (this.required === true) {
+            this.input[1].required = true;
+            this.input[0].required = true;
+        }
+        if (this.editable === false) {
+            this.input[0].readOnly = true;
+            this.input[0].readOnly = true;
+            this.spinner = false;
+        }
+        if (this.spinner) {
+            el = document.createElement("li");
+            list.appendChild(el);
+            dec = document.createElement("div");
+            dec.className = "arrows";
+            el.appendChild(dec);
+            var up = document.createElement("span");
+            up.classList.add("up", "ui-icon", "ui-icon-triangle-1-n");
+            var down = document.createElement("span");
+            down.classList.add("down", "ui-icon", "ui-icon-triangle-1-s");
+            dec.appendChild(up);
+            dec.appendChild(down);
+            if (this.step === undefined) {
+                this.step = 0.1;
+            }
+
+            var timer;
+            var step_fn = function step_fn(direction) {
+                var t = that.getValue();
+                if (t === null || t === "") {
+                    clearInterval(timer);
+                    return;
+                }
+                if (!Apoco.type.float.check(t)) {
+                    clearInterval(timer);
+                    throw new Error("stepfn return from getValue: this is not a floating point number");
+                }
+                if (direction === "up") {
+                    t = parseFloat(t, 10) + that.step;
+                } else {
+                    t = parseFloat(t, 10) - that.step;
+                }
+                t = parseFloat(t, 10).toFixed(that.precision);
+                if (that.setValue(t) === null) {
+                    clearInterval(timer);
+                    throw new Error("step_fn val is not floating point " + t);
+                }
+            };
+            var eObj = {
+                mouseover: function mouseover(e) {
+                    e.stopPropagation();
+                    e.currentTarget.parentNode.classList.add('ui-state-hover');
+                },
+                mouseout: function mouseout(e) {
+                    e.stopPropagation();
+                    e.currentTarget.parentNode.classList.remove('ui-state-hover');
+                },
+                click: function click(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (e.currentTarget === down) {
+                        step_fn("down");
+                    } else {
+                        step_fn("up");
+                    }
+                },
+                mousedown: function mousedown(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (e.currentTarget === down) {
+                        timer = setInterval(function () {
+                            step_fn("down");
+                        }, 100);
+                    } else {
+                        timer = setInterval(function () {
+                            step_fn("up");
+                        }, 100);
+                    }
+                },
+                mouseup: function mouseup(e) {
+                    e.stopPropagation();
+                    if (timer) {
+                        clearInterval(timer);
+                    }
+                }
+            };
+            for (var k in eObj) {
+                up.addEventListener(k, eObj[k], false);
+                down.addEventListener(k, eObj[k], false);
+            }
+        };
+        this.element.appendChild(list);
+        if (this.action) {
+            this.action(this);
+        }
+        return this;
+    };
+
+    FloatField.prototype = {
+        getValue: function getValue() {
+            var a = this.input[0].value;
+            var b = this.input[1].value;
+            if (Apoco.type.blank.check(a)) {
+                if (Apoco.type.blank.check(b)) {
+                    return this.value = "";
+                } else {
+                    this.value = parseFloat("0." + b, 10).toFixed(this.precision);
+                }
+            } else if (Apoco.type.blank.check(b)) {
+                this.value = parseFloat(a + ".000", 10).toFixed(this.precision);
+            } else {
+                if (a < 0) {
+                    this.value = (parseInt(a, 10) - parseFloat("." + b, 10)).toFixed(this.precision);
+                } else {
+                    this.value = (parseInt(a, 10) + parseFloat("." + b, 10)).toFixed(this.precision);
+                }
+            }
+            if (!Apoco.type.float.check(this.value)) {
+                throw new Error("getValue: this is not a floating point number " + this.value);
+                return null;
+            }
+            return this.value;
+        },
+        resetValue: function resetValue() {
+            this.setValue(this.value);
+        },
+        setValue: function setValue(v) {
+            if (Apoco.type.blank.check(v)) {
+                this.input[0].value = "";
+                this.input[1].value = "";
+                this.value = "";
+                return;
+            }
+            if (!Apoco.type["float"].check(v)) {
+                throw new Error("FloatField: setValue this value is not a float " + v);
+            }
+            v = parseFloat(v, 10).toFixed(this.precision);
+            var p = v.toString().split(".");
+            if (p.length !== 2) {
+                throw new Error("value is not a floating point number" + v);
+                return null;
+            }
+            this.input[0].value = p[0];
+            this.input[1].value = p[1];
+            this.value = v;
+        },
+        popupEditor: null
+    };
+
+    Apoco.Utils.extend(FloatField, _Field);
+
+    var DateField = function DateField(d, element) {
+        var that = this;
+        d.field = "date";
+        d.type = "date";
+        _Field.call(this, d, element);
+        this.input = document.createElement("input");
+        this.input.type = this.html_type;
+        if (this.required === true) {
+            this.input.required = true;
+        }
         this.element.appendChild(this.input);
-        if(this.required===true){
-            this.input.required=true;
+        if (this.value) {
+            this.input.value = this.value;
+        }
+        if (this.editable !== false) {
+            if (navigator.appCodeName === "Mozilla") {
+                this.input.type = "text";
+                this.input.setAttribute("placeholder", "YYYY-MM-DD");
+                Apoco.datepicker.init(this.input);
+            } else {
+                this.picker = document.createElement("datepicker");
+                this.picker.setAttribute("type", "grid");
+                this.input.appendChild(this.picker);
+            }
+        }
+        if (this.action) {
+            this.action(this);
+        }
+        return this;
+    };
+
+    Apoco.Utils.extend(DateField, _Field);
+
+    var TimeField = function TimeField(d, element) {
+        d.field = "time";
+        d.type = "time";
+
+        _Field.call(this, d, element);
+        this.input = document.createElement("input");
+        this.input.setAttribute("type", this.html_type);
+        if (this.required === true) {
+            this.input.required = true;
+        }
+        this.element.appendChild(this.input);
+        if (this.editable === false) {
+            this.input.readOnly = true;
+        }
+        if (this.action) {
+            this.action(this);
+        }
+        return this;
+    };
+
+    Apoco.Utils.extend(TimeField, _Field);
+
+    var CheckBoxField = function CheckBoxField(d, element) {
+        d.field = "checkBox";
+        d.type = "boolean";
+        _Field.call(this, d, element);
+        this.input = document.createElement("input");
+        this.input.setAttribute("type", this.html_type);
+        this.input.className = "check_box";
+
+        this.element.appendChild(this.input);
+        if (this.required === true) {
+            this.input.required = true;
         }
         this.setValue(this.value);
-        if(this.editable === false){
-            this.input.setAttribute("disabled",true);
+        if (this.editable === false) {
+            this.input.setAttribute("disabled", true);
         }
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
-	return this;
+        return this;
     };
 
-    CheckBoxField.prototype={
-	getValue:function(){
+    CheckBoxField.prototype = {
+        getValue: function getValue() {
             return this.input.checked;
-	},
-        setValue:function(val){
-            if(val === "true" || val === true || val === 1){
-                this.input.setAttribute("checked","checked");
-	    }
-	    else {
-                if(this.input.hasAttribute("checked")){
+        },
+        setValue: function setValue(val) {
+            if (val === "true" || val === true || val === 1) {
+                this.input.setAttribute("checked", "checked");
+            } else {
+                if (this.input.hasAttribute("checked")) {
                     this.input.removeAttribute("checked");
                 }
-	    }
+            }
         },
-	popupEditor:function(func){
-            if(this.editable === true){
-	        var cb=function(that){
-		    return function(e){
-		        e.stopPropagation();
-		        func(that.input.checked);
-		    };
-	        }(this);
-	        this.input.AddEventListener("click",cb,false);
+        popupEditor: function popupEditor(func) {
+            if (this.editable === true) {
+                var cb = function (that) {
+                    return function (e) {
+                        e.stopPropagation();
+                        func(that.input.checked);
+                    };
+                }(this);
+                this.input.AddEventListener("click", cb, false);
             }
         }
     };
 
-    Apoco.Utils.extend(CheckBoxField,_Field);
+    Apoco.Utils.extend(CheckBoxField, _Field);
 
-    var NumberArrayField=function(d,element){
-        if(!d.size && !d.value ){
+    var NumberArrayField = function NumberArrayField(d, element) {
+        if (!d.size && !d.value) {
             throw new Error("NumberArrayfield needs a size or value");
         }
-        d.field="numberArray";
-	_Field.call(this,d,element);
-        if(!this.size){
-            this.size=this.value.length;
+        d.field = "numberArray";
+        _Field.call(this, d, element);
+        if (!this.size) {
+            this.size = this.value.length;
         }
-	this.input=new Array(this.size);
-	this.popup=true;
-        if(this.type === "floatArray" && this.step === undefined){
-            this.step=0.1;
+        this.input = new Array(this.size);
+        this.popup = true;
+        if (this.type === "floatArray" && this.step === undefined) {
+            this.step = 0.1;
         }
-	if(this.value && !Apoco.type.array.check(this.value)){
-	    throw new Error("NumberArrayField: value is not an array");
-	}
-	for(var i=0;i<this.input.length;i++){
-            this.input[i]={};
-            if(this.value){ 
-	        this.input[i].value=(this.value[i] || "");
+        if (this.value && !Apoco.type.array.check(this.value)) {
+            throw new Error("NumberArrayField: value is not an array");
+        }
+        for (var i = 0; i < this.input.length; i++) {
+            this.input[i] = {};
+            if (this.value) {
+                this.input[i].value = this.value[i] || "";
             }
-            this.addValue(i,"internal");
-   	}
-        if(this.action){
+            this.addValue(i, "internal");
+        }
+        if (this.action) {
             this.action(this);
         }
-	return this;
+        return this;
     };
 
-    NumberArrayField.prototype={
-        addValue:function(i,internal){
+    NumberArrayField.prototype = {
+        addValue: function addValue(i, internal) {
             var s;
-            if(internal !== "internal"){
-                var v=i;
-                i=this.input.length;
-                this.input[i]={};
-                this.input[i].value=v;
+            if (internal !== "internal") {
+                var v = i;
+                i = this.input.length;
+                this.input[i] = {};
+                this.input[i].value = v;
             }
-            this.input[i].input=document.createElement("input");
+            this.input[i].input = document.createElement("input");
             this.input[i].input.setAttribute("type", this.html_type);
-            this.input[i].input.className=this.type;
-            if(this.required===true){
-                this.input[i].input.required=true;
+            this.input[i].input.className = this.type;
+            if (this.required === true) {
+                this.input[i].input.required = true;
             }
-            this.input[i].input.value=this.input[i].value;
-            if( this.delimiter !== undefined){
-                if(i>0 && i<(this.input.length-1)){
-                    s=document.createElement("span");
-                    s.textContent=this.delimiter;
+            this.input[i].input.value = this.input[i].value;
+            if (this.delimiter !== undefined) {
+                if (i > 0 && i < this.input.length - 1) {
+                    s = document.createElement("span");
+                    s.textContent = this.delimiter;
                     this.element[0].appendChild(s);
                 }
             }
-            if(this.editable === false){
-                this.input[i].input.readOnly=true;
-            }
-            else{
-                if(this.min){
+            if (this.editable === false) {
+                this.input[i].input.readOnly = true;
+            } else {
+                if (this.min) {
                     this.input[i].input.setAttribute("min", this.min);
                 }
-                if(this.max){
+                if (this.max) {
                     this.input[i].input.setAttribute("max", this.max);
                 }
-                if(this.step){
+                if (this.step) {
                     this.input[i].input.setAttribute("step", this.step);
                 }
             }
- 	    this.element.appendChild(this.input[i].input);
+            this.element.appendChild(this.input[i].input);
             return true;
         },
-        deleteValue:function(value){
+        deleteValue: function deleteValue(value) {
             var index = -1;
-            for(var i=0;i<this.input.length;i++){
-                if(this.input[i].value === value){
-                    if(index !== -1){
-                        throw new Error("Mpre than one values matches "+ value);
+            for (var i = 0; i < this.input.length; i++) {
+                if (this.input[i].value === value) {
+                    if (index !== -1) {
+                        throw new Error("Mpre than one values matches " + value);
                     }
-                    index=i;
+                    index = i;
                 }
             }
-            if(index !== -1){
-                this.input.splice(index,1);
+            if (index !== -1) {
+                this.input.splice(index, 1);
             }
         },
-	setValue: function(v){
-            if(v.length >this.input.length){
+        setValue: function setValue(v) {
+            if (v.length > this.input.length) {
                 throw new Error("NumverArratField: input array size is less than value size");
             }
-   	    for(var i=0;i<this.input.length;i++){
-                if(v[i]){
-                    this.input[i].input.value=Number(v[i]);
+            for (var i = 0; i < this.input.length; i++) {
+                if (v[i]) {
+                    this.input[i].input.value = Number(v[i]);
+                } else {
+                    this.input[i].input.value = "";
                 }
-                else{
-                    this.input[i].input.value="";
-                }
-	    }
-            this.value=v;
-	},
-	getValue:function(index){
-            if(index !== undefined && index< this.input.length){
+            }
+            this.value = v;
+        },
+        getValue: function getValue(index) {
+            if (index !== undefined && index < this.input.length) {
                 return this.input[index].input.value;
             }
-            var v=new Array;
-            for(var i=0;i<this.input.length;i++){
-	        v[i]=this.input[i].input.value;
+            var v = new Array();
+            for (var i = 0; i < this.input.length; i++) {
+                v[i] = this.input[i].input.value;
             }
             return v;
-	},
-	popupEditor:function(func){
-	    if(this.input.length>0){
-		var r=this.getValue();
-		this.element.addEventListener("keypress",function(event){
-		    event.stopPropagation();
-		    if(event.which === 13){
-			func(r);
-		    }
-		},false);
-	    }
-	    throw new Error("no input element for this type " + this.type);
-	}
+        },
+        popupEditor: function popupEditor(func) {
+            if (this.input.length > 0) {
+                var r = this.getValue();
+                this.element.addEventListener("keypress", function (event) {
+                    event.stopPropagation();
+                    if (event.which === 13) {
+                        func(r);
+                    }
+                }, false);
+            }
+            throw new Error("no input element for this type " + this.type);
+        }
     };
 
-    Apoco.Utils.extend(NumberArrayField,_Field);
+    Apoco.Utils.extend(NumberArrayField, _Field);
 
-    var TextAreaField=function(d,element){
-        d.field="textArea";
-        d.type="text";
-	_Field.call(this,d,element);
-	this.popup=true;
-        this.input=document.createElement("textarea");
-        if(this.required===true){
-            this.input.required=true;
+    var TextAreaField = function TextAreaField(d, element) {
+        d.field = "textArea";
+        d.type = "text";
+        _Field.call(this, d, element);
+        this.popup = true;
+        this.input = document.createElement("textarea");
+        if (this.required === true) {
+            this.input.required = true;
         }
-	this.element.appendChild(this.input);
-	if(this.value){
-            this.input.value=this.value;
-	}
-        if(this.editable === false){
-            this.input.readOnly=true;
-            this.popup=false;
+        this.element.appendChild(this.input);
+        if (this.value) {
+            this.input.value = this.value;
         }
-        if(this.action){
+        if (this.editable === false) {
+            this.input.readOnly = true;
+            this.popup = false;
+        }
+        if (this.action) {
             this.action(this);
         }
-	return this;
+        return this;
     };
 
-    TextAreaField.prototype={
-	popupEditor:function(func,ok,cancel){
-	    if(ok && ok.length >0 && cancel && cancel.length >0){
-		var cb=function(that){
-		    return function(e){
-			e.stopPropagation();
-			that.value=that.input.val();
-			func(that.input.val());
-		    };
-		}(this);
-		var bb=function(that){
-		    return function(e){
-			e.stopPropagation();
-			func(null);
-		};
-		}(this);
-		ok.addEventListener("click",cb,false);
-		cancel.addEventListener("click",bb,false);
-	    }
-	    else{
-		throw new Error("no input element for this type " + this.type);
-	    }
-	}
-    };
-
-    Apoco.Utils.extend(TextAreaField,_Field);
-
-
-    var SelectField=function(d,element){
-	var i,o,that=this;
-        d.field="select";
-        d.type="string";
-	_Field.call(this,d,element);
-
-        var options=document.createElement("select");
-        if(this.required === true){
-            options.required=true;
+    TextAreaField.prototype = {
+        popupEditor: function popupEditor(func, ok, cancel) {
+            if (ok && ok.length > 0 && cancel && cancel.length > 0) {
+                var cb = function (that) {
+                    return function (e) {
+                        e.stopPropagation();
+                        that.value = that.input.val();
+                        func(that.input.val());
+                    };
+                }(this);
+                var bb = function (that) {
+                    return function (e) {
+                        e.stopPropagation();
+                        func(null);
+                    };
+                }(this);
+                ok.addEventListener("click", cb, false);
+                cancel.addEventListener("click", bb, false);
+            } else {
+                throw new Error("no input element for this type " + this.type);
+            }
         }
-	for(i=0; i<this.options.length; i++){
+    };
 
-            o=document.createElement("option");
-            o.value=this.options[i];
-            o.textContent=this.options[i];
+    Apoco.Utils.extend(TextAreaField, _Field);
+
+    var SelectField = function SelectField(d, element) {
+        var i,
+            o,
+            that = this;
+        d.field = "select";
+        d.type = "string";
+        _Field.call(this, d, element);
+
+        var options = document.createElement("select");
+        if (this.required === true) {
+            options.required = true;
+        }
+        for (i = 0; i < this.options.length; i++) {
+
+            o = document.createElement("option");
+            o.value = this.options[i];
+            o.textContent = this.options[i];
             options.appendChild(o);
-	}
-	if(this.blank_option === true){ // add a blank option at the head of the list
-            o=document.createElement("option");
-            o.value="";
+        }
+        if (this.blank_option === true) {
+            o = document.createElement("option");
+            o.value = "";
             options.appendChild(o);
-	}
-        this.select=options;
-	var cd=function(that){
-		return function(e){
-		    e.stopPropagation();
-                    if(e.keyCode === 13){
-		        if(that.input.style.visibility === "visible"){ //}("visible")){
-			    that.input.style.visibility= "hidden"; //hide();
-                            that.select.style.visibility="visible";
-                            console.log("target value" + e.target.value);
-                            o=document.createElement("option");
-                            o.value=e.target.value;
-                            o.textContent=e.target.value;
-                            that.select.appendChild(o);
-                            that.options.push(that.select.value);
-                            that.select.value=e.target.value;
-		        }
+        }
+        this.select = options;
+        var cd = function (that) {
+            return function (e) {
+                e.stopPropagation();
+                if (e.keyCode === 13) {
+                    if (that.input.style.visibility === "visible") {
+                        that.input.style.visibility = "hidden";
+                        that.select.style.visibility = "visible";
+                        console.log("target value" + e.target.value);
+                        o = document.createElement("option");
+                        o.value = e.target.value;
+                        o.textContent = e.target.value;
+                        that.select.appendChild(o);
+                        that.options.push(that.select.value);
+                        that.select.value = e.target.value;
                     }
-		};
-	}(this);
+                }
+            };
+        }(this);
 
-
-        var mk_input=function(){
-            that.input=document.createElement("input");
-            that.input.setAttribute("type",that.html_type);
+        var mk_input = function mk_input() {
+            that.input = document.createElement("input");
+            that.input.setAttribute("type", that.html_type);
             that.element.appendChild(that.input);
-            that.input.addEventListener("keypress",cd);
+            that.input.addEventListener("keypress", cd);
         };
 
-        // if selection option is "Other" add a new input field
-        this.select.addEventListener("change",function(){
-	    console.log("select option has changed");
-            if(that.select.value === ""){      
-		if(!that.input){ 
+        this.select.addEventListener("change", function () {
+            console.log("select option has changed");
+            if (that.select.value === "") {
+                if (!that.input) {
                     mk_input();
                 }
-                that.select.style.visibility="hidden";
-	        that.input.style.visibility="visible";
-	        that.input.focus();
-	    }
-	    else if(that.edit_func){ //set for editor callback
-		var v=that.getValue();
-		that.value=v;
-		if(that.edit_func.context){
-		    that.edit_func.cmd.call(that.edit_func.context,v);
-		}
-		else that.edit_func(v);
-	    }
+                that.select.style.visibility = "hidden";
+                that.input.style.visibility = "visible";
+                that.input.focus();
+            } else if (that.edit_func) {
+                var v = that.getValue();
+                that.value = v;
+                if (that.edit_func.context) {
+                    that.edit_func.cmd.call(that.edit_func.context, v);
+                } else that.edit_func(v);
+            }
+        });
 
-	});
-
-	if(this.value){
-            this.select.value=this.value;
-	}
+        if (this.value) {
+            this.select.value = this.value;
+        }
         this.element.appendChild(this.select);
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
-	return this;
+        return this;
     };
 
-
-    SelectField.prototype={
-        setValue: function(v){
-            for(var i=0;i<this.options.length;i++){
-                if(this.options[i] == v){
-                    this.select.value=v;
-                    this.value=v;
+    SelectField.prototype = {
+        setValue: function setValue(v) {
+            for (var i = 0; i < this.options.length; i++) {
+                if (this.options[i] == v) {
+                    this.select.value = v;
+                    this.value = v;
                     return;
                 }
             }
-            if(this.input){
-                this.input.value=v;
-                this.value=v;
+            if (this.input) {
+                this.input.value = v;
+                this.value = v;
                 return;
             }
-            throw new Error("SelectField: Cannot set value to " + v );
-           
+            throw new Error("SelectField: Cannot set value to " + v);
         },
-	getValue:function(){
-	   
-	    if(this.input && this.input.value){
-		var v=this.input.value;
-	    }
-	    else{
-		var v=this.select.value;
-	    }
-	    if(v && v.length > 0){
-		return v;
-	    }
-	    return null;
+        getValue: function getValue() {
 
-	},
-	popupEditor:function(func){
-	    this.edit_func=func;
-	},
-        resetValue:function(){
-            this.select.value=this.value;
+            if (this.input && this.input.value) {
+                var v = this.input.value;
+            } else {
+                var v = this.select.value;
+            }
+            if (v && v.length > 0) {
+                return v;
+            }
+            return null;
+        },
+        popupEditor: function popupEditor(func) {
+            this.edit_func = func;
+        },
+        resetValue: function resetValue() {
+            this.select.value = this.value;
             return this.select.value;
         }
 
     };
 
-   Apoco.Utils.extend(SelectField,_Field);
+    Apoco.Utils.extend(SelectField, _Field);
 
-    var ButtonSetField=function(d,element){   // like select field - but not in a dropdown and not editable
-        d.field="ButtonSetField";
-        d.type="boolean";
-        if(!d.labels || d.labels.length ===0){
-	    throw new Error("must have a labels array for ButtonSetField");
-	}
-          
-	_Field.call(this,d,element);
-        this.input=[];
-        if(!this.value){
-            this.value=[];  
+    var ButtonSetField = function ButtonSetField(d, element) {
+        d.field = "ButtonSetField";
+        d.type = "boolean";
+        if (!d.labels || d.labels.length === 0) {
+            throw new Error("must have a labels array for ButtonSetField");
         }
-        
-        for(var i=0;i<this.labels.length;i++){
-            this.input[i]={};
-            this.input[i].label=this.labels[i];
-            if(!this.value[i]){
-                this.value[i]=false;
+
+        _Field.call(this, d, element);
+        this.input = [];
+        if (!this.value) {
+            this.value = [];
+        }
+
+        for (var i = 0; i < this.labels.length; i++) {
+            this.input[i] = {};
+            this.input[i].label = this.labels[i];
+            if (!this.value[i]) {
+                this.value[i] = false;
             }
-         }
-        this.labels.length=0;
-	this.popup=true;
-        var u=document.createElement("ul");
-        u.className="choice";
-	this.element.appendChild(u);
-        
-	for(var i=0;i<this.input.length;i++){
-	    this.addValue(i);
-	};
+        }
+        this.labels.length = 0;
+        this.popup = true;
+        var u = document.createElement("ul");
+        u.className = "choice";
+        this.element.appendChild(u);
+
+        for (var i = 0; i < this.input.length; i++) {
+            this.addValue(i);
+        };
         this.setValue(this.value);
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
-	return this;
+        return this;
     };
 
-    ButtonSetField.prototype={
-	addValue:function(index,value){
-            var l,p;
-            if(index === undefined){
+    ButtonSetField.prototype = {
+        addValue: function addValue(index, value) {
+            var l, p;
+            if (index === undefined) {
                 throw new Error("ButtonSetField: must supply a name");
             }
-            if(!Apoco.type["integer"].check(index)){
-                var label=index;
-                index=this.input.length;
-                this.input[index]={};
-                this.input[index].label=label;
-                this.value[index]=(value)?value:false;
+            if (!Apoco.type["integer"].check(index)) {
+                var label = index;
+                index = this.input.length;
+                this.input[index] = {};
+                this.input[index].label = label;
+                this.value[index] = value ? value : false;
             }
-            l=document.createElement("li");
-  	    this.element.getElementsByTagName('ul')[0].appendChild(l);
-            this.input[index].input=document.createElement("input");
-            if(this.checkbox === true ){
-                this.input[index].input.type="checkbox";
+            l = document.createElement("li");
+            this.element.getElementsByTagName('ul')[0].appendChild(l);
+            this.input[index].input = document.createElement("input");
+            if (this.checkbox === true) {
+                this.input[index].input.type = "checkbox";
+            } else {
+                this.input[index].input.type = "radio";
             }
-            else{
-                this.input[index].input.type="radio"; 
-            }
-            this.input[index].input.checked=this.value[index];
-	    l.appendChild(this.input[index].input);
-            p=document.createElement("p");
-            p.textContent=this.input[index].label;
+            this.input[index].input.checked = this.value[index];
+            l.appendChild(this.input[index].input);
+            p = document.createElement("p");
+            p.textContent = this.input[index].label;
             l.appendChild(p);
-       
-            if(this.checkbox !== true){
-	        this.input[index].input.addEventListener("click",function(that,node){
-		    return function(e){
-		        e.stopPropagation();
-                        for(var i=0;i<that.input.length;i++){
-                            if(that.input[i].input !== node){
-                                that.input[i].input.checked=false;
+
+            if (this.checkbox !== true) {
+                this.input[index].input.addEventListener("click", function (that, node) {
+                    return function (e) {
+                        e.stopPropagation();
+                        for (var i = 0; i < that.input.length; i++) {
+                            if (that.input[i].input !== node) {
+                                that.input[i].input.checked = false;
                             }
                         }
-		    };
-	        }(this,this.input[index].input)); 
-            } 
-            return true;
-	},
-	resetValue:function(){
-            for(var i=0;i<this.input.length;i++){
-                this.input[i].input.checked=this.value[i];
+                    };
+                }(this, this.input[index].input));
             }
-	},
-        setValue: function(value,index){
-            var t=0;
-            if(!Apoco.type["array"].check(value)){
-                if( index !== undefined && index<=this.input.length){
-                    if(this.checkbox !== true){
-                        if(value === true){ //set all the others to false
-                            for(var i=0;i<this.input.length;i++){
-                                this.input[i].input.checked=false;
-                                this.value[i]=false;
+            return true;
+        },
+        resetValue: function resetValue() {
+            for (var i = 0; i < this.input.length; i++) {
+                this.input[i].input.checked = this.value[i];
+            }
+        },
+        setValue: function setValue(value, index) {
+            var t = 0;
+            if (!Apoco.type["array"].check(value)) {
+                if (index !== undefined && index <= this.input.length) {
+                    if (this.checkbox !== true) {
+                        if (value === true) {
+                            for (var i = 0; i < this.input.length; i++) {
+                                this.input[i].input.checked = false;
+                                this.value[i] = false;
                             }
                         }
                     }
-                    this.input[index].input.checked=value;
-                    this.value[index]=value;
-                    
-                }
-                else{
+                    this.input[index].input.checked = value;
+                    this.value[index] = value;
+                } else {
                     throw new Error("ButtonSetField: value must be a boolean array");
                 }
                 return;
             }
-            
-            if(value.length!== this.input.length){
+
+            if (value.length !== this.input.length) {
                 throw new Error("ButtonSetField: values array length " + value.length + " does not match labels " + this.input.length);
-            }
-            else if(this.checkbox !== true){ //radio button only one true value
-                 for(var i=0;i<value.length;i++){
-                    if(value[i] === true){
+            } else if (this.checkbox !== true) {
+                for (var i = 0; i < value.length; i++) {
+                    if (value[i] === true) {
                         t++;
                     }
                 }
-                if(t> 1){
+                if (t > 1) {
                     throw new Error("ButtonSetField: only one true value for radio buttons");
                 }
             }
-            for(var i=0;i<value.length;i++){
-                this.value[i]=value[i];
-                this.input[i].input.checked =value[i];
+            for (var i = 0; i < value.length; i++) {
+                this.value[i] = value[i];
+                this.input[i].input.checked = value[i];
             }
         },
-	deleteValue:function(label){
-	    var that=this;
-	    var index=null;
-	    for(var i=0;i<this.input.length;i++){
-		if(this.input[i].label === label){
-		    index=i;
-		    break;
-		}
-	    }
-	    if(index !== null){
-		var p=this.input[index].input.parentNode;
-                p.removeChild(this.input[index].input);
-		this.input.splice(index,1);
-                p.parentNode.removeChild(p);
-	    }
-	    else{
-		throw new Error("could not remove value " + value);
-	    }
-
-	},
-	getValue:function(){
-            var ar=[],p;
-            for(var i=0;i<this.input.length;i++){
-                p={};
-                p[this.input[i].label]=this.input[i].input.checked;
-                ar[i]=p;
+        deleteValue: function deleteValue(label) {
+            var that = this;
+            var index = null;
+            for (var i = 0; i < this.input.length; i++) {
+                if (this.input[i].label === label) {
+                    index = i;
+                    break;
+                }
             }
-	    return ar;
-	},
-	checkValue:function(){
-	    if(this.required ){ // must have at least one value set to true.
-                for(var i=0; i<this.input.length; i++){
-                    if(this.input[i].input.checked === true){
+            if (index !== null) {
+                var p = this.input[index].input.parentNode;
+                p.removeChild(this.input[index].input);
+                this.input.splice(index, 1);
+                p.parentNode.removeChild(p);
+            } else {
+                throw new Error("could not remove value " + value);
+            }
+        },
+        getValue: function getValue() {
+            var ar = [],
+                p;
+            for (var i = 0; i < this.input.length; i++) {
+                p = {};
+                p[this.input[i].label] = this.input[i].input.checked;
+                ar[i] = p;
+            }
+            return ar;
+        },
+        checkValue: function checkValue() {
+            if (this.required) {
+                for (var i = 0; i < this.input.length; i++) {
+                    if (this.input[i].input.checked === true) {
                         return true;
                     }
                 }
-	    }
-            else{
+            } else {
                 return true;
             }
-	    return false;
-	}
+            return false;
+        }
     };
-    Apoco.Utils.extend(ButtonSetField,_Field);
+    Apoco.Utils.extend(ButtonSetField, _Field);
 
-    var SliderField=function(d,element){
-        d.field="SliderField";
-        d.type="range";
-        d.html_type="range";
-      	_Field.call(this,d,element);
-	this.popup=true;
-	this.input= document.createElement("input");
-        this.input.setAttribute("type",this.type);
+    var SliderField = function SliderField(d, element) {
+        d.field = "SliderField";
+        d.type = "range";
+        d.html_type = "range";
+        _Field.call(this, d, element);
+        this.popup = true;
+        this.input = document.createElement("input");
+        this.input.setAttribute("type", this.type);
         this.element.appendChild(this.input);
-	var that=this;
-	if(this.min){
-            this.input.setAttribute("min",this.min);
+        var that = this;
+        if (this.min) {
+            this.input.setAttribute("min", this.min);
         }
-        if(this.max){
-             this.input.setAttribute("max",this.max);
+        if (this.max) {
+            this.input.setAttribute("max", this.max);
         }
-        if(this.step){
-             this.input.setAttribute("step",this.step);
+        if (this.step) {
+            this.input.setAttribute("step", this.step);
         }
-        this.value=(this.value)?this.value: this.min;
-        this.input.value=this.value;
-        if(this.editable === false){
-            this.input.readOnly=true;
+        this.value = this.value ? this.value : this.min;
+        this.input.value = this.value;
+        if (this.editable === false) {
+            this.input.readOnly = true;
         }
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
         return this;
     };
-     
-    Apoco.Utils.extend(SliderField,_Field);
 
-    var StringArrayField=function(d,element){
-        d.field="StringArrayField";
-        d.type="stringArray";
-	_Field.call(this,d,element);
-	this.popup=true;
-	var that=this;
-	var array_length=0;
-        this.input=[];
-        var dv=document.createElement("div");
-        dv.className="list_container";
+    Apoco.Utils.extend(SliderField, _Field);
+
+    var StringArrayField = function StringArrayField(d, element) {
+        d.field = "StringArrayField";
+        d.type = "stringArray";
+        _Field.call(this, d, element);
+        this.popup = true;
+        var that = this;
+        var array_length = 0;
+        this.input = [];
+        var dv = document.createElement("div");
+        dv.className = "list_container";
         this.element.appendChild(dv);
-        var u=document.createElement("ul");
-        u.className="string_fieldset";
+        var u = document.createElement("ul");
+        u.className = "string_fieldset";
         dv.appendChild(u);
-	if(this.value && this.value.length>0){
-	    array_length=this.value.length;
-	}
-	if(!this.length){
-	    this.length=array_length;
-	}
-        this.length=Math.max(this.length,array_length);
+        if (this.value && this.value.length > 0) {
+            array_length = this.value.length;
+        }
+        if (!this.length) {
+            this.length = array_length;
+        }
+        this.length = Math.max(this.length, array_length);
 
-	if(this.length === 0){
-	    this.length=4;
-	}
-	for(var i=0;i<this.length;i++){
-            if(this.value[i]){
-	        this.addValue(this.value[i],i);
+        if (this.length === 0) {
+            this.length = 4;
+        }
+        for (var i = 0; i < this.length; i++) {
+            if (this.value[i]) {
+                this.addValue(this.value[i], i);
+            } else {
+                this.addValue("", i);
             }
-            else{
-                this.addValue("",i); 
-            }
-	}
-	// this adds an extra field if you press return in last field
-	if(this.editable !== false){
-	    // add a glyph
-            var sp=document.createElement("span");
-            sp.classList.add("plus","ui-icon","ui-icon-plusthick");
-            var p=this.element.getElementsByTagName("li")[(this.element.getElementsByTagName("li").length-1)];
+        }
+
+        if (this.editable !== false) {
+            var sp = document.createElement("span");
+            sp.classList.add("plus", "ui-icon", "ui-icon-plusthick");
+            var p = this.element.getElementsByTagName("li")[this.element.getElementsByTagName("li").length - 1];
             p.appendChild(sp);
-            var sm=document.createElement("span");
-            sm.classList.add("minus","ui-icon","ui-icon-minusthick");
+            var sm = document.createElement("span");
+            sm.classList.add("minus", "ui-icon", "ui-icon-minusthick");
             p.appendChild(sm);
-            var addremove=function(add){
-                var l=that.input.length,n;
+            var addremove = function addremove(add) {
+                var l = that.input.length,
+                    n;
                 sp.parentNode.removeChild(sp);
                 sm.parentNode.removeChild(sm);
-                if(add=== "add"){
-		    that.addValue("",l); // add a blank value
+                if (add === "add") {
+                    that.addValue("", l);
+                } else {
+                    that.deleteValue(l - 1);
                 }
-                else{
-                    that.deleteValue(l-1);
-                }
-                n=parseInt(that.element.getElementsByTagName("li").length-1,10);
-                var last_element=that.element.getElementsByTagName("li")[n];
-		last_element.appendChild(sp);
+                n = parseInt(that.element.getElementsByTagName("li").length - 1, 10);
+                var last_element = that.element.getElementsByTagName("li")[n];
+                last_element.appendChild(sp);
                 last_element.appendChild(sm);
             };
-            
-	    sp.addEventListener("click",function(e){
-		e.stopPropagation();
-	        addremove("add");
-	    });
-	    sm.addEventListener("click",function(e){
-		e.stopPropagation();
-	        addremove("remove");
-	    });
 
-	}
-        if(this.action){
+            sp.addEventListener("click", function (e) {
+                e.stopPropagation();
+                addremove("add");
+            });
+            sm.addEventListener("click", function (e) {
+                e.stopPropagation();
+                addremove("remove");
+            });
+        }
+        if (this.action) {
             this.action(this);
         }
         return this;
     };
-    
-    StringArrayField.prototype={
-        setValue:function(v,index){
-            if(!Apoco.type["array"].check(v)){
-                if( index !== undefined && index<this.length){
-                    this.input[index].input.value=v;
-                    this.value[index]=v;
-                }
-                else{
+
+    StringArrayField.prototype = {
+        setValue: function setValue(v, index) {
+            if (!Apoco.type["array"].check(v)) {
+                if (index !== undefined && index < this.length) {
+                    this.input[index].input.value = v;
+                    this.value[index] = v;
+                } else {
                     throw new Error("StringArrayField: setValue not an array");
                 }
-            } 
-            else {
-               if(v.length <= this.length){
-                    for(var i=0;i<v.length;i++){
-                        this.input[i].input.value=v[i];
-                        this.value[i]=v[i];
+            } else {
+                if (v.length <= this.length) {
+                    for (var i = 0; i < v.length; i++) {
+                        this.input[i].input.value = v[i];
+                        this.value[i] = v[i];
                     }
-               }
-                else{
+                } else {
                     throw new Error("StringArrayField: setValue array is too long");
-                } 
+                }
             }
         },
-	getValue:function(){
-	    var vals=[],t;
-	    for(var i=0;i<this.input.length;i++){
-		t=this.input[i].input.value;
-		if(t !== ""){
-		    vals.push(this.input[i].input.value);
-		}
-	    }
-	    return vals;
-	},
-        deleteValue:function(i){
+        getValue: function getValue() {
+            var vals = [],
+                t;
+            for (var i = 0; i < this.input.length; i++) {
+                t = this.input[i].input.value;
+                if (t !== "") {
+                    vals.push(this.input[i].input.value);
+                }
+            }
+            return vals;
+        },
+        deleteValue: function deleteValue(i) {
             var t;
-            if(this.input.length>1){
-                t=this.input[i].input.parentNode;
-                this.input.splice(i,1);
-                if(this.value[i]){
-                    this.value.splice(i,1);
+            if (this.input.length > 1) {
+                t = this.input[i].input.parentNode;
+                this.input.splice(i, 1);
+                if (this.value[i]) {
+                    this.value.splice(i, 1);
                 }
                 t.parentNode.removeChild(t);
             }
         },
-	addValue:function(value,i){
-            if(i===undefined){
-                i=this.input.length;
+        addValue: function addValue(value, i) {
+            if (i === undefined) {
+                i = this.input.length;
             }
- 	    this.input[i]={};
-            var element=document.createElement("li");
-            element.className="string";
-            this.input[i].input=document.createElement("input");
-            if(this.required===true){
-                this.input[i].input.required=true;
+            this.input[i] = {};
+            var element = document.createElement("li");
+            element.className = "string";
+            this.input[i].input = document.createElement("input");
+            if (this.required === true) {
+                this.input[i].input.required = true;
             }
-            this.input[i].input.setAttribute("type","string");
+            this.input[i].input.setAttribute("type", "string");
             element.appendChild(this.input[i].input);
             this.element.getElementsByClassName("string_fieldset")[0].appendChild(element);
-	   
-	    this.input[i].input.value=value;
-            if(this.editable === false){
-                this.input[i].input.readOnly=true;
+
+            this.input[i].input.value = value;
+            if (this.editable === false) {
+                this.input[i].input.readOnly = true;
             }
-	},
-	checkValue:function(){
-	    var valid;
-	    (this.required)?valid=false: valid=true;
-	    var v=this.getValue();
-	    for(var i=0;i<v.length;i++){
-		if(this.required){
-		    if(!Apoco.type["blank"].check(v[i])){
-			valid=true;   // at least one non blank value
-		    }
-		}
-		if(!Apoco.type["string"].check(v[i])){  
-		    valid=false;
-		    break;
-		}
-	    }
-	    if(!valid){
-		this.displayInvalid();
-	    }
-	    return valid;
-	},
-        resetValue:function(){
+        },
+        checkValue: function checkValue() {
+            var valid;
+            this.required ? valid = false : valid = true;
+            var v = this.getValue();
+            for (var i = 0; i < v.length; i++) {
+                if (this.required) {
+                    if (!Apoco.type["blank"].check(v[i])) {
+                        valid = true;
+                    }
+                }
+                if (!Apoco.type["string"].check(v[i])) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) {
+                this.displayInvalid();
+            }
+            return valid;
+        },
+        resetValue: function resetValue() {
             var v;
-            for(var i=0;i<this.length;i++){ // original length
-                v=(this.value[i])?this.value[i]:"";
-                if(this.input[i]){
-                    this.input[i].input.value=v;
-                }
-                else{  // value has been deleted
-                    this.addValue(v,i);
+            for (var i = 0; i < this.length; i++) {
+                v = this.value[i] ? this.value[i] : "";
+                if (this.input[i]) {
+                    this.input[i].input.value = v;
+                } else {
+                    this.addValue(v, i);
                 }
             }
-            if(this.input.length > this.length && this.length>0){
+            if (this.input.length > this.length && this.length > 0) {
                 console.log("this input length " + this.input.length + " original length " + this.length);
-                for(var i=this.input.length-1; i>this.length;i--){
+                for (var i = this.input.length - 1; i > this.length; i--) {
                     this.deleteValue(i);
                 }
             }
         }
     };
 
-    Apoco.Utils.extend(StringArrayField,_Field);
+    Apoco.Utils.extend(StringArrayField, _Field);
 
+    var ImageArrayField = function ImageArrayField(d, element) {
+        var that = this;
+        var new_values = [];
+        this.promises = [];
+        d.field = "ImageArrayField";
+        d.type = "imageArray";
+        _Field.call(this, d, element);
+        this.popup = true;
 
-    var ImageArrayField =function(d,element){
-        var that=this;
-        var new_values=[];
-        this.promises=[];
-        d.field="ImageArrayField";
-        d.type="imageArray";
-	_Field.call(this,d,element);
-	this.popup=true;
-       
-        this.width=this.width?this.width:120;
-        this.height=this.height?this.height:90;
-        if(!this.value){
-            this.value=[];
+        this.width = this.width ? this.width : 120;
+        this.height = this.height ? this.height : 90;
+        if (!this.value) {
+            this.value = [];
         }
-        if(this.editable !== false){
-	    if(!window.FileReader){
-	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
-	        throw new Error("No FileReader");
-	    }
-            this.input=document.createElement("input");
-            this.input.type="file";
-            if(this.required===true){
-                this.input.required=true;
+        if (this.editable !== false) {
+            if (!window.FileReader) {
+                Apoco.popup.dialog("Sorry No FileReader", "Your browser does not support the image reader");
+                throw new Error("No FileReader");
             }
-            this.input.setAttribute("name","files");
-            this.input.setAttribute("multiple","multiple");
-	    this.element.appendChild(this.input);
-	    this.input.addEventListener("change",function(e){
+            this.input = document.createElement("input");
+            this.input.type = "file";
+            if (this.required === true) {
+                this.input.required = true;
+            }
+            this.input.setAttribute("name", "files");
+            this.input.setAttribute("multiple", "multiple");
+            this.element.appendChild(this.input);
+            this.input.addEventListener("change", function (e) {
                 that._getImageFileSelect(e);
             });
         }
-  
-        if(this.value && this.value.length>0){  // start pre-loading
+
+        if (this.value && this.value.length > 0) {
             this.loadImages();
         }
-        if(this.thumbnails === true){ 
+        if (this.thumbnails === true) {
             this.mkThumbnails();
         }
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
         return this;
     };
 
-    ImageArrayField.prototype={
-        _getImage: function(o){
-            var that=this;
-            var imm=document.createElement("img"); //new Image();  // get the width and height - need to load in to image
-            imm.src=o.src;
-            var promise=new Promise(function(resolve,reject){
-	        imm.onload=function(){
-                    o.width=parseFloat(this.width);
-                    o.height=parseFloat(this.height);
-                    o.title=o.name;
-                    o.image=imm;
-                    o.aspect_ratio=parseFloat(this.width/this.height);
+    ImageArrayField.prototype = {
+        _getImage: function _getImage(o) {
+            var that = this;
+            var imm = document.createElement("img");
+            imm.src = o.src;
+            var promise = new Promise(function (resolve, reject) {
+                imm.onload = function () {
+                    o.width = parseFloat(this.width);
+                    o.height = parseFloat(this.height);
+                    o.title = o.name;
+                    o.image = imm;
+                    o.aspect_ratio = parseFloat(this.width / this.height);
                     resolve(o);
                 };
-                imm.onerror=function(){
-                    o.image=null;
+                imm.onerror = function () {
+                    o.image = null;
                     reject("Field:ImageArray._getImage Could not load image " + o.src);
                 };
             });
             return promise;
-        }, 
-        _getImageFileSelect: function(evt){
-            var that=this;
-            var td=this.element.querySelector("div.thumbnails");
-   	    //new_values.length=0; // reset array
-	    evt.stopPropagation();
-	    var files = new Array; //evt.target.files;
-            //check that the files are images
-            for(var i=0;i<evt.target.files.length;i++){
+        },
+        _getImageFileSelect: function _getImageFileSelect(evt) {
+            var that = this;
+            var td = this.element.querySelector("div.thumbnails");
+
+            evt.stopPropagation();
+            var files = new Array();
+            for (var i = 0; i < evt.target.files.length; i++) {
                 if (evt.target.files[i].type.match('image.*')) {
                     files.push(evt.target.files[i]);
                 }
             }
-            var count=that.value.length;
-	    var last=count+files.length;
-	    for (var i=count,j=0; i<last; i++,j++) {
-		var reader = new FileReader();
-		reader.onload = (function(f,num) {
-                    console.log("getImagefileselect  file is  %j",f);
-		    return function(e) {
+            var count = that.value.length;
+            var last = count + files.length;
+            for (var i = count, j = 0; i < last; i++, j++) {
+                var reader = new FileReader();
+                reader.onload = function (f, num) {
+                    console.log("getImagefileselect  file is  %j", f);
+                    return function (e) {
                         var p;
-			e.stopPropagation();
-                        that.value[num]={src: e.target.result,name:f.name};
-                        that.promises[num]=that._getImage(that.value[num]);
-                        if(that.thumbnails === true){
-                            that._addThumbnail(td,num);
+                        e.stopPropagation();
+                        that.value[num] = { src: e.target.result, name: f.name };
+                        that.promises[num] = that._getImage(that.value[num]);
+                        if (that.thumbnails === true) {
+                            that._addThumbnail(td, num);
                         }
- 		    };
-		})(files[j],i);
-		reader.readAsDataURL(files[j]);
-	    }
+                    };
+                }(files[j], i);
+                reader.readAsDataURL(files[j]);
+            }
         },
-        loadImages: function(values){
-            var i=0,last,that=this;
-            if(values !==undefined && Apoco.type["array"].check(values)){ //loading more images after creation
-                i=this.value.length;
-                this.value=this.value.concat(values);
+        loadImages: function loadImages(values) {
+            var i = 0,
+                last,
+                that = this;
+            if (values !== undefined && Apoco.type["array"].check(values)) {
+                i = this.value.length;
+                this.value = this.value.concat(values);
             }
-            last=this.value.length;
-    
-            for(i; i<last;i++){
-                this.promises[i]=that._getImage(that.value[i]);
+            last = this.value.length;
+
+            for (i; i < last; i++) {
+                this.promises[i] = that._getImage(that.value[i]);
             }
-      
+
             return this.promises;
         },
-        finishedLoading:function(){
-            return Promise.all(this.promises); // rejects on first fail
+        finishedLoading: function finishedLoading() {
+            return Promise.all(this.promises);
         },
-        _addThumbnail:function(pp,i){
-            var that=this,div=document.createElement("div");
-            if(this.value[i].name){
-                div.setAttribute("name",this.value[i].name);
+        _addThumbnail: function _addThumbnail(pp, i) {
+            var that = this,
+                div = document.createElement("div");
+            if (this.value[i].name) {
+                div.setAttribute("name", this.value[i].name);
             }
             pp.appendChild(div);
-            
-            if(this.value[i].label){
-                var r=document.createElement("h5");
-                r.textContent=this.value[i].label;
+
+            if (this.value[i].label) {
+                var r = document.createElement("h5");
+                r.textContent = this.value[i].label;
                 div.appendChild(r);
             }
-            this.promises[i].then((function(el){
-                return function(v){
-                    if(!v.image){
+            this.promises[i].then(function (el) {
+                return function (v) {
+                    if (!v.image) {
                         throw new Error("mkThumbnails: image does not exist");
                     }
-                    if(that.width){
-                        v.image.style.width=(that.width.toString() + "px");
+                    if (that.width) {
+                        v.image.style.width = that.width.toString() + "px";
                     }
-                    if(that.height){
-                        v.image.style.height=(that.height.toString() + "px");
+                    if (that.height) {
+                        v.image.style.height = that.height.toString() + "px";
                     }
-        	    el.appendChild(v.image); 
-                    //that._addThumbnail(td,v);
+                    el.appendChild(v.image);
                 };
-            }(div))); 
+            }(div));
         },
-        mkThumbnails: function(){
-            var that=this,el;
-            var td=this.element.querySelector("div.thumbnails");
-            if(!td){
-                td=document.createElement("div");
-                td.className="thumbnails";
+        mkThumbnails: function mkThumbnails() {
+            var that = this,
+                el;
+            var td = this.element.querySelector("div.thumbnails");
+            if (!td) {
+                td = document.createElement("div");
+                td.className = "thumbnails";
                 this.element.appendChild(td);
-	    }
-	    for(var i=0;i<this.value.length;i++){ // each image
-                that._addThumbnail(td,i);
             }
-  	},
-        resetValue:function(){
+            for (var i = 0; i < this.value.length; i++) {
+                that._addThumbnail(td, i);
+            }
+        },
+        resetValue: function resetValue() {
             return;
         },
-	getValue:function(){ // images are in this.value[i].image
-	    return this.value;
-	},
-	checkValue:function(){
-	    return true;
-	},
-        deleteValue:function(title){
-            var index=-1;
-            for(var i=0;i<this.value;i++){
-                if(this.value[i].title == title){
-                    index=i;
+        getValue: function getValue() {
+            return this.value;
+        },
+        checkValue: function checkValue() {
+            return true;
+        },
+        deleteValue: function deleteValue(title) {
+            var index = -1;
+            for (var i = 0; i < this.value; i++) {
+                if (this.value[i].title == title) {
+                    index = i;
                     break;
                 }
             }
-            if(index > 0){
-                this.value.splice(index,1);
+            if (index > 0) {
+                this.value.splice(index, 1);
             }
-            if(this.thumbnails){
+            if (this.thumbnails) {
                 this.mk_thumbnails();
             }
         }
     };
 
-    Apoco.Utils.extend(ImageArrayField,_Field);
+    Apoco.Utils.extend(ImageArrayField, _Field);
 
-    var AutoCompleteField=function(d,element){
-        var v,rect,offset={};
-        var box,that=this;
-        var contains=function(arr,item){
-            var count=0,a,n=[];
-            // make it case insensitive
-            item=item.toLowerCase();
-            for(var i=0;i<arr.length;i++){
-                a=arr[i].toLowerCase();
-                 if((a).indexOf(item) !== -1){
-                     n[count]=arr[i];
+    var AutoCompleteField = function AutoCompleteField(d, element) {
+        var v,
+            rect,
+            offset = {};
+        var box,
+            that = this;
+        var contains = function contains(arr, item) {
+            var count = 0,
+                a,
+                n = [];
+
+            item = item.toLowerCase();
+            for (var i = 0; i < arr.length; i++) {
+                a = arr[i].toLowerCase();
+                if (a.indexOf(item) !== -1) {
+                    n[count] = arr[i];
                     count++;
                 }
-                if(count ===4){
+                if (count === 4) {
                     return n;
                 }
             }
             return n;
         };
-        function getOffset (object, offset) {
-            if (!object){
+        function getOffset(object, offset) {
+            if (!object) {
                 return;
             }
             offset.x += object.offsetLeft;
             offset.y += object.offsetTop;
-            getOffset (object.offsetParent, offset);
+            getOffset(object.offsetParent, offset);
         }
 
-        d.field="AutoCompleteField";
-        d.type="string";
+        d.field = "AutoCompleteField";
+        d.type = "string";
 
-        _Field.call(this,d,element);
-        box=document.createElement("div");
-        box.classList.add(this.type,"apoco_autocomplete");
+        _Field.call(this, d, element);
+        box = document.createElement("div");
+        box.classList.add(this.type, "apoco_autocomplete");
         this.element.appendChild(box);
-        this.input=document.createElement("input");
-        if(this.required===true){
-            this.input.required=true;
+        this.input = document.createElement("input");
+        if (this.required === true) {
+            this.input.required = true;
         }
-        this.input.setAttribute("type",this.html_type);
-         box.appendChild(this.input);  
-        //sort the options
-        Apoco.sort(this.options,"string");
-       
-        var select=document.createElement("ul");
-        select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
-        select.style.visibility="hidden";
-        select.addEventListener("click",function(e){
-            if(e.target.tagName === "LI"){
+        this.input.setAttribute("type", this.html_type);
+        box.appendChild(this.input);
+
+        Apoco.sort(this.options, "string");
+
+        var select = document.createElement("ul");
+        select.classList.add("choice", "ui-autocomplete", "ui-menu", "ui-front", "ui-widget-content");
+        select.style.visibility = "hidden";
+        select.addEventListener("click", function (e) {
+            if (e.target.tagName === "LI") {
                 e.stopPropagation();
                 e.preventDefault();
-                that.input.value=e.target.textContent;
-                select.style.visibility="hidden";
+                that.input.value = e.target.textContent;
+                select.style.visibility = "hidden";
             }
         });
-        select.addEventListener("mouseover",function(e){
-            if(e.target.tagName === "LI"){
+        select.addEventListener("mouseover", function (e) {
+            if (e.target.tagName === "LI") {
                 e.stopPropagation();
                 e.preventDefault();
                 e.target.classList.add("ui-state-hover");
             }
         });
-        
-        select.addEventListener("mouseout",function(e){
-            if(e.target.tagName === "LI"){
+
+        select.addEventListener("mouseout", function (e) {
+            if (e.target.tagName === "LI") {
                 e.stopPropagation();
                 e.preventDefault();
                 e.target.classList.remove("ui-state-hover");
             }
         });
-        
+
         box.appendChild(select);
-        var options=[];
-        for(var i=0;i<4;i++){
-            options[i]=document.createElement("li");
+        var options = [];
+        for (var i = 0; i < 4; i++) {
+            options[i] = document.createElement("li");
             select.appendChild(options[i]);
         }
 
-        this.input.addEventListener("keyup",function(e){
+        this.input.addEventListener("keyup", function (e) {
             var r;
             e.stopPropagation();
-            v=that.input.value;
-            offset={x:0,y:0};
-            rect=that.input.getBoundingClientRect();
-            getOffset(select,offset);
-            select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
-            select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
-            select.style.visibility="hidden";
-            r=contains(that.options,v);
-            for(var i=0;i<r.length;i++){
-                options[i].textContent=r[i];
+            v = that.input.value;
+            offset = { x: 0, y: 0 };
+            rect = that.input.getBoundingClientRect();
+            getOffset(select, offset);
+            select.style.top = (rect.bottom + window.scrollY - offset.y).toString() + "px";
+            select.style.left = (rect.left + window.scrollX - offset.x).toString() + "px";
+            select.style.visibility = "hidden";
+            r = contains(that.options, v);
+            for (var i = 0; i < r.length; i++) {
+                options[i].textContent = r[i];
             }
-            select.style.visibility="visible";
-            this.value=v;
+            select.style.visibility = "visible";
+            this.value = v;
         });
-        if(this.action){
+        if (this.action) {
             this.action(this);
         }
         return this;
     };
 
-    AutoCompleteField.prototype={
+    AutoCompleteField.prototype = {
         popupEditor: null
     };
 
-    Apoco.Utils.extend(AutoCompleteField,_Field);
+    Apoco.Utils.extend(AutoCompleteField, _Field);
 
-    Apoco.field={
-        exists:function(field){
-            if(this[field]){
+    Apoco.field = {
+        exists: function exists(field) {
+            if (this[field]) {
                 return true;
             }
             return false;
         },
-        input:function(options,element){return new InputField(options,element);},
-        inputMethods:function(){var n=[]; for(var k in InputField.prototype){  n.push(k);} return n;},
-        float:function(options,element){return new FloatField(options,element);},
-        floatMethods:function(){var n=[]; for(var k in FloatField.prototype){ n.push(k);} return n;},
-        date:function(options,element){return new DateField(options,element);},
-        dateMethods:function(){var n=[]; for(var k in DateField.prototype){  n.push(k);} return n;},
-        time:function(options,element){return new TimeField(options,element);},
-        timeMethods:function(){var n=[]; for(var k in TimeField.prototype){ n.push(k);} return n;},
-	numberArray:function(options,element){return new  NumberArrayField(options,element);},
-        numberArrayMethods:function(){var n=[]; for(var k in NumberArrayField.prototype){ n.push(k);} return n;},
-	textArea:function(options,element){ return new  TextAreaField(options,element);},
-        textAreaMethods:function(){var n=[]; for(var k in TextAreaField.prototype){ n.push(k);} return n;},
-	select:function(options,element){ return new  SelectField(options,element);},
-        selectMethods:function(){var n=[]; for(var k in SelectField.prototype){ n.push(k);} return n;},
-	checkBox: function(options,element){return new CheckBoxField(options,element);},
-        checkBoxMethods:function(){var n=[]; for(var k in CheckBoxField.prototype){ n.push(k);} return n;},
-        slider:function(options,element){ return new  SliderField(options,element);},
-        sliderMethods:function(){var n=[]; for(var k in SliderField.prototype){ n.push(k);} return n;},
-	buttonSet:function(options,element){ return new  ButtonSetField(options,element);},
-        buttonSetMethods:function(){var n=[]; for(var k in ButtonSetField.prototype){ n.push(k);} return n;},
-	stringArray:function(options,element){ return new  StringArrayField(options,element);},
-        stringArrayMethods:function(){var n=[]; for(var k in StringArrayField.prototype){ n.push(k);} return n;},
-        imageArray:function(options,element){ return new  ImageArrayField(options,element);},
-        imageArrayMethods:function(){var n=[]; for(var k in ImageArrayField.prototype){ n.push(k);} return n;},
-	autoComplete: function(options,element){ return new AutoCompleteField(options,element);},
-        autoCompleteMethods:function(){var n=[]; for(var k in AutoCompleteField.prototype){ n.push(k);} return n;}
+        input: function input(options, element) {
+            return new InputField(options, element);
+        },
+        inputMethods: function inputMethods() {
+            var n = [];for (var k in InputField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        float: function float(options, element) {
+            return new FloatField(options, element);
+        },
+        floatMethods: function floatMethods() {
+            var n = [];for (var k in FloatField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        date: function date(options, element) {
+            return new DateField(options, element);
+        },
+        dateMethods: function dateMethods() {
+            var n = [];for (var k in DateField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        time: function time(options, element) {
+            return new TimeField(options, element);
+        },
+        timeMethods: function timeMethods() {
+            var n = [];for (var k in TimeField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        numberArray: function numberArray(options, element) {
+            return new NumberArrayField(options, element);
+        },
+        numberArrayMethods: function numberArrayMethods() {
+            var n = [];for (var k in NumberArrayField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        textArea: function textArea(options, element) {
+            return new TextAreaField(options, element);
+        },
+        textAreaMethods: function textAreaMethods() {
+            var n = [];for (var k in TextAreaField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        select: function select(options, element) {
+            return new SelectField(options, element);
+        },
+        selectMethods: function selectMethods() {
+            var n = [];for (var k in SelectField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        checkBox: function checkBox(options, element) {
+            return new CheckBoxField(options, element);
+        },
+        checkBoxMethods: function checkBoxMethods() {
+            var n = [];for (var k in CheckBoxField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        slider: function slider(options, element) {
+            return new SliderField(options, element);
+        },
+        sliderMethods: function sliderMethods() {
+            var n = [];for (var k in SliderField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        buttonSet: function buttonSet(options, element) {
+            return new ButtonSetField(options, element);
+        },
+        buttonSetMethods: function buttonSetMethods() {
+            var n = [];for (var k in ButtonSetField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        stringArray: function stringArray(options, element) {
+            return new StringArrayField(options, element);
+        },
+        stringArrayMethods: function stringArrayMethods() {
+            var n = [];for (var k in StringArrayField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        imageArray: function imageArray(options, element) {
+            return new ImageArrayField(options, element);
+        },
+        imageArrayMethods: function imageArrayMethods() {
+            var n = [];for (var k in ImageArrayField.prototype) {
+                n.push(k);
+            }return n;
+        },
+        autoComplete: function autoComplete(options, element) {
+            return new AutoCompleteField(options, element);
+        },
+        autoCompleteMethods: function autoCompleteMethods() {
+            var n = [];for (var k in AutoCompleteField.prototype) {
+                n.push(k);
+            }return n;
+        }
     };
-
-    
-
-
-    
 })();
 
-},{"./Sort":14,"./Types":15,"./Utils":16,"./datepicker":18,"./declare":19}],10:[function(require,module,exports){
-var Apoco=require('./declare').Apoco,UI=require('./declare').UI; 
+},{"./Sort":14,"./Types":15,"./Utils":16,"./datepicker":18,"./declare":19,"es6-promise":43}],10:[function(require,module,exports){
+'use strict';
 
-;(function(){
+var Apoco = require('./declare').Apoco,
+    UI = require('./declare').UI;
+var PolyfillPromise = require('es6-promise').Promise;
 
-    Apoco.IO={
-        _subscribers:{},
-        dispatch:function(name,args){  //pubsub
-           // console.log("dispatch is here name is " + name);
-	    if(this._subscribers[name]){
-           //     console.log("found subscriber");
-	        try{
-		    this._subscribers[name].forEach(function(s){
-                        if(!s.action){
+if (Promise === undefined) {
+    Promise = PolyfillPromise;
+}
+
+;(function () {
+
+    Apoco.IO = {
+        _subscribers: {},
+        dispatch: function dispatch(name, args) {
+            if (this._subscribers[name]) {
+                try {
+                    this._subscribers[name].forEach(function (s) {
+                        if (!s.action) {
                             throw new Error("No action for " + s);
                         }
-                     //   for(var k in s.context){
-                     //       console.log("before dispatch " + k);
-                        //   }
-             //           console.log("action is " + s.action);
-               //         console.log("with args " + args);
-		        s.action(s.context,args);
-		    });
-	        } catch (err){
-		    throw new Error("_Subscriber error on " + name + " " + err);
-	       }
-	    }
+
+                        s.action(s.context, args);
+                    });
+                } catch (err) {
+                    throw new Error("_Subscriber error on " + name + " " + err);
+                }
+            }
         },
-        listen:function(that){ //pubsub
-	    //var b=that.getKey();
-            //  for(var k in that){
-            //      console.log("listen has that " + k);
-            //   }
-            if(that === undefined || that.listen === undefined){
+        listen: function listen(that) {
+            if (that === undefined || that.listen === undefined) {
                 throw new Error("IO.listen needs an object");
             }
-	    for(var i=0; i< that.listen.length; i++){
-	        var n=that.listen[i].name;
-	    //   console.log("adding listener " + n );// + " to " + that.getKey());
-	        if(!this._subscribers[n]){
-		    this._subscribers[n]=[];
-	        }
-	        this._subscribers[n].push({context:that,action:that.listen[i].action});
-	    }
-        },
-        unsubscribe:function(that){ //pubsub
-	    var index=-1;
+            for (var i = 0; i < that.listen.length; i++) {
+                var n = that.listen[i].name;
 
-	    for(var i=0; i< that.listen.length; i++){
-	     //   console.log("finding name " + that.listen[i].name);
-	        if(this._subscribers[that.listen[i].name]){
-		    for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
-		        if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){
-			    this._subscribers[that.listen[i].name].splice(j,1);
-			    index=j;
-		        }
-		    }
-	        }
-	    }
-	    if(index !== -1){
-	        if(this._subscribers[that.listen[index].name].length === 0){ // nobody listening
-		    delete this._subscribers[that.listen[index].name];
-	        }
+                if (!this._subscribers[n]) {
+                    this._subscribers[n] = [];
+                }
+                this._subscribers[n].push({ context: that, action: that.listen[i].action });
+            }
+        },
+        unsubscribe: function unsubscribe(that) {
+            var index = -1;
+
+            for (var i = 0; i < that.listen.length; i++) {
+                if (this._subscribers[that.listen[i].name]) {
+                    for (var j = 0; j < this._subscribers[that.listen[i].name].length; j++) {
+                        if (this._subscribers[that.listen[i].name][j]["context"].action === that.action) {
+                            this._subscribers[that.listen[i].name].splice(j, 1);
+                            index = j;
+                        }
+                    }
+                }
+            }
+            if (index !== -1) {
+                if (this._subscribers[that.listen[index].name].length === 0) {
+                    delete this._subscribers[that.listen[index].name];
+                }
                 return undefined;
-	    }
-	    else{
+            } else {
                 console.log("Apoco.unsubscribe could not find listener");
                 return null;
             }
         },
-        publish:function(that) {//pubsub
-            if(that === undefined || that.publish === undefined){
+        publish: function publish(that) {
+            if (that === undefined || that.publish === undefined) {
                 throw new Error("IO.publish needs an object");
             }
-          //  console.log("++++++++++++=+++ publish +++++++++ " + that.id);
-	    for(var i=0;i<that.publish.length;i++){
 
-	        if(that.publish[i].data){
-		    this.dispatch(that.publish[i].name,that.publish[i].data);
-	        }
-	        else if(that.publish[i].action){
-		    that.publish[i].action(that,that.publish[i].name);
+            for (var i = 0; i < that.publish.length; i++) {
 
-	        }
-	        else{
-		    throw new Error("incorrect method for apoco.publish");
-	        }
-	    }
-        },
-        webSocket:function(options,data){
-            var that=this;
-            var defaults={url: UI.webSocketURL};
-            var settings={};
-            var sendMessage=function(data){
-              //  console.log("Trying to send message ___________________________________");
-                var msg=JSON.stringify(data);
-              //  console.log("got some data " + msg);
-                try{
-                    Apoco.webSocket.send(msg+'\n');
+                if (that.publish[i].data) {
+                    this.dispatch(that.publish[i].name, that.publish[i].data);
+                } else if (that.publish[i].action) {
+                    that.publish[i].action(that, that.publish[i].name);
+                } else {
+                    throw new Error("incorrect method for apoco.publish");
                 }
-                catch(err){
-                    Apoco.popup.error("websocket send", ("Could not send websocket message %j ",err));
+            }
+        },
+        webSocket: function webSocket(options, data) {
+            var that = this;
+            var defaults = { url: UI.webSocketURL };
+            var settings = {};
+            var sendMessage = function sendMessage(data) {
+                var msg = JSON.stringify(data);
+
+                try {
+                    Apoco.webSocket.send(msg + '\n');
+                } catch (err) {
+                    Apoco.popup.error("websocket send", ("Could not send websocket message %j ", err));
                 }
             };
-            settings.url=defaults.url;
-            for(var k in options){
-                settings[k]=options[k];
+            settings.url = defaults.url;
+            for (var k in options) {
+                settings[k] = options[k];
             }
-            
-            if(!Apoco.webSocket){
-              //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
-                var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
-              //  console.log("a is " + a + " protocol " + window.location.protocol);
-                if(!a){
+
+            if (!Apoco.webSocket) {
+                var a = { 'http:': 'ws:', 'https:': 'wss:', 'file:': 'wstest:' }[window.location.protocol];
+
+                if (!a) {
                     throw new Error("IO: Cannot get protocol for window " + window.location);
                 }
-              //  console.log("location host " + window.location.host + " hostname " + window.location.hostname);
-                try{
-                    Apoco.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
+
+                try {
+                    Apoco.webSocket = new WebSocket(a + "//" + window.location.host + settings.url);
                     Apoco.webSocket.onopen = function (e) {
-                          //     console.log("created websocket + + + + + + + + + + + + + + ++");
-                        if(data !== undefined){ // in case of timing issue
-                              sendMessage(data);
+                        if (data !== undefined) {
+                            sendMessage(data);
                         }
                     };
+                } catch (err) {
+                    throw new Error("webSocket: failed to open" + err);
                 }
-                catch(err){
-                    throw new Error(("webSocket: failed to open" + err));
-                }
-	    }
-            else if(data !== undefined){
+            } else if (data !== undefined) {
                 sendMessage(data);
             }
 
-            Apoco.webSocket.onerror=function(e){
-                Apoco.popup.error("webSocket","Received an error msg");
+            Apoco.webSocket.onerror = function (e) {
+                Apoco.popup.error("webSocket", "Received an error msg");
             };
-            Apoco.webSocket.onclose=function(e){
-                if(e.code !== 1000){ // normal termination
+            Apoco.webSocket.onclose = function (e) {
+                if (e.code !== 1000) {
                     Apoco.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
                 }
             };
-            Apoco.webSocket.onmessage=function(e){
-                if(!e.data){
+            Apoco.webSocket.onmessage = function (e) {
+                if (!e.data) {
                     throw new Error("webSocket: no data or name from server");
                 }
-                var d=JSON.parse(e.data);
-                console.log("got: %j %j",d[0],d[1]);
-                if(d[0] === "error"){
-                    Apoco.popup.dialog("Error",JSON.stringify(d[1]));
-                }
-                else{
-                    that.dispatch(d[0],d[1]);
+                var d = JSON.parse(e.data);
+                console.log("got: %j %j", d[0], d[1]);
+                if (d[0] === "error") {
+                    Apoco.popup.dialog("Error", JSON.stringify(d[1]));
+                } else {
+                    that.dispatch(d[0], d[1]);
                 }
             };
-            //if(data !== undefined){
-            //    sendMessage(data);
-           // }
-
         },
-        REST:function(type,options,data){
-            var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};
-            //type=type.toString();
-            if(type !== "GET" && type !== "POST"){
+        REST: function REST(type, options, data) {
+            var defaults = { url: UI.URL, dataType: 'json', mimeType: 'application/json' };
+
+            if (type !== "GET" && type !== "POST") {
                 throw new Error("REST: only knows about GET and POST not " + type);
             }
-	    //    var settings=$.extend({},defaults,options);
-            var settings={};
-            for(var k in defaults){
-                settings[k]=defaults[k];
+
+            var settings = {};
+            for (var k in defaults) {
+                settings[k] = defaults[k];
             }
-            for(var k in options){
-                settings[k]=options[k];
+            for (var k in options) {
+                settings[k] = options[k];
             }
-            if(settings.url === ""){
+            if (settings.url === "") {
                 throw new Error("Apoco.REST Must have a url");
             }
-            data=JSON.stringify(data);
-            //var promise=$.ajax(settings);
+            data = JSON.stringify(data);
 
-            var promise=new Promise(function(resolve,reject){
-                var request=new XMLHttpRequest();
-                var stateChange=function(){
-                    if(request.readyState === XMLHttpRequest.DONE){
-                        if(request.status === 200){ //success
-                          //  console.log("return from server is " + request.responseText);
+
+            var promise = new Promise(function (resolve, reject) {
+                var request = new XMLHttpRequest();
+                var stateChange = function stateChange() {
+                    if (request.readyState === XMLHttpRequest.DONE) {
+                        if (request.status === 200) {
                             resolve(JSON.parse(request.responseText));
-                        }
-                        else{
+                        } else {
                             reject(request.status);
-                            if(!request){
+                            if (!request) {
                                 throw new Error("REST failed with no return from server");
                             }
-                            Apoco.display.statusCode[request.status]((request.statusText + " " + request.responseText));
+                            Apoco.display.statusCode[request.status](request.statusText + " " + request.responseText);
                         }
                     }
                 };
-                var reqFail=function(e){
+                var reqFail = function reqFail(e) {
                     reject(request.status);
                 };
-                request.onreadystatechange=stateChange;
-                request.open(type,settings.url);
-                request.addEventListener('error',reqFail);
-                if(type === "POST"){
+                request.onreadystatechange = stateChange;
+                request.open(type, settings.url);
+                request.addEventListener('error', reqFail);
+                if (type === "POST") {
                     request.setRequestHeader("Content-Type", settings.mimeType);
                     request.send(data);
-                }
-                else{
-                    request.responseType=settings.mimeType;
+                } else {
+                    request.responseType = settings.mimeType;
                     request.send();
                 }
             });
@@ -4746,1860 +4430,1700 @@ var Apoco=require('./declare').Apoco,UI=require('./declare').UI;
     };
 })();
 
-},{"./declare":19}],11:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+},{"./declare":19,"es6-promise":43}],11:[function(require,module,exports){
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./Types.js");
-// Node class for static elements like headings and text etc
-// No callbacks or publish or listeners for these elements
-// if you need callbacks use Apoco.fields
 
-;(function(){
 
-    var _Node=function(d,element){
-        if(!d){
+;(function () {
+
+    var _Node = function _Node(d, element) {
+        if (!d) {
             throw new Error("Apoco: node, No params");
         }
-	if(d && !d.node){
-            throw new Error("Apoco: node doesn't know how to make",d.node);
+        if (d && !d.node) {
+            throw new Error("Apoco: node doesn't know how to make", d.node);
         };
-  	for(var k in d){
-	    this[k]=d[k];
-	}
+        for (var k in d) {
+            this[k] = d[k];
+        }
         _getNode[d.node](this);
 
-	if(this.class){
-	    this.element.classList.add(this.class);
-	}
-	if(this.id){
-	    this.element.id=this.id;
-	}
-        if(this.name){
-           // console.log("++++++++++++++++Node adding name " + this.name);
-            this.element.setAttribute("name",this.name);
+        if (this.class) {
+            this.element.classList.add(this.class);
         }
-        if(element){
+        if (this.id) {
+            this.element.id = this.id;
+        }
+        if (this.name) {
+            this.element.setAttribute("name", this.name);
+        }
+        if (element) {
             element.appendChild(this.element);
         }
     };
 
-    _Node.prototype={
-	getElement: function(){
-	    return this.element;
-	},
-	setText: function(text){
-            switch(this.node){
-            case "heading":
-            case "paragraph":
-            case "label":
-            case "anchor":
-		this.element.innerHTML=text;
-		this.text=text;
-                return;
-            default:
-                throw new Error("Cannot set text of " + this.node);
+    _Node.prototype = {
+        getElement: function getElement() {
+            return this.element;
+        },
+        setText: function setText(text) {
+            switch (this.node) {
+                case "heading":
+                case "paragraph":
+                case "label":
+                case "anchor":
+                    this.element.innerHTML = text;
+                    this.text = text;
+                    return;
+                default:
+                    throw new Error("Cannot set text of " + this.node);
             }
-	}
+        }
     };
 
-    var _getNode={
-	anchor: function(that){
-            that.element=document.createElement("a"); 
-            that.element.href=that.href;
-            that.element.textContent=that.text;
-            if(that.target){
-                that.element.target="_blank";
+    var _getNode = {
+        anchor: function anchor(that) {
+            that.element = document.createElement("a");
+            that.element.href = that.href;
+            that.element.textContent = that.text;
+            if (that.target) {
+                that.element.target = "_blank";
             }
-	},
-        whatever: function(that){
-            if(that.nodeType){
-                that.element=document.createElement(that.nodeType);
-                if(that.element !== null){
-                    if(that.text){
-                        that.element.textContent=that.text;
+        },
+        whatever: function whatever(that) {
+            if (that.nodeType) {
+                that.element = document.createElement(that.nodeType);
+                if (that.element !== null) {
+                    if (that.text) {
+                        that.element.textContent = that.text;
                     }
-                  
                 }
-                if(that.attr){
-                    for(var i=0;i<that.attr.length;i++){
-                        for(var k in that.attr[i]){
-                            that.element.setAttribute(k,that.attr[i][k]);
+                if (that.attr) {
+                    for (var i = 0; i < that.attr.length; i++) {
+                        for (var k in that.attr[i]) {
+                            that.element.setAttribute(k, that.attr[i][k]);
                         }
                     }
                 }
-            }
-            else{
-                throw new Error ("Node: whatever no nodeType specified");
-            }
-        },
-	heading: function(that){
-	    switch(that.size){
-	    case "h1":
-	    case "H1":
-		that.element=document.createElement("h1");
-                that.element.textContent=that.text;
-		return;
-	    case "h2":
-	    case "H2":
-                that.element=document.createElement("h2");
-                that.element.textContent=that.text;
-		return;
-	    case "h3":
-	    case "H3":
-                that.element=document.createElement("h3");
-                that.element.textContent=that.text;
-		return;
-	    case "h4":
-	    case "H4":
-                that.element=document.createElement("h4");
-                that.element.textContent=that.text;
-		return;
-	    case "h5":
-	    case "H5":
-                that.element=document.createElement("h5");
-                that.element.textContent=that.text;
-		return;
-	    case "h6":
-            case "H6":
-                that.element=document.createElement("h6");
-                that.element.textContent=that.text;
-		return;
-	    default:
-		throw new Error("invalid arg for header " + that.size);
-	    };
-	},
-	label: function(that){
-            that.element=document.createElement("label");
-            that.element.textContent=that.text;
-	    if(that.for){
-                that.element.htmlFor=that.for;
-	    }
-	},
-        code: function(that){
-            that.element=document.createElement("code");
-            if(that.text!==undefined){
-               // that.element.textNode(that.text);
-               that.element.textContent=that.text;
+            } else {
+                throw new Error("Node: whatever no nodeType specified");
             }
         },
-	paragraph: function(that){
-	    that.element=document.createElement("p");
-            if(that.text!==undefined){
-                // that.element.textContent=that.text; // doesn't parse unicode
-                that.element.innerHTML=that.text;
+        heading: function heading(that) {
+            switch (that.size) {
+                case "h1":
+                case "H1":
+                    that.element = document.createElement("h1");
+                    that.element.textContent = that.text;
+                    return;
+                case "h2":
+                case "H2":
+                    that.element = document.createElement("h2");
+                    that.element.textContent = that.text;
+                    return;
+                case "h3":
+                case "H3":
+                    that.element = document.createElement("h3");
+                    that.element.textContent = that.text;
+                    return;
+                case "h4":
+                case "H4":
+                    that.element = document.createElement("h4");
+                    that.element.textContent = that.text;
+                    return;
+                case "h5":
+                case "H5":
+                    that.element = document.createElement("h5");
+                    that.element.textContent = that.text;
+                    return;
+                case "h6":
+                case "H6":
+                    that.element = document.createElement("h6");
+                    that.element.textContent = that.text;
+                    return;
+                default:
+                    throw new Error("invalid arg for header " + that.size);
+            };
+        },
+        label: function label(that) {
+            that.element = document.createElement("label");
+            that.element.textContent = that.text;
+            if (that.for) {
+                that.element.htmlFor = that.for;
             }
-	},
-        list: function(that){
-	    that.element=document.createElement("ul");
+        },
+        code: function code(that) {
+            that.element = document.createElement("code");
+            if (that.text !== undefined) {
+                that.element.textContent = that.text;
+            }
+        },
+        paragraph: function paragraph(that) {
+            that.element = document.createElement("p");
+            if (that.text !== undefined) {
+                that.element.innerHTML = that.text;
+            }
+        },
+        list: function list(that) {
+            that.element = document.createElement("ul");
             that.element.classList.add("list");
-	    for(var i=0;i<that.list.length;i++){
-                var l=that.list[i];
-	        var el=document.createElement("li");
-                el.textContent=l;
-	        that.element.appendChild(el);
+            for (var i = 0; i < that.list.length; i++) {
+                var l = that.list[i];
+                var el = document.createElement("li");
+                el.textContent = l;
+                that.element.appendChild(el);
             }
         },
-        descriptionList: function(that){
+        descriptionList: function descriptionList(that) {
             var d;
-            if(that.items === undefined){
+            if (that.items === undefined) {
                 throw new Error("Node: descriptionList requires at least one item" + that.name);
             }
-            that.element=document.createElement("dl"); 
-            for(var i=0;i<that.items.length;i++){
-                if(that.items[i].label){
-                    d=document.createElement("dt");
-                    d.textContent=that.items[i].label;
+            that.element = document.createElement("dl");
+            for (var i = 0; i < that.items.length; i++) {
+                if (that.items[i].label) {
+                    d = document.createElement("dt");
+                    d.textContent = that.items[i].label;
                     that.element.appendChild(d);
-                }
-                else  if(that.items[i].labels){
-                    if(Apoco.type['array'].check(that.items[i].labels)){
-                        for(var j=0;j<that.items[i].labels.length;j++){
-                            d=document.createElement("dt");
-                            d.textContent=that.items[i].labels[j];
+                } else if (that.items[i].labels) {
+                    if (Apoco.type['array'].check(that.items[i].labels)) {
+                        for (var j = 0; j < that.items[i].labels.length; j++) {
+                            d = document.createElement("dt");
+                            d.textContent = that.items[i].labels[j];
                             that.element.appendChild(d);
                         }
                     }
                 }
-                if (that.items[i].description){
-                    d=document.createElement("dd");
-                    d.innerHTML=that.items[i].description;
+                if (that.items[i].description) {
+                    d = document.createElement("dd");
+                    d.innerHTML = that.items[i].description;
                     that.element.appendChild(d);
-                }
-                else if (that.items[i].descriptions){
-                    if(Apoco.type['array'].check(that.items[i].descriptions)){
-                        for(var j=0;j<that.items[i].descriptions.length;j++){
-                            d=document.createElement("dd");
-                            d.innerHTML=that.items[i].descriptions[j];
+                } else if (that.items[i].descriptions) {
+                    if (Apoco.type['array'].check(that.items[i].descriptions)) {
+                        for (var j = 0; j < that.items[i].descriptions.length; j++) {
+                            d = document.createElement("dd");
+                            d.innerHTML = that.items[i].descriptions[j];
                             that.element.appendChild(d);
                         }
                     }
                 }
             }
         },
-        image: function(that){
-          //  console.log("image node is here");
-            var imm=document.createElement("img");//new Image();
-            // get the width and height - need to load in to image
-            if(that.url !== undefined){
-                imm.src=that.url;
-            }
-            else if(that.src !== undefined){
-                imm.src=that.src;
-            }
-            else{
+        image: function image(that) {
+            var imm = document.createElement("img");
+            if (that.url !== undefined) {
+                imm.src = that.url;
+            } else if (that.src !== undefined) {
+                imm.src = that.src;
+            } else {
                 throw new Error("Node: image no url or src parm supplied");
             }
-            that.element=document.createElement("div"); 
-	    imm.onload=function(){
-	//	console.log("+++++ reader onload got width " + this.width + " " + this.height);
-                if(that.width){
-                    this.width=that.width;
+            that.element = document.createElement("div");
+            imm.onload = function () {
+                if (that.width) {
+                    this.width = that.width;
+                } else {
+                    that.element.style.width = this.width.toString() + "px";
                 }
-                else{
-                    that.element.style.width=((this.width).toString()+ "px");
-                }
-                if(that.height){
-                    this.height=that.height;
-                }
-                else{
-                    that.element.style.height=((this.height).toString()+ "px");
+                if (that.height) {
+                    this.height = that.height;
+                } else {
+                    that.element.style.height = this.height.toString() + "px";
                 }
                 that.element.appendChild(imm);
             };
         },
-	clock: function(that){  
-            that.element=document.createElement("div");  
+        clock: function clock(that) {
+            that.element = document.createElement("div");
             that.element.classList.add("Apoco_clock");
-            var cb=function(t){
-                var d=new Date();
-                that.element.textContent=d.toLocaleTimeString();
+            var cb = function cb(t) {
+                var d = new Date();
+                that.element.textContent = d.toLocaleTimeString();
             };
-	    window.setInterval(function(){cb(that);},1000);
-	},
-        button:function(that){
-            var t=that.text?that.text: that.name;
-            that.element=document.createElement("button");
-            that.element.type="button";
+            window.setInterval(function () {
+                cb(that);
+            }, 1000);
+        },
+        button: function button(that) {
+            var t = that.text ? that.text : that.name;
+            that.element = document.createElement("button");
+            that.element.type = "button";
             that.element.classList.add("ui-button");
-            that.element.textContent=t;
-            if(that.disabled === true){
-                that.element.setAttribute("disabled","disabled");
+            that.element.textContent = t;
+            if (that.disabled === true) {
+                that.element.setAttribute("disabled", "disabled");
             }
-            if(that.action){
-                that.element.addEventListener("click",function(e){
+            if (that.action) {
+                that.element.addEventListener("click", function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                     that.action(that);
-                },false);
+                }, false);
             }
-	},
-        paginate:function(that){
+        },
+        paginate: function paginate(that) {
             var n;
-            if(!that.number){
+            if (!that.number) {
                 throw new Error("paginate needs a number");
             }
-	    that.current_num=0;
-            //console.log("paginator init with number " + that.number);
-	    // var that=this;
-            that.element=document.createElement("div");
+            that.current_num = 0;
+
+            that.element = document.createElement("div");
             that.element.classList.add("Apoco_paginate");
-            var cb=function(index,el){
-              //  console.log("index is " + index);
-                n=el.parentNode.childNodes;
-                for(var i=0;i<n.length;i++){
+            var cb = function cb(index, el) {
+                n = el.parentNode.childNodes;
+                for (var i = 0; i < n.length; i++) {
                     n[i].classList.remove("ui-state-active");
                 }
-                el.classList.add("ui-state-active");   
-                that.current_num=index;
+                el.classList.add("ui-state-active");
+                that.current_num = index;
                 that.action(that);
             };
-            if(this.prevNext){
+            if (this.prevNext) {
                 var n;
-                var b=document.createElement("button");
-                b.textContent="previous";
+                var b = document.createElement("button");
+                b.textContent = "previous";
                 this.element.appendChild(b);
-                b.addEventListener("click",function(e){
+                b.addEventListener("click", function (e) {
                     e.stopPropagation();
-                    if(that.current_num === 0){
-                        n=that.number-1;
+                    if (that.current_num === 0) {
+                        n = that.number - 1;
+                    } else {
+                        n = that.current_num - 1;
                     }
-                    else{
-                        n=that.current_num-1;
-                    }
-                    var t=this.element.getElementsByName(n)[0];
+                    var t = this.element.getElementsByName(n)[0];
                     t.click();
-                },false);
-
+                }, false);
             }
-            for(var i=0;i<that.number;i++){
-                //console.log("making button number " + i);
-                var b=document.createElement("button");
-                b.name=i;
-                b.textContent=(i+1);
+            for (var i = 0; i < that.number; i++) {
+                var b = document.createElement("button");
+                b.name = i;
+                b.textContent = i + 1;
                 that.element.appendChild(b);
-                b.addEventListener("click", function(){
-                    var index=i;
-                    return function(e){
-                        e.stopPropagation();     
-                        cb(index,e.target);
-                  //      console.log("got a click for " + index);
+                b.addEventListener("click", function () {
+                    var index = i;
+                    return function (e) {
+                        e.stopPropagation();
+                        cb(index, e.target);
                     };
-
-                }(i),false);
+                }(i), false);
             }
-            if(this.prevNext){
-                var b=document.createElement("button");
-                b.textContent="next";
+            if (this.prevNext) {
+                var b = document.createElement("button");
+                b.textContent = "next";
                 this.element.appendChild(b);
-                b.addEventListener("click",function(e){
-                    var n=(that.current_num+1)%that.number;
-                    var t=this.element.getElementsByName(n); 
+                b.addEventListener("click", function (e) {
+                    var n = (that.current_num + 1) % that.number;
+                    var t = this.element.getElementsByName(n);
                     t.click();
-                },false);
+                }, false);
             }
-        }/*,
-        progressBar:function(that){
-            var max=100;
-            if(!document.contains(document.getElementById("Apoco_progressBar"))){
-                if(!that.element){
-                    that.element=document.createElement("div");//$("<div id='Apoco_progressBar'></div>");
-                    that.element.id="Apoco.progressBar";
-                    $(that.element).progressbar({ value: that.value, max: max,min:0});
-                    //element.append(pb);
-                    //return pb;
-                }
-            }
+        } };
 
-        }*/
-    };
-
-    Apoco.node=function(options,el){
-        if(options === "node_list"){ // return the list of nodes- internal use only
-            var nl={};
-            for(var k in _getNode){
-              //  console.log("k in getNode is " + k);
-                nl[k]=k;
+    Apoco.node = function (options, el) {
+        if (options === "node_list") {
+            var nl = {};
+            for (var k in _getNode) {
+                nl[k] = k;
             }
             return nl;
-         }
-        else{
-            //console.log("Apoco.node calling _Node");
-            return new _Node(options,el);
+        } else {
+            return new _Node(options, el);
         }
     };
 })();
 
 },{"./Types.js":15,"./declare":19}],12:[function(require,module,exports){
-var Apoco=require('./declare').Apoco,UI=require('./declare').UI; 
+'use strict';
+
+var Apoco = require('./declare').Apoco,
+    UI = require('./declare').UI;
 require("./Utils");
 require("./Popups");
 require("./Window");
 
-;(function() {
+;(function () {
     'use strict';
-    function check(ar){
-	if(!Apoco.type["object"].check(ar)){
-	    throw new Error("This is not a window display object " + ar);
-	}
-	for(var i in ar){
-	    var OK=0;
-	    var msg=new String;
-            for(var k in ar[i]){
-	//	console.log("key is " + k);
-		switch(k){
-		case "display": // check whether there is a display object
-		    var d=ar[i][k];
-		   //console.log("switch case display " + d);
-		    if(!Apoco.display[d]){
-			msg=msg.concat("Apoco does not know how to create " + d);
-		    }
-		    else{
-			OK++;
-		    }
-                    break;
-		case "DOM": // does this object exist ?
-		    //var d=document.getElementById(ar[i][k]);
-                    var d=true;
-                    if(!ar[i][k] || ar[i][k].length===0){
-                        d=false;
-                    }
-		  // console.log("switch case DOM ", d);
-		    if(!d){
-			msg=msg.concat("No Dom object called " + d);
-		    }
-		    else{
-			OK++;
-		    }
-		    break;
-		case "id":  // must have an id
-		  //  console.log("switch case id");
-		    if(!ar[i][k] || ar[i][k].length===0){
-			msg=msg.concat("display objects must have an id");
-		    }
-		    else{
-			OK++;
-		    }
-		    break;
-		default:
-		 //   console.log("this is default");
-		    break;
-		}
-	    }
-	    if(OK !== 3 ){
-		//console.log("got " + OK );
-		throw new Error(msg);
-	    }
-	}
-	return true;
+
+    function check(ar) {
+        if (!Apoco.type["object"].check(ar)) {
+            throw new Error("This is not a window display object " + ar);
+        }
+        for (var i in ar) {
+            var OK = 0;
+            var msg = new String();
+            for (var k in ar[i]) {
+                switch (k) {
+                    case "display":
+                        var d = ar[i][k];
+
+                        if (!Apoco.display[d]) {
+                            msg = msg.concat("Apoco does not know how to create " + d);
+                        } else {
+                            OK++;
+                        }
+                        break;
+                    case "DOM":
+                        var d = true;
+                        if (!ar[i][k] || ar[i][k].length === 0) {
+                            d = false;
+                        }
+
+                        if (!d) {
+                            msg = msg.concat("No Dom object called " + d);
+                        } else {
+                            OK++;
+                        }
+                        break;
+                    case "id":
+                        if (!ar[i][k] || ar[i][k].length === 0) {
+                            msg = msg.concat("display objects must have an id");
+                        } else {
+                            OK++;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (OK !== 3) {
+                throw new Error(msg);
+            }
+        }
+        return true;
     }
 
-  
-
-    Apoco.Panel={
-	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
-        UIStart:function(w){
+    Apoco.Panel = {
+        _list: [],
+        UIStart: function UIStart(w) {
             var nv;
-          //  console.log("UIStart is here");
-            if(w === undefined){
+
+            if (w === undefined) {
                 throw new Error("Panel.UIStart needs a string array of valid UI Panel names");
             }
-            for(var i=0;i<w.length;i++){
-              //  console.log("trying to find " + w[i]);
-                nv=this._UIGet(w[i]);
-                if(nv !== null){
+            for (var i = 0; i < w.length; i++) {
+                nv = this._UIGet(w[i]);
+                if (nv !== null) {
                     this.add(nv);
-                }
-                else{
+                } else {
                     throw new Error("Apoco.Panel: No panel called " + w[i] + " was found in UI.Panels");
                 }
             }
-
         },
-        _UIGet:function(name){
-           // console.log("UIGet trying to find " + name);
-         //   console.log("UIGet Panels " + UI.Panels);
-            if(name === undefined){
+        _UIGet: function _UIGet(name) {
+            if (name === undefined) {
                 throw new Error("Panel._UIGet: panel name is undefined");
             }
-            for(var k in UI.Panels){
-            //     console.log("trying to get panel " + name + " from " + k);
-                if(k == name){
-                //    console.log("found " + name);
-                    var cd=Apoco.cloneDeep(UI.Panels[k]);
-               //     console.log("clone deep is " + cd);
+            for (var k in UI.Panels) {
+                if (k == name) {
+                    var cd = Apoco.cloneDeep(UI.Panels[k]);
+
                     return cd;
                 }
             }
             return null;
         },
- 	_inList: function(k){
-            if(k===undefined){
+        _inList: function _inList(k) {
+            if (k === undefined) {
                 throw new Error("Panel: inList name is undefined");
             }
-            for(var i=0;i< this._list.length;i++){
-	//	console.log("i is " + i + "checking is in list " + this._list[i].name);
-		if(this._list[i].name == k){
-		    return i;
-		}
-	    }
-	    return null;
-	},
-        get: function(k){
-            var u=this._inList(k);
-            if(u !== null){
-                return this._list[u];
+            for (var i = 0; i < this._list.length; i++) {
+                if (this._list[i].name == k) {
+                    return i;
+                }
             }
-          //  console.log("panel not yet in list");
             return null;
         },
-        show:function(k){
-            if(k===undefined){
+        get: function get(k) {
+            var u = this._inList(k);
+            if (u !== null) {
+                return this._list[u];
+            }
+
+            return null;
+        },
+        show: function show(k) {
+            if (k === undefined) {
                 throw new Error("Panel.show name is undefined");
             }
-            var p=this.get(k);
-            if(!p){
-                var w=this._UIGet(k);
-                if(!w){
+            var p = this.get(k);
+            if (!p) {
+                var w = this._UIGet(k);
+                if (!w) {
                     throw new Error("Cannot find panel " + k);
-                }
-                else{
-                    p=this.add(w);
-                    if(p === null){
-                         throw new Error("Cannot find panel " + k);
+                } else {
+                    p = this.add(w);
+                    if (p === null) {
+                        throw new Error("Cannot find panel " + k);
                     }
                 }
             }
-            var c=p.getChildren();
-            for(var i=0;i<c.length;i++){
-               // if(!$.contains(window.document.body,c[i].element)){
-              //        c[i].DOM.append(c[i].element);
-                //  }
-                if(c[i].hidden !== true){
+            var c = p.getChildren();
+            for (var i = 0; i < c.length; i++) {
+                if (c[i].hidden !== true) {
                     c[i].show();
                 }
             }
         },
-        showAll:function(win){
-            var w,tw=null;
-            if(win !== undefined){
-                w=Apoco.Window.get(win);
-                if(w===null){
+        showAll: function showAll(win) {
+            var w,
+                tw = null;
+            if (win !== undefined) {
+                w = Apoco.Window.get(win);
+                if (w === null) {
                     throw new Error("Panel.hideAll - cannot find window " + w);
                 }
-                tw=w.window;
+                tw = w.window;
             }
-            for(var i=0;i<this._list.length;i++){
-                if(tw !== null){
-                    if( this._list[i].window === tw){
+            for (var i = 0; i < this._list.length; i++) {
+                if (tw !== null) {
+                    if (this._list[i].window === tw) {
                         this.show(this._list[i].name);
                     }
-                }
-                else{
+                } else {
                     this.show(this._list[i].name);
                 }
             }
         },
-        hideAll: function(win){
-            var w,tw=null;
-            if(win !== undefined){
-               // console.log("hideall got window");
-                w=Apoco.Window.get(win);
-                if(w===null){
+        hideAll: function hideAll(win) {
+            var w,
+                tw = null;
+            if (win !== undefined) {
+                w = Apoco.Window.get(win);
+                if (w === null) {
                     throw new Error("Panel.hideAll - cannot find window " + w);
                 }
-                tw=w.window;
+                tw = w.window;
             }
-            for(var i=0;i<this._list.length;i++){
-               // console.log(i + " this is panel " + this._list[i].name + " with window " + this._list[i].window);
-               // console.log("WINDOW IS " + tw);
-                if(tw !== null){
-                    if(this._list[i].window === tw){
-                 //       console.log("hiding panel for window " + win + " name " + this._list[i].name);
+            for (var i = 0; i < this._list.length; i++) {
+                if (tw !== null) {
+                    if (this._list[i].window === tw) {
                         this.hide(this._list[i].name);
                     }
-                }
-                else{
-                   // console.log("hiding things without window");
+                } else {
                     this.hide(this._list[i].name);
                 }
             }
         },
-        hide:function(k){
-            var p=this.get(k);
-           // console.log("hiding panel " + k);
-            if(!p){
+        hide: function hide(k) {
+            var p = this.get(k);
+
+            if (!p) {
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
-            var c=p.getChildren();
-            for(var i=0;i<c.length;i++){
+            var c = p.getChildren();
+            for (var i = 0; i < c.length; i++) {
                 c[i].hide();
             }
         },
-        getList: function(){
-            var l=[];
-            for(var i=0;i< this._list.length;i++){
-              //  console.log("panel has " + this._list[i].name + " at " + i);
-                l[i]=this._list[i].name;
+        getList: function getList() {
+            var l = [];
+            for (var i = 0; i < this._list.length; i++) {
+                l[i] = this._list[i].name;
             }
             return l;
         },
-        clone: function(panel){ // clone an existing panel and put in new window
-            var stuff={},np,p,name,i=0;
-            
-            p=this.get(panel);
-            if(p !== null){
-                name=panel;
-                np=this._UIGet(panel); //need to change the name
-                if(np == null){
+        clone: function clone(panel) {
+            var stuff = {},
+                np,
+                p,
+                name,
+                i = 0;
+
+            p = this.get(panel);
+            if (p !== null) {
+                name = panel;
+                np = this._UIGet(panel);
+                if (np == null) {
                     throw new Error("Panel can't find " + panel + " in UI.Panels");
                 }
-                while(this.get(name) !== null){
+                while (this.get(name) !== null) {
                     i++;
-                    name=(name + i);
+                    name = name + i;
                 }
-                np.name=name;
-            //    console.log("name is " + name + " i is " + i);
-                for(var j=0;j<np.components.length;j++){
-                    np.components[j].id = ( np.components[j].id + i);
+                np.name = name;
+
+                for (var j = 0; j < np.components.length; j++) {
+                    np.components[j].id = np.components[j].id + i;
                 }
                 return np;
-            }
-            else{
+            } else {
                 throw new Error("Apoco.Panel.clone: No panel named " + panel + " found");
             }
         },
-	add: function(panel){
-	  //  console.log("Panel.add is here");
-	   //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
-         
-            if(Apoco.type['string'].check(panel)){
-                var w=this._UIGet(panel);
-                panel=w;
+        add: function add(panel) {
+
+            if (Apoco.type['string'].check(panel)) {
+                var w = this._UIGet(panel);
+                panel = w;
             }
 
-	    if(this._inList(panel.name) === null){
-		check(panel.components);
-		var p=Apoco._panelComponents(panel);
-		// for(var k in p){
-		//     console.log("panel base has keys " + k);
-		// }
-		this._list.push(p);
-	    }
-	    else{
-		throw new Error("Panel.add " + panel.name + " is already in the display list");
-	    }
+            if (this._inList(panel.name) === null) {
+                check(panel.components);
+                var p = Apoco._panelComponents(panel);
+
+                this._list.push(p);
+            } else {
+                throw new Error("Panel.add " + panel.name + " is already in the display list");
+            }
             return p;
-	},
-        deleteAll: function(promise_resolve){
+        },
+        deleteAll: function deleteAll(promise_resolve) {
             var obj;
-            var n=this._list.length;
-           // console.log("there are " + n + " panels in Panel List");
-            for(var i=0;i<n; i++){
-               // console.log("panel: removing panel " + i + " name " + this._list[i].name + " from list");
-               	obj=this._list[i];
+            var n = this._list.length;
+
+            for (var i = 0; i < n; i++) {
+                obj = this._list[i];
                 obj.deleteChildren();
-              //  console.log("deleted children of " + this._list[i].name);
-               // for(var k in obj){
-               //     delete obj[k];
-                //}
-                if(promise_resolve){
-                    if(i===(n-1)){
-                  //      console.log("***********************************8delete is done");
+
+                if (promise_resolve) {
+                    if (i === n - 1) {
                         promise_resolve();
                     }
                 }
-                //obj=null;
-                
             }
-         //   if(!promise_resolve){
+
             Apoco.Window._closeAll();
-        //    }
-            this._list.length=0;
+
+            this._list.length = 0;
         },
-        delete: function(name){
-   	    var p=this._inList(name);
-	    if(p !== null){
-                var obj=this._list[p];
+        delete: function _delete(name) {
+            var p = this._inList(name);
+            if (p !== null) {
+                var obj = this._list[p];
                 obj.deleteChildren();
-	//	console.log("panel: removing panel " + obj.name + " from list");
-		this._list.splice(p,1);
-                for(var k in obj){
-                  //  console.log("DELETING " + k);
+
+                this._list.splice(p, 1);
+                for (var k in obj) {
                     delete obj[k];
-                    
                 }
-                obj=null;
-            }
-            else {
+                obj = null;
+            } else {
                 throw new Error("Apoco.Panel delete -" + name + "is not in the list of Panels");
             }
-	}
+        }
     };
-    var _Components=function(obj){
-        var that=this,w;
-        for(var k in obj){
-	    this[k]=obj[k];
-	  //   console.log("_ApocoPanelComponents got value " + k + " value ", this[k]);
-	}
-        //Apoco.mixinDeep(this,obj);
-        
-	if(this.window){
-            w=Apoco.Window.get(this.window);
-            if(w !== null){
+    var _Components = function _Components(obj) {
+        var that = this,
+            w;
+        for (var k in obj) {
+            this[k] = obj[k];
+        }
+
+
+        if (this.window) {
+            w = Apoco.Window.get(this.window);
+            if (w !== null) {
                 w.window.focus();
-                that.window=w.window;
+                that.window = w.window;
                 that._addComponents();
-            }
-            else{ 
-                var p=Apoco.Window.open(obj.window);  // create a new browser window
-	        p.then(function(w){
+            } else {
+                var p = Apoco.Window.open(obj.window);
+                p.then(function (w) {
                     w.window.focus();
-                    that.window=w.window;
+                    that.window = w.window;
                     that._addComponents();
-                }).catch(function(msg){
+                }).catch(function (msg) {
                     throw new Error("window " + that.window + " does not exist " + msg);
                 });
             }
-	}
-        else{
+        } else {
             that._addComponents();
         }
     };
 
-    _Components.prototype={
-	_addComponents: function(){
-	    var that=this;
+    _Components.prototype = {
+        _addComponents: function _addComponents() {
+            var that = this;
             var d;
-	 
-	    for(var i=0;i<this.components.length;i++){
-                // check that DOM parent exists
- 		var p=this.components[i].display;
-             //   console.log("adding component " + p);
-		this.components[i].parent=this;
-               // console.log("addComponents window is " + that.window);
-	        d=Apoco.display[p](this.components[i],that.window);
-		if(!d){
-		    throw new Error("could not create " + p);
-	        }
-               
-            //    console.log("_addComponents id is " + d.id + " hidden is " + d.hidden);
-                if(d.hidden === undefined  ||  d.hidden !== true){ /// hmmmm
-              //      console.log("_addComponents showing " + d.id);
-        	    d.show();
+
+            for (var i = 0; i < this.components.length; i++) {
+                var p = this.components[i].display;
+
+                this.components[i].parent = this;
+
+                d = Apoco.display[p](this.components[i], that.window);
+                if (!d) {
+                    throw new Error("could not create " + p);
                 }
-    
-		this.components[i]=d;
-	    }
-	},
-	addChild: function(display_object){ // to existing panel
+
+                if (d.hidden === undefined || d.hidden !== true) {
+                    d.show();
+                }
+
+                this.components[i] = d;
+            }
+        },
+        addChild: function addChild(display_object) {
             var d;
-            if(this.getChild(display_object.id)){
+            if (this.getChild(display_object.id)) {
                 throw new Error("Apoco.Panel: already have a child with id " + display_object.id);
             }
-            if(!display_object.display){
+            if (!display_object.display) {
                 throw new Error("You can only add display objects to a window");
             }
-            if(!display_object.displayType){ //has not been instantiated
-                d=display_object;
-                display_object=Apoco.display[d.display](d,this.window);
-                if(!display_object){
+            if (!display_object.displayType) {
+                d = display_object;
+                display_object = Apoco.display[d.display](d, this.window);
+                if (!display_object) {
                     throw new Error("Panel.addChild: could not create display object " + d.display);
                 }
             }
-     //       console.log("adding child length is " + this.components.length);
-            display_object.parent=this;
- 	    this.components.push(display_object);
-            if(display_object.hidden !== true){
+
+            display_object.parent = this;
+            this.components.push(display_object);
+            if (display_object.hidden !== true) {
                 display_object.show();
             }
-       //     console.log("after add adding child length is " + this.components.length);
-	},
-        deleteChildren: function(){
-            if(!this.components){
+        },
+        deleteChildren: function deleteChildren() {
+            if (!this.components) {
                 throw new Error("Panel: has no children " + this.name);
             }
-            for(var i=0;i<this.components.length;i++){
-              //  console.log("panel_components.deleteChildren: " + this.components[i].display);
-             //   if(this.components[i].listen){
-            //       Apoco.IO.unsubscribe(this.components[i]);
-            //    }
+            for (var i = 0; i < this.components.length; i++) {
                 this.components[i].delete("message from parent");
             }
-            this.components.length=0;
+            this.components.length = 0;
         },
-	deleteChild: function(obj){
-            var index=-1;
-            //var obj=o;
-            if(!obj){
+        deleteChild: function deleteChild(obj) {
+            var index = -1;
+
+            if (!obj) {
                 throw new Error("Apoco.Panel: deleteChild obj is null");
             }
-            if(Apoco.type['string'].check(obj)){
-              //  console.log("got string for delete child");
-                obj=this.getChild(obj);
+            if (Apoco.type['string'].check(obj)) {
+                obj = this.getChild(obj);
             }
-           //console.log("deleteing child length is " + this.components.length);
-	   // console.log(Panel delete child is here");
-            if(obj.listen){ // remove the listener
-		Apoco.unsubscribe(obj);
-	    }
-	    for(var i=0;i<this.components.length;i++){
-		if(obj === this.components[i]){
-                    index=i;
+
+            if (obj.listen) {
+                Apoco.unsubscribe(obj);
+            }
+            for (var i = 0; i < this.components.length; i++) {
+                if (obj === this.components[i]) {
+                    index = i;
                     break;
-		}
-	    }
-            if(index !== -1){
-                this.components[index].delete("message from parent");
-	        this.components.splice(index,1);
+                }
             }
-            else{
+            if (index !== -1) {
+                this.components[index].delete("message from parent");
+                this.components.splice(index, 1);
+            } else {
                 throw new Error("Panel: deleteChild could not find child " + obj.id);
             }
-	  //  if(this.components.length === 0){
-	//	console.log("No components left");
-	 //       Apoco.Panel.delete(this.name);
-	 //   }
-	  //  console.log("after delete child length is " + this.components.length);
-	},
-	getChildren: function(){
-	    if (this.components && this.components.length>0){
-		return this.components;
-	    }
-	    return null;
-	},
-        getChild: function(id){
-            if(!this.components){
+        },
+        getChildren: function getChildren() {
+            if (this.components && this.components.length > 0) {
+                return this.components;
+            }
+            return null;
+        },
+        getChild: function getChild(id) {
+            if (!this.components) {
                 return null;
             }
-           // console.log("Panel.getChild Trying to find " + id);
-            for(var i=0;i< this.components.length;i++){
-             //   console.log("this is child " + this.components[i].id);
-                if(this.components[i].id === id){
+
+            for (var i = 0; i < this.components.length; i++) {
+                if (this.components[i].id === id) {
                     return this.components[i];
                 }
             }
             return null;
         },
-	findChild: function(child){
-            if(!this.components){
+        findChild: function findChild(child) {
+            if (!this.components) {
                 return null;
             }
-	    var found=null;
-	    for(var i=0;i<this.components.length; i++){
-	//	console.log("this is child " + i);
-		found=null;
-		for(var k in child){ // if there is more than one property in the child - make sure all are matched
-		    switch(k){
-		    case "key":
-			(child[k] === this.components[i].getKey())?found=i:found=-1;
-			break;
-		    case "element":
-			(child[k] === this.components[i].getElement())? found=i: found=-1;
-			break;
-		    case "name":
-			(child[k] === this.components[i].getName())? found=i: found=-1;
-			break;
-		    default:
-			found=null;
-			break;
-		    }
-		    //console.log("in keys found key " + k + " and found is " + found);
-		    if(found === -1){
-			break;   // has the key but not matched so move to next child
-		    }
-		}
-		if(found !== null && found !== -1){
-		    return this.components[i];
-		}
+            var found = null;
+            for (var i = 0; i < this.components.length; i++) {
+                found = null;
+                for (var k in child) {
+                    switch (k) {
+                        case "key":
+                            child[k] === this.components[i].getKey() ? found = i : found = -1;
+                            break;
+                        case "element":
+                            child[k] === this.components[i].getElement() ? found = i : found = -1;
+                            break;
+                        case "name":
+                            child[k] === this.components[i].getName() ? found = i : found = -1;
+                            break;
+                        default:
+                            found = null;
+                            break;
+                    }
 
-	    }
-	    return null;
-	}
+                    if (found === -1) {
+                        break;
+                    }
+                }
+                if (found !== null && found !== -1) {
+                    return this.components[i];
+                }
+            }
+            return null;
+        }
     };
-    Apoco._panelComponents=function(t){
-        if(t === "methods"){
-            var f={};
-            for(var k in _Components.prototype ){
-                f[k]=k;
+    Apoco._panelComponents = function (t) {
+        if (t === "methods") {
+            var f = {};
+            for (var k in _Components.prototype) {
+                f[k] = k;
             }
             return f;
-        }else{
+        } else {
             return new _Components(t);
         }
     };
-      
 })();
 
 },{"./Popups":13,"./Utils":16,"./Window":17,"./declare":19}],13:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+'use strict';
 
-;(function(){
+var Apoco = require('./declare').Apoco;
+
+;(function () {
     'use strict';
 
-    // var popups={
-    Apoco.popup={
-        error:function(title,message){
-            var t="ERROR ";
-            if(Apoco.error === undefined){
-                title=t.concat(title);
-                Apoco.error=this.dialog(title,message,true);
-                Apoco.error.close=function(){
+    Apoco.popup = {
+        error: function error(title, message) {
+            var t = "ERROR ";
+            if (Apoco.error === undefined) {
+                title = t.concat(title);
+                Apoco.error = this.dialog(title, message, true);
+                Apoco.error.close = function () {
                     document.body.removeChild();
                 };
                 return;
             }
-            Apoco.error.update(title,message,true);
+            Apoco.error.update(title, message, true);
         },
-	dialog: function(title, message,modal){
-            var mkDialog=function(title,message,modal){
-	        var Hdialog,message_text,title_text,Modal,draggable;
-                if(modal && Apoco.modal === undefined){
+        dialog: function dialog(title, message, modal) {
+            var mkDialog = function mkDialog(title, message, modal) {
+                var Hdialog, message_text, title_text, Modal, draggable;
+                if (modal && Apoco.modal === undefined) {
                     console.log("creating a modal ");
-                    Apoco.modal=document.createElement("div");
-                    Apoco.modal.id="Apoco_modal";
+                    Apoco.modal = document.createElement("div");
+                    Apoco.modal.id = "Apoco_modal";
                 }
-	        if(message === undefined){
-                    message="";
-	        }
-                if(title === undefined){
-                    title="";
+                if (message === undefined) {
+                    message = "";
                 }
-                if(modal === undefined){
-                    modal=false;
+                if (title === undefined) {
+                    title = "";
+                }
+                if (modal === undefined) {
+                    modal = false;
                 }
 
-                this.close=function(){
+                this.close = function () {
                     console.log("click closed is here");
                     console.log("Gdiakof is " + Hdialog);
-                    if(modal === true){
+                    if (modal === true) {
                         Apoco.modal.removeChild(Hdialog);
                         document.body.removeChild(Apoco.modal);
-                    }
-                    else{
+                    } else {
                         document.body.removeChild(Hdialog);
                     }
                 };
 
-                this.create=function(){
-                    var s,b,t,header;
-                    Hdialog=document.createElement("div");
-                    Hdialog.classList.add("Apoco_dialog","ui-dialog","resizable","ui-widget","ui-widget-content","ui-corner-all");
-                    draggable=Apoco.Utils.draggable(Hdialog);
+                this.create = function () {
+                    var s, b, t, header;
+                    Hdialog = document.createElement("div");
+                    Hdialog.classList.add("Apoco_dialog", "ui-dialog", "resizable", "ui-widget", "ui-widget-content", "ui-corner-all");
+                    draggable = Apoco.Utils.draggable(Hdialog);
 
-                    // create header
-                    header=document.createElement("div");
-                    header.classList.add("ui-dialog-titlebar","ui-widget-header","ui-corner-all");
-                    title_text=document.createElement("span");
+                    header = document.createElement("div");
+                    header.classList.add("ui-dialog-titlebar", "ui-widget-header", "ui-corner-all");
+                    title_text = document.createElement("span");
                     title_text.classList.add("ui-dialog-title");
-                    title_text.textContent=title;
+                    title_text.textContent = title;
                     header.appendChild(title_text);
-                    b=document.createElement("button");
-                    b.classList.add("ui-button","ui-widget","ui-state-default","ui-corner-all","ui-button-icon-only","ui-dialog-titlebar-close");
+                    b = document.createElement("button");
+                    b.classList.add("ui-button", "ui-widget", "ui-state-default", "ui-corner-all", "ui-button-icon-only", "ui-dialog-titlebar-close");
                     header.appendChild(b);
-                    b.role="button";
-                    b.style.float="right";
-                    s=document.createElement("span");
-                    s.classList.add("ui-button-icon-primary","ui-icon","ui-icon-closethick");
-                    b.addEventListener("click",this.close,false);
+                    b.role = "button";
+                    b.style.float = "right";
+                    s = document.createElement("span");
+                    s.classList.add("ui-button-icon-primary", "ui-icon", "ui-icon-closethick");
+                    b.addEventListener("click", this.close, false);
                     b.appendChild(s);
                     Hdialog.appendChild(header);
-                    //Content
-                    s=document.createElement("div");
-                    s.classList.add("ui-dialog-content","ui-widget-content");
-                    
-                    message_text=document.createElement("p");
-                    message_text.style.float="right";
-                    message_text.textContent=message;
-                    b=document.createElement("span");
-                    b.classList.add("ui-icon","ui-icon-circle-check");
+
+                    s = document.createElement("div");
+                    s.classList.add("ui-dialog-content", "ui-widget-content");
+
+                    message_text = document.createElement("p");
+                    message_text.style.float = "right";
+                    message_text.textContent = message;
+                    b = document.createElement("span");
+                    b.classList.add("ui-icon", "ui-icon-circle-check");
                     s.appendChild(b);
                     s.appendChild(message_text);
                     Hdialog.appendChild(s);
-                    // Tail
-	            s=document.createElement("div");
-                    s.classList.add("ui-dialog-buttonpane","ui-widget-content");
-                    t=document.createElement("div");
+
+                    s = document.createElement("div");
+                    s.classList.add("ui-dialog-buttonpane", "ui-widget-content");
+                    t = document.createElement("div");
                     t.classList.add("ui-dialog-buttonset");
                     s.appendChild(t);
-                    b=document.createElement("button");
-                    b.classList.add("ui-button","ui-widget","ui-state-default","ui-corner-all","ui-button-text-only");
-                    b.type="button";
-                    b.addEventListener("click",this.close,false);
+                    b = document.createElement("button");
+                    b.classList.add("ui-button", "ui-widget", "ui-state-default", "ui-corner-all", "ui-button-text-only");
+                    b.type = "button";
+                    b.addEventListener("click", this.close, false);
                     t.appendChild(b);
-                    t=document.createElement("span");
+                    t = document.createElement("span");
                     t.classList.add("ui-button-text");
-                    t.textContent="OK";
+                    t.textContent = "OK";
                     b.appendChild(t);
                     Hdialog.appendChild(s);
-                    if(modal === true){
+                    if (modal === true) {
                         document.body.appendChild(Apoco.modal);
                         Apoco.modal.appendChild(Hdialog);
-                    }
-                    else{
+                    } else {
                         document.body.appendChild(Hdialog);
                     }
-                    
                 };
-                this.exists=function(){
-                    if(Hdialog === undefined){
+                this.exists = function () {
+                    if (Hdialog === undefined) {
                         return false;
                     }
                     return true;
-                },
-                this.update=function(title,message){
-                    message_text.textContent=message;     
-	            title_text.textContent=title;
-                    if(modal === true){
+                }, this.update = function (title, message) {
+                    message_text.textContent = message;
+                    title_text.textContent = title;
+                    if (modal === true) {
                         document.body.appendChild(Apoco.modal);
-                       // document.body.classList.add("modal");
-                       Apoco.modal.appendChild(Hdialog);
-                    }
-                    else{
+
+                        Apoco.modal.appendChild(Hdialog);
+                    } else {
                         document.body.appendChild(Hdialog);
                     }
-                    //Hdialog.visibility="visible";
-                    //Modal.visibility="visible";
                 };
-                
             };
-          
-            var d=new mkDialog(title,message,modal);
+
+            var d = new mkDialog(title, message, modal);
             d.create();
             return d;
-            
         },
-	spinner: function(on){
-	
-            if(!document.contains(document.getElementById("Apoco_spinner"))){
-		var spinner=document.createElement("div");
-                spinner.id="Apoco_spinner";
-		document.body.appendChild(spinner);
-	    }
-	    if(on === true ){
-		console.log("Apoco spinner on");
-                document.getElementById("Apoco_spinner").style.display="inherit";
-	    }
-	    else{
-		console.log("Apoco spinner off");
-                document.getElementById("Apoco_spinner").style.display="none";
+        spinner: function spinner(on) {
 
-	    }
+            if (!document.contains(document.getElementById("Apoco_spinner"))) {
+                var spinner = document.createElement("div");
+                spinner.id = "Apoco_spinner";
+                document.body.appendChild(spinner);
+            }
+            if (on === true) {
+                console.log("Apoco spinner on");
+                document.getElementById("Apoco_spinner").style.display = "inherit";
+            } else {
+                console.log("Apoco spinner off");
+                document.getElementById("Apoco_spinner").style.display = "none";
+            }
             return spinner;
-	},
-	alert: function(text,time){
-	    var nd,ns,np,s;
-            nd=document.createElement("div");
-            nd.id="Apoco_alert";
+        },
+        alert: function alert(text, time) {
+            var nd, ns, np, s;
+            nd = document.createElement("div");
+            nd.id = "Apoco_alert";
             nd.classList.add("ui-widget");
             Apoco.Utils.draggable(nd);
-            ns=document.createElement("div");
-            ns.classList.add("ui-state-error","ui-corner-all");
-            ns.style.padding="10px";
-            np=document.createElement("p");
+            ns = document.createElement("div");
+            ns.classList.add("ui-state-error", "ui-corner-all");
+            ns.style.padding = "10px";
+            np = document.createElement("p");
             np.classList.add("ui-state-error-text");
-            s=document.createElement("span");
-            s.classList.add("ui-icon","ui-icon-alert");
-            s.style.float="left";
-            s.style.margin="1em";
+            s = document.createElement("span");
+            s.classList.add("ui-icon", "ui-icon-alert");
+            s.style.float = "left";
+            s.style.margin = "1em";
             np.appendChild(s);
-            s=document.createElement("strong");
-            s.textContent="Alert";
+            s = document.createElement("strong");
+            s.textContent = "Alert";
             np.appendChild(s);
-            s=document.createElement("span");
-            s.style.margin="1em";
-            s.textContent=text;
+            s = document.createElement("span");
+            s.style.margin = "1em";
+            s.textContent = text;
             np.appendChild(s);
-            
-	    ns.appendChild(np);
-	    nd.appendChild(ns);
-	    document.body.appendChild(nd);
+
+            ns.appendChild(np);
+            nd.appendChild(ns);
+            document.body.appendChild(nd);
 
             var t;
-            if(time === undefined){
-                time=10000;
+            if (time === undefined) {
+                time = 10000;
             }
-            t=window.setTimeout(function(){
+            t = window.setTimeout(function () {
                 document.body.removeChild(nd);
                 window.clearTimeout(t);
-            },time);
-  
-	    return nd;
+            }, time);
 
-	},
-	trouble: function(heading,text){
-            var a=document.createElement("div");
-            a.id="Apoco_trouble";
+            return nd;
+        },
+        trouble: function trouble(heading, text) {
+            var a = document.createElement("div");
+            a.id = "Apoco_trouble";
 
-            var b=document.createElement("h1");
-            b.textContent=heading;
-	    a.appendChild(b);
-	    if(text!== undefined){
+            var b = document.createElement("h1");
+            b.textContent = heading;
+            a.appendChild(b);
+            if (text !== undefined) {
 
-                var c=document.createElement("div");
-                var d=document.createElement("h2");
-                d.textContent=text;
+                var c = document.createElement("div");
+                var d = document.createElement("h2");
+                d.textContent = text;
                 c.appendChild(d);
-		a.appendChild(c);
-	    }
-	    // this should call a hard logging function
-	    document.body.appendChild(a);
+                a.appendChild(c);
+            }
+
+            document.body.appendChild(a);
             var t;
-           
-            t=window.setTimeout(function(){
+
+            t = window.setTimeout(function () {
                 document.body.removeChild(a);
-                a=null;
+                a = null;
                 window.clearTimeout(t);
-                Apoco.popup.error("Unrecoverable Error","Please shutdown now");
-            },5000);
- 	},
+                Apoco.popup.error("Unrecoverable Error", "Please shutdown now");
+            }, 5000);
+        },
 
-	statusCode: {
-	    204: function(s) {
-		Apoco.popup.error("Bad Return from server: 204","There is no content for this page " + s);
-	    },
-	    205: function(s){
-		Apoco.popup.error("Bad Return from server: 205","Response requires that the requester reset the document view " + s);
-	    },
-	    400: function(s){  // Bad request
-		Apoco.popup.error("Bad Return from server: 400","Bad request " + s);
-	    },
-	    401: function(s){
-		Apoco.popup.error("Bad Return from server: 401","Unauthorised " + s);
-	    },
-	    403: function(s){
-		Apoco.popup.error("Bad Return from server: 403","Forbidden " + s);
-	    },
-	    404: function(s) {
-		Apoco.popup.error("Bad Return from server: 404","Not Found " + s);
-	    },
-	    410: function(s){
-		Apoco.popup.error("Bad Return from server: 410","Gone " + s);
-	    },
-	    413: function(s){
-		Apoco.popup.error("Bad Return from server: 413","Request entity too large " + s);
-	    },
-	    424: function(s){
-		Apoco.popup.error("Bad Return from server: 424","Method Failure " + s);
-	    },
-	    500: function(s){
-		Apoco.popup.error("Bad Return from server: 500","Internal server error " +s);
-	    },
-	    501: function(s){
-		Apoco.popup.error("Bad Return from server: 501","Not Implemented " + s);
-	    },
-	    503: function(s){
-		Apoco.popup.error("Bad Return from server: 503","Service unavailable " +s);
-	    },
-	    511: function(s){
-		Apoco.popup.error("Bad Return from server: 511","Network authentication required " + s);
-	    }
-	}
+        statusCode: {
+            204: function _(s) {
+                Apoco.popup.error("Bad Return from server: 204", "There is no content for this page " + s);
+            },
+            205: function _(s) {
+                Apoco.popup.error("Bad Return from server: 205", "Response requires that the requester reset the document view " + s);
+            },
+            400: function _(s) {
+                Apoco.popup.error("Bad Return from server: 400", "Bad request " + s);
+            },
+            401: function _(s) {
+                Apoco.popup.error("Bad Return from server: 401", "Unauthorised " + s);
+            },
+            403: function _(s) {
+                Apoco.popup.error("Bad Return from server: 403", "Forbidden " + s);
+            },
+            404: function _(s) {
+                Apoco.popup.error("Bad Return from server: 404", "Not Found " + s);
+            },
+            410: function _(s) {
+                Apoco.popup.error("Bad Return from server: 410", "Gone " + s);
+            },
+            413: function _(s) {
+                Apoco.popup.error("Bad Return from server: 413", "Request entity too large " + s);
+            },
+            424: function _(s) {
+                Apoco.popup.error("Bad Return from server: 424", "Method Failure " + s);
+            },
+            500: function _(s) {
+                Apoco.popup.error("Bad Return from server: 500", "Internal server error " + s);
+            },
+            501: function _(s) {
+                Apoco.popup.error("Bad Return from server: 501", "Not Implemented " + s);
+            },
+            503: function _(s) {
+                Apoco.popup.error("Bad Return from server: 503", "Service unavailable " + s);
+            },
+            511: function _(s) {
+                Apoco.popup.error("Bad Return from server: 511", "Network authentication required " + s);
+            }
+        }
     };
-
 })();
 
 },{"./declare":19}],14:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./Utils");
-require("./Types")
+require("./Types");(function () {
 
-;(function(){
+	'use strict';
 
-    'use strict';
+	function chunkify(t) {
+		var tz = [],
+		    x = 0,
+		    y = -1,
+		    n = 0,
+		    i,
+		    j;
 
-    function chunkify(t) {
-	var tz = [], x = 0, y = -1, n = 0, i, j;
-	
-	while (i = (j = t.charAt(x++)).charCodeAt(0)) {
-	    var m = (i == 46 || (i >=48 && i <= 57));
-	    if (m !== n) {
-		tz[++y] = "";
-		n = m;
-	    }
-	    tz[y] += j;
-	}
-	return tz;
-    }
-
-    var default_compare=function(a){return a;};
-    
-    function generic_compare(a,b,fn){
-	var s=fn(a);
-	var t=fn(b);
-	if(s<t) return -1;
-	if(s>t) return 1;
-	return 0;
-    }
-
-
-    var sort_fn=function(type){
-        var a,b,aa,bb,c,d;
-	switch(type){
-	case "integer":
-	case "count":
-	case "phoneNumber":
-	case "maxCount":
-	case "string":
-	case "float":
-	case "positiveInteger":
-	case "date":
-	    return generic_compare;
-	case "token":	
-	case "alphaNum":
-	    return (function(s,t,fn){
-		a=fn(s);
-		b=fn(t);
-		if( a === b) return 0;
-		aa = chunkify(a);
-		bb = chunkify(b);
-		
-		for (var x = 0; aa[x] && bb[x]; x++) {
-		    if (aa[x] !== bb[x]) {
-			c = Number(aa[x]), d = Number(bb[x]);
-			if (c == aa[x] && d == bb[x]) {
-			    return c - d;
-			} else return (aa[x] > bb[x]) ? 1 : -1;
-		    }
+		while (i = (j = t.charAt(x++)).charCodeAt(0)) {
+			var m = i == 46 || i >= 48 && i <= 57;
+			if (m !== n) {
+				tz[++y] = "";
+				n = m;
+			}
+			tz[y] += j;
 		}
-		return aa.length - bb.length;
-	    });
-	case "negativeInteger":
-	    return function(a,b,fn){ // note order is swapped 
-		var s=fn(a);
-		var t=fn(b);
-		if(t<s) return -1;
-		if(t>s) return 1;
-		return 0;	
-	    };
-	case "boolean":
-	case "currency":
-	case "email":
-	case "integers2":
-	case "floats2":
-	case "text":	
-	case "time":
-	default:
-	    //throw new Error("Apoco.sort:- Don't know how to sort " + type);
-	    return undefined;
+		return tz;
 	}
-	return undefined;    
-	
-    };
- 
-    
-    Apoco.isSortable=function(type){
-	if(sort_fn(type) !== undefined){
-	    return true;
-	}
-	return false;
-    };
-    Apoco.sort=function(r,type_data){
-	var compare,fn,t;
-        if(r === undefined){
-            throw new Error("Apoco.sort needs an input array");
-        }
-        if(Apoco.type['array'].check(type_data)){
-	    for(var i=0;i<type_data.length;i++){ // multiple fields to order sort
-		if(!Apoco.isSortable(type_data[i].type)){
-		    throw new Error("Apoco.sort:- Don't know how to sort type " + type_data[i].type);
-		}
-                // if(!Apoco.type_data[i].fn){
-                if(!type_data[i].fn){
-                     throw new Error("Apoco.sort needs a function to retrieve the array element"); 
-                }
-	        //	console.log("sort: array index " + i + " has type " + type_data[i].type)
-		type_data[i].compare=sort_fn(type_data[i].type);
-	        //	console.log("sort: type data function is " + type_data[i].fn);
-	    }
-	    r.sort(function(a,b){ 
-		for(var i=0;i<type_data.length;i++){
-		    t=type_data[i].compare(a,b,type_data[i].fn);
-		    if(t !== 0){
-			return t;
-		    }
-		}
-		return t;
-	    });
-        }
-        else{
-            if(type_data && Apoco.type["object"].check(type_data)){
-	        compare=sort_fn(type_data.type);
-                if(!type_data.fn){
-                    throw new Error("Apoco.sort needs a function to retrieve the array element");
-                }
-	        fn=type_data.fn;
-            }
-            else if(Apoco.type["string"].check(type_data)){
-                compare=sort_fn(type_data);
-                if(compare === undefined){
-                    throw new Error("Sort: don't know how to sort " + type_data);
-                }
-                fn=default_compare;
-            }
-            else{
-                throw new Error("Apoco.sort: Incorrect parameters ");
-            }
-	    r.sort(function(a,b){
-	        return compare(a,b,fn);
-	    });
-        }
-        return r;
-    };
- 
 
-	
+	var default_compare = function default_compare(a) {
+		return a;
+	};
+
+	function generic_compare(a, b, fn) {
+		var s = fn(a);
+		var t = fn(b);
+		if (s < t) return -1;
+		if (s > t) return 1;
+		return 0;
+	}
+
+	var sort_fn = function sort_fn(type) {
+		var a, b, aa, bb, c, d;
+		switch (type) {
+			case "integer":
+			case "count":
+			case "phoneNumber":
+			case "maxCount":
+			case "string":
+			case "float":
+			case "positiveInteger":
+			case "date":
+				return generic_compare;
+			case "token":
+			case "alphaNum":
+				return function (s, t, fn) {
+					a = fn(s);
+					b = fn(t);
+					if (a === b) return 0;
+					aa = chunkify(a);
+					bb = chunkify(b);
+
+					for (var x = 0; aa[x] && bb[x]; x++) {
+						if (aa[x] !== bb[x]) {
+							c = Number(aa[x]), d = Number(bb[x]);
+							if (c == aa[x] && d == bb[x]) {
+								return c - d;
+							} else return aa[x] > bb[x] ? 1 : -1;
+						}
+					}
+					return aa.length - bb.length;
+				};
+			case "negativeInteger":
+				return function (a, b, fn) {
+					var s = fn(a);
+					var t = fn(b);
+					if (t < s) return -1;
+					if (t > s) return 1;
+					return 0;
+				};
+			case "boolean":
+			case "currency":
+			case "email":
+			case "integers2":
+			case "floats2":
+			case "text":
+			case "time":
+			default:
+				return undefined;
+		}
+		return undefined;
+	};
+
+	Apoco.isSortable = function (type) {
+		if (sort_fn(type) !== undefined) {
+			return true;
+		}
+		return false;
+	};
+	Apoco.sort = function (r, type_data) {
+		var compare, fn, t;
+		if (r === undefined) {
+			throw new Error("Apoco.sort needs an input array");
+		}
+		if (Apoco.type['array'].check(type_data)) {
+			for (var i = 0; i < type_data.length; i++) {
+				if (!Apoco.isSortable(type_data[i].type)) {
+					throw new Error("Apoco.sort:- Don't know how to sort type " + type_data[i].type);
+				}
+
+				if (!type_data[i].fn) {
+					throw new Error("Apoco.sort needs a function to retrieve the array element");
+				}
+
+				type_data[i].compare = sort_fn(type_data[i].type);
+			}
+			r.sort(function (a, b) {
+				for (var i = 0; i < type_data.length; i++) {
+					t = type_data[i].compare(a, b, type_data[i].fn);
+					if (t !== 0) {
+						return t;
+					}
+				}
+				return t;
+			});
+		} else {
+			if (type_data && Apoco.type["object"].check(type_data)) {
+				compare = sort_fn(type_data.type);
+				if (!type_data.fn) {
+					throw new Error("Apoco.sort needs a function to retrieve the array element");
+				}
+				fn = type_data.fn;
+			} else if (Apoco.type["string"].check(type_data)) {
+				compare = sort_fn(type_data);
+				if (compare === undefined) {
+					throw new Error("Sort: don't know how to sort " + type_data);
+				}
+				fn = default_compare;
+			} else {
+				throw new Error("Apoco.sort: Incorrect parameters ");
+			}
+			r.sort(function (a, b) {
+				return compare(a, b, fn);
+			});
+		}
+		return r;
+	};
 })();
 
-
 },{"./Types":15,"./Utils":16,"./declare":19}],15:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+"use strict";
 
-;(function(){
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-    
-    Apoco.type={
-        alphaNum:{
-            html_type:"text",
+var Apoco = require('./declare').Apoco;
+
+;(function () {
+
+    Apoco.type = {
+        alphaNum: {
+            html_type: "text",
             field: "input",
-            check: function(s){
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-	        s=String(s);
-	        s=s.trim(); // trim leading and trailing whitespace
-	        var isAlphaNumeric =/^[a-zA-Z0-9]+$/;   // No spaces or underscores //: /[^a-zA-Z0-9_ ]/;  // /^[a-zA-Z0-9]*$/
-	        if(s.search(isAlphaNumeric) != -1){
-		    return  true;  //s.toString();
-	        }
-	        return false;
-            }},
-        alphabetic:{
-            html_type:"text",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                s = s.trim();
+                var isAlphaNumeric = /^[a-zA-Z0-9]+$/;
+                if (s.search(isAlphaNumeric) != -1) {
+                    return true;
+                }
+                return false;
+            } },
+        alphabetic: {
+            html_type: "text",
             field: "input",
-            check:function(s){
-	        if(Apoco.type.blank.check(String(s))){
-		    return false;
-	        }
-	        var isAlpha =/^[a-zA-Z]+$/;
-                s=String(s);
-	        if(s.search(isAlpha) != -1){
-		    return true;
-	        }
-	        return false;
-	}},
-        any:{
-            html_type:"text",
+            check: function check(s) {
+                if (Apoco.type.blank.check(String(s))) {
+                    return false;
+                }
+                var isAlpha = /^[a-zA-Z]+$/;
+                s = String(s);
+                if (s.search(isAlpha) != -1) {
+                    return true;
+                }
+                return false;
+            } },
+        any: {
+            html_type: "text",
             field: "input",
-            check:function(s){
+            check: function check(s) {
                 return true;
-            }},
-        array:{
+            } },
+        array: {
             html_type: "text",
             field: "stringArray",
-            check:function(a){
-	        // var t=("testing  " + a + " is an array");
-	        if( Object.prototype.toString.call(a) === '[object Array]' ) {
-                    if(a.length>=0){
-		        return true;
+            check: function check(a) {
+                if (Object.prototype.toString.call(a) === '[object Array]') {
+                    if (a.length >= 0) {
+                        return true;
                     }
-	        }
-	        return false;
-	}},
-        blank:{
-            check:function(s){
-                if(s == "undefined" || s == undefined){
-                    return true;
                 }
-                else if(s === null){
+                return false;
+            } },
+        blank: {
+            check: function check(s) {
+                if (s == "undefined" || s == undefined) {
                     return true;
-                }
-                else if(s === false){
+                } else if (s === null) {
+                    return true;
+                } else if (s === false) {
                     return null;
+                } else {
+                    var isNonblank_re = /\S/;
+                    var st = String(s);
+                    if (st.search(isNonblank_re) === -1) {
+                        return true;
+                    } else {
+                        return null;
+                    }
                 }
-                else{
-		    var isNonblank_re    = /\S/;  // has at least one character which is not tab space or newline
-		    var st=String(s);
-		    if(st.search(isNonblank_re) === -1){ // does not have any "real" characters
-		        return true;
-		    }
-		    else{
-		        return null;
-		    }
-                }
-	  	return true;
-	}},
-        boolean:{
+                return true;
+            } },
+        boolean: {
             html_type: "checkbox",
             field: "checkBox",
-            check:function(s){
-	        //  console.log("check_field.boolean: value is " + s);
-                var rf=/^([Vv]+(erdade(iro)?)?|[Ff]+(als[eo])?|[Tt]+(rue)?|0|[\+\-]?1)$/;
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-	        s=String(s);
-                if(s.search(rf) !== -1){
+            check: function check(s) {
+                var rf = /^([Vv]+(erdade(iro)?)?|[Ff]+(als[eo])?|[Tt]+(rue)?|0|[\+\-]?1)$/;
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                if (s.search(rf) !== -1) {
                     return true;
                 }
-	        return false;
-	}},
-        booleanArray:{
-            html_type:"checkbox",
+                return false;
+            } },
+        booleanArray: {
+            html_type: "checkbox",
             field: "buttonSet",
-            check:function(a){
-            if(Apoco.type.array.check(a)){
-                for(var i=0;i<a.length;i++){
-                    if(!Apoco.type.boolean.check(a[i])){
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }},
-        count:{
-            html_type: "number",
-            field: "input",
-            check:function(s){
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-	        if(isNaN(parseFloat(s))){
-		    return false;
-	        }
-	        return true;
-	}},
-        currency:{
-            html_type:"number",
-            field: "input",
-            check:function(s){
-	        // Check if string is currency
-                
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-                }
-                //currency woth currency code prefix
-                var re=/^([A-Z]{0,3})?[ ]?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$/;
-	        //var re=/[\u0024\u20AC\u00A5A-Z\s]{0,4}[0-9.,]+[\s\u0024\u20AC\u00A5A-Z]{0,4}/;
-                var s=String(s);  
-	        if(s.search(re) != -1){
-                    return true;
-                }
-	        return false;
-	    }},
-        date: {
-            html_type:"date",
-            field: "date",
-            check:function(s){ // Gregorian calendar date
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-	        var yyyymmdd = new RegExp("^(?:(?:(?:(?:(?:[13579][26]|[2468][048])00)|(?:[0-9]{2}(?:(?:[13579][26])|(?:[2468][048]|0[48]))))(?:(?:(?:09|04|06|11)(?:0[1-9]|1[0-9]|2[0-9]|30))|(?:(?:01|03|05|07|08|10|12)(?:0[1-9]|1[0-9]|2[0-9]|3[01]))|(?:02(?:0[1-9]|1[0-9]|2[0-9]))))|(?:[0-9]{4}(?:(?:(?:09|04|06|11)(?:0[1-9]|1[0-9]|2[0-9]|30))|(?:(?:01|03|05|07|08|10|12)(?:0[1-9]|1[0-9]|2[0-9]|3[01]))|(?:02(?:[01][0-9]|2[0-8])))))$");
-	        s=String(s);
-	        if(s.search(yyyymmdd) !== -1){
-		        return true;
-	        }
-	        //	    var isDate_re=/^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/; // dd/mm/yyyy
-	        var isDate_re=/^(19|20)?[0-9]{2}[- \/.](0?[1-9]|1[012])[- \/.](0?[1-9]|[12][0-9]|3[01])$/; // yyyy-mm-dd 1900-2099
-	        if(s.search(isDate_re) !== -1){
-		    return true;
-	        }
-	        return false;
-	    }},
-        decimal:{
-            html_type:"number",
-            field: "input",
-            check: function(s){  //Decimal numbers
-	        if(Apoco.type.blank.check(s) || isNaN(s)){
-		    return false;
-	        }
-	        s=String(s);
-                if(!s.search){
-                    return false;
-                }
-	        var isDecimal_re = /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
-	        if(s.search(isDecimal_re) != -1){
-		    s=parseFloat(s); //.toFixed(2); // 2 decimal places
-		    return true;
-	        }
-	        return false;
-	    }},
-        email:{
-            html_type:"email",
-            field: "input",
-            check: function(s){
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-	        s=String(s);
-	        s=s.trim(); // trim leading and trailing whitespace
-	        // checks that an input string looks like a valid email address.
-	        var isEmail_re= /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
-	        if(s.search(isEmail_re) != -1){
-		    return true;
-	        }
-	        return false;
-	    }},
-        file:{
-            html_type:"file",
-            field: "input",
-            check: function(s){
-                return true;
-            }},
-        float:{
-            html_type:"number",
-            field: "float",
-            check:function(s){   //IEEE 32-bit floating-point
-	        // Checks that an input string is a decimal number, with an optional +/- sign character.
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                if(isNaN(s)){
-                    return false;
-                }
-	        if(s==0){ return true;} // this regex below does not match 0.0 !!!!! AHGGG WHY ?????
-	        // console.log("float as string is " + s);
-	        s=String(s);
-                if(!s.search){
-                    return false;
-                }
-	        var isDecimal_re   =  /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
-	        if(s.search(isDecimal_re) != -1){
-		    s=parseFloat(s);  //.toFixed(6); // 6 decimal places
-		    return true;
-	        }
-	        return false;
-	    }},
-        floatArray:{
-            html_type:"number",
-            field: "numberArray",
-            check:function(s){
-	        if(Apoco.type.array.check(s)) {
-                    for(var i=0;i<s.length;i++){
-		        if(!Apoco.type.float.check(s[i])){
-		            return false;
-                        }
-		    }
-		    return true;
-	        }
-	        return false;
-	    }},
-        function:{
-            check: function(a){
-	        function isFunction(object) {
-                    var obj={};
-		    return !!(object && obj.toString.call(object) == '[object Function]');
-	        }
-	        // if(isFunction(a)){
-	        //	return true;
-	        //}
-                if(typeof a === "function"){
-                    return true;
-                }
-	        return false;
-	}},
-        image:{
-            html_type: "image",
-  
-            check:function(img){   // obviously need better checking than this!!!
-	        if(!img){
-		    return false;
-	        }
-                if(!img.naturalWidth){
-                    return false;
-                }
-                if(typeof img.naturalWidth != undefined && img.naturalWidth === 0){
-                    return false;
-                }
-                
-	        return true;
-	    }},
-        imageArray:{
-            html_type:"image",
-            field: "imageArray",
-            check:function(a){
-                if(Apoco.type.array.check(a)){
-                    for(var i=0;i<a.length;i++){
-                        if(!Apoco.type.object.check(a[i])){ // needs better than this
-                            return false;
-                        }
-                        else if(!Apoco.type.image.check(a)){
-                            return false;
-                        }
-                    }
-                }
-                else{
-                    return false;
-                }
-                return true;
-            }},
-        integer:{
-            html_type: "number",
-            field: "input",
-            check: function(s){  //32 bit signed integers
-	        // checks that an input string is an integer, with an optional +/- sign character.
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-	        var isInteger_re     = /^\s*(\+|-)?\d+\s*$/;
-	        if(s.search(isInteger_re) !== -1){
-		    return  true; //parseInt(s, 10);
-	        }
-                
-	        return false;
-            }},
-        integerArray:{
-            html_type:"number",
-            field: "numberArray",
-            check:function(a){
-                if(Apoco.type.array.check(a)){
-                    for(var i=0;i<a.length;i++){
-                        if(!Apoco.type.integer.check(a[i])){
+            check: function check(a) {
+                if (Apoco.type.array.check(a)) {
+                    for (var i = 0; i < a.length; i++) {
+                        if (!Apoco.type.boolean.check(a[i])) {
                             return false;
                         }
                     }
                     return true;
                 }
                 return false;
-            }},
-        negativeInteger:{
-            html_type:"number",
-            field: "input",
-            check:function(s){  //strictly negative integers of arbitary length
-	        var isNegativeInteger_re     =  /-\s?\d+\s*$/; //  /^\s*(\-)?\d+\s*$/;
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);                
-	        if(s.search(isNegativeInteger_re) !== -1){
-		    return true; //parseInt(s,10); // base 10
-	        }
-                
-	        return false;
-	    }},
-        number:{
+            } },
+        count: {
             html_type: "number",
             field: "input",
-            check:function(s){
-	        if(Apoco.type.blank.check(s) || isNaN(s)){
-		    return false;
-	        }
-                s=String(s);
-                return true;
-            }},
-        object:{
-            check: function(a){  // a string is an object if called with var s= new String();
-	        //var t=("testing  " + a + " is an object");
-                if(a === undefined){
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
                     return false;
                 }
-	        if(a !== null && typeof a === 'object'){
-		    return true;
-	        }
-	        return false;
-	    }},
-        objectArray:{
-            check:function(a){
-                if(Apoco.type.array.check(a)){
-                    for(var i=0;i<a.length;i++){
-                        if(!Apoco.type.object.check(a[i])){
-                            return false;
-                        }
-                    }
-                }
-                else{
+                s = String(s);
+                if (isNaN(parseFloat(s))) {
                     return false;
                 }
                 return true;
-            }},
-        password:{
-            html_type:"password",
+            } },
+        currency: {
+            html_type: "number",
             field: "input",
-            check:function(s){
-               // s=String(s);
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                if(Apoco.type.token.check(s)){
-                    return true;
-                }
-                return false;
-            }},
-        phoneNumber:{
-            html_type:"tel",
-            field:"input",
-            check:function(s){
-	        //console.log("checking phone number " + s);
-	        var pn_re=/^[\s()+-]*([0-9][\s()+-]*){6,20}$/;                    // /^(?:\+?\d{2}[ -]?\d{3}[ -]?\d{5}|\d{4})$/;
-               
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-	        if(s.search(pn_re) !== -1){
-		    return true;
-	        }
-                
-	        return false;
+            check: function check(s) {
 
-	}},
-        positiveInteger:{
-            html_type:"number",
-            field: "input",
-            check:function(s){  //strictly positive integers of arbitary length
-	     	var isPositiveInteger_re= /^\s*\d+\s*$/;
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-	        if(s.search(isPositiveInteger_re) !== -1){
-		    return true; // parseInt(s,10); // base 10
-	        }
-	        return false;
-	    }},
-        range:{
-            html_type:"range",
-            field: "slider",
-            check:function(s){
-                if(Apoco.type.float.check(s)){
-                    return true;
+                if (Apoco.type.blank.check(s)) {
+                    return false;
                 }
-                if(Apoco.type.integer.check(s)){
+
+                var re = /^([A-Z]{0,3})?[ ]?([0-9]{1,3},([0-9]{3},)*[0-9]{3}|[0-9]+)(.[0-9][0-9])?$/;
+
+                var s = String(s);
+                if (s.search(re) != -1) {
                     return true;
                 }
                 return false;
-            }},
-        string:{
-            html_type:"text",
+            } },
+        date: {
+            html_type: "date",
+            field: "date",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                var yyyymmdd = new RegExp("^(?:(?:(?:(?:(?:[13579][26]|[2468][048])00)|(?:[0-9]{2}(?:(?:[13579][26])|(?:[2468][048]|0[48]))))(?:(?:(?:09|04|06|11)(?:0[1-9]|1[0-9]|2[0-9]|30))|(?:(?:01|03|05|07|08|10|12)(?:0[1-9]|1[0-9]|2[0-9]|3[01]))|(?:02(?:0[1-9]|1[0-9]|2[0-9]))))|(?:[0-9]{4}(?:(?:(?:09|04|06|11)(?:0[1-9]|1[0-9]|2[0-9]|30))|(?:(?:01|03|05|07|08|10|12)(?:0[1-9]|1[0-9]|2[0-9]|3[01]))|(?:02(?:[01][0-9]|2[0-8])))))$");
+                s = String(s);
+                if (s.search(yyyymmdd) !== -1) {
+                    return true;
+                }
+
+                var isDate_re = /^(19|20)?[0-9]{2}[- \/.](0?[1-9]|1[012])[- \/.](0?[1-9]|[12][0-9]|3[01])$/;
+                if (s.search(isDate_re) !== -1) {
+                    return true;
+                }
+                return false;
+            } },
+        decimal: {
+            html_type: "number",
+            field: "input",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s) || isNaN(s)) {
+                    return false;
+                }
+                s = String(s);
+                if (!s.search) {
+                    return false;
+                }
+                var isDecimal_re = /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
+                if (s.search(isDecimal_re) != -1) {
+                    s = parseFloat(s);
+                    return true;
+                }
+                return false;
+            } },
+        email: {
+            html_type: "email",
+            field: "input",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                s = s.trim();
+                var isEmail_re = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
+                if (s.search(isEmail_re) != -1) {
+                    return true;
+                }
+                return false;
+            } },
+        file: {
+            html_type: "file",
+            field: "input",
+            check: function check(s) {
+                return true;
+            } },
+        float: {
+            html_type: "number",
+            field: "float",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                if (isNaN(s)) {
+                    return false;
+                }
+                if (s == 0) {
+                    return true;
+                }
+                s = String(s);
+                if (!s.search) {
+                    return false;
+                }
+                var isDecimal_re = /^\s*(\+|-)?((\d+(\.\d+)?)|(\.\d+))\s*$/;
+                if (s.search(isDecimal_re) != -1) {
+                    s = parseFloat(s);
+                    return true;
+                }
+                return false;
+            } },
+        floatArray: {
+            html_type: "number",
+            field: "numberArray",
+            check: function check(s) {
+                if (Apoco.type.array.check(s)) {
+                    for (var i = 0; i < s.length; i++) {
+                        if (!Apoco.type.float.check(s[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            } },
+        function: {
+            check: function check(a) {
+                function isFunction(object) {
+                    var obj = {};
+                    return !!(object && obj.toString.call(object) == '[object Function]');
+                }
+
+                if (typeof a === "function") {
+                    return true;
+                }
+                return false;
+            } },
+        image: {
+            html_type: "image",
+
+            check: function check(img) {
+                if (!img) {
+                    return false;
+                }
+                if (!img.naturalWidth) {
+                    return false;
+                }
+                if (_typeof(img.naturalWidth) != undefined && img.naturalWidth === 0) {
+                    return false;
+                }
+
+                return true;
+            } },
+        imageArray: {
+            html_type: "image",
+            field: "imageArray",
+            check: function check(a) {
+                if (Apoco.type.array.check(a)) {
+                    for (var i = 0; i < a.length; i++) {
+                        if (!Apoco.type.object.check(a[i])) {
+                            return false;
+                        } else if (!Apoco.type.image.check(a)) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+                return true;
+            } },
+        integer: {
+            html_type: "number",
+            field: "input",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                var isInteger_re = /^\s*(\+|-)?\d+\s*$/;
+                if (s.search(isInteger_re) !== -1) {
+                    return true;
+                }
+
+                return false;
+            } },
+        integerArray: {
+            html_type: "number",
+            field: "numberArray",
+            check: function check(a) {
+                if (Apoco.type.array.check(a)) {
+                    for (var i = 0; i < a.length; i++) {
+                        if (!Apoco.type.integer.check(a[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            } },
+        negativeInteger: {
+            html_type: "number",
+            field: "input",
+            check: function check(s) {
+                var isNegativeInteger_re = /-\s?\d+\s*$/;
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                if (s.search(isNegativeInteger_re) !== -1) {
+                    return true;
+                }
+
+                return false;
+            } },
+        number: {
+            html_type: "number",
+            field: "input",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s) || isNaN(s)) {
+                    return false;
+                }
+                s = String(s);
+                return true;
+            } },
+        object: {
+            check: function check(a) {
+                if (a === undefined) {
+                    return false;
+                }
+                if (a !== null && (typeof a === "undefined" ? "undefined" : _typeof(a)) === 'object') {
+                    return true;
+                }
+                return false;
+            } },
+        objectArray: {
+            check: function check(a) {
+                if (Apoco.type.array.check(a)) {
+                    for (var i = 0; i < a.length; i++) {
+                        if (!Apoco.type.object.check(a[i])) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+                return true;
+            } },
+        password: {
+            html_type: "password",
+            field: "input",
+            check: function check(s) {
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                if (Apoco.type.token.check(s)) {
+                    return true;
+                }
+                return false;
+            } },
+        phoneNumber: {
+            html_type: "tel",
+            field: "input",
+            check: function check(s) {
+                var pn_re = /^[\s()+-]*([0-9][\s()+-]*){6,20}$/;
+
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                if (s.search(pn_re) !== -1) {
+                    return true;
+                }
+
+                return false;
+            } },
+        positiveInteger: {
+            html_type: "number",
+            field: "input",
+            check: function check(s) {
+                var isPositiveInteger_re = /^\s*\d+\s*$/;
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                if (s.search(isPositiveInteger_re) !== -1) {
+                    return true;
+                }
+                return false;
+            } },
+        range: {
+            html_type: "range",
+            field: "slider",
+            check: function check(s) {
+                if (Apoco.type.float.check(s)) {
+                    return true;
+                }
+                if (Apoco.type.integer.check(s)) {
+                    return true;
+                }
+                return false;
+            } },
+        string: {
+            html_type: "text",
             field: "input",
             alt: "autoComplete",
-            check:function(s){  // any non zero string
-                //  console.log("checkType string is " + s);
-                if(s==="") {
+            check: function check(s) {
+                if (s === "") {
                     return true;
                 }
-	        if(Apoco.type.blank.check(String(s))){
-		    return false;
-	        }
-	        if(typeof(s) === 'string' || s instanceof String ){
-		    return true;
-	        }
- 	        return false; //   .toString();
-	    }},
-        stringArray:{
+                if (Apoco.type.blank.check(String(s))) {
+                    return false;
+                }
+                if (typeof s === 'string' || s instanceof String) {
+                    return true;
+                }
+                return false;
+            } },
+        stringArray: {
             html_type: "text",
             field: "stringArray",
             alt: "select",
-            check:function(s){
-                if(Apoco.type.array.check(s)){
-                    for(var i=0;i<s.length;i++){
-                        if(!Apoco.type.string.check(s[i])){
-		            return false;
-	                }
+            check: function check(s) {
+                if (Apoco.type.array.check(s)) {
+                    for (var i = 0; i < s.length; i++) {
+                        if (!Apoco.type.string.check(s[i])) {
+                            return false;
+                        }
                     }
                     return true;
                 }
-	        return false;
-	    }},
-        text:{
-            html_type:"text",
+                return false;
+            } },
+        text: {
+            html_type: "text",
             field: "textArea",
-            check:function(s){
-	        if(Apoco.type.blank.check(String(s))){
-		    return false;
-	        }
-	        return true;
-  	    }},
-        time:{
-            html_type:"time",
-            field: "input",
-            check: function(s){ //Instant of time (Gregorian calendar)
-	       
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-	        //  var isTime =/^([0-1][0-9]|[2][0-3]):([0-5][0-9])$/; // 24 hour clock HH:MM
-	        // var isTime_re = /^(\d{1,2}):(\d{2})(:00)?([ap]m)?$/;
-	        s=s.trim();
-	        var isTime=/^((([0]?[1-9]|1[0-2])(:|\.)[0-5][0-9]((:|\.)[0-5][0-9])?( )?(AM|am|aM|Am|PM|pm|pM|Pm))|(([0]?[0-9]|1[0-9]|2[0-3])(:|\.)[0-5][0-9]((:|\.)[0-5][0-9])?))$/;  // Matches 1:01 AM | 23:52:01 | 03.24.36 AM
- 	        // var isDateTime=/?n:^(?=\d)((?<day>31(?!(.0?[2469]|11))|30(?!.0?2)|29(?(.0?2)(?=.{3,4}(1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(16|[2468][048]|[3579][26])00))|0?[1-9]|1\d|2[0-8])(?<sep>[/.-])(?<month>0?[1-9]|1[012])\2(?<year>(1[6-9]|[2-9]\d)\d{2})(?:(?=\x20\d)\x20|$))?(?<time>((0?[1-9]|1[012])(:[0-5]\d){0,2}(?i:\ [AP]M))|([01]\d|2[0-3])(:[0-5]\d){1,2})?$/;
-	        if(s.search(isTime) !== -1){
-		    return true;
-	        }
-	        else{
-		    return false;
+            check: function check(s) {
+                if (Apoco.type.blank.check(String(s))) {
+                    return false;
                 }
-	}},
-        token:{
-            html_type:"text",
+                return true;
+            } },
+        time: {
+            html_type: "time",
             field: "input",
-            check:function(s){  // a token has no whitespace or special chars
-	        
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-	        //	var isSpecialChar= /^[@!#\$\^%&*()+=\-\[\]\\\';,\.\/\{\}\|\":<>\? ]+$/;
-	        // var isSpecialChar= /^[@!#\$\^%&*()+=\[\]\\\';,\/\{\}\|\":<>\? ]+$/; // except . -
-	        s=s.trim(); // trim leading and trailing whitespace
-	        var invalidChar = /[^A-Za-z0-9.#_\\-]/;
-	        //log("check_field token " + s);
-	        if(s.search(invalidChar) === -1){
-		    //log("check_field token " + s);
-		    return true;
-	        }
-                
-	        return false;
-	    }},
-        url:{
-            html_type:"url",
+            check: function check(s) {
+
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+
+                s = s.trim();
+                var isTime = /^((([0]?[1-9]|1[0-2])(:|\.)[0-5][0-9]((:|\.)[0-5][0-9])?( )?(AM|am|aM|Am|PM|pm|pM|Pm))|(([0]?[0-9]|1[0-9]|2[0-3])(:|\.)[0-5][0-9]((:|\.)[0-5][0-9])?))$/;
+                if (s.search(isTime) !== -1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } },
+        token: {
+            html_type: "text",
             field: "input",
-            check: function(s){
-                
-	        if(Apoco.type.blank.check(s)){
-		    return false;
-	        }
-                s=String(s);
-                var isURL=/^(ht|f)tp(s?)\:\/\/(([a-zA-Z0-9\-\._]+(\.[a-zA-Z0-9\-\._]+)+)|localhost)(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?([\d\w\.\/\%\+\-\=\&amp;\?\:\\\&quot;\'\,\|\~\;]*)$/;
-                
-                if(s.search(isURL) !== -1){
-		    //log("check_field token " + s);
-		    return true;
-	        }
-	        return false;  
-            }}
+            check: function check(s) {
+
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+
+                s = s.trim();
+                var invalidChar = /[^A-Za-z0-9.#_\\-]/;
+
+                if (s.search(invalidChar) === -1) {
+                    return true;
+                }
+
+                return false;
+            } },
+        url: {
+            html_type: "url",
+            field: "input",
+            check: function check(s) {
+
+                if (Apoco.type.blank.check(s)) {
+                    return false;
+                }
+                s = String(s);
+                var isURL = /^(ht|f)tp(s?)\:\/\/(([a-zA-Z0-9\-\._]+(\.[a-zA-Z0-9\-\._]+)+)|localhost)(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_]*)?([\d\w\.\/\%\+\-\=\&amp;\?\:\\\&quot;\'\,\|\~\;]*)$/;
+
+                if (s.search(isURL) !== -1) {
+                    return true;
+                }
+                return false;
+            } }
     };
-
-/*
-        inheritsFrom=function(a,c){
-	    var t=("testing Inherits from ");
-	    while (a != null) {
-		if(a.superClass && a.superClass == c.prototype)
-		{
-		    return true;
-		}
-	    }
-	    return false;
-	};
-   */ 
-
 })();
 
-
 },{"./declare":19}],16:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+'use strict';
 
-
-// check that we have the string methos to remove leading and trailing whitespace
+var Apoco = require('./declare').Apoco;
 
 String.prototype.trim = String.prototype.trim || function trim() {
-    return this.replace(/^\s\s*/, '').replace(/\s\s*$/, ''); };
+    return this.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+};
 
-
-
-;(function(){
-    var DEBUG=true;
+;(function () {
+    var DEBUG = true;
     'use strict';
-    Apoco.cloneDeep=require("clone-deep");
-    Apoco.Utils={  
-        getCssValue:function(css_class,rule,filename){ // doesn't work in chrome
+    Apoco.cloneDeep = require("clone-deep");
+    Apoco.Utils = {
+        getCssValue: function getCssValue(css_class, rule, filename) {
             var stylesheets;
             console.log("class is " + css_class + " rule " + rule + " filename " + filename);
-            if(document && document.styleSheets){
+            if (document && document.styleSheets) {
                 stylesheets = document.styleSheets;
-            }
-            else{
+            } else {
                 return null;
             }
-           // console.log("found " + stylesheets.length + " number of stylesheets");
-            var found=-100;
-            for(var j=0;j< stylesheets.length; j++){
-                if(filename !== undefined){
-                  //  console.log("got stylesheets" + stylesheets[j].href);
-                    if(stylesheets[j].href && (stylesheets[j].href.indexOf(filename)>0)) {
-                     //   console.log("filename equals %j ", stylesheets[j]);
-                        found=j;
+
+            var found = -100;
+            for (var j = 0; j < stylesheets.length; j++) {
+                if (filename !== undefined) {
+                    if (stylesheets[j].href && stylesheets[j].href.indexOf(filename) > 0) {
+                        found = j;
                         break;
                     }
                 }
             }
-            if(found>=0){
-              //  console.log("Found the filename");
-                var classes=stylesheets[j].rules || stylesheets[j].cssRules; // || stylesheets[j].rules[0].cssRules;
-                if(classes === undefined || classes === null){
+            if (found >= 0) {
+                var classes = stylesheets[j].rules || stylesheets[j].cssRules;
+                if (classes === undefined || classes === null) {
                     return null;
                 }
-               // console.log("got classes %j ",classes);
-                for(var i=0; i<classes.length; i++){
-                   // console.log("got class " + classes[i].selectorText );
-                    if(classes[i].selectorText == css_class){
-                    //  console.log("found the class " + classes[i].selectorText + " style " + classes[i].style[rule]);
-                    //   console.log("style Object %j ", classes[i].style);
-                    //   console.log("rule is " + classes[i].style[rule]);
-                        if(classes[i].style[rule]){
-                          //  console.log("returning " + classes[i].style[rule]);
+
+                for (var i = 0; i < classes.length; i++) {
+                    if (classes[i].selectorText == css_class) {
+                        if (classes[i].style[rule]) {
                             return classes[i].style[rule];
                         }
                     }
@@ -6607,925 +6131,809 @@ String.prototype.trim = String.prototype.trim || function trim() {
             }
             return null;
         },
-        widthFromCssClass:function(class_list,filename){ // if in ems need to take font-size into account
-            var value=0,units,v;
-            for(var i=0;i<class_list.length;i++){
-              //  var c=("." + children[i].type).toString();
-                var t=Apoco.Utils.getCssValue(class_list[i].classname,"width",filename);
-              //  console.log("got class value " + t);
-                if(t=== null){
+        widthFromCssClass: function widthFromCssClass(class_list, filename) {
+            var value = 0,
+                units,
+                v;
+            for (var i = 0; i < class_list.length; i++) {
+                var t = Apoco.Utils.getCssValue(class_list[i].classname, "width", filename);
+
+                if (t === null) {
                     return null;
                 }
-                if(t.indexOf("em")>0){
-                    var v=t.split("em");
-                    if(units !== undefined && units !== "em"){
+                if (t.indexOf("em") > 0) {
+                    var v = t.split("em");
+                    if (units !== undefined && units !== "em") {
                         return null;
                     }
-                    units="em";
-                }
-                else if(t.indexOf("px")>0){
-                    var v=t.split("px");
-                    if(units !== undefined && units !== "px"){
+                    units = "em";
+                } else if (t.indexOf("px") > 0) {
+                    var v = t.split("px");
+                    if (units !== undefined && units !== "px") {
                         return null;
                     }
-                    units="px";
-                }
-                else{
+                    units = "px";
+                } else {
                     return null;
                 }
-                class_list[i].value=v[0];
-                class_list[i].units=units;
+                class_list[i].value = v[0];
+                class_list[i].units = units;
                 value += parseFloat(v[0]);
             }
-            return (value.toString() + units);
+            return value.toString() + units;
         },
-        fontSizeToPixels:function(font_size){
-            var p,pp="";
-            var lu={"6":8,"7":9,"7.5":10,"8":11,"9":12,"10":13,"11":15,"12":16,"13":17,"13.5":18,"14":19,"14.5":20,"15":21,"16":22,"17":23,"18":24,"20":26,"22":29,"24":32,"26":35,"27":36,"28":37,"29":38,"30":40,"32":42,"34":45,"36":48};
-            if(font_size === undefined){
+        fontSizeToPixels: function fontSizeToPixels(font_size) {
+            var p,
+                pp = "";
+            var lu = { "6": 8, "7": 9, "7.5": 10, "8": 11, "9": 12, "10": 13, "11": 15, "12": 16, "13": 17, "13.5": 18, "14": 19, "14.5": 20, "15": 21, "16": 22, "17": 23, "18": 24, "20": 26, "22": 29, "24": 32, "26": 35, "27": 36, "28": 37, "29": 38, "30": 40, "32": 42, "34": 45, "36": 48 };
+            if (font_size === undefined) {
                 return null;
             }
-            pp=font_size.toString();
-            if(pp.indexOf("pt")>=0){
-                p=pp.split("pt");
-                pp=p[0].toString();
-            }
-            else if(isNaN(font_size)){
+            pp = font_size.toString();
+            if (pp.indexOf("pt") >= 0) {
+                p = pp.split("pt");
+                pp = p[0].toString();
+            } else if (isNaN(font_size)) {
                 return null;
             }
-            if(lu[pp]){
+            if (lu[pp]) {
                 return lu[pp];
             }
-            
+
             return null;
         },
-	binarySearch: function(arr,sort_order,data,closest){ // sorted list on an array of key value objects
-	    // sort_order array -  1st then 2nd etc
-	    var mid,r,compare;
-            var len=arr.length;
-          //  console.log("array len is " + len);
-         
-            if(sort_order === null){
-                compare=function(aa){
-                 //   console.log("testing " + aa + " with " + data);
-                    if(aa == data){
-                   //     console.log(aa + " is equal to " + data);
+        binarySearch: function binarySearch(arr, sort_order, data, closest) {
+            var mid, r, compare;
+            var len = arr.length;
+
+
+            if (sort_order === null) {
+                compare = function compare(aa) {
+                    if (aa == data) {
                         return 0;
-		    }
-		    else if(aa > data){
-		     //  	console.log(aa + " is greater than " + data);
-			return 1;
-		    }
-		    else if(aa < data){
-		       // console.log(aa + " is less than " + data);
-			return -1;
-		    }
-	            else{
+                    } else if (aa > data) {
+                        return 1;
+                    } else if (aa < data) {
+                        return -1;
+                    } else {
                         throw new Error("binarySearch: should never get here");
                     }
                 };
-            }
-            else{
-	        compare=function(aa){
-		    var field,item;
-                    //console.log("Compare: sort_order.length is " + sort_order.length);
-		    for(var i=0;i<sort_order.length;i++){
-		        field=sort_order[i];
-		        item=data[field];
-		      // console.log("field is " + field);
-                        if(aa[field].value == item){ // && i === sort_order.length -1){
-		        //    console.log(aa[field].value + " equals " + item);
-		            //found[i]=true;
+            } else {
+                compare = function compare(aa) {
+                    var field, item;
+
+                    for (var i = 0; i < sort_order.length; i++) {
+                        field = sort_order[i];
+                        item = data[field];
+
+                        if (aa[field].value == item) {
                             continue;
-		        }
-		        else if(aa[field].value > item){
-		         //   console.log(aa[field].value + " is greater than " + item);
-			    return 1;
-		        }
-		        else if(aa[field].value < item){
-		           // console.log(aa[field].value + " is less than " + item);
-			    return -1;
-		        }
-	                else{
+                        } else if (aa[field].value > item) {
+                            return 1;
+                        } else if (aa[field].value < item) {
+                            return -1;
+                        } else {
                             throw new Error("binarySearch: should never get here");
                         }
-		    }
+                    }
                     return 0;
-	            //	console.log(" return value is  null ");
-	            //	return null;
-	        };
+                };
             }
-	    // perhaps should use localeCompare() e.g string1.localeCompare(string2)
-	    mid = Math.floor(arr.length / 2);
-	  //  console.log("mid is " + mid);
-            if(closest){
-                if(closest.index === undefined){
-                    closest.index=mid;
-                }
-                else{
-                    closest.index=(closest.dir==="after")?closest.index+mid:closest.index-Math.ceil(arr.length / 2);
+
+            mid = Math.floor(arr.length / 2);
+
+            if (closest) {
+                if (closest.index === undefined) {
+                    closest.index = mid;
+                } else {
+                    closest.index = closest.dir === "after" ? closest.index + mid : closest.index - Math.ceil(arr.length / 2);
                 }
             }
-  	    r=compare(arr[mid]);
-	    if (r < 0  && arr.length > 1) {
-                if(closest){
-                    closest.dir="after";
+            r = compare(arr[mid]);
+            if (r < 0 && arr.length > 1) {
+                if (closest) {
+                    closest.dir = "after";
                 }
-            	return Apoco.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
-	    }
-	    else if (r > 0 && arr.length > 1) {
-                if(closest){
-                    closest.dir="before";
+                return Apoco.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE), sort_order, data, closest);
+            } else if (r > 0 && arr.length > 1) {
+                if (closest) {
+                    closest.dir = "before";
                 }
-		return Apoco.Utils.binarySearch(arr.slice(0, mid),sort_order,data,closest);
-	    }
-	    else if (r  === 0) {
+                return Apoco.Utils.binarySearch(arr.slice(0, mid), sort_order, data, closest);
+            } else if (r === 0) {
                 return arr[mid];
-	    }
-	    else {
-		//console.log('not here');
-		if(closest){
-		    closest.val=arr[mid];
-                    if(r<0){
-                        closest.dir="after";
+            } else {
+                if (closest) {
+                    closest.val = arr[mid];
+                    if (r < 0) {
+                        closest.dir = "after";
+                    } else {
+                        closest.dir = "before";
                     }
-                    else{
-                        closest.dir="before";
-                    }
-		}
-		return null;
-	    }
-	},
-	hashCode: function(str){
-	    var hash = 0;
-	    var char;
-	    if (str.length == 0) return hash;
-	    for (var i = 0; i < str.length; i++) {
-		char = str.charCodeAt(i);
-		hash = ((hash<<5)-hash)+char;
-		hash = hash & hash; // Convert to 32bit integer
-	    }
-	    return hash;
-	},
-	extend: function(subClass,superClass){   //class deep inheritance
-	    var F = function(){};
-	    F.prototype=superClass.prototype;
-	    var subProto=subClass.prototype;
+                }
+                return null;
+            }
+        },
+        hashCode: function hashCode(str) {
+            var hash = 0;
+            var char;
+            if (str.length == 0) return hash;
+            for (var i = 0; i < str.length; i++) {
+                char = str.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash = hash & hash;
+            }
+            return hash;
+        },
+        extend: function extend(subClass, superClass) {
+            var F = function F() {};
+            F.prototype = superClass.prototype;
+            var subProto = subClass.prototype;
 
-	    subClass.prototype=new F();
-	    subClass.prototype.constructor=subClass;
-	    subClass.superClass=superClass.prototype;
-	    // if the subClass has prototype members copy them to the new object
-	    for(var k in subProto){
-		if(subProto.hasOwnProperty(k)){
-		    subClass.prototype[k]=subProto[k];
-		}
-	    }
+            subClass.prototype = new F();
+            subClass.prototype.constructor = subClass;
+            subClass.superClass = superClass.prototype;
 
-	    //  if(!Object.prototype.constructor) console.log("olkjkllkj");
-	    //if(superClass.prototype.constructor) console.log("uiiooui");
-	    if(superClass.prototype){
-		if(superClass.prototype.constructor === Object.prototype.constructor){
-		    superClass.prototype.constructor = superClass;
-		}
-	    }
-	},
-  
-        draggable:function(source,destination){
-            if(destination === undefined){
-                destination=document.body;
+            for (var k in subProto) {
+                if (subProto.hasOwnProperty(k)) {
+                    subClass.prototype[k] = subProto[k];
+                }
+            }
+
+            if (superClass.prototype) {
+                if (superClass.prototype.constructor === Object.prototype.constructor) {
+                    superClass.prototype.constructor = superClass;
+                }
+            }
+        },
+
+        draggable: function draggable(source, destination) {
+            if (destination === undefined) {
+                destination = document.body;
             }
             source.classList.add("isdraggable");
-            
-            var allowDrag=function(e){
-              //  console.log("allow drag is here");
+
+            var allowDrag = function allowDrag(e) {
                 e.preventDefault();
                 return false;
             };
-            var dragEnd=function(e){
-               // console.log("dragEnd is here");
+            var dragEnd = function dragEnd(e) {
                 e.stopPropagation();
-                //console.log("dragend is here");
+
                 e.currentTarget.classList.remove("draggable");
-                destination.removeEventListener("drop",drop);
-                destination.removeEventListener("dragover",allowDrag);
-                
+                destination.removeEventListener("drop", drop);
+                destination.removeEventListener("dragover", allowDrag);
             };
-            var drop=function(e){
-                // return function(e){
+            var drop = function drop(e) {
                 console.log("drop is here");
                 e.preventDefault();
                 e.stopPropagation();
-                var data=e.dataTransfer.getData("text").split(",");
-                if(!source){
+                var data = e.dataTransfer.getData("text").split(",");
+                if (!source) {
                     throw new Error("source is undefined");
                 }
-                if(source.classList.contains("draggable")){
-                   // console.log("source has class");
-                    source.style.left = (e.clientX + parseInt(data[0],10)) + 'px';
-                    source.style.top = (e.clientY + parseInt(data[1],10)) + 'px';
+                if (source.classList.contains("draggable")) {
+                    source.style.left = e.clientX + parseInt(data[0], 10) + 'px';
+                    source.style.top = e.clientY + parseInt(data[1], 10) + 'px';
                     source.classList.remove("draggable");
                 }
-                //  document.body.removeChild(document.getElementById("temp_clone"));
+
                 return false;
-               // };
             };
-            
-            var dragStart=function(e){
-              //  console.log("dragStart is here ");
+
+            var dragStart = function dragStart(e) {
                 e.currentTarget.classList.add("draggable");
-                destination.addEventListener("dragover",allowDrag,false);
-                destination.addEventListener("drop",drop,false);
-                var style=window.getComputedStyle(e.target, null);
-                    //e.dataTransfer.setData("text", e.target.id);
-                e.dataTransfer.setData("text",  (parseInt(style.getPropertyValue("left"),10) - e.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - e.clientY));
+                destination.addEventListener("dragover", allowDrag, false);
+                destination.addEventListener("drop", drop, false);
+                var style = window.getComputedStyle(e.target, null);
+
+                e.dataTransfer.setData("text", parseInt(style.getPropertyValue("left"), 10) - e.clientX + ',' + (parseInt(style.getPropertyValue("top"), 10) - e.clientY));
             };
-            
-            //console.log("draggable is here draggable is " + source.draggable);
-            if(source.draggable=== false){
-               // console.log("dragable is false");
-                source.draggable=true;
-                source.addEventListener("dragstart",dragStart,false);
-                source.addEventListener("dragend",dragEnd,false);
+
+            if (source.draggable === false) {
+                source.draggable = true;
+                source.addEventListener("dragstart", dragStart, false);
+                source.addEventListener("dragend", dragEnd, false);
             }
-                        
         },
-        formatDate: function(d){ //YYYY-MMM-DD to human
-            //	console.log("date is " + d);
-	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-	    var months = ["January", "February", "March", "April", "May",
-		          "June", "July", "August", "September", "October", "November", "December"];
+        formatDate: function formatDate(d) {
+            var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-	    var parts=d.split("-"); // because Safari does not understand the ISO8601 format
-            //	var date=new Date(d);
-	    var date=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])); // stuoid workaround for Safari 5.1
-	    var month=date.getMonth();
-	    var day=date.getDay();
-	    var n=date.getDate();
-	    var year=date.getFullYear();
-	    var ending;
-	    var last_char=n.toString().slice(-1);
-	    //console.log(" last char is " + last_char);
-	    var d=parseInt(n);
-	    if(d>10 && d<14){
-	        ending="th";
-	    }
-	    else if(last_char === "1"){
+            var parts = d.split("-");
+            var date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            var month = date.getMonth();
+            var day = date.getDay();
+            var n = date.getDate();
+            var year = date.getFullYear();
+            var ending;
+            var last_char = n.toString().slice(-1);
 
-	        ending="st";
-	    }
-	    else if( last_char === "2"){
-	        ending="nd";
-	    }
-	    else if(last_char === "3"){
-	        ending="rd";
-	    }
-	    else{
-	        ending="th";
-	    }
-	    //date.toLocaleString();
-	    return (days[day] + " " + n + ending + " "  +  months[month] + " " + year);
+            var d = parseInt(n);
+            if (d > 10 && d < 14) {
+                ending = "th";
+            } else if (last_char === "1") {
 
+                ending = "st";
+            } else if (last_char === "2") {
+                ending = "nd";
+            } else if (last_char === "3") {
+                ending = "rd";
+            } else {
+                ending = "th";
+            }
+
+            return days[day] + " " + n + ending + " " + months[month] + " " + year;
         },
 
-        dateNow:function(){
-	    var n=new Date();
-	    var now= (n.getFullYear() + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2));
-	    return now;
+        dateNow: function dateNow() {
+            var n = new Date();
+            var now = n.getFullYear() + "-" + ('0' + (n.getMonth() + 1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2);
+            return now;
         },
-        datePast:function(date){
-	    var n=new Date(); //.toISOString(); // current or past events
-	    var now= (n.getFullYear() + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2));
-            //	console.log("now is " + now + " and date is " + date);
-	    var r=(now > date)?true: false;
-	    return r;
+        datePast: function datePast(date) {
+            var n = new Date();
+            var now = n.getFullYear() + "-" + ('0' + (n.getMonth() + 1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2);
+
+            var r = now > date ? true : false;
+            return r;
         },
-        observer:{
-            _list:[],
-            create: function(){
-                var that=this;
-                var check=function(mutations){
-                    if(that._list.length>0){
-                        mutations.forEach(function(mutation){
-                            for(var k in mutation){
-                                //console.log("mutation is " + k);
-                                if(k === "addedNodes"){
-                                  //  for(var n in mutation.addedNodes){
-                                  //      console.log("mutation.addNodes key is " + n);
-                                  //  }
-                                    for(var i=0; i< mutation.addedNodes.length;i++){
-                                       // console.log("Mutation observer addedNodes " + mutation.addedNodes[i].id);
-                                        for(var j=0;j<that._list.length;j++){
-                                          //  console.log("Observer trying to find " + that._list[j].id);
-                                            if(mutation.addedNodes[i].id == that._list[j].id && that._list[j].found === false){
-                                              //  console.log(" really found ????? " + document.getElementById(that._list[j].id));
-                                              //  console.log("+++++++++++++++++++++++++++++++++++++++++==Observer Found " + that._list[j].id);
-                                              //  console.log("!!!!!!!!!!!!!!!!!!!!!!!!Observer calling action function");
-                                                that._list[j].found=true;
-                                                that._list[j].fn.call(that._list[j].context,that._list[j].context);
-                                                // break;
+        observer: {
+            _list: [],
+            create: function create() {
+                var that = this;
+                var check = function check(mutations) {
+                    if (that._list.length > 0) {
+                        mutations.forEach(function (mutation) {
+                            for (var k in mutation) {
+                                if (k === "addedNodes") {
+                                    for (var i = 0; i < mutation.addedNodes.length; i++) {
+                                        for (var j = 0; j < that._list.length; j++) {
+                                            if (mutation.addedNodes[i].id == that._list[j].id && that._list[j].found === false) {
+                                                that._list[j].found = true;
+                                                that._list[j].fn.call(that._list[j].context, that._list[j].context);
                                             };
                                         }
                                     }
                                     break;
                                 }
                             }
-                        });  
-                        
+                        });
                     }
-                    var temp=[];
-                 //   console.log("observer list is " + that._list.length);
-                    for(var k=0;k<that._list.length;k++){
-                     //   console.log("that_list " + k + " found is " + that._list[k].id + " found " + that._list[k].found);
-                        if(that._list[k].found === false){
+                    var temp = [];
+
+                    for (var k = 0; k < that._list.length; k++) {
+                        if (that._list[k].found === false) {
                             temp.push(that._list[k]);
                         }
-                       // else{
-                            //console.log("==================== cutting out " + that._list[k].id);
-                       // }
                     }
-                    that._list=temp;
-                    if(that._list.length==0){ // all fullfilled so reset
-                        Apoco.Observer.takeRecords(); //empty the list
-                        Apoco.Observer.disconnect(); //stop observing
-                       // console.log("OBSERVER DISCONNECT");
+                    that._list = temp;
+                    if (that._list.length == 0) {
+                        Apoco.Observer.takeRecords();
+                        Apoco.Observer.disconnect();
                     }
-
-                   // console.log("observer list is now " + that._list.length);
                 };
-                if(!Apoco.Observer){
+                if (!Apoco.Observer) {
                     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-                  //  console.log("MAKING NEW OBSERVER");
-                    Apoco.Observer=new MutationObserver(function(mutations){
+
+                    Apoco.Observer = new MutationObserver(function (mutations) {
                         check(mutations);
                     });
                 }
             },
-            add:  function(id,fn,context){
-
-               // console.log("Observer adding ____________- id to list  " + id);
-                if(id !== undefined){
-                    this._list.push({id:id,fn:fn,context:context,found:false});
+            add: function add(id, fn, context) {
+                if (id !== undefined) {
+                    this._list.push({ id: id, fn: fn, context: context, found: false });
                 }
-                //console.log("obsever list is " + this._list.length + " long");
             }
 
         },
-        getSiblings:function (elem) {
+        getSiblings: function getSiblings(elem) {
             var siblings = [];
             var sibling = elem.parentNode.firstChild;
-            while(sibling){
-                //for ( ; sibling; sibling = sibling.nextSibling )
-               // console.log("found sibling");
-                if ( sibling.nodeType == 1 && sibling != elem ){
-                    siblings.push( sibling );
+            while (sibling) {
+                if (sibling.nodeType == 1 && sibling != elem) {
+                    siblings.push(sibling);
                 }
-                sibling=sibling.nextSibling;
+                sibling = sibling.nextSibling;
             }
             return siblings;
         },
-        detectMobile: function(){
-            if(navigator.userAgent.match(/Android/i)
-               ||navigator.userAgent.match(/iPhone/i)
-               ||navigator.userAgent.match(/BlackBerry/i)
-               ||navigator.userAgent.match(/IEMobile/i)){
+        detectMobile: function detectMobile() {
+            if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/IEMobile/i)) {
                 return true;
-            }
-            else{
+            } else {
                 return false;
             }
-
         }
     };
-
 })();
 
 },{"./declare":19,"clone-deep":26}],17:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+"use strict";
+
+var Apoco = require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Panel");
+var PolyfillPromise = require('es6-promise').Promise;
 
-;(function(){
+if (Promise === undefined) {
+    Promise = PolyfillPromise;
+}
+
+;(function () {
     "use strict";
-    Apoco.Window={
-        _list:[],
-        delete:function(win){ // remove a panel that is in a separate browser
+
+    Apoco.Window = {
+        _list: [],
+        delete: function _delete(win) {
             var w;
-            if(win === undefined){
+            if (win === undefined) {
                 throw new Error("Window.delete  must supply window name or windowObject");
             }
-            w=this._inList(win);
-            if(w === null){
-                return null; //may already have been deleted
-                //throw new Error("Window.delete - could not find window " + win);
+            w = this._inList(win);
+            if (w === null) {
+                return null;
             }
-           
-           // console.log("deleting the panels for window " + win);
-            var p=Apoco.Panel._list;
-            for(var j=0;j<p.length;j++){
-                if(p[j].window && p[j].window === this._list[w].window){
-             //       console.log("deleting " + p[j].name);
+
+            var p = Apoco.Panel._list;
+            for (var j = 0; j < p.length; j++) {
+                if (p[j].window && p[j].window === this._list[w].window) {
                     Apoco.Panel.delete(p[j].name);
                 }
             }
-            this._list[w].window.onunload=null; // stop the close callback
+            this._list[w].window.onunload = null;
             this._list[w].window.close();
-            this._list.splice(w,1);
+            this._list.splice(w, 1);
             return undefined;
         },
-        _close:function(name){
-            var p=this._inList(name);
-            if(p !== null){
+        _close: function _close(name) {
+            var p = this._inList(name);
+            if (p !== null) {
                 this._list[p].window.close();
-            }
-            else{
+            } else {
                 throw new Error("Apoco.Window: Cannot find window " + name);
             }
-            this._list.splice(p,1);
+            this._list.splice(p, 1);
         },
-        _closeAll:function(){
-          //  console.log("Close all is here");
-            
-            for(var i=0; i<this._list.length; i++){
+        _closeAll: function _closeAll() {
+
+            for (var i = 0; i < this._list.length; i++) {
                 this._list[i].window.close();
             }
-            this._list.length=0;
+            this._list.length = 0;
         },
-        get:function(p){
-            var i=this._inList(p);
-            if(i=== null){
-             //   console.log("return from inList is null");
+        get: function get(p) {
+            var i = this._inList(p);
+            if (i === null) {
                 return null;
             }
             return this._list[i];
         },
-        _inList:function(name){
-            var str=false;
-            if(name === undefined){
+        _inList: function _inList(name) {
+            var str = false;
+            if (name === undefined) {
                 throw new Error("no name given");
             }
-            if(Apoco.type["string"].check(name)){
-                str=true;
+            if (Apoco.type["string"].check(name)) {
+                str = true;
             }
-         //   console.log("is " + name + " in list?");
-         //   console.log("Window: inList length is " + this._list.length);
-            for(var i=0; i<this._list.length;i++){
-           //     console.log("testing list is " + i);
-                if(str === true){
-             //       console.log("str is true name is " + this._list[i].name + " to match " + name);
-                    if((this._list[i].name).toString() == (name).toString()){
-               //         console.log("found it " + name);
-                        return i; //this._list[i].window;
+
+            for (var i = 0; i < this._list.length; i++) {
+                if (str === true) {
+                    if (this._list[i].name.toString() == name.toString()) {
+                        return i;
                     }
-                }
-                else{
-                 //   console.log("str is false name is " + this._list[i].name + " to match " + name);
-                    if(this._list[i].window === name){
-                        return i; //this._list[i].window;
+                } else {
+                    if (this._list[i].window === name) {
+                        return i;
                     }
                 }
             }
             return null;
         },
-        open:function(d){     // open a new window or a tab
-            var settings=new String;
-            var that=this;
-            var defaults={
-                width:600,
-                height:600,
-                menubar:0,
-                toolbar:0,
-                location:0,
-                personalbar:0
+        open: function open(d) {
+            var settings = new String();
+            var that = this;
+            var defaults = {
+                width: 600,
+                height: 600,
+                menubar: 0,
+                toolbar: 0,
+                location: 0,
+                personalbar: 0
             };
-            if(!d.name){
+            if (!d.name) {
                 throw new Error("Window:open - must have a name");
             }
-            if(!d.url){
+            if (!d.url) {
                 throw new Error("Window: open - must have a url");
             }
-            if(this.get(d.name)){
+            if (this.get(d.name)) {
                 throw new Error("Apoco,Window: " + d.name + " already exists");
             }
-	    if(!d.opts){
-  	        settings="_blank"; // open in new tab
-	    }
-            else{
-                for(var k in defaults){
-                    if(d.opts[k] === undefined ){
-                        d.opts[k]=defaults[k];
+            if (!d.opts) {
+                settings = "_blank";
+            } else {
+                for (var k in defaults) {
+                    if (d.opts[k] === undefined) {
+                        d.opts[k] = defaults[k];
                     }
                 }
-               
-                for(var k in d.opts){
-                    if(settings === ""){
-                        settings=settings.concat((k + "=" + d.opts[k]));
-                    }
-                    else{
-                        settings=settings.concat(("," + k + "=" + d.opts[k]));
+
+                for (var k in d.opts) {
+                    if (settings === "") {
+                        settings = settings.concat(k + "=" + d.opts[k]);
+                    } else {
+                        settings = settings.concat("," + k + "=" + d.opts[k]);
                     }
                 }
                 console.log("settings are " + settings);
             }
-	    var win=window.open(d.url,d.name,("'"+ settings + "'"));
-            var p=new Promise(function(resolve,reject){
-	        if(!win){
+            var win = window.open(d.url, d.name, "'" + settings + "'");
+            var p = new Promise(function (resolve, reject) {
+                if (!win) {
                     reject("Could not open window");
-	        }
-	        window.addEventListener("childReady",function(){
-	            return function(e){
-		        if(e.data === win){
-                            var tt={name: d.name,window:win,promise:p};
-		          //  console.log("window equals e.data");
+                }
+                window.addEventListener("childReady", function () {
+                    return function (e) {
+                        if (e.data === win) {
+                            var tt = { name: d.name, window: win, promise: p };
+
                             that._list.push(tt);
                             resolve(tt);
-		        }
-                        else{
-                            reject(("Apoco.Window: could not open " + d.name));
+                        } else {
+                            reject("Apoco.Window: could not open " + d.name);
                         }
-		      //  console.log("Parent child is ready");
-		    };
-	        }(d.name,win,p),false);
+                    };
+                }(d.name, win, p), false);
             });
-            
-            p.then(function(d){
-                d.window.onunload=function(e){
-                   // console.log("got child closed " + d.name);
-                    // delete the window from the list
-                    var win= d.window; //that._list[d.name];
-                    if(win !== null){
+
+            p.then(function (d) {
+                d.window.onunload = function (e) {
+                    var win = d.window;
+                    if (win !== null) {
                         Apoco.Window.delete(win);
-                    }
-                    else{
+                    } else {
                         throw new Error("Could not find window to remove");
                     }
                 };
-            }).catch(function(reason){
-                Apoco.popup.error("Window Open Error",reason);
+            }).catch(function (reason) {
+                Apoco.popup.error("Window Open Error", reason);
             });
-                                        
-	    return p;
+
+            return p;
         }
     };
 })();
 
-},{"./Panel":12,"./Popups":13,"./Utils":16,"./declare":19}],18:[function(require,module,exports){
-var Apoco=require('./declare').Apoco;
+},{"./Panel":12,"./Popups":13,"./Utils":16,"./declare":19,"es6-promise":43}],18:[function(require,module,exports){
+'use strict';
 
-;(function(){
-// ISO 8691
+var Apoco = require('./declare').Apoco;
+
+;(function () {
     "use strict";
-    //singleton 
-    function Datepicker(element){
-        var that=this;
-        this.days= ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        this.months=[{name:'January',len:31}, {name:'February',len:28}, {name:'March',len:31}, {name:'April',len:30}, {name:'May',len:31},{name: 'June',len:30},{name:'July',len:31},{name:'August',len:31},{name:'September',len:30}, {name:'October',len:31}, {name:'November',len:30}, {name:'December',len:31}];
+
+    function Datepicker(element) {
+        var that = this;
+        this.days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        this.months = [{ name: 'January', len: 31 }, { name: 'February', len: 28 }, { name: 'March', len: 31 }, { name: 'April', len: 30 }, { name: 'May', len: 31 }, { name: 'June', len: 30 }, { name: 'July', len: 31 }, { name: 'August', len: 31 }, { name: 'September', len: 30 }, { name: 'October', len: 31 }, { name: 'November', len: 30 }, { name: 'December', len: 31 }];
     };
-    Datepicker.prototype={
-        init:function(element){
-            var that=this;
-           // console.log("Datepicker is here");
-            // if(element){
-           //     console.log("got a paramenter");
-           // }
-       
-            var  click=function(e){
-             //   console.log("click is here");
-                var pos=[];
-                if(that.element === undefined){
+    Datepicker.prototype = {
+        init: function init(element) {
+            var that = this;
+
+
+            var click = function click(e) {
+                var pos = [];
+                if (that.element === undefined) {
                     that.create();
                 }
                 e.stopPropagation();
                 e.preventDefault();
-                // if the datepicker is open  close it
-                
-                // get the date in the input if any
-                var date=e.target.value;
 
-                if(that.current_element !== undefined){
-               //     console.log("there is a previous click");
-                    if(element==that.current_element){ //at least 2 clicks
-                 //       console.log("and it was the same element");
-                   //     console.log("and the element's  visibility is " + that.element.style.visibility);
-                        if(that.element.style.visibility === "visible"){
-                     //       console.log("and it is visible- so close it");
+                var date = e.target.value;
+
+                if (that.current_element !== undefined) {
+                    if (element == that.current_element) {
+                        if (that.element.style.visibility === "visible") {
                             that.close();
                             return;
                         }
                     }
                 }
-                that.close(); //close and reopen
-                that.current_element=element; 
-                var t=that.parseDate(date);               
-                if(!t){  // if no date in input node
-                    that.selectedDate=new Date();  // set the date to today
+                that.close();
+                that.current_element = element;
+                var t = that.parseDate(date);
+                if (!t) {
+                    that.selectedDate = new Date();
+                } else {
+                    that.selectedDate = t;
+                    e.target.value = that.dateToString(that.selectedDate);
                 }
-                else{
-                    that.selectedDate=t;
-                    e.target.value=that.dateToString(that.selectedDate);          
-                } 
 
-               // console.log("selected date is " + that.selectedDate);
                 that.mkCalendarBody();
                 var rect = element.getBoundingClientRect();
-                // get the position
-                //  console.log("init x " + e.clientX + " y " + e.clientY);
-                //  console.log("rect right is " + rect.right + " bottom " + rect.bottom);
-                // pos=that.getPos(e);
-                that.element.style.top=((rect.bottom+window.scrollY).toString() + "px"); //pos[0];
-                that.element.style.left=((rect.right+window.scrollX).toString() + "px"); //pos[1];
-                that.element.style.visibility="visible";
+
+                that.element.style.top = (rect.bottom + window.scrollY).toString() + "px";
+                that.element.style.left = (rect.right + window.scrollX).toString() + "px";
+                that.element.style.visibility = "visible";
             };
-            var change=function(e){
+            var change = function change(e) {
                 var date;
-               // console.log("change is here ================");
-                date=e.target.value;
-                var t=that.parseDate(date);
-                if(t){
-                    that.selectedDate=t;
-                
-                    e.target.value=that.dateToString(that.selectedDate);
-                    //console.log("selected date is " + that.selectedDate);
+
+                date = e.target.value;
+                var t = that.parseDate(date);
+                if (t) {
+                    that.selectedDate = t;
+
+                    e.target.value = that.dateToString(that.selectedDate);
+
                     that.mkCalendarBody();
-                }
-                else{
-                    e.target.value="";
+                } else {
+                    e.target.value = "";
                 }
             };
-            if(element!== undefined){
-              //  console.log("++++++++++++++++++++tag name us " + element.tagName);
-                if(element.tagName.toLowerCase() !== "input"){
+            if (element !== undefined) {
+                if (element.tagName.toLowerCase() !== "input") {
                     throw new Error("datepicker: element must be an input node");
                 }
-               // console.log("datepicker here");
+
                 element.classList.add("Apoco_datepicker_input");
-                element.addEventListener("click",click,false);
-                element.addEventListener("change",change,false);
+                element.addEventListener("click", click, false);
+                element.addEventListener("change", change, false);
             }
         },
-        close:function(){
-            if(this.element){
-                this.element.style.visibility="hidden";
+        close: function close() {
+            if (this.element) {
+                this.element.style.visibility = "hidden";
             }
         },
-        parseDate:function(date){
+        parseDate: function parseDate(date) {
             var p;
-            if(date === undefined || date === ""){
-               // console.log("parseDate date is undefined");
+            if (date === undefined || date === "") {
                 return null;
             }
-            p=new Date(date);
-            if(!p || p<0){
+            p = new Date(date);
+            if (!p || p < 0) {
                 throw new Error("datepicker: cannot parse this as a date  " + date);
             }
-          
+
             return p;
         },
-        mkCalendarHeader:function(date){
-            var table,row,body,head,col,title,span,that=this;
-            var icons=[{id:"Apoco_datepicker_prevYear",
-                        func: function(e){
-                            e.stopPropagation();
-                            if(that.selectedDate){
-                                var f=that.selectedDate.getFullYear()-1;
-                                that.selectedDate.setFullYear(f);
-                                that.mkCalendarBody(this.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
-                                if(p){
-                                    p.classList.remove("ui-state-active");
-                                }
-                            }
+        mkCalendarHeader: function mkCalendarHeader(date) {
+            var table,
+                row,
+                body,
+                head,
+                col,
+                title,
+                span,
+                that = this;
+            var icons = [{ id: "Apoco_datepicker_prevYear",
+                func: function func(e) {
+                    e.stopPropagation();
+                    if (that.selectedDate) {
+                        var f = that.selectedDate.getFullYear() - 1;
+                        that.selectedDate.setFullYear(f);
+                        that.mkCalendarBody(this.selectedDate);
+                        var p = that.calendar.querySelector("td.ui-state-active");
+                        if (p) {
+                            p.classList.remove("ui-state-active");
                         }
-                       },
-                       {id:"Apoco_datepicker_prevMonth",
-                        func:function(e){
-                            e.stopPropagation();
-                            if(that.selectedDate){
-                                var f=that.selectedDate.getMonth()-1;
-                                that.selectedDate.setMonth(f);
-                                that.mkCalendarBody(that.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
-                                if(p){
-                                    p.classList.remove("ui-state-active");
-                                }
-                            }
+                    }
+                }
+            }, { id: "Apoco_datepicker_prevMonth",
+                func: function func(e) {
+                    e.stopPropagation();
+                    if (that.selectedDate) {
+                        var f = that.selectedDate.getMonth() - 1;
+                        that.selectedDate.setMonth(f);
+                        that.mkCalendarBody(that.selectedDate);
+                        var p = that.calendar.querySelector("td.ui-state-active");
+                        if (p) {
+                            p.classList.remove("ui-state-active");
                         }
-                       },
-                       {id:"Apoco_datepicker_nextYear",
-                        func:function(e){
-                            e.stopPropagation();
-                            if(that.selectedDate){
-                                var f=that.selectedDate.getFullYear()+1;
-                                that.selectedDate.setFullYear(f);
-                                that.mkCalendarBody(that.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
-                                if(p){
-                                    p.classList.remove("ui-state-active");
-                                }
-                            }
+                    }
+                }
+            }, { id: "Apoco_datepicker_nextYear",
+                func: function func(e) {
+                    e.stopPropagation();
+                    if (that.selectedDate) {
+                        var f = that.selectedDate.getFullYear() + 1;
+                        that.selectedDate.setFullYear(f);
+                        that.mkCalendarBody(that.selectedDate);
+                        var p = that.calendar.querySelector("td.ui-state-active");
+                        if (p) {
+                            p.classList.remove("ui-state-active");
                         }
-                       },
-                       {id:"Apoco_datepicker_nextMonth",
-                        func:function(e){
-                            e.stopPropagation();
-                            if(that.selectedDate){
-                                var f=that.selectedDate.getMonth()+1;
-                                that.selectedDate.setMonth(f);
-                                that.mkCalendarBody(that.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
-                                if(p){
-                                    p.classList.remove("ui-state-active");
-                                }
-                            }
+                    }
+                }
+            }, { id: "Apoco_datepicker_nextMonth",
+                func: function func(e) {
+                    e.stopPropagation();
+                    if (that.selectedDate) {
+                        var f = that.selectedDate.getMonth() + 1;
+                        that.selectedDate.setMonth(f);
+                        that.mkCalendarBody(that.selectedDate);
+                        var p = that.calendar.querySelector("td.ui-state-active");
+                        if (p) {
+                            p.classList.remove("ui-state-active");
                         }
-                       }
-                      ];
-            table=document.createElement("table");
-            table.id="Apoco_datepicker_controls";
-            table.classList.add("ui-datepicker-header","ui-widget-header","ui-helper-clearfix","ui-corner-all");
+                    }
+                }
+            }];
+            table = document.createElement("table");
+            table.id = "Apoco_datepicker_controls";
+            table.classList.add("ui-datepicker-header", "ui-widget-header", "ui-helper-clearfix", "ui-corner-all");
             this.element.appendChild(table);
-            body=document.createElement("tbody");
+            body = document.createElement("tbody");
             table.appendChild(body);
-            row=document.createElement("tr");
-            
+            row = document.createElement("tr");
+
             body.appendChild(row);
-            col=document.createElement("td");
+            col = document.createElement("td");
             col.classList.add("arrows");
             row.appendChild(col);
-            for(var i=0;i<2;i++){
-                span=document.createElement("span");
-                span.id=icons[i].id;
-                if(i===0){
-                    span.classList.add("ui-icon","ui-icon-circle-arrow-w");
+            for (var i = 0; i < 2; i++) {
+                span = document.createElement("span");
+                span.id = icons[i].id;
+                if (i === 0) {
+                    span.classList.add("ui-icon", "ui-icon-circle-arrow-w");
+                } else {
+                    span.classList.add("ui-icon", "ui-icon-circle-triangle-w");
                 }
-                else{
-                    span.classList.add("ui-icon","ui-icon-circle-triangle-w");
-                }
-                span.addEventListener("click",icons[i].func,false);
+                span.addEventListener("click", icons[i].func, false);
                 col.appendChild(span);
             }
-            title=document.createElement("td");
-            title.id="Apoco_datepicker_title";
+            title = document.createElement("td");
+            title.id = "Apoco_datepicker_title";
             title.classList.add("ui-datepicker-title");
             row.appendChild(title);
-            col=document.createElement("td");
+            col = document.createElement("td");
             col.classList.add("arrows");
-            col.style.float="right";
+            col.style.float = "right";
             row.appendChild(col);
-            for(var i=2;i<icons.length;i++){
-                span=document.createElement("span");
-                span.id=icons[i].id;
-                if(i===2){
-                    span.classList.add("ui-icon","ui-icon-circle-arrow-e");
-                    //"ui-icon-seek-next");
+            for (var i = 2; i < icons.length; i++) {
+                span = document.createElement("span");
+                span.id = icons[i].id;
+                if (i === 2) {
+                    span.classList.add("ui-icon", "ui-icon-circle-arrow-e");
+                } else {
+                    span.classList.add("ui-icon", "ui-icon-circle-triangle-e");
                 }
-                else{
-                    span.classList.add("ui-icon","ui-icon-circle-triangle-e");
-                }
-                span.addEventListener("click",icons[i].func,false);
+                span.addEventListener("click", icons[i].func, false);
                 col.appendChild(span);
             }
-            this.calendar=document.createElement("table");
-            this.calendar.id="Apoco_datepicker_grid";
+            this.calendar = document.createElement("table");
+            this.calendar.id = "Apoco_datepicker_grid";
             this.element.appendChild(this.calendar);
-            body=document.createElement("tbody");
+            body = document.createElement("tbody");
             this.calendar.appendChild(body);
-            row=document.createElement("tr");
+            row = document.createElement("tr");
             body.appendChild(row);
-            for(var i=0;i<this.days.length;i++){
-                col=document.createElement("th");
-                col.textContent=this.days[i];
+            for (var i = 0; i < this.days.length; i++) {
+                col = document.createElement("th");
+                col.textContent = this.days[i];
                 row.appendChild(col);
             }
-            var selectDay=function(e){
-                var day,s,p;
-               // console.log("selectDay is here");
-              //  console.log("target type is " + e.target.type);
-              //  console.log("target classlist " + e.target.classList.contains("Apoco_date"));
-                if(e.target.classList.contains("Apoco_date")){
-                    day=e.target.textContent;
-                //    console.log("got day " + day);
+            var selectDay = function selectDay(e) {
+                var day, s, p;
+
+                if (e.target.classList.contains("Apoco_date")) {
+                    day = e.target.textContent;
+
                     e.stopPropagation();
                     e.preventDefault();
-                    //find the previous selection
-                    p=that.calendar.querySelector("td.ui-state-active");
-                    if(p){
+
+                    p = that.calendar.querySelector("td.ui-state-active");
+                    if (p) {
                         p.classList.remove("ui-state-active");
                     }
                     e.target.classList.add("ui-state-active");
-                    //e.target.siblings.classList.remove("ui-state-active");
+
                     that.selectedDate.setDate(day);
-                    s=that.dateToString(that.selectedDate);
-                    
-                    that.current_element.value=s;
-                  //  console.log("setected day is " + that.selectedDate);
+                    s = that.dateToString(that.selectedDate);
+
+                    that.current_element.value = s;
                 }
             };
-            this.calendar.addEventListener("click",selectDay,false);
+            this.calendar.addEventListener("click", selectDay, false);
         },
-        dateToString:function(date){
-            var y,m,s,d;
-            y=(date.getFullYear()).toString();
-            m=(date.getMonth() + 1);
-            d=date.getDate();
-            if(m<10){
-                m=("0" + m ).toString();
+        dateToString: function dateToString(date) {
+            var y, m, s, d;
+            y = date.getFullYear().toString();
+            m = date.getMonth() + 1;
+            d = date.getDate();
+            if (m < 10) {
+                m = ("0" + m).toString();
             }
-            if(d<10){
-                d=("0" + d).toString();
+            if (d < 10) {
+                d = ("0" + d).toString();
             }
-            s=(y + "-" + m + "-" + d);
+            s = y + "-" + m + "-" + d;
             return s;
         },
-        mkCalendarBody:function(){
-            var c,r,last_day,s;
-           // console.log("mkCalendarBody: selected Date is " + this.selectedDate);
-            var current_month=this.selectedDate.getMonth();
-            var prev_month=(current_month === 0)?11:current_month-1;
-            var next_month=(current_month+1)%12;
-            var current_year=this.selectedDate.getFullYear();
-            var day=this.selectedDate.getDate();
-            var t=new Date(),today=-1;
-            // is today included in the calendar
-           // console.log("today's year is " + t.getFullYear() + " and current " + current_year);
-           // console.log("today's month is " + t.getMonth() + " and current " + current_month);              
-            if(t.getFullYear() === current_year){
-                if(t.getMonth() === current_month){
-                    today=t.getDate();
+        mkCalendarBody: function mkCalendarBody() {
+            var c, r, last_day, s;
+
+            var current_month = this.selectedDate.getMonth();
+            var prev_month = current_month === 0 ? 11 : current_month - 1;
+            var next_month = (current_month + 1) % 12;
+            var current_year = this.selectedDate.getFullYear();
+            var day = this.selectedDate.getDate();
+            var t = new Date(),
+                today = -1;
+
+            if (t.getFullYear() === current_year) {
+                if (t.getMonth() === current_month) {
+                    today = t.getDate();
                     console.log("today is " + today);
                 }
             }
-           // console.log("mkCalendarBody this.calendar is " + this.calendar);
-            
-            // fill in the title
-            c=document.getElementById("Apoco_datepicker_title");
-            c.textContent=(this.months[current_month].name + " " + current_year).toString();
-            //remove the previous body if it exists
-            var tbody=this.calendar.getElementsByTagName("tbody")[0];
-            r=tbody.getElementsByTagName("tr")[0]; //week names
-            //console.log("length of rows is " + r.length);
-            while(tbody.firstChild){
+
+            c = document.getElementById("Apoco_datepicker_title");
+            c.textContent = (this.months[current_month].name + " " + current_year).toString();
+
+            var tbody = this.calendar.getElementsByTagName("tbody")[0];
+            r = tbody.getElementsByTagName("tr")[0];
+            while (tbody.firstChild) {
                 tbody.removeChild(tbody.firstChild);
             }
-            // put the week names back
+
             tbody.appendChild(r);
-            // what day of the week does the current month start on?
-            //console.log("current year " + current_year + " current_month " + current_month);
-            if((current_month+1) > 9){
-                s=(current_year.toString() + "-" + (current_month+1).toString() + "-01");
+
+            if (current_month + 1 > 9) {
+                s = current_year.toString() + "-" + (current_month + 1).toString() + "-01";
+            } else {
+                s = current_year.toString() + "-0" + (current_month + 1).toString() + "-01";
             }
-            else {
-                s=(current_year.toString() + "-0" + (current_month+1).toString() + "-01");
-            }
-           // console.log("s is " + s);
-            var start_day=new Date(s).getDay();
-            //console.log("start_day is " + start_day);
-            if(start_day !== 0){ // need to get the prev month
-                if(prev_month === 1){ // February - need to see if its a leap year
-                    last_day=this.months[prev_month].len;
-                    if(current_year%4 === 0){
+
+            var start_day = new Date(s).getDay();
+
+            if (start_day !== 0) {
+                if (prev_month === 1) {
+                    last_day = this.months[prev_month].len;
+                    if (current_year % 4 === 0) {
                         last_day++;
                     }
-                }
-                else{
-                    last_day=this.months[prev_month].len;
+                } else {
+                    last_day = this.months[prev_month].len;
                 }
             }
-            c=Math.ceil((start_day+this.months[current_month].len)/7);
-            var len=c*7;
-            //console.log("c is " + c + " len is " + len);
-            var ml=this.months[current_month].len;
-            //howmany days of the previous month do we need to show?
-            var p=last_day-start_day+1;
-            for(var i=0;i<len;i++){
-               // console.log("making day " + p);
-                if(i%7 === 0){
-                    r=document.createElement("tr");
-                    tbody.appendChild(r); 
+            c = Math.ceil((start_day + this.months[current_month].len) / 7);
+            var len = c * 7;
+
+            var ml = this.months[current_month].len;
+
+            var p = last_day - start_day + 1;
+            for (var i = 0; i < len; i++) {
+                if (i % 7 === 0) {
+                    r = document.createElement("tr");
+                    tbody.appendChild(r);
                 }
-                c=document.createElement("td");
-                if(i<start_day){
-                    c.className="ui-state-disabled";
-                }
-                else if (i=== start_day){
-                    p=1;
+                c = document.createElement("td");
+                if (i < start_day) {
+                    c.className = "ui-state-disabled";
+                } else if (i === start_day) {
+                    p = 1;
                     c.classList.add("Apoco_date");
+                } else if (i === ml + start_day) {
+                    p = 1;
+                    c.className = "ui-state-disabled";
+                } else if (i > ml + start_day) {
+                    c.className = "ui-state-disabled";
                 }
-                else if(i=== ml+start_day){
-                    p=1;
-                    c.className="ui-state-disabled";
-                }
-                else if(i>(ml+start_day)){
-                    c.className="ui-state-disabled";
-                }
-                c.textContent=p;
-                if(i>=start_day && i<(ml+start_day) ){
+                c.textContent = p;
+                if (i >= start_day && i < ml + start_day) {
                     c.classList.add("Apoco_date");
-                    if(p=== today){ 
+                    if (p === today) {
                         c.classList.add("ui-state-highlight");
                     }
-                    if(p===day){
+                    if (p === day) {
                         c.classList.add("ui-state-active");
                     }
                 }
@@ -7533,58 +6941,34 @@ var Apoco=require('./declare').Apoco;
                 p++;
             }
         },
-      
-       	create:function(){
-	    if (this.element=== undefined) {
-		this.element = document.createElement('div');
-		//this.element.onselectstart = function () { return false; };
-		this.element.id = "Apoco_datepicker";
-                this.element.classList.add("ui-datepicker","ui-widget-content","ui-corner-all");
-		document.getElementsByTagName("body").item(0).appendChild(this.element);
+
+        create: function create() {
+            if (this.element === undefined) {
+                this.element = document.createElement('div');
+
+                this.element.id = "Apoco_datepicker";
+                this.element.classList.add("ui-datepicker", "ui-widget-content", "ui-corner-all");
+                document.getElementsByTagName("body").item(0).appendChild(this.element);
                 this.mkCalendarHeader();
-	    }
-            this.format="YYYY-MM-DD";  // e.g 2020-10-23
-            this.selectedDate=Date();
-	}
-    };        
-   // console.log("Making datepicker");
-    
-    Apoco.datepicker=new Datepicker(); 
-    
+            }
+            this.format = "YYYY-MM-DD";
+            this.selectedDate = Date();
+        }
+    };
+
+
+    Apoco.datepicker = new Datepicker();
 })();
 
-
 },{"./declare":19}],19:[function(require,module,exports){
-module.exports = {Apoco:{},UI:{}};
-/*var fs = require('fs');
-var browserify = require('browserify');
+"use strict";
 
-module.exports = function( callback ) {
-    var Apoco={};
-    var UI={};
-    callback = callback || function(){};
-
-    // Create a write stream for the pipe to output to
-    var bundleFs = fs.createWriteStream(bundle.js); //__dirname + '/public/browserify/bundle.js');
-
-    var b = browserify({standalone: 'nodeModules'});
-    b.add('./index.js');
-    b.bundle().pipe(bundleFs);
-
-    //now listen out for the finish event to know when things have finished 
-    bundleFs.on('finish', function () {
-        console.log('finished writing the browserify file');
-        return callback();
-    });
-};
-*/
+module.exports = { Apoco: {}, UI: {} };
 
 },{}],20:[function(require,module,exports){
 "use strict";
 
 var dcl = require('./declare.js');
-
-//??? which of these are mandatory/optional? ???
 
 require('./Core');
 require('./Utils');
@@ -10282,4 +9666,1164 @@ require = fn;
 
 module.exports = utils;
 
-},{"for-own":27,"is-plain-object":29,"kind-of":31,"lazy-cache":33,"shallow-clone":34}]},{},[20]);
+},{"for-own":27,"is-plain-object":29,"kind-of":31,"lazy-cache":33,"shallow-clone":34}],43:[function(require,module,exports){
+(function (process,global){
+/*!
+ * @overview es6-promise - a tiny implementation of Promises/A+.
+ * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+ * @license   Licensed under MIT license
+ *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
+ * @version   4.0.5
+ */
+
+(function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global.ES6Promise = factory());
+}(this, (function () { 'use strict';
+
+function objectOrFunction(x) {
+  return typeof x === 'function' || typeof x === 'object' && x !== null;
+}
+
+function isFunction(x) {
+  return typeof x === 'function';
+}
+
+var _isArray = undefined;
+if (!Array.isArray) {
+  _isArray = function (x) {
+    return Object.prototype.toString.call(x) === '[object Array]';
+  };
+} else {
+  _isArray = Array.isArray;
+}
+
+var isArray = _isArray;
+
+var len = 0;
+var vertxNext = undefined;
+var customSchedulerFn = undefined;
+
+var asap = function asap(callback, arg) {
+  queue[len] = callback;
+  queue[len + 1] = arg;
+  len += 2;
+  if (len === 2) {
+    // If len is 2, that means that we need to schedule an async flush.
+    // If additional callbacks are queued before the queue is flushed, they
+    // will be processed by this flush that we are scheduling.
+    if (customSchedulerFn) {
+      customSchedulerFn(flush);
+    } else {
+      scheduleFlush();
+    }
+  }
+};
+
+function setScheduler(scheduleFn) {
+  customSchedulerFn = scheduleFn;
+}
+
+function setAsap(asapFn) {
+  asap = asapFn;
+}
+
+var browserWindow = typeof window !== 'undefined' ? window : undefined;
+var browserGlobal = browserWindow || {};
+var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
+var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && ({}).toString.call(process) === '[object process]';
+
+// test for web worker but not in IE10
+var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
+
+// node
+function useNextTick() {
+  // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+  // see https://github.com/cujojs/when/issues/410 for details
+  return function () {
+    return process.nextTick(flush);
+  };
+}
+
+// vertx
+function useVertxTimer() {
+  if (typeof vertxNext !== 'undefined') {
+    return function () {
+      vertxNext(flush);
+    };
+  }
+
+  return useSetTimeout();
+}
+
+function useMutationObserver() {
+  var iterations = 0;
+  var observer = new BrowserMutationObserver(flush);
+  var node = document.createTextNode('');
+  observer.observe(node, { characterData: true });
+
+  return function () {
+    node.data = iterations = ++iterations % 2;
+  };
+}
+
+// web worker
+function useMessageChannel() {
+  var channel = new MessageChannel();
+  channel.port1.onmessage = flush;
+  return function () {
+    return channel.port2.postMessage(0);
+  };
+}
+
+function useSetTimeout() {
+  // Store setTimeout reference so es6-promise will be unaffected by
+  // other code modifying setTimeout (like sinon.useFakeTimers())
+  var globalSetTimeout = setTimeout;
+  return function () {
+    return globalSetTimeout(flush, 1);
+  };
+}
+
+var queue = new Array(1000);
+function flush() {
+  for (var i = 0; i < len; i += 2) {
+    var callback = queue[i];
+    var arg = queue[i + 1];
+
+    callback(arg);
+
+    queue[i] = undefined;
+    queue[i + 1] = undefined;
+  }
+
+  len = 0;
+}
+
+function attemptVertx() {
+  try {
+    var r = require;
+    var vertx = r('vertx');
+    vertxNext = vertx.runOnLoop || vertx.runOnContext;
+    return useVertxTimer();
+  } catch (e) {
+    return useSetTimeout();
+  }
+}
+
+var scheduleFlush = undefined;
+// Decide what async method to use to triggering processing of queued callbacks:
+if (isNode) {
+  scheduleFlush = useNextTick();
+} else if (BrowserMutationObserver) {
+  scheduleFlush = useMutationObserver();
+} else if (isWorker) {
+  scheduleFlush = useMessageChannel();
+} else if (browserWindow === undefined && typeof require === 'function') {
+  scheduleFlush = attemptVertx();
+} else {
+  scheduleFlush = useSetTimeout();
+}
+
+function then(onFulfillment, onRejection) {
+  var _arguments = arguments;
+
+  var parent = this;
+
+  var child = new this.constructor(noop);
+
+  if (child[PROMISE_ID] === undefined) {
+    makePromise(child);
+  }
+
+  var _state = parent._state;
+
+  if (_state) {
+    (function () {
+      var callback = _arguments[_state - 1];
+      asap(function () {
+        return invokeCallback(_state, child, callback, parent._result);
+      });
+    })();
+  } else {
+    subscribe(parent, child, onFulfillment, onRejection);
+  }
+
+  return child;
+}
+
+/**
+  `Promise.resolve` returns a promise that will become resolved with the
+  passed `value`. It is shorthand for the following:
+
+  ```javascript
+  let promise = new Promise(function(resolve, reject){
+    resolve(1);
+  });
+
+  promise.then(function(value){
+    // value === 1
+  });
+  ```
+
+  Instead of writing the above, your code now simply becomes the following:
+
+  ```javascript
+  let promise = Promise.resolve(1);
+
+  promise.then(function(value){
+    // value === 1
+  });
+  ```
+
+  @method resolve
+  @static
+  @param {Any} value value that the returned promise will be resolved with
+  Useful for tooling.
+  @return {Promise} a promise that will become fulfilled with the given
+  `value`
+*/
+function resolve(object) {
+  /*jshint validthis:true */
+  var Constructor = this;
+
+  if (object && typeof object === 'object' && object.constructor === Constructor) {
+    return object;
+  }
+
+  var promise = new Constructor(noop);
+  _resolve(promise, object);
+  return promise;
+}
+
+var PROMISE_ID = Math.random().toString(36).substring(16);
+
+function noop() {}
+
+var PENDING = void 0;
+var FULFILLED = 1;
+var REJECTED = 2;
+
+var GET_THEN_ERROR = new ErrorObject();
+
+function selfFulfillment() {
+  return new TypeError("You cannot resolve a promise with itself");
+}
+
+function cannotReturnOwn() {
+  return new TypeError('A promises callback cannot return that same promise.');
+}
+
+function getThen(promise) {
+  try {
+    return promise.then;
+  } catch (error) {
+    GET_THEN_ERROR.error = error;
+    return GET_THEN_ERROR;
+  }
+}
+
+function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+  try {
+    then.call(value, fulfillmentHandler, rejectionHandler);
+  } catch (e) {
+    return e;
+  }
+}
+
+function handleForeignThenable(promise, thenable, then) {
+  asap(function (promise) {
+    var sealed = false;
+    var error = tryThen(then, thenable, function (value) {
+      if (sealed) {
+        return;
+      }
+      sealed = true;
+      if (thenable !== value) {
+        _resolve(promise, value);
+      } else {
+        fulfill(promise, value);
+      }
+    }, function (reason) {
+      if (sealed) {
+        return;
+      }
+      sealed = true;
+
+      _reject(promise, reason);
+    }, 'Settle: ' + (promise._label || ' unknown promise'));
+
+    if (!sealed && error) {
+      sealed = true;
+      _reject(promise, error);
+    }
+  }, promise);
+}
+
+function handleOwnThenable(promise, thenable) {
+  if (thenable._state === FULFILLED) {
+    fulfill(promise, thenable._result);
+  } else if (thenable._state === REJECTED) {
+    _reject(promise, thenable._result);
+  } else {
+    subscribe(thenable, undefined, function (value) {
+      return _resolve(promise, value);
+    }, function (reason) {
+      return _reject(promise, reason);
+    });
+  }
+}
+
+function handleMaybeThenable(promise, maybeThenable, then$$) {
+  if (maybeThenable.constructor === promise.constructor && then$$ === then && maybeThenable.constructor.resolve === resolve) {
+    handleOwnThenable(promise, maybeThenable);
+  } else {
+    if (then$$ === GET_THEN_ERROR) {
+      _reject(promise, GET_THEN_ERROR.error);
+    } else if (then$$ === undefined) {
+      fulfill(promise, maybeThenable);
+    } else if (isFunction(then$$)) {
+      handleForeignThenable(promise, maybeThenable, then$$);
+    } else {
+      fulfill(promise, maybeThenable);
+    }
+  }
+}
+
+function _resolve(promise, value) {
+  if (promise === value) {
+    _reject(promise, selfFulfillment());
+  } else if (objectOrFunction(value)) {
+    handleMaybeThenable(promise, value, getThen(value));
+  } else {
+    fulfill(promise, value);
+  }
+}
+
+function publishRejection(promise) {
+  if (promise._onerror) {
+    promise._onerror(promise._result);
+  }
+
+  publish(promise);
+}
+
+function fulfill(promise, value) {
+  if (promise._state !== PENDING) {
+    return;
+  }
+
+  promise._result = value;
+  promise._state = FULFILLED;
+
+  if (promise._subscribers.length !== 0) {
+    asap(publish, promise);
+  }
+}
+
+function _reject(promise, reason) {
+  if (promise._state !== PENDING) {
+    return;
+  }
+  promise._state = REJECTED;
+  promise._result = reason;
+
+  asap(publishRejection, promise);
+}
+
+function subscribe(parent, child, onFulfillment, onRejection) {
+  var _subscribers = parent._subscribers;
+  var length = _subscribers.length;
+
+  parent._onerror = null;
+
+  _subscribers[length] = child;
+  _subscribers[length + FULFILLED] = onFulfillment;
+  _subscribers[length + REJECTED] = onRejection;
+
+  if (length === 0 && parent._state) {
+    asap(publish, parent);
+  }
+}
+
+function publish(promise) {
+  var subscribers = promise._subscribers;
+  var settled = promise._state;
+
+  if (subscribers.length === 0) {
+    return;
+  }
+
+  var child = undefined,
+      callback = undefined,
+      detail = promise._result;
+
+  for (var i = 0; i < subscribers.length; i += 3) {
+    child = subscribers[i];
+    callback = subscribers[i + settled];
+
+    if (child) {
+      invokeCallback(settled, child, callback, detail);
+    } else {
+      callback(detail);
+    }
+  }
+
+  promise._subscribers.length = 0;
+}
+
+function ErrorObject() {
+  this.error = null;
+}
+
+var TRY_CATCH_ERROR = new ErrorObject();
+
+function tryCatch(callback, detail) {
+  try {
+    return callback(detail);
+  } catch (e) {
+    TRY_CATCH_ERROR.error = e;
+    return TRY_CATCH_ERROR;
+  }
+}
+
+function invokeCallback(settled, promise, callback, detail) {
+  var hasCallback = isFunction(callback),
+      value = undefined,
+      error = undefined,
+      succeeded = undefined,
+      failed = undefined;
+
+  if (hasCallback) {
+    value = tryCatch(callback, detail);
+
+    if (value === TRY_CATCH_ERROR) {
+      failed = true;
+      error = value.error;
+      value = null;
+    } else {
+      succeeded = true;
+    }
+
+    if (promise === value) {
+      _reject(promise, cannotReturnOwn());
+      return;
+    }
+  } else {
+    value = detail;
+    succeeded = true;
+  }
+
+  if (promise._state !== PENDING) {
+    // noop
+  } else if (hasCallback && succeeded) {
+      _resolve(promise, value);
+    } else if (failed) {
+      _reject(promise, error);
+    } else if (settled === FULFILLED) {
+      fulfill(promise, value);
+    } else if (settled === REJECTED) {
+      _reject(promise, value);
+    }
+}
+
+function initializePromise(promise, resolver) {
+  try {
+    resolver(function resolvePromise(value) {
+      _resolve(promise, value);
+    }, function rejectPromise(reason) {
+      _reject(promise, reason);
+    });
+  } catch (e) {
+    _reject(promise, e);
+  }
+}
+
+var id = 0;
+function nextId() {
+  return id++;
+}
+
+function makePromise(promise) {
+  promise[PROMISE_ID] = id++;
+  promise._state = undefined;
+  promise._result = undefined;
+  promise._subscribers = [];
+}
+
+function Enumerator(Constructor, input) {
+  this._instanceConstructor = Constructor;
+  this.promise = new Constructor(noop);
+
+  if (!this.promise[PROMISE_ID]) {
+    makePromise(this.promise);
+  }
+
+  if (isArray(input)) {
+    this._input = input;
+    this.length = input.length;
+    this._remaining = input.length;
+
+    this._result = new Array(this.length);
+
+    if (this.length === 0) {
+      fulfill(this.promise, this._result);
+    } else {
+      this.length = this.length || 0;
+      this._enumerate();
+      if (this._remaining === 0) {
+        fulfill(this.promise, this._result);
+      }
+    }
+  } else {
+    _reject(this.promise, validationError());
+  }
+}
+
+function validationError() {
+  return new Error('Array Methods must be provided an Array');
+};
+
+Enumerator.prototype._enumerate = function () {
+  var length = this.length;
+  var _input = this._input;
+
+  for (var i = 0; this._state === PENDING && i < length; i++) {
+    this._eachEntry(_input[i], i);
+  }
+};
+
+Enumerator.prototype._eachEntry = function (entry, i) {
+  var c = this._instanceConstructor;
+  var resolve$$ = c.resolve;
+
+  if (resolve$$ === resolve) {
+    var _then = getThen(entry);
+
+    if (_then === then && entry._state !== PENDING) {
+      this._settledAt(entry._state, i, entry._result);
+    } else if (typeof _then !== 'function') {
+      this._remaining--;
+      this._result[i] = entry;
+    } else if (c === Promise) {
+      var promise = new c(noop);
+      handleMaybeThenable(promise, entry, _then);
+      this._willSettleAt(promise, i);
+    } else {
+      this._willSettleAt(new c(function (resolve$$) {
+        return resolve$$(entry);
+      }), i);
+    }
+  } else {
+    this._willSettleAt(resolve$$(entry), i);
+  }
+};
+
+Enumerator.prototype._settledAt = function (state, i, value) {
+  var promise = this.promise;
+
+  if (promise._state === PENDING) {
+    this._remaining--;
+
+    if (state === REJECTED) {
+      _reject(promise, value);
+    } else {
+      this._result[i] = value;
+    }
+  }
+
+  if (this._remaining === 0) {
+    fulfill(promise, this._result);
+  }
+};
+
+Enumerator.prototype._willSettleAt = function (promise, i) {
+  var enumerator = this;
+
+  subscribe(promise, undefined, function (value) {
+    return enumerator._settledAt(FULFILLED, i, value);
+  }, function (reason) {
+    return enumerator._settledAt(REJECTED, i, reason);
+  });
+};
+
+/**
+  `Promise.all` accepts an array of promises, and returns a new promise which
+  is fulfilled with an array of fulfillment values for the passed promises, or
+  rejected with the reason of the first passed promise to be rejected. It casts all
+  elements of the passed iterable to promises as it runs this algorithm.
+
+  Example:
+
+  ```javascript
+  let promise1 = resolve(1);
+  let promise2 = resolve(2);
+  let promise3 = resolve(3);
+  let promises = [ promise1, promise2, promise3 ];
+
+  Promise.all(promises).then(function(array){
+    // The array here would be [ 1, 2, 3 ];
+  });
+  ```
+
+  If any of the `promises` given to `all` are rejected, the first promise
+  that is rejected will be given as an argument to the returned promises's
+  rejection handler. For example:
+
+  Example:
+
+  ```javascript
+  let promise1 = resolve(1);
+  let promise2 = reject(new Error("2"));
+  let promise3 = reject(new Error("3"));
+  let promises = [ promise1, promise2, promise3 ];
+
+  Promise.all(promises).then(function(array){
+    // Code here never runs because there are rejected promises!
+  }, function(error) {
+    // error.message === "2"
+  });
+  ```
+
+  @method all
+  @static
+  @param {Array} entries array of promises
+  @param {String} label optional string for labeling the promise.
+  Useful for tooling.
+  @return {Promise} promise that is fulfilled when all `promises` have been
+  fulfilled, or rejected if any of them become rejected.
+  @static
+*/
+function all(entries) {
+  return new Enumerator(this, entries).promise;
+}
+
+/**
+  `Promise.race` returns a new promise which is settled in the same way as the
+  first passed promise to settle.
+
+  Example:
+
+  ```javascript
+  let promise1 = new Promise(function(resolve, reject){
+    setTimeout(function(){
+      resolve('promise 1');
+    }, 200);
+  });
+
+  let promise2 = new Promise(function(resolve, reject){
+    setTimeout(function(){
+      resolve('promise 2');
+    }, 100);
+  });
+
+  Promise.race([promise1, promise2]).then(function(result){
+    // result === 'promise 2' because it was resolved before promise1
+    // was resolved.
+  });
+  ```
+
+  `Promise.race` is deterministic in that only the state of the first
+  settled promise matters. For example, even if other promises given to the
+  `promises` array argument are resolved, but the first settled promise has
+  become rejected before the other promises became fulfilled, the returned
+  promise will become rejected:
+
+  ```javascript
+  let promise1 = new Promise(function(resolve, reject){
+    setTimeout(function(){
+      resolve('promise 1');
+    }, 200);
+  });
+
+  let promise2 = new Promise(function(resolve, reject){
+    setTimeout(function(){
+      reject(new Error('promise 2'));
+    }, 100);
+  });
+
+  Promise.race([promise1, promise2]).then(function(result){
+    // Code here never runs
+  }, function(reason){
+    // reason.message === 'promise 2' because promise 2 became rejected before
+    // promise 1 became fulfilled
+  });
+  ```
+
+  An example real-world use case is implementing timeouts:
+
+  ```javascript
+  Promise.race([ajax('foo.json'), timeout(5000)])
+  ```
+
+  @method race
+  @static
+  @param {Array} promises array of promises to observe
+  Useful for tooling.
+  @return {Promise} a promise which settles in the same way as the first passed
+  promise to settle.
+*/
+function race(entries) {
+  /*jshint validthis:true */
+  var Constructor = this;
+
+  if (!isArray(entries)) {
+    return new Constructor(function (_, reject) {
+      return reject(new TypeError('You must pass an array to race.'));
+    });
+  } else {
+    return new Constructor(function (resolve, reject) {
+      var length = entries.length;
+      for (var i = 0; i < length; i++) {
+        Constructor.resolve(entries[i]).then(resolve, reject);
+      }
+    });
+  }
+}
+
+/**
+  `Promise.reject` returns a promise rejected with the passed `reason`.
+  It is shorthand for the following:
+
+  ```javascript
+  let promise = new Promise(function(resolve, reject){
+    reject(new Error('WHOOPS'));
+  });
+
+  promise.then(function(value){
+    // Code here doesn't run because the promise is rejected!
+  }, function(reason){
+    // reason.message === 'WHOOPS'
+  });
+  ```
+
+  Instead of writing the above, your code now simply becomes the following:
+
+  ```javascript
+  let promise = Promise.reject(new Error('WHOOPS'));
+
+  promise.then(function(value){
+    // Code here doesn't run because the promise is rejected!
+  }, function(reason){
+    // reason.message === 'WHOOPS'
+  });
+  ```
+
+  @method reject
+  @static
+  @param {Any} reason value that the returned promise will be rejected with.
+  Useful for tooling.
+  @return {Promise} a promise rejected with the given `reason`.
+*/
+function reject(reason) {
+  /*jshint validthis:true */
+  var Constructor = this;
+  var promise = new Constructor(noop);
+  _reject(promise, reason);
+  return promise;
+}
+
+function needsResolver() {
+  throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+}
+
+function needsNew() {
+  throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+}
+
+/**
+  Promise objects represent the eventual result of an asynchronous operation. The
+  primary way of interacting with a promise is through its `then` method, which
+  registers callbacks to receive either a promise's eventual value or the reason
+  why the promise cannot be fulfilled.
+
+  Terminology
+  -----------
+
+  - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+  - `thenable` is an object or function that defines a `then` method.
+  - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+  - `exception` is a value that is thrown using the throw statement.
+  - `reason` is a value that indicates why a promise was rejected.
+  - `settled` the final resting state of a promise, fulfilled or rejected.
+
+  A promise can be in one of three states: pending, fulfilled, or rejected.
+
+  Promises that are fulfilled have a fulfillment value and are in the fulfilled
+  state.  Promises that are rejected have a rejection reason and are in the
+  rejected state.  A fulfillment value is never a thenable.
+
+  Promises can also be said to *resolve* a value.  If this value is also a
+  promise, then the original promise's settled state will match the value's
+  settled state.  So a promise that *resolves* a promise that rejects will
+  itself reject, and a promise that *resolves* a promise that fulfills will
+  itself fulfill.
+
+
+  Basic Usage:
+  ------------
+
+  ```js
+  let promise = new Promise(function(resolve, reject) {
+    // on success
+    resolve(value);
+
+    // on failure
+    reject(reason);
+  });
+
+  promise.then(function(value) {
+    // on fulfillment
+  }, function(reason) {
+    // on rejection
+  });
+  ```
+
+  Advanced Usage:
+  ---------------
+
+  Promises shine when abstracting away asynchronous interactions such as
+  `XMLHttpRequest`s.
+
+  ```js
+  function getJSON(url) {
+    return new Promise(function(resolve, reject){
+      let xhr = new XMLHttpRequest();
+
+      xhr.open('GET', url);
+      xhr.onreadystatechange = handler;
+      xhr.responseType = 'json';
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.send();
+
+      function handler() {
+        if (this.readyState === this.DONE) {
+          if (this.status === 200) {
+            resolve(this.response);
+          } else {
+            reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
+          }
+        }
+      };
+    });
+  }
+
+  getJSON('/posts.json').then(function(json) {
+    // on fulfillment
+  }, function(reason) {
+    // on rejection
+  });
+  ```
+
+  Unlike callbacks, promises are great composable primitives.
+
+  ```js
+  Promise.all([
+    getJSON('/posts'),
+    getJSON('/comments')
+  ]).then(function(values){
+    values[0] // => postsJSON
+    values[1] // => commentsJSON
+
+    return values;
+  });
+  ```
+
+  @class Promise
+  @param {function} resolver
+  Useful for tooling.
+  @constructor
+*/
+function Promise(resolver) {
+  this[PROMISE_ID] = nextId();
+  this._result = this._state = undefined;
+  this._subscribers = [];
+
+  if (noop !== resolver) {
+    typeof resolver !== 'function' && needsResolver();
+    this instanceof Promise ? initializePromise(this, resolver) : needsNew();
+  }
+}
+
+Promise.all = all;
+Promise.race = race;
+Promise.resolve = resolve;
+Promise.reject = reject;
+Promise._setScheduler = setScheduler;
+Promise._setAsap = setAsap;
+Promise._asap = asap;
+
+Promise.prototype = {
+  constructor: Promise,
+
+  /**
+    The primary way of interacting with a promise is through its `then` method,
+    which registers callbacks to receive either a promise's eventual value or the
+    reason why the promise cannot be fulfilled.
+  
+    ```js
+    findUser().then(function(user){
+      // user is available
+    }, function(reason){
+      // user is unavailable, and you are given the reason why
+    });
+    ```
+  
+    Chaining
+    --------
+  
+    The return value of `then` is itself a promise.  This second, 'downstream'
+    promise is resolved with the return value of the first promise's fulfillment
+    or rejection handler, or rejected if the handler throws an exception.
+  
+    ```js
+    findUser().then(function (user) {
+      return user.name;
+    }, function (reason) {
+      return 'default name';
+    }).then(function (userName) {
+      // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+      // will be `'default name'`
+    });
+  
+    findUser().then(function (user) {
+      throw new Error('Found user, but still unhappy');
+    }, function (reason) {
+      throw new Error('`findUser` rejected and we're unhappy');
+    }).then(function (value) {
+      // never reached
+    }, function (reason) {
+      // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+      // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+    });
+    ```
+    If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+  
+    ```js
+    findUser().then(function (user) {
+      throw new PedagogicalException('Upstream error');
+    }).then(function (value) {
+      // never reached
+    }).then(function (value) {
+      // never reached
+    }, function (reason) {
+      // The `PedgagocialException` is propagated all the way down to here
+    });
+    ```
+  
+    Assimilation
+    ------------
+  
+    Sometimes the value you want to propagate to a downstream promise can only be
+    retrieved asynchronously. This can be achieved by returning a promise in the
+    fulfillment or rejection handler. The downstream promise will then be pending
+    until the returned promise is settled. This is called *assimilation*.
+  
+    ```js
+    findUser().then(function (user) {
+      return findCommentsByAuthor(user);
+    }).then(function (comments) {
+      // The user's comments are now available
+    });
+    ```
+  
+    If the assimliated promise rejects, then the downstream promise will also reject.
+  
+    ```js
+    findUser().then(function (user) {
+      return findCommentsByAuthor(user);
+    }).then(function (comments) {
+      // If `findCommentsByAuthor` fulfills, we'll have the value here
+    }, function (reason) {
+      // If `findCommentsByAuthor` rejects, we'll have the reason here
+    });
+    ```
+  
+    Simple Example
+    --------------
+  
+    Synchronous Example
+  
+    ```javascript
+    let result;
+  
+    try {
+      result = findResult();
+      // success
+    } catch(reason) {
+      // failure
+    }
+    ```
+  
+    Errback Example
+  
+    ```js
+    findResult(function(result, err){
+      if (err) {
+        // failure
+      } else {
+        // success
+      }
+    });
+    ```
+  
+    Promise Example;
+  
+    ```javascript
+    findResult().then(function(result){
+      // success
+    }, function(reason){
+      // failure
+    });
+    ```
+  
+    Advanced Example
+    --------------
+  
+    Synchronous Example
+  
+    ```javascript
+    let author, books;
+  
+    try {
+      author = findAuthor();
+      books  = findBooksByAuthor(author);
+      // success
+    } catch(reason) {
+      // failure
+    }
+    ```
+  
+    Errback Example
+  
+    ```js
+  
+    function foundBooks(books) {
+  
+    }
+  
+    function failure(reason) {
+  
+    }
+  
+    findAuthor(function(author, err){
+      if (err) {
+        failure(err);
+        // failure
+      } else {
+        try {
+          findBoooksByAuthor(author, function(books, err) {
+            if (err) {
+              failure(err);
+            } else {
+              try {
+                foundBooks(books);
+              } catch(reason) {
+                failure(reason);
+              }
+            }
+          });
+        } catch(error) {
+          failure(err);
+        }
+        // success
+      }
+    });
+    ```
+  
+    Promise Example;
+  
+    ```javascript
+    findAuthor().
+      then(findBooksByAuthor).
+      then(function(books){
+        // found books
+    }).catch(function(reason){
+      // something went wrong
+    });
+    ```
+  
+    @method then
+    @param {Function} onFulfilled
+    @param {Function} onRejected
+    Useful for tooling.
+    @return {Promise}
+  */
+  then: then,
+
+  /**
+    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+    as the catch block of a try/catch statement.
+  
+    ```js
+    function findAuthor(){
+      throw new Error('couldn't find that author');
+    }
+  
+    // synchronous
+    try {
+      findAuthor();
+    } catch(reason) {
+      // something went wrong
+    }
+  
+    // async with promises
+    findAuthor().catch(function(reason){
+      // something went wrong
+    });
+    ```
+  
+    @method catch
+    @param {Function} onRejection
+    Useful for tooling.
+    @return {Promise}
+  */
+  'catch': function _catch(onRejection) {
+    return this.then(null, onRejection);
+  }
+};
+
+function polyfill() {
+    var local = undefined;
+
+    if (typeof global !== 'undefined') {
+        local = global;
+    } else if (typeof self !== 'undefined') {
+        local = self;
+    } else {
+        try {
+            local = Function('return this')();
+        } catch (e) {
+            throw new Error('polyfill failed because global object is unavailable in this environment');
+        }
+    }
+
+    var P = local.Promise;
+
+    if (P) {
+        var promiseToString = null;
+        try {
+            promiseToString = Object.prototype.toString.call(P.resolve());
+        } catch (e) {
+            // silently ignored
+        }
+
+        if (promiseToString === '[object Promise]' && !P.cast) {
+            return;
+        }
+    }
+
+    local.Promise = Promise;
+}
+
+// Strange compat..
+Promise.polyfill = polyfill;
+Promise.Promise = Promise;
+
+return Promise;
+
+})));
+
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"_process":25}]},{},[20]);

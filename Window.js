@@ -2,6 +2,11 @@ var Apoco=require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Panel");
+var PolyfillPromise=require('es6-promise').Promise; //polyfill for ie11
+
+if(Promise === undefined){ // for ie11
+    Promise=PolyfillPromise;
+}
 
 ;(function(){
     "use strict";
