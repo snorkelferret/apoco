@@ -296,7 +296,7 @@ require("./DisplayBase");
      //       console.log("slideshow cover is " + r);
             // that.hide();
             that.stop();
-	    if(!document.contains(r)){
+	    if(!document.body.contains(r)){
 //	        console.log("Fullscreen is truE- so do it");
 	        that.element.style.width=(width.toString() + "px"); 
                 that.element.style.height=(height.toString() + "px");
