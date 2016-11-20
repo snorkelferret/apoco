@@ -89,8 +89,11 @@ require("./Window");
             if(name === undefined){
                 throw new Error("Panel._UIGet: panel name is undefined");
             }
-            if(!UI){
+            if(typeof UI === undefined){
                 throw new Error("Panels: UIGet needs UI.Panels to be defined");
+            }
+            if(typeof UI.Panels === undefined){
+                throw new Error("Panel: UI.Panels is not defined");
             }
             for(var k in UI.Panels){
             //     console.log("trying to get panel " + name + " from " + k);
@@ -242,7 +245,9 @@ require("./Window");
 	add: function(panel){
 	  //  console.log("Panel.add is here");
 	   //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
-         
+            if(!panel){
+                throw new Error("Panel.add must have a name or object");
+            }
             if(Apoco.type['string'].check(panel)){
                 var w=this._UIGet(panel);
                 panel=w;

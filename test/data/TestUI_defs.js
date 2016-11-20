@@ -1,4 +1,6 @@
-var Harvey=require('../../declare').Harvey,UI=require('../../declare').UI;
+//var Apoco=require('../../declare').Apoco;
+var Apoco=require('../../declare').Apoco;
+global.UI={};
 
 
 UI.Panels={
@@ -12,17 +14,20 @@ UI.Panels={
                          { node: "button", name: "create_window",text: "new",
 			   action: function(that){
 			       var h=that.parent.getChild("selection_dropdown").getValue();
-                               if(Harvey.Panel.inList(h) === null){
-                                   var p=Harvey.Panel.add(h);
+                               if(Apoco.Panel.inList(h) === null){
+                                   var p=Apcoc.Panel.add(h);
                                }
                            }
                          },
                          { node: "button",name: "logout",text: "logout",
                            action: function(that){
-                               Harvey.stop();
+                               Apoco.stop();
                                }
                          }]
             }
 	]
     }
 };
+
+
+

@@ -7,10 +7,7 @@ require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
-var PolyfillPromise = require('es6-promise').Promise;
-if (Promise === undefined) {
-    var Promise = PolyfillPromise;
-}
+var Promise = require('es6-promise').Promise;
 
 (function () {
     'use strict';
@@ -2519,7 +2516,10 @@ require("./DisplayBase.js");
             return true;
         },
         addTab: function addTab(t, tablist) {
-            var label, index, s;
+            var label,
+                index,
+                s,
+                that = this;
             t.label ? label = t.label : label = t.name;
             if (tablist === undefined) {
                 tablist = this.element.querySelector("ul.ui-tabs-nav");
@@ -2535,26 +2535,12 @@ require("./DisplayBase.js");
             this.tabs[index] = t;
             this.tabs[index].parent = this;
             if (t.action) {
-                t.element.addEventListener("click", function (tab, that, i) {
-                    return function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        tab.action(t, i);
-                        that.select(tab.name);
-                    };
-                }(t, this, index), false);
+                t.element.addEventListener("click", function (e) {
+                    console.log("tab " + t + " index " + index);
+                    t.action(t, index);
+                    that.select(t.name);
+                }, false);
             }
-            t.element.addEventListener("mouseover", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.currentTarget.classList.add("ui-state-hover");
-            }, false);
-            t.element.addEventListener("mouseout", function (e) {
-                e.stopPropagation();
-                e.preventDefault();
-                e.currentTarget.classList.remove("ui-state-hover");
-            }, false);
-
             tablist.appendChild(t.element);
         },
         getTab: function getTab(name) {
@@ -2656,12 +2642,7 @@ require('./Utils');
 require("./Sort");
 require('./Types');
 require("./datepicker");
-var PolyfillPromise = require('es6-promise').Promise;
-
-if (Promise === undefined) {
-    Promise = PolyfillPromise;
-}
-
+var Promise = require('es6-promise').Promise;
 
 ;(function () {
     "use strict";
@@ -4237,11 +4218,7 @@ if (Promise === undefined) {
 'use strict';
 
 var Apoco = require('./declare').Apoco;
-var PolyfillPromise = require('es6-promise').Promise;
-
-if (Promise === undefined) {
-    Promise = PolyfillPromise;
-}
+var Promise = require('es6-promise').Promise;
 
 ;(function () {
 
@@ -6467,11 +6444,7 @@ var Apoco = require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
 require("./Panel");
-var PolyfillPromise = require('es6-promise').Promise;
-
-if (Promise === undefined) {
-    Promise = PolyfillPromise;
-}
+var Promise = require('es6-promise').Promise;
 
 ;(function () {
     "use strict";

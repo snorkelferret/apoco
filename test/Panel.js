@@ -8,7 +8,6 @@ const browserifyFn = require('browserify-string');
 const         path = require('path');
 const           fs = require('fs');
 const Apoco=require('../declare').Apoco;
-const UI=require('../declare').UI;
 
 global.document=require("jsdom").jsdom(undefined,
                                            {virtualConsole: jsdom.createVirtualConsole().sendTo(console)});
@@ -97,16 +96,38 @@ describe("Panel - from data file",function(){
     //var $= global.jQuery; 
     var t;
   
+        /*const UI={
+        Panels:{
+            TestPanel:{
+                name: "TestPanel",
+                components: [
+	            {display: "fieldset",
+	             DOM: "test",
+	             id: "Create",
+	             components:[{ field: "select", name: "selection_dropdown", options: [ "Blotter","Broker","Bigfig","Auction-control","Trades","robo-broker","knock-down-ginger","auction"]},
+                                 {node: "paragraph",text:"kkkkkkk"}
+                                ]
+                    }
+	        ]
+            }
+        }
+    };  */
+
     require("../Panel.js");
     require("./data/TestUI_defs.js");
-    it("creates a tab display object",function(){
-        //$("body").append("<div id='test'></div>");
-        console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC trying to add TestPanel %j",UI.Panels);
-       
-       // assert.strictEqual(document.contains(b),true);
     
-        t=Apoco.Panel.add("TestPanel");
-        console.log("return from panels is " + t);
+    it("creates a tab display object",function(){
+        if(!document.getElementById("test")){
+            console.log("creating element test");
+            var t=document.createElement("div");
+            t.id="test";
+        }
+        
+        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX trying to add TestPanel %j",UI);
+       
+          
+       t=Apoco.Panel.add("TestPanel");
+      //  console.log("return from panels is " + t);
         assert.isObject(t);
     });
     it("has put a node called Create in the dom",function(){

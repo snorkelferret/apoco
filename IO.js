@@ -1,9 +1,5 @@
 var Apoco=require('./declare').Apoco;
-var PolyfillPromise=require('es6-promise').Promise; //polyfill for ie11
-
-if(Promise === undefined){ // for ie11
-    Promise=PolyfillPromise;
-}
+var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 ;(function(){
 

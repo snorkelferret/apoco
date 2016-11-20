@@ -3,11 +3,8 @@ require('./Utils');
 require("./Sort");
 require('./Types');
 require("./datepicker");
-var PolyfillPromise=require('es6-promise').Promise; //polyfill for ie11
+var Promise=require('es6-promise').Promise; //polyfill for ie11
 
-if(Promise === undefined){ // for ie11
-    Promise=PolyfillPromise;
-}
 // editable: true by default
 // required: false by default
 

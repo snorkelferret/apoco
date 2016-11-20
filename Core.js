@@ -3,12 +3,7 @@ require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
-var PolyfillPromise=require('es6-promise').Promise; //polyfill for ie11
-
-// polyfill for ie11
-if(Promise === undefined){
-    var Promise = PolyfillPromise; 
-}
+var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 // Apoco is a singleton 
 

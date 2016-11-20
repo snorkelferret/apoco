@@ -59,7 +59,7 @@ require("./DisplayBase.js");
 	    return true;
 	},
         addTab:function(t,tablist){
-            var label,index,s;
+            var label,index,s,that=this;
             t.label?label=t.label: label=t.name;
             if(tablist === undefined){
                 tablist=this.element.querySelector("ul.ui-tabs-nav");
@@ -75,32 +75,13 @@ require("./DisplayBase.js");
             this.tabs[index]=t;
             this.tabs[index].parent=this;
             if(t.action){
-		t.element.addEventListener("click",
-					   function(tab,that,i){
-					       return function(e){
-						   e.preventDefault();
-						   e.stopPropagation();
-						   tab.action(t,i);
-                                                   that.select(tab.name);
-					       };
-					   }(t,this,index),false);
-            }
-            t.element.addEventListener("mouseover",function(e){
-               // if(e.currentTarget.tagName === "LI"){
-                    e.stopPropagation();
-                    e.preventDefault();
-                    e.currentTarget.classList.add("ui-state-hover");
-                //}
-            },false);
-            t.element.addEventListener("mouseout",function(e){
-               // if(e.target.tagName === "LI"){
-                    e.stopPropagation();
-                    e.preventDefault();
-                    e.currentTarget.classList.remove("ui-state-hover");
-                //}
-            },false);
-        
-	    tablist.appendChild(t.element);
+                t.element.addEventListener("click",function(e){
+                     console.log("tab " + t + " index " + index);
+                     t.action(t,index);
+                     that.select(t.name);
+                },false);
+             }
+ 	    tablist.appendChild(t.element);
         },
         getTab:function(name){
             if(name !== undefined){

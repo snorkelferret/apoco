@@ -32,7 +32,7 @@ describe("Manual",function(){
             .build();
 
     //});
-    driver.get("file://"+process.cwd()+"/manual.html");
+    driver.get("file://"+process.cwd()+"/index.html");
 
 
     test.after(function() {
