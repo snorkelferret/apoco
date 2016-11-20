@@ -2136,19 +2136,6 @@ require("./DisplayBase");
             d.classList.add("slideshow_controls");
             u = document.createElement("ul");
             d.appendChild(u);
-            u.addEventListener("mouseover", function (e) {
-                if (e.target.tagName === "LI") {
-                    e.stopPropagation();
-                    e.target.classList.add("ui-icon-hover");
-                }
-            });
-            u.addEventListener("mouseout", function (e) {
-                if (e.target.tagName === "LI") {
-                    e.stopPropagation();
-                    e.target.classList.remove("ui-icon-hover");
-                }
-            });
-
             for (var i = 0; i < icons.length; i++) {
                 if (icons[i].action === "showFullscreen" && this.fullscreen !== true) {
                     continue;
@@ -2181,7 +2168,7 @@ require("./DisplayBase");
                     };
                 }(icons[i], this), false);
                 s = document.createElement("span");
-                s.classList.add("ui-icon", icons[i].class);
+                s.classList.add(icons[i].class, "ui-icon");
                 l.appendChild(s);
                 u.appendChild(l);
             }
