@@ -2513,7 +2513,6 @@ require("./DisplayBase.js");
                 tablist = this.element.querySelector("ul.ui-tabs-nav");
             }
             index = this.tabs.length;
-
             t.element = document.createElement("li");
             t.element.classList.add("ui-state-default", "ui-corner-top");
             s = document.createElement("span");
@@ -2524,7 +2523,6 @@ require("./DisplayBase.js");
             this.tabs[index].parent = this;
             if (t.action) {
                 t.element.addEventListener("click", function (e) {
-                    console.log("tab " + t + " index " + index);
                     t.action(t, index);
                     that.select(t.name);
                 }, false);
