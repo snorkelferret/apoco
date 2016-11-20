@@ -2168,7 +2168,8 @@ require("./DisplayBase");
                     };
                 }(icons[i], this), false);
                 s = document.createElement("span");
-                s.classList.add(icons[i].class, "ui-icon");
+                s.classList.add(icons[i].class);
+                s.classList.add("ui-icon");
                 l.appendChild(s);
                 u.appendChild(l);
             }
@@ -2302,7 +2303,7 @@ require("./DisplayBase");
             that.element.parentNode.removeChild(this.element);
 
             that.stop();
-            if (!document.contains(r)) {
+            if (!document.body.contains(r)) {
                 that.element.style.width = width.toString() + "px";
                 that.element.style.height = height.toString() + "px";
                 that.slideshow_container.style.width = width.toString() + "px";

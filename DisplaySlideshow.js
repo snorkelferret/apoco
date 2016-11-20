@@ -145,7 +145,8 @@ require("./DisplayBase");
                     };
                 })(icons[i],this),false);
                 s=document.createElement("span");
-                s.classList.add(icons[i].class,"ui-icon");
+                s.classList.add(icons[i].class);
+                s.classList.add("ui-icon"); // add replicated for ie11
                 l.appendChild(s);
                 u.appendChild(l);
             }
