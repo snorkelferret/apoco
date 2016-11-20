@@ -125,7 +125,7 @@ require("./Fields");
                     }
                 }
                 var b = document.body;
-                Apoco.Observer.observe(b, { childList: true, subtree: true, attributeFilter: ["id"] });
+                Apoco.Observer.observe(b, { childList: true, subtree: true, attributes: true, attributeFilter: ["id"] });
                 Apoco.Utils.observer.add(this.dependsOn, doit, this);
             } else {
                 this.action(this);
@@ -4724,6 +4724,8 @@ require("./Types.js");
 },{"./Types.js":15,"./declare":19}],12:[function(require,module,exports){
 "use strict";
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var Apoco = require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
@@ -4801,8 +4803,11 @@ require("./Window");
             if (name === undefined) {
                 throw new Error("Panel._UIGet: panel name is undefined");
             }
-            if (!UI) {
+            if ((typeof UI === "undefined" ? "undefined" : _typeof(UI)) === undefined) {
                 throw new Error("Panels: UIGet needs UI.Panels to be defined");
+            }
+            if (_typeof(UI.Panels) === undefined) {
+                throw new Error("Panel: UI.Panels is not defined");
             }
             for (var k in UI.Panels) {
                 if (k == name) {
@@ -4942,7 +4947,9 @@ require("./Window");
             }
         },
         add: function add(panel) {
-
+            if (!panel) {
+                throw new Error("Panel.add must have a name or object");
+            }
             if (Apoco.type['string'].check(panel)) {
                 var w = this._UIGet(panel);
                 panel = w;
