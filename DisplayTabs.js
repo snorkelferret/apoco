@@ -65,8 +65,7 @@ require("./DisplayBase.js");
                 tablist=this.element.querySelector("ul.ui-tabs-nav");
             }
             index=this.tabs.length;
-	    //if(this.DEBUG)console.log("tabs.execute creating tab  " );
-            t.element=document.createElement("li");
+	    t.element=document.createElement("li");
             t.element.classList.add("ui-state-default","ui-corner-top");
             s=document.createElement("span");
             s.textContent=label;
@@ -76,9 +75,8 @@ require("./DisplayBase.js");
             this.tabs[index].parent=this;
             if(t.action){
                 t.element.addEventListener("click",function(e){
-                     console.log("tab " + t + " index " + index);
-                     t.action(t,index);
-                     that.select(t.name);
+                    t.action(t,index);
+                    that.select(t.name);
                 },false);
              }
  	    tablist.appendChild(t.element);
