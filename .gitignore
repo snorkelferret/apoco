@@ -5,6 +5,8 @@
 .\#*
 .nfs*
 
+apoco.js
+
 .bash_history
 
 node_modules
