@@ -1139,7 +1139,7 @@ var UI={};
                                }
                                var p=window[(n + "_obj")];
                                if(p){
-                                   dobj=p;
+                                   var dobj=p;
                                }
                                else{
                                    throw new Error("Display Object " + n + " not in the DOM");
