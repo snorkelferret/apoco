@@ -36,8 +36,8 @@ var Apoco=require('./declare').Apoco;
                 }
 
                 this.close=function(){
-                    console.log("click closed is here");
-                    console.log("Gdiakof is " + Hdialog);
+                   // console.log("click closed is here");
+                   // console.log("Gdiakof is " + Hdialog);
                     if(modal === true){
                         Apoco.modal.removeChild(Hdialog);
                         document.body.removeChild(Apoco.modal);

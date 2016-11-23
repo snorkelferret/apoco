@@ -271,25 +271,17 @@ require("./Window");
             var n=this._list.length;
            // console.log("there are " + n + " panels in Panel List");
             for(var i=0;i<n; i++){
-               // console.log("panel: removing panel " + i + " name " + this._list[i].name + " from list");
+               //console.log("panel: removing panel " + i + " name " + this._list[i].name + " from list");
                	obj=this._list[i];
                 obj.deleteChildren();
-              //  console.log("deleted children of " + this._list[i].name);
-               // for(var k in obj){
-               //     delete obj[k];
-                //}
                 if(promise_resolve){
                     if(i===(n-1)){
                   //      console.log("***********************************8delete is done");
                         promise_resolve();
                     }
                 }
-                //obj=null;
-                
-            }
-         //   if(!promise_resolve){
+             }
             Apoco.Window._closeAll();
-        //    }
             this._list.length=0;
         },
         delete: function(name){
@@ -395,29 +387,22 @@ require("./Window");
                 throw new Error("Panel: has no children " + this.name);
             }
             for(var i=0;i<this.components.length;i++){
-              //  console.log("panel_components.deleteChildren: " + this.components[i].display);
-             //   if(this.components[i].listen){
-            //       Apoco.IO.unsubscribe(this.components[i]);
-            //    }
+        
                 this.components[i].delete("message from parent");
             }
             this.components.length=0;
         },
-	deleteChild: function(obj){
+        deleteChild: function(obj){
             var index=-1;
-            //var obj=o;
             if(!obj){
                 throw new Error("Apoco.Panel: deleteChild obj is null");
             }
             if(Apoco.type['string'].check(obj)){
-              //  console.log("got string for delete child");
                 obj=this.getChild(obj);
             }
-           //console.log("deleteing child length is " + this.components.length);
-	   // console.log(Panel delete child is here");
-            if(obj.listen){ // remove the listener
-		Apoco.unsubscribe(obj);
-	    }
+           // if(obj.listen){ // remove the listener
+	//	Apoco.unsubscribe(obj);
+	  //  }
 	    for(var i=0;i<this.components.length;i++){
 		if(obj === this.components[i]){
                     index=i;

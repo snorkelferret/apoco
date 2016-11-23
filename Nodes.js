@@ -43,6 +43,7 @@ require("./Types.js");
             case "paragraph":
             case "label":
             case "anchor":
+            case "button":    
 		this.element.innerHTML=text;
 		this.text=text;
                 return;

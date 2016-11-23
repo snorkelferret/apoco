@@ -62,9 +62,15 @@ require("./Nodes.js");
 	getChildren: function(){
 	    var comp;
             var comp=this.getField();
+           // console.log("fiels is %j",comp);
             var c=this.getNode();
-            comp.concat(c);
-            return comp;
+           // console.log("node is %j",c);
+            if(comp.length > 0){
+                comp.concat(c);
+                return comp;
+            }
+          //  console.log("returning %j",c);
+            return c;
         },
         getChild:function(name){
             var k;
@@ -77,8 +83,10 @@ require("./Nodes.js");
                 if(k !==null && !Apoco.type["array"].check(k)){
                     return k;
                 }
+                return null;
             }
-            return null;
+            
+            return this.getChildren();
         },
 	getField: function(name){
             if(name !== undefined){
@@ -106,9 +114,11 @@ require("./Nodes.js");
             if(name !== undefined){
                 //is it a node or a field?
                 if(this.getNode(name)!== null){
+                    console.log("getNode got %j" + this.getNode(name));
                     this.deleteNode(name);
                 }
                 else if(this.getField(name)!== null){
+                    console.log("getField got %j" + this.getField(name));
                     this.deleteField(name);
                 }
                 else {

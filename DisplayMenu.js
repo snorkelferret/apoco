@@ -35,8 +35,7 @@ require("./DisplayBase");
     ApocoMakeMenu.prototype={
 	_execute: function(){
             var s,u;
-	    //console.log("execute of DisplayMenu");
-            this.selected=undefined;
+
             this.menu=[];
             this.element=document.createElement("div");
             this.element.id=this.id;
@@ -52,13 +51,19 @@ require("./DisplayBase");
 //	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
-            u.classList.add("apoco_menu_list","ui-menu","ui-widget-content");
+            u.classList.add("apoco_menu_list","ui-menu");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){
                 //  console.log("Making menu item " + i);
                 this.list[i].parent=this;
                 this.addMenu(this.list[i],u);
+            }
+            if(this.selected){
+                this.select(this.selected);
+            }
+            else{
+	        this.selected=undefined;
             }
             this.list.length=0; // for garbage collection
 	   // return true;
@@ -82,7 +87,7 @@ require("./DisplayBase");
             this.selected=null;
             var p=this.element.getElementsByTagName("li");
             for(var i=0;i<p.length;i++){
-                p[i].classList.remove("ui-state-active");
+                p[i].classList.remove("selected","ui-state-active");
             }
         },
 	getMenu: function(name){
@@ -124,8 +129,9 @@ require("./DisplayBase");
 	        d.parent=this;
                 parent_element.appendChild(d.element);
                 this.menu[index]=d;
-               
-                               
+                if(d.action === "default"){
+                    d.action=select_menu;
+                }
                 if(d.action !==undefined){
                     //console.log("menu has action " + this.menu[index].action);
 	            d.element.addEventListener("click",
@@ -178,9 +184,9 @@ require("./DisplayBase");
                     //           var el=this.element.find("ul li:nth-child(" + (i+1) + ")");
                     c=this.selected.element.parentNode.children;
                     for(var j=0;j<c.length;j++){
-                        c[j].classList.remove("ui-state-active");
+                        c[j].classList.remove("selected","ui-state-active");
                     }
-                    this.selected.element.classList.add("ui-state-active");
+                    this.selected.element.classList.add("selected","ui-state-active");
                     return;
                 }
             }

@@ -56,17 +56,13 @@ require("./DisplayFieldset");
 	    }
 	    header.appendChild(h);
             var close=document.createElement("span");
+            close.innerHTML="&#x2715;"; 
             close.classList.add("ui-icon","ui-icon-close");
             header.appendChild(close);
 	    var c=function(e){
-	        //	return function(e){
 		e.stopPropagation();
-		   // if(!cmd){
-	//		throw new Error("command for " +  this.getKey + " does not exist");
-	        //	    }
-		that.delete();
+		that.hide();
 	    };
-	    //}(this));
 	    close.addEventListener("click",c,false);
 
             fp=document.createElement("ul");
@@ -227,6 +223,7 @@ require("./DisplayFieldset");
                     this.buttons[i].element.parentNode.removeChild(this.buttons[i].element);
                 }
             }
+            //console.log("this element is " + this.element + " parebt " + this.element.parentNode);
             this.buttons.length=0;
         },
         deleteButton:function(name){

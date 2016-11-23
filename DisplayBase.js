@@ -256,32 +256,31 @@ require("./Fields");
                 this.DOM.removeChild(this.element);
                 return;
             }
-//           console.log("Can't hide element that is NOT in dom");
         },
 	delete: function(msg_from_parent){
-	    //console.log("delete display object is here");
-            if(this.listen){
-                Apoco.IO.unsubscribe(this);
-            }
-            if(this.draggable){
-                //this.draggable.delete(); // FIX THIS
-                console.log("Need method to delete draggable");
-            }
-            this.deleteAll();
-            if(this.element && this.element.parentNode){
-                this.element.parentNode.removeChild(this.element);  //removes events and data as well
-                this.element=null;
-            }
-	    else{
-                console.log("this element should not be null " + this.id);
-            }
-          
-	    if(this.parent && msg_from_parent === undefined){
-		//console.log("WE have a parent");
+	   // console.log("delete display object is here " + msg_from_parent);
+            if(this.parent && msg_from_parent === undefined){
 		this.parent.deleteChild(this);
 	    }
-            //this.element=null;
-            
+            else{
+                if(this.listen){
+                    Apoco.IO.unsubscribe(this);
+                }
+                if(this.draggable){
+                    //this.draggable.delete(); // FIX THIS
+                    console.log("Need method to delete draggable");
+                }
+                this.deleteAll();
+                if(this.element){
+                    if(this.element.parentNode){ // no parentNode if hidden
+                        this.element.parentNode.removeChild(this.element);  //removes events and data as well
+                    }
+                    this.element=null;  
+                }
+	        else{
+                    console.log("this element should not be null " + this.id);
+                }
+            }
 	}
     };
 

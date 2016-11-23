@@ -1418,17 +1418,21 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         d.type="string";
 
         _Field.call(this,d,element);
+        this.options=[];
         box=document.createElement("div");
         box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
         this.input=document.createElement("input");
+        this.input.setAttribute("placeholder","Search");
         if(this.required===true){
             this.input.required=true;
         }
         this.input.setAttribute("type",this.html_type);
          box.appendChild(this.input);  
         //sort the options
-        Apoco.sort(this.options,"string");
+        if(this.options.length>1){
+            Apoco.sort(this.options,"string");
+        }
        
         var select=document.createElement("ul");
         select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
@@ -1441,7 +1445,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 select.style.visibility="hidden";
             }
         });
-        select.addEventListener("mouseover",function(e){
+   /*     select.addEventListener("mouseover",function(e){
             if(e.target.tagName === "LI"){
                 e.stopPropagation();
                 e.preventDefault();
@@ -1455,11 +1459,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 e.preventDefault();
                 e.target.classList.remove("ui-state-hover");
             }
-        });
+        }); */
         
         box.appendChild(select);
         var options=[];
-        for(var i=0;i<4;i++){
+        for(var i=0;i<this.options.length;i++){
             options[i]=document.createElement("li");
             select.appendChild(options[i]);
         }

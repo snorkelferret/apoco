@@ -7,13 +7,14 @@
                 z-index:600;
                 min-width: 12em;
                 min-height:18em;
-               /* width: 30em;
+                /* width: 30em;
                 height: 25em; */
                 /* padding:1em 25px 1em 2em; */
                  max-height: 80em;
-                overflow: hidden;
+                 overflow: hidden;
                  display: inline-block}
-.form_header{cursor: move; height: 2em  }
+.form_header{cursor: move; height: 2em ; background-color:#000; color:#fff }
+.form_header span{color: #fff}
 .apoco_form .form_header h5{display:inline; margin: 0;position: absolute; top:0.4em; left:0.4em  }
 
 /* .form_drag{ height: 100%; width: 100%;  } */
@@ -108,7 +109,7 @@
 
 
 .apoco_form ul li p{  display: table-cell; float: left }
-.apoco_form .form_button_container{height: 5em; display: block;position:absolute;min-width:inherit;width:inherit; bottom:0px }  /* container for buttons */ 
+.apoco_form .form_button_container{height: 5em; display: block;position:absolute;min-width:inherit;width:inherit; bottom:0px; border-top: 1px solid }  /* container for buttons */ 
 .apoco_form button.print_button { float: right; } 
 .apoco_form button { float: left;  display: block; margin: 1em 3em} 
 .apoco_form li p.required{ color: #aa2222; display: inline; font-size: 8pt; float: right;

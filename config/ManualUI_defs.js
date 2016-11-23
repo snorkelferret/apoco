@@ -459,6 +459,7 @@ var UI={};
                 k.id=HFields[i];
                 k.dependsOn=HFields[i];
                 k.action=function(that){
+                    console.log("starting field action");
                     var p=that.getChild("doit");
                     p.element.click();
                 },
@@ -479,7 +480,7 @@ var UI={};
                               {name: "Input_params",field: "textArea", value: that.Commands[i]},
                               {name: "doit", node: "button", text: "Go",
                                action: function(that){
-                                   //                        console.log("button action is here");
+                                   console.log("Field button action is here");
                                    var f=that.parent.getChild("Input_params");
                                    if(!f){
                                        throw new Error("can't get input params");
@@ -488,10 +489,11 @@ var UI={};
                                    globalEval(f.getValue());
                                    //         console.log("parms are " + dataObject);
                                    if(Apoco.type["object"].check(dataObject)){
-                                       //             console.log("and it is an object");
+                                       console.log("and it is an object");
                                        var name=dataObject.name;
+                                       console.log("that.parent.getChild %j",that.parent.getChild(name));
                                        if(that.parent.getChild(name)){
-                                         //  console.log("deleting child");
+                                           console.log("deleting child " + name);
                                            that.parent.deleteChild(name);
                                        }
                                        //            console.log("adding child");
@@ -1054,10 +1056,24 @@ var UI={};
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]},
                        {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                   ]},
-            menu:{  required:[{label: "list",description:""}],
-                    options:[{label: "label",description:""},
+            menu:{  required:[{label: "list",descriptions:["type: objectArray","which must contain a name, key value pair and optionally an action and/or label ","<code>{name:'menu1',action:some_function,label:'some_string'}</code>", "action: A function that receives one arg which is 'this'","the action can also be 'default' in which case the following code is substituted",
+                                                           "<br><code> var select_menu=function(that,index){<br>" +
+                                                           mk_spaces(2) +"var name=that.menu[index].name;<br>" +
+                                                           mk_spaces(2) +"var p=that.getSiblings();<br>" +
+                                                           mk_spaces(2) + "if(!p){<br>" +
+                                                           mk_spaces(4) + "throw new Error('Could not find siblings of ' + that.parent.name);<br>" +
+                                                           mk_spaces(2) + "}<br>" +
+                                                           mk_spaces(2) + "for(var i=0;i &#60 p.length;i++){<br>" +
+                                                           mk_spaces(4) + "if(p[i].id == name){<br>" +
+                                                           mk_spaces(6) +" p[i].show();<br>" +
+                                                           mk_spaces(4) + "}<br>" +
+                                                           mk_spaces(4) + "else{<br>" +
+                                                           mk_spaces(6) +" p[i].hide();<br>" +
+                                                           mk_spaces(4) + "}<br>" +
+                                                           mk_spaces(2) + "}<br> }; </code>"]}],
+                    options:[{label: "selected",descriptions:["type:string","name of the menu from the list"]},
                              {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
-                             {label: "heading",description:""},
+                             {label: "heading",descriptions:["type:string","Add a Heading to the top of the menu "]},
                             ]},
             slideshow:{options:[{label: "values",descriptions:["type: objectArray","array of Image objects","<code> var values=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]},
                                 {label: "delay",descriptions:["type: integer","default: 4000", "time in milliseconds to display each image"]},
@@ -1132,11 +1148,13 @@ var UI={};
                                    throw new Error("can't get input params");
                                }
                                var n=that.parent.id;
-                               globalEval(f.getValue());
+                         
                                var d=Apoco.Panel.get("Displays").getChild((n+"Display"));
                                if( d!== null){
+                                 // console.log("deleting " + n + "Display");
                                    Apoco.Panel.get("Displays").deleteChild((n+"Display"));
                                }
+                               globalEval(f.getValue());
                                var p=window[(n + "_obj")];
                                if(p){
                                    var dobj=p;
