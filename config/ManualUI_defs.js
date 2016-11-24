@@ -459,7 +459,7 @@ var UI={};
                 k.id=HFields[i];
                 k.dependsOn=HFields[i];
                 k.action=function(that){
-                    console.log("starting field action");
+              //      console.log("starting field action");
                     var p=that.getChild("doit");
                     p.element.click();
                 },
@@ -480,7 +480,7 @@ var UI={};
                               {name: "Input_params",field: "textArea", value: that.Commands[i]},
                               {name: "doit", node: "button", text: "Go",
                                action: function(that){
-                                   console.log("Field button action is here");
+                              //     console.log("Field button action is here");
                                    var f=that.parent.getChild("Input_params");
                                    if(!f){
                                        throw new Error("can't get input params");
@@ -489,11 +489,11 @@ var UI={};
                                    globalEval(f.getValue());
                                    //         console.log("parms are " + dataObject);
                                    if(Apoco.type["object"].check(dataObject)){
-                                       console.log("and it is an object");
+                                  //     console.log("and it is an object");
                                        var name=dataObject.name;
-                                       console.log("that.parent.getChild %j",that.parent.getChild(name));
+                                 //      console.log("that.parent.getChild %j",that.parent.getChild(name));
                                        if(that.parent.getChild(name)){
-                                           console.log("deleting child " + name);
+                                   //        console.log("deleting child " + name);
                                            that.parent.deleteChild(name);
                                        }
                                        //            console.log("adding child");

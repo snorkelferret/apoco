@@ -51,7 +51,7 @@ require("./DisplayBase");
 //	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
-            u.classList.add("apoco_menu_list","ui-menu");
+            u.classList.add("apoco_menu_list","ui-menu","ui-widget-content");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.list.length;i++){

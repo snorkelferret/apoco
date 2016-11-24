@@ -1409,39 +1409,40 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.select=document.createElement("ul");
         this.select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         this.select.style.visibility="hidden";
-      
-
-        this.select.addEventListener("click",function(e){
-            if(e.target.tagName === "LI"){
-                e.stopPropagation();
-                e.preventDefault();
-                that.input.value=e.target.textContent;
-                that.select.style.visibility="hidden";
-            }
-        });
-         
-        box.appendChild(this.select);
+         box.appendChild(this.select);
         //make a list of 10 things
         for(var i=0;i<10;i++){
             this.select.appendChild(document.createElement("li"));
         }
-        this.input.addEventListener("input",function(e){
+
+
+        //click event triggers after the blur so the link gets hidden.
+        // Instead of click use mousedown it will work.
+        this.select.addEventListener("mousedown",function(e){
+            e.stopPropagation();
+            that.input.value=e.target.textContent;
+            //console.log("setting value to " + that.input.value);
+            that.select.style.visibility="hidden";
+        },false);
+         
+         this.input.addEventListener("input",function(e){
             var r;
             e.stopPropagation();
-            v=that.input.value;
+          //  console.log("INPUT event on %j ",e.target);
+            var v=that.input.value;
   
             that.select.style.visibility="hidden";
             r=that.contains(that.options,v);
-            that._make_list(r);
-            that.select.style.visibility="visible";
-            
-        });
-        this.element.addEventListener("blur",function(e){
-            console.log("blur called on autocomplete");
+            if(r.length>0){
+                that._make_list(r);
+                that.select.style.visibility="visible";
+            }
+        },false);
+        
+        this.input.addEventListener("blur",function(e){
             e.stopPropagation();
-            that.value=that.input.value;
             that.select.style.visibility="hidden";
-        },true);
+        },true); 
        
         if(this.action){
             this.action(this);
@@ -1480,7 +1481,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             for(var i=0;i<arr.length;i++){
                 a=arr[i].toLowerCase();
                 if(arr[i].startsWith(item)){
-                    console.log("item " + item + " starts with " + arr[i]);
+                  //  console.log("item " + item + " starts with " + arr[i]);
                     n[count]=arr[i];
                     count++;
                 }

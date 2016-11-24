@@ -216,8 +216,8 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 */
-
-div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0em; position:relative;top:0}
+div.apoco_autocomplete{position:relative}
+div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0em; position:absolute;top:1.5em}
 div.apoco_autocomplete ul li{display: block; 
                              z-index:10; width: inherit}
 div.apoco_autocomplete ul li:hover{font-weight:bold}
