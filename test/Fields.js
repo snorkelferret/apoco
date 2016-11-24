@@ -773,8 +773,39 @@ describe("AutoCompleteField",function(){
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
-       document.getElementsByTagName("body")[0].appendChild(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+       
     });
+    it("has added the initial options",function(){
+        assert.strictEqual(f.options.length,3);
+        
+    });
+    it("can add options",function(){
+        var p=["adfgd","aa","safsd","bbbbndsa","dff"];
+        f.addOptions(p);
+        assert.strictEqual(f.options.length,8);
+
+    });
+    it("can add a subset of the options to the select element",function(){
+        var t=f.contains(f.options,"a");
+   
+        assert.strictEqual(t.length,2); // only 2 elements start with a
+    });
+    it("puts the matching options into the DOM ",function(){
+        f.addOptions(["throw","through"]);
+        var c=0,ar=f.contains(f.options,"thr");
+        f._make_list(ar);
+        var t=f.element.getElementsByTagName("li");
+       // console.log("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV Got " + t.length + " number of lis");
+        for(var i=0;i<t.length;i++){
+         //   console.log("visibility is "+ t[i].style.visibility );
+            if(t[i].style.visibility === "inherit"){
+                c++;
+            }
+        }
+        assert.strictEqual(c,3);
+    });
+    
 
 });
 

@@ -217,12 +217,13 @@ input[type=number] {
 }
 */
 
-div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0.2em}
-div.apoco_autocomplete ul li{display: block; z-index:10; width: inherit}
+div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0em; position:relative;top:0}
+div.apoco_autocomplete ul li{display: block; 
+                             z-index:10; width: inherit}
 div.apoco_autocomplete ul li:hover{font-weight:bold}
-div.apoco_autocomplete input{margin-bottom: 0.2em}
+div.apoco_autocomplete input{margin-bottom: 0.2em;width:10em;}
 
-ul.choice {list-style-type: none; min-width: 10em }
+ul.choice {list-style-type: none; width: 10em }
 ul.choice li{display: block}
 ul.choice li input{float: left}
 /* floats not using the input default */

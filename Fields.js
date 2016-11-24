@@ -1387,38 +1387,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     Apoco.Utils.extend(ImageArrayField,_Field);
 
     var AutoCompleteField=function(d,element){
-        var v,rect,offset={};
+        var v;
         var box,that=this;
-        var contains=function(arr,item){
-            var count=0,a,n=[];
-            // make it case insensitive
-            item=item.toLowerCase();
-            for(var i=0;i<arr.length;i++){
-                a=arr[i].toLowerCase();
-                 if((a).indexOf(item) !== -1){
-                     n[count]=arr[i];
-                    count++;
-                }
-                if(count ===4){
-                    return n;
-                }
-            }
-            return n;
-        };
-        function getOffset (object, offset) {
-            if (!object){
-                return;
-            }
-            offset.x += object.offsetLeft;
-            offset.y += object.offsetTop;
-            getOffset (object.offsetParent, offset);
-        }
-
+ 
         d.field="AutoCompleteField";
         d.type="string";
 
         _Field.call(this,d,element);
-        this.options=[];
+      
         box=document.createElement("div");
         box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
@@ -1428,63 +1404,45 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.input.required=true;
         }
         this.input.setAttribute("type",this.html_type);
-         box.appendChild(this.input);  
-        //sort the options
-        if(this.options.length>1){
-            Apoco.sort(this.options,"string");
-        }
-       
-        var select=document.createElement("ul");
-        select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
-        select.style.visibility="hidden";
-        select.addEventListener("click",function(e){
+        box.appendChild(this.input);  
+        
+        this.select=document.createElement("ul");
+        this.select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
+        this.select.style.visibility="hidden";
+      
+
+        this.select.addEventListener("click",function(e){
             if(e.target.tagName === "LI"){
                 e.stopPropagation();
                 e.preventDefault();
                 that.input.value=e.target.textContent;
-                select.style.visibility="hidden";
+                that.select.style.visibility="hidden";
             }
         });
-   /*     select.addEventListener("mouseover",function(e){
-            if(e.target.tagName === "LI"){
-                e.stopPropagation();
-                e.preventDefault();
-                e.target.classList.add("ui-state-hover");
-            }
-        });
-        
-        select.addEventListener("mouseout",function(e){
-            if(e.target.tagName === "LI"){
-                e.stopPropagation();
-                e.preventDefault();
-                e.target.classList.remove("ui-state-hover");
-            }
-        }); */
-        
-        box.appendChild(select);
-        var options=[];
-        for(var i=0;i<this.options.length;i++){
-            options[i]=document.createElement("li");
-            select.appendChild(options[i]);
+         
+        box.appendChild(this.select);
+        //make a list of 10 things
+        for(var i=0;i<10;i++){
+            this.select.appendChild(document.createElement("li"));
         }
-
-        this.input.addEventListener("keyup",function(e){
+        this.input.addEventListener("input",function(e){
             var r;
             e.stopPropagation();
             v=that.input.value;
-            offset={x:0,y:0};
-            rect=that.input.getBoundingClientRect();
-            getOffset(select,offset);
-            select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
-            select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
-            select.style.visibility="hidden";
-            r=contains(that.options,v);
-            for(var i=0;i<r.length;i++){
-                options[i].textContent=r[i];
-            }
-            select.style.visibility="visible";
-            this.value=v;
+  
+            that.select.style.visibility="hidden";
+            r=that.contains(that.options,v);
+            that._make_list(r);
+            that.select.style.visibility="visible";
+            
         });
+        this.element.addEventListener("blur",function(e){
+            console.log("blur called on autocomplete");
+            e.stopPropagation();
+            that.value=that.input.value;
+            that.select.style.visibility="hidden";
+        },true);
+       
         if(this.action){
             this.action(this);
         }
@@ -1492,6 +1450,63 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
 
     AutoCompleteField.prototype={
+        addOptions:function(n){
+            for(var i=0;i<n.length;i++){
+                this.options.push(n[i]);
+            }
+            if(this.options.length>1){
+                Apoco.sort(this.options,"string");
+            }
+         },
+        _make_list:function(ar){
+            var p;
+            var l=this.element.getElementsByTagName("li");
+            
+            for(var i=0;i<10;i++){
+                if(ar[i]){
+                    l[i].textContent=ar[i];
+                    l[i].style.visibility="inherit";
+                }
+                else{
+                    l[i].textContent="";
+                    l[i].style.visibility="hidden";
+                }
+            }
+         },
+        contains:function(arr,item){
+            var count=0,a,n=[];
+            // make it case insensitive
+            item=item.toLowerCase();
+            for(var i=0;i<arr.length;i++){
+                a=arr[i].toLowerCase();
+                if(arr[i].startsWith(item)){
+                    console.log("item " + item + " starts with " + arr[i]);
+                    n[count]=arr[i];
+                    count++;
+                }
+                if(count ===10){
+                    return n;
+                }
+            }
+            return n;
+        },
+    /*    offset:function(){
+            var that=this;
+            var  offset={x:0,y:0};
+            var rect=that.input.getBoundingClientRect();
+            that._getOffset(that.select,offset);
+            that.select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
+            that.select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
+
+        },
+        _getOffset: function(object, offset) {
+            if (!object){
+                return;
+            }
+            offset.x += object.offsetLeft;
+            offset.y += object.offsetTop;
+            this._getOffset(object.offsetParent, offset);
+        }, */
         popupEditor: null
     };
 

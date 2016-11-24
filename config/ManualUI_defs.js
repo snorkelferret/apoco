@@ -542,6 +542,12 @@ var UI={};
                     "return:HTMLObject",
                     "The input node"
                 ]},
+                addOptions:{ descriptions:[
+                    "<code> field.addOptions['adc','ddfg','dddgf']); </code>"
+                ]},
+                contains:{descriptions:[
+                    "<code> var array=field.contains(options_array,value);<code>"
+                ]},
                 resetValue:{descriptions:[
                     "<code>var r=field.resetValue()</code>",
                     "set the values of the DOM to the last good setValue() call or initial values"
