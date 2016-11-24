@@ -1394,7 +1394,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         d.type="string";
 
         _Field.call(this,d,element);
-      
+        if(this.options === undefined){
+            this.options=[];
+        }
         box=document.createElement("div");
         box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
