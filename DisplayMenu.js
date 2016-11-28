@@ -18,7 +18,7 @@ require("./DisplayBase");
 
     var select_menu=function(that,index){
         var name=that.menu[index].name;
-        var p=that.getSiblings();
+        var p=that.getSibling();
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
         }
@@ -66,7 +66,6 @@ require("./DisplayBase");
 	        this.selected=undefined;
             }
             this.list.length=0; // for garbage collection
-	   // return true;
 	},
 	update:function(name){
 	    var p=this.getMenu(name);
