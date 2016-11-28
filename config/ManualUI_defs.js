@@ -543,7 +543,10 @@ var UI={};
                     "The input node"
                 ]},
                 addOptions:{ descriptions:[
-                    "<code> field.addOptions['adc','ddfg','dddgf']); </code>"
+                    "<code> field.addOptions(['adc','ddfg','dddgf']); </code>"
+                ]},
+                deleteOptions:{ descriptions:[
+                    "<code> field.removeOptions(); </code>"
                 ]},
                 contains:{descriptions:[
                     "<code> var array=field.contains(options_array,value);<code>"

@@ -1414,27 +1414,55 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.select=document.createElement("ul");
         this.select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         this.select.style.visibility="hidden";
-         box.appendChild(this.select);
+        box.appendChild(this.select);
+        var handleEvent=function(e){
+            var pubsub;
+            switch(e.type){
+            case "input":
+                var r;
+                //  console.log("INPUT event on %j ",e.target);
+                var v=that.input.value;
+              
+                e.stopPropagation();
+                Apoco.IO.dispatch(pubsub,v);
+                that.select.style.visibility="hidden";
+                r=that.contains(that.options,v);
+                if(r.length>0){
+                    that._make_list(r);
+                    that.select.style.visibility="visible";
+                }
+                break;
+            case "blur":
+                e.stopPropagation();
+                that.select.style.visibility="hidden";
+                break;
+            case "keypress":
+                pubsub=(that.name + "_value_selected");
+            default: return;
+            }
+        };
         //make a list of 10 things
         for(var i=0;i<10;i++){
             this.select.appendChild(document.createElement("li"));
         }
-
+        
         //click event triggers after the blur so the link gets hidden.
         // Instead of click use mousedown it will work.
-        pubsub=(that.name + "_value_changed");
-        this.select.addEventListener("mousedown",function(e){
+        
+        this.select.addEventListener("mousedown", function(e){
             e.stopPropagation();
+            pubsub=(that.name + "_value_selected");
             that.input.value=e.target.textContent;
             Apoco.IO.dispatch(pubsub,that.input.value);
         //    console.log("setting value to " + that.input.value);
             that.select.style.visibility="hidden";
         },false);
-         
-        this.input.addEventListener("input",function(e){
-             var r;
+        
+        this.input.addEventListener("input", function(e){
+            var r;
              //  console.log("INPUT event on %j ",e.target);
             var v=that.input.value;
+            pubsub=(that.name + "_value_changed");
             e.stopPropagation();
             Apoco.IO.dispatch(pubsub,v);
             that.select.style.visibility="hidden";
@@ -1443,9 +1471,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 that._make_list(r);
                 that.select.style.visibility="visible";
             }
-        },false);
+       },false);
         
-        this.input.addEventListener("blur",function(e){
+        this.input.addEventListener("keyup",function(e){
+            e.stopPropagation();
+            if(e.key === "Enter"){
+                pubsub=(that.name + "_value_selected");
+             //   console.log("key was " + e.key);
+                var v=that.input.value;
+                Apoco.IO.dispatch(pubsub,v);
+            }
+        },true);
+       this.input.addEventListener("blur", function(e){
             e.stopPropagation();
             that.select.style.visibility="hidden";
         },true); 	
@@ -1458,6 +1495,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
 
     AutoCompleteField.prototype={
+        deleteOptions:function(){
+            this.options.length=0;
+        },
         addOptions:function(n){
             for(var i=0;i<n.length;i++){
                 this.options.push(n[i]);

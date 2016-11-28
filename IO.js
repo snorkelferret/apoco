@@ -170,11 +170,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             else{
                 defaults.url=".";
             }
-            //type=type.toString();
             if(type !== "GET" && type !== "POST"){
                 throw new Error("REST: only knows about GET and POST not " + type);
             }
-	    //    var settings=$.extend({},defaults,options);
+	    
             var settings={};
             for(var k in defaults){
                 settings[k]=defaults[k];
@@ -185,16 +184,21 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(settings.url === ""){
                 throw new Error("Apoco.REST Must have a url");
             }
-            data=JSON.stringify(data);
-            //var promise=$.ajax(settings);
-
+            if(data){
+                data=JSON.stringify(data);
+            }
             var promise=new Promise(function(resolve,reject){
                 var request=new XMLHttpRequest();
                 var stateChange=function(){
                     if(request.readyState === XMLHttpRequest.DONE){
                         if(request.status === 200){ //success
-                          //  console.log("return from server is " + request.responseText);
-                            resolve(JSON.parse(request.responseText));
+                            //  console.log("return from server is " + request.responseText);
+                            if(settings.mimeType === 'application/json'){
+                                resolve(JSON.parse(request.responseText));
+                            }
+                            else{
+                                resolve(request.responseText);
+                            }
                         }
                         else{
                             reject(request.status);

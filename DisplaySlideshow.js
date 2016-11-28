@@ -86,11 +86,11 @@ require("./DisplayBase");
                 }
             }
         },
-        handleEvent:function(e){           
+   /*     handleEvent:function(e){           
             if(e.type == "visibilitychange"){
                 this._isVisible(e);
             }
-        },
+        }, */
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
