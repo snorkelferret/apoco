@@ -118,6 +118,44 @@ require("./Window");
 	    }
 	    return null;
 	},
+        _dumpHTML:function(filename){
+            var nodes=[],c,found,t=new String;
+            var file;
+            for(var i=0;i<this._list.length;i++){
+                for(var j=0; j<this._list[i].components.length;j++){
+                    c=this._list[i].components[j];
+                    if(c){
+                        t="<!-- INSERT INTO ";
+                        if(Apoco.type.object.check(c.DOM)){  // has been put into DOM with show
+                            //c.DOM.id;
+                            t=t.concat(c.DOM.id );
+                        }
+                        else{
+                            t=t.concat(c.DOM);
+                        }
+                        t=t.concat(" -->");
+                        nodes.push(t);
+                        t=c.element.outerHTML;
+                        nodes.push(t);
+                    } 
+                }
+            }
+            console.log(nodes);
+            return nodes;
+           
+        /*    file=new Blob(nodes,'application/json');
+            var a=document.createElement('a');
+            var url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);  
+            }, 0); */
+            
+        },
         get: function(k){
             var u=this._inList(k);
             if(u !== null){

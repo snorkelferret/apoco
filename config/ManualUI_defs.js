@@ -1083,6 +1083,7 @@ var UI={};
                             ]},
             slideshow:{options:[{label: "values",descriptions:["type: objectArray","array of Image objects","<code> var values=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]},
                                 {label: "delay",descriptions:["type: integer","default: 4000", "time in milliseconds to display each image"]},
+                                {label:"fit_to",descriptions:["type: string -  'width'or'height'","default: 'height'","defaults to fitting the slideshow to the height of the parent element, otherwise changes the height of the parent element so the images fit the width "]},
                                 {label:"controls",descriptions:["type: Boolean","default: true","display the controls"]},
                                 {label:"thumbnails",descriptions:["type: Boolean","default: false","display the thumbnails"]},
                                 {label: "autoplay",descriptions:["type: Boolean","default: true","start playing immeditately"]},
@@ -1439,7 +1440,18 @@ var UI={};
                     des: "Listens for messages sent by publish,websocket or dispatch methods"
                    },
             publish:{code: "<code>Apoco.IO.publish(object);</code>",
-                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called publish","e.g <br> <code>var object={publish:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
+                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called publish",
+                                                          "e.g <br> <code>var object={publish:[{name:'some_name',<br>" + mk_spaces(11) +
+                                                          "action:my_func(that,name){ <br> " + mk_spaces(14) +
+                                                          "alert('got name ' + name);<br> "+ mk_spaces(14)+
+                                                          "}<br>"+ mk_spaces(13) +
+                                                          "},<br> " + mk_spaces(11) +
+                                                          "// or alternatively just send the data" + mk_spaces(11) +
+                                                          "<br> " + mk_spaces(11) +
+                                                          "{name:'another_name',<br>" + mk_spaces(12) +
+                                                          "data:'Hello from another_name' <br>" + mk_spaces(11) +  "}" + mk_spaces(8) +
+                                                          "<br>" + mk_spaces(11) + 
+                                                          "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object","Typically the action function is used when an eventListener needs to be added to the calling element, see example below","Otherwise calling publish with name and data is just polyfill for Apoco.IO.dispatch(name,some_data)"]}],
                      cmd: "Apoco.IO.publish({publish:[{name:'mySignal',action:function(that,name){ var t=Apoco.Panel.get('IO').getChild('publishMethods'); t.element.addEventListener('click',function(e){ Apoco.IO.dispatch(name,'hullo from publish');},false); }}]}); // press Go to initialise, and then click anywhere in the panel to send data- the data will be caught on the listen page",
                      ret: "none",
                      des:""

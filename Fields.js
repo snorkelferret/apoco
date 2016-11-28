@@ -1389,7 +1389,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     var AutoCompleteField=function(d,element){
         var v;
         var box,that=this;
- 
+        var pubsub;
         d.field="AutoCompleteField";
         d.type="string";
 
@@ -1406,8 +1406,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.input.required=true;
         }
         this.input.setAttribute("type",this.html_type);
-        box.appendChild(this.input);  
-        
+        box.appendChild(this.input);
+        var p=document.createElement("span");
+        p.text="&#9906;";
+        box.appendChild(p);
+     
         this.select=document.createElement("ul");
         this.select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         this.select.style.visibility="hidden";
@@ -1417,22 +1420,23 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.select.appendChild(document.createElement("li"));
         }
 
-
         //click event triggers after the blur so the link gets hidden.
         // Instead of click use mousedown it will work.
+        pubsub=(that.name + "_value_changed");
         this.select.addEventListener("mousedown",function(e){
             e.stopPropagation();
             that.input.value=e.target.textContent;
-            //console.log("setting value to " + that.input.value);
+            Apoco.IO.dispatch(pubsub,that.input.value);
+        //    console.log("setting value to " + that.input.value);
             that.select.style.visibility="hidden";
         },false);
          
-         this.input.addEventListener("input",function(e){
-            var r;
-            e.stopPropagation();
-          //  console.log("INPUT event on %j ",e.target);
+        this.input.addEventListener("input",function(e){
+             var r;
+             //  console.log("INPUT event on %j ",e.target);
             var v=that.input.value;
-  
+            e.stopPropagation();
+            Apoco.IO.dispatch(pubsub,v);
             that.select.style.visibility="hidden";
             r=that.contains(that.options,v);
             if(r.length>0){
@@ -1444,7 +1448,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.input.addEventListener("blur",function(e){
             e.stopPropagation();
             that.select.style.visibility="hidden";
-        },true); 
+        },true); 	
+        //&#128269;
        
         if(this.action){
             this.action(this);

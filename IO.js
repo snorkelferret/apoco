@@ -14,11 +14,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                         if(!s.action){
                             throw new Error("No action for " + s);
                         }
-                     //   for(var k in s.context){
-                     //       console.log("before dispatch " + k);
-                        //   }
-             //           console.log("action is " + s.action);
-               //         console.log("with args " + args);
+                    /*   for(var k in s.context){
+                            console.log("before dispatch " + k);
+                         }
+                       console.log("action is " + s.action);
+                       console.log("with args " + args); */
 		        s.action(s.context,args);
 		    });
 	        } catch (err){
@@ -80,7 +80,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	        }
 	        else if(that.publish[i].action){
 		    that.publish[i].action(that,that.publish[i].name);
-
 	        }
 	        else{
 		    throw new Error("incorrect method for apoco.publish");

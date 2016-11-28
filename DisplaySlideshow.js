@@ -15,7 +15,8 @@ require("./DisplayBase");
             fade: false,
             fadeDuration: 2000,
             current: 0,
-            controls: true
+            controls: true,
+            fit_to: "height"
 	};
 	var f,that=this;
  
@@ -66,10 +67,6 @@ require("./DisplayBase");
         _isVisible:function(e){
             var that=this;
             if(that.DOM.contains(that.element)){
-//                e.stopPropagation();
-               // console.log("element is " + that.getKey() + " element " + that.element);    
-                //e.preventDefault();
-               // console.log("visibility change");
                 if(document.hidden){
                   //  console.log("hidden");
                     if(that.interval){
@@ -79,22 +76,17 @@ require("./DisplayBase");
                 else{
                  //   console.log("visible");
                     if(that.autoplay){
-                        //   var t;
-                        //    t=setInterval(function(){ //need this to stop race condition
                         if(that.controls){
                             that.element.querySelector("span.ui-icon-play").click();
                         }
                         else{
                             that.play();
                         }
-                        //    clearInterval(t);
-                        // },2000);
                     }
                 }
             }
         },
         handleEvent:function(e){           
-          //  console.log("event handler is here event type is " + e.type);
             if(e.type == "visibilitychange"){
                 this._isVisible(e);
             }
@@ -154,46 +146,81 @@ require("./DisplayBase");
             
         },
         _calculateCover:function(v){
-            var that=this;
-            this._setWidth();
-            var ar=this.width/this.height;
-            v.SSimage.style.margin="0"; // reset the margin 
-            if(v.aspect_ratio > ar){   //wider than window - fit to width
-		var h=that.width/v.aspect_ratio;
-              //  console.log("new image height is " + h);
-                var w=((that.width).toString() + "px");
-              //  console.log("new image width is " + w);
-                v.SSimage.style.width=w;
-                v.SSimage.style.height=(h.toString() + "px");
-		h=(that.height-h)/2;
-		v.SSimage.style.marginTop=(h.toString() + "px"); 
-                v.SSimage.style.marginBottom=(h.toString() + "px");
-	    }
-	    else{  // - fit to height
-		var w=that.height*v.aspect_ratio;
-             //   console.log("new image width is " + w);
-                v.SSimage.style.width=(w + "px");
-                v.SSimage.style.height=(that.height + "px");
-		w=(that.width-w)/2;
-                v.SSimage.style.marginLeft=(w + "px");
-                v.SSimage.style.marginRight=(w + "px");
-	    }
+            
+            var ar,w,h;
+            w=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
+            h=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
+            this.width=parseInt(w);
+            this.height=parseInt(h);
+          //  console.log("slideshow container width " + this.width + " height " + this.height);
+            
+            if(parseInt(this.height)>0 ){
+               
+                ar=this.width/this.height;
+            //    console.log("height " + this.height + " is > 0 ; and ar is " + ar );
+            }
+            else{
+                ar=0;
+            }
+          //  console.log("window aspect ratio is " + ar);
+              
+            if(this.fit_to === "width"){
+                this._setToWidth(v,ar);
+            }
+            else if(v.aspect_ratio > ar){
+                this._setToWidth(v,ar);
+            }
+            else{
+                this._setToHeight(v,ar);
+            }
         },
-        _setWidth:function(){
-            this.width=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
-            this.height=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
-            //console.log("slideshow container width " + this.width + " height " + this.height);
-            this.height=parseInt(this.height);
-            this.width=parseInt(this.width);
-         
-         },
+   
+        _setToHeight:function(v,ar){
+            var w,h,that=this;
+            v.SSimage.style.margin="0"; // reset the margin
+          //  console.log("FIT TO HEIGHT");
+          //  console.log("image aspect ration is " + v.aspect_ratio + " and window is " + ar);
+	    w=that.height*v.aspect_ratio;
+            //   console.log("new image width is " + w);
+            v.SSimage.style.width=(w + "px");
+            v.SSimage.style.height=(that.height + "px");
+	    w=(that.width-w)/2;
+            v.SSimage.style.marginLeft=(w + "px");
+            v.SSimage.style.marginRight=(w + "px");
+        },
+        _setToWidth:function(v,ar){
+            var w,h,that=this;
+            v.SSimage.style.margin="0"; // reset the margin
+          //  console.log("FIT to WIDTH");
+            h=this.width/v.aspect_ratio;
+          //  console.log("need height " + h);
+            if(this.height< h && this.fit_to=== "width"){
+                h=parseInt(h);
+            //    console.log("setting height to " + h);
+                this.element.style.height=(h + "px");
+                this.height=h;
+              //  console.log("this.height " + this.height);
+            }
+           // console.log("image aspect ration is " + v.aspect_ratio + " and window is " + ar);
+	  //  console.log("new image height is " + h);
+            w=((that.width).toString() + "px");
+          //  console.log("new image width is " + w);
+            v.SSimage.style.width=(w + "px");
+            v.SSimage.style.height=(h + "px");
+            if(this.fit_to !== "width"){
+	        h=(that.height-h)/2;
+                v.SSimage.style.marginTop=(h + "px"); 
+                v.SSimage.style.marginBottom=(h + "px");
+            }
+        },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
-            
-            this._setWidth();
+         
             for(var i=0;i<this.values.length;i++){
+             //   console.log("after show calc " + i + " this loaded is " + this.values[i].loaded);
                 if(this.values[i].loaded){
+                //    console.log("Values loaded = going to calculate cover");
                     this._calculateCover(this.values[i]);
                 }
             }
@@ -205,13 +232,7 @@ require("./DisplayBase");
             
             // get the slide container
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
-    
-           /* for(var i=0;i<this.values.length;i++){
-                console.log("loaded is " + this.values[i].loaded);
-                if(this.values[i].loaded){ // image is loaded
-                    this._calculateCover(this.values[i]);
-               }
-            } */
+
             if(that.autoplay === true){
                 //         console.log("trigger autoplay");
                 if(that.interval){
@@ -257,10 +278,11 @@ require("./DisplayBase");
                 }
                                
                 this.promises[i].then(function(v){
-              //      console.log("image loaded" + v.src);
+                  //  console.log("image loaded " + v.src);
                     v.SSimage.src=v.src;
-                    that._calculateCover(v);
                     v.loaded=true;
+                    that._calculateCover(v);
+                    
                 });/*.catch(function(reason){
                      Apoco.popup.error("Slideshow",("Could not load images" + reason));
                 }); */

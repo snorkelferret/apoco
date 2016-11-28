@@ -30,7 +30,7 @@ require("./Nodes.js");
             
             if(this.components !== undefined){
                 for(var i=0;i<this.components.length;i++){
-                    this.components[i].parent=that;
+                //    this.components[i].parent=that;
                     el=document.createElement("div");
                     el.classList.add("fieldset");
                     if(this.components[i].class){
@@ -145,6 +145,7 @@ require("./Nodes.js");
                 n=Apoco.node(d,el);
             }
             if(n){
+                n.parent=this;
                 this.element.appendChild(n.element);
 	        this.nodes.push(n);
                 return n;
@@ -193,6 +194,7 @@ require("./Nodes.js");
                 }
                 else{
                     p=Apoco.field[d.field](d,el);
+                    p.parent=this;
                 }
 		if(!p){
 		    throw new Error("Cannot make field " + d.field);
