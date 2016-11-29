@@ -184,7 +184,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(settings.url === ""){
                 throw new Error("Apoco.REST Must have a url");
             }
-            if(data){
+            if(data && settings.mimeType === 'application/json'){
                 data=JSON.stringify(data);
             }
             var promise=new Promise(function(resolve,reject){

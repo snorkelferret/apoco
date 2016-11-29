@@ -1400,6 +1400,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         box=document.createElement("div");
         box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
+        var p=document.createElement("span");
+        p.classList.add("ui-icon","ui-icon-magnify-left");
+        p.innerHTML="&#x26B2;";
+        box.appendChild(p);
         this.input=document.createElement("input");
         this.input.setAttribute("placeholder","Search");
         if(this.required===true){
@@ -1407,10 +1411,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         }
         this.input.setAttribute("type",this.html_type);
         box.appendChild(this.input);
-        var p=document.createElement("span");
-        p.text="&#9906;";
-        box.appendChild(p);
-     
+      
         this.select=document.createElement("ul");
         this.select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
         this.select.style.visibility="hidden";
@@ -1486,7 +1487,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             e.stopPropagation();
             that.select.style.visibility="hidden";
         },true); 	
-        //&#128269;
+       
        
         if(this.action){
             this.action(this);
