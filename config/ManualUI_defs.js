@@ -1201,6 +1201,7 @@ var UI={};
 
         }
         var display_methods_list={
+            reset:["<code> my_display.reset();</code>","deselect all child elements"],
             show:["<code> var v=my_display.show();</code>","params: none","return: boolean","add the root display element to the DOM"],
             getElement:["<code> var v=my_display.getElement();</code>","params: none","return: htmlobject"," the root element of the display"],
             getChild:["<code>var c=my_display.getChild(name);</code>","params: type: string - name as defined in the components array ","return: object","returns null on fail"],
@@ -1685,16 +1686,13 @@ var UI={};
     };
 
     var select_tabs=function (that,index){
-        if(!that){
-            console.log("select_tabs: that is  " + that);
-        }
         var name=that.name;
-       // console.log("select_tabs: trying to show " + name);
+        //console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Apoco.Panel.hide(that.parent.selected.name);
         }
-     //   if(name !== that.selected){
-          //  console.log("select_tabs: trying to show " + that.selected);
+       // if(name !== that.selected){
+        //  console.log("select_tabs: trying to show " + that.selected);
         //Apoco.Panel.hide(that.selected);
 
         Apoco.Panel.show(name);
@@ -1703,12 +1701,12 @@ var UI={};
             var ar=b.getChildren();
             for(var i=0; i< ar.length; i++){
                 var n=ar[i].getKey();
-                // console.log("select_tabs n is " +  n);
+             //   console.log("select_tabs n is " +  n);
                 if(n == "Blurb" ||  n == (name +"Menu")){
                     ar[i].show();
                 }
                 else{
-                    //   console.log("select_tabs hiding " + n );
+               //     console.log("select_tabs hiding " + n );
                     ar[i].hide();
                 }
                 if(n === (name + "Menu")){

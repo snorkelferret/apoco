@@ -67,6 +67,9 @@ require("./DisplayBase.js");
             index=this.tabs.length;
 	    t.element=document.createElement("li");
             t.element.classList.add("ui-state-default","ui-corner-top");
+            if(t.class){
+                t.element.classList.add(t.class);
+            }
             s=document.createElement("span");
             s.textContent=label;
             t.element.appendChild(s);
@@ -75,9 +78,12 @@ require("./DisplayBase.js");
             this.tabs[index].parent=this;
             if(t.action){
                 t.element.addEventListener("click",function(e){
-                    that.select(t.name);
-                    t.action(t,index);
-                   
+                  
+                    e.stopPropagation();
+                    var p=t.action(t,index);
+                    if(p !== false && p !== null){
+                        that.select(t.name);
+                    }
                 },false);
              }
  	    tablist.appendChild(t.element);
@@ -146,7 +152,7 @@ require("./DisplayBase.js");
         },
 	select: function(name){
 	    for(var i=0;i<this.tabs.length;i++){
-		if(this.tabs[i].name == name){
+             	if(this.tabs[i].name == name){
                     this.selected=this.tabs[i];
 		    this.tabs[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
                     this.tabs[i].element.classList.remove("ui-state-default");
@@ -156,7 +162,14 @@ require("./DisplayBase.js");
 		    this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
 		}
 	    }
-	}
+	},
+        reset:function(){
+            for(var i=0;i<this.tabs.length;i++){
+                this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
+            }
+            this.selected=null;
+        }
+        
     };
 
     Apoco.Utils.extend(ApocoMakeTabs,Apoco._DisplayBase);

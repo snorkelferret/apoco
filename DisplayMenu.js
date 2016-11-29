@@ -108,6 +108,9 @@ require("./DisplayBase");
             index=this.menu.length;
            // console.log("addMenu index is " + index);
             d.element=document.createElement("li");
+            if(d.class){
+                d.element.classList.add(d.class);
+            }
             if(d.seperator !== undefined){
                 d.element.classList.add("seperator");
                 s=document.createElement("span");
@@ -139,8 +142,10 @@ require("./DisplayBase");
                                          e.stopPropagation();
                       //                   console.log("menu name is " + t.name);
                       //                   console.log("menu has action " + t.action);
-                                         t.action(t);
-                                         that.select(t.name);
+                                         var p=t.action(t);
+                                         if(p!== false && p!==null){
+                                             that.select(t.name);
+                                         }
                                      };
                                  }(d,that),false);//,false);
 	            // }(that,index),false);

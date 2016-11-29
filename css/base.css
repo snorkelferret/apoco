@@ -274,11 +274,9 @@ text-align: left;  padding: 0em 0em .5em 0em}
 h5{color: #202020; font-size: 12pt}
 
 
-.disabled{ /*display: none;
-           position: absolute;
-           cursor: auto;
-           background-color: gray;  */
-           opacity: 0.4;
+.disabled{ 
+    pointer-events:none; 
+    opacity:0.6;         
  }  /* use <div class='disabled'></div> $(.disabled).show() or .hide()  */
 
 #Apoco_modal {
