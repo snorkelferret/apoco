@@ -205,7 +205,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                             if(!request){
                                 throw new Error("REST failed with no return from server");
                             }
-                            Apoco.display.statusCode[request.status]((request.statusText + " " + request.responseText));
+                           // Apoco.popup.statusCode[request.status]((request.statusText + " " + request.responseText));
                         }
                     }
                 };
