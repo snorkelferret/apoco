@@ -130,6 +130,14 @@ require("./Nodes.js");
             }              
 
         },
+        addChild:function(d,el){
+            if(d.node){
+                this.addNode(d,el);
+            }
+            else{
+                this.addField(d,el);
+            }
+        },
         addNode:function(d,el){
             var n,parent_element;
             if(d.name && this.getNode(d.name)!==null){

@@ -240,40 +240,46 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    }
 	},
   
-        draggable:function(source,destination){
+        draggable:function(source,destination,handle){
             if(destination === undefined){
                 destination=document.body;
             }
-            source.classList.add("isdraggable");
+            if(handle === undefined){
+            //    console.log("handle is undefined");
+                handle=source;
+            }
+            handle.classList.add("isdraggable");
             
             var allowDrag=function(e){
-              //  console.log("allow drag is here");
+               // console.log("allow drag is here");
                 e.preventDefault();
                 return false;
             };
             var dragEnd=function(e){
-               // console.log("dragEnd is here");
-                e.stopPropagation();
-                //console.log("dragend is here");
-                e.currentTarget.classList.remove("draggable");
-                destination.removeEventListener("drop",drop);
-                destination.removeEventListener("dragover",allowDrag);
-                
+               // console.log("dragEnd is here " + e.target);
+                if(e.currentTarget === e.target){
+                    e.stopPropagation();
+                 //   console.log("dragend is here");
+                    e.currentTarget.classList.remove("draggable");
+                    destination.removeEventListener("drop",drop);
+                    destination.removeEventListener("dragover",allowDrag);
+                }
+   
             };
             var drop=function(e){
                 // return function(e){
-                console.log("drop is here");
+              //  console.log("drop is here");
                 e.preventDefault();
                 e.stopPropagation();
                 var data=e.dataTransfer.getData("text").split(",");
                 if(!source){
                     throw new Error("source is undefined");
                 }
-                if(source.classList.contains("draggable")){
-                   // console.log("source has class");
+                if(handle.classList.contains("draggable")){
+                 //   console.log("source has class draggable ");
                     source.style.left = (e.clientX + parseInt(data[0],10)) + 'px';
                     source.style.top = (e.clientY + parseInt(data[1],10)) + 'px';
-                    source.classList.remove("draggable");
+                    handle.classList.remove("draggable");
                 }
                 //  document.body.removeChild(document.getElementById("temp_clone"));
                 return false;
@@ -281,21 +287,26 @@ String.prototype.trim = String.prototype.trim || function trim() {
             };
             
             var dragStart=function(e){
-              //  console.log("dragStart is here ");
-                e.currentTarget.classList.add("draggable");
-                destination.addEventListener("dragover",allowDrag,false);
-                destination.addEventListener("drop",drop,false);
-                var style=window.getComputedStyle(e.target, null);
+             //   console.log("current target is " + e.currentTarget.id + " target " + e.target.id);
+                if(e.currentTarget === e.target){
+                    e.stopPropagation();
+                 //   console.log("dragStart is here " + e.target);     
+                    e.currentTarget.classList.add("draggable");
+                    destination.addEventListener("dragover",allowDrag,false);
+                    destination.addEventListener("drop",drop,false);
+                    var style=window.getComputedStyle(e.target, null);
                     //e.dataTransfer.setData("text", e.target.id);
-                e.dataTransfer.setData("text",  (parseInt(style.getPropertyValue("left"),10) - e.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - e.clientY));
+                    e.dataTransfer.setData("text",  (parseInt(style.getPropertyValue("left"),10) - e.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - e.clientY));
+                }
+             
             };
             
             //console.log("draggable is here draggable is " + source.draggable);
-            if(source.draggable=== false){
+            if(handle.draggable=== false){
                // console.log("dragable is false");
-                source.draggable=true;
-                source.addEventListener("dragstart",dragStart,false);
-                source.addEventListener("dragend",dragEnd,false);
+                handle.draggable=true;
+                handle.addEventListener("dragstart",dragStart,false);
+                handle.addEventListener("dragend",dragEnd,false);
             }
                         
         },

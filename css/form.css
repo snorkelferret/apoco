@@ -13,7 +13,7 @@
                  max-height: 80em;
                  overflow: hidden;
                  display: inline-block}
-.form_header{cursor: move; height: 2em ; background-color:#000; color:#fff }
+.form_header{cursor: move; height: 2em ; background-color:#000; color:#fff; min-width:inherit; width: inherit}
 .form_header span{color: #fff}
 .apoco_form .form_header h5{display:inline; margin: 0;position: absolute; top:0.4em; left:0.4em  }
 

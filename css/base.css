@@ -301,7 +301,10 @@ dl{text-align:justify}
 code{font-size: 10pt}
 
 .Apoco_dialog{position: fixed; top: 50%; left: 50%; z-index: 1000; width: 20em; height: 12em}
-.Apoco_dialog div.ui-dialog-titlebar{height: 2em}
+.Apoco_dialog div.ui-dialog-titlebar{height: 2em; border-bottom: 1px solid}
+.Apoco_dialog div.ui-dialog-titlebar button{height:16px;width:16px}
+.Apoco_dialog div.ui-dialog-buttonset button{float:right}
+    
 #Apoco_datepicker{
     display: block;
     left: 36px;

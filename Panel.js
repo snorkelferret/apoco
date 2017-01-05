@@ -3,6 +3,7 @@ require("./Utils");
 require("./Popups");
 require("./Window");
 
+// change show to show hidden children if param is show_children
 ;(function() {
     'use strict';
     function check(ar){

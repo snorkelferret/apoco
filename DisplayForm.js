@@ -42,7 +42,7 @@ require("./DisplayFieldset");
             header.classList.add("form_header","ui-state-default", "ui-widget-header","ui-corner-all");
 	    this.element.appendChild(header);
 	    if(this.draggable !== false){
-                this.draggable=Apoco.Utils.draggable(this.element);
+                this.draggable=Apoco.Utils.draggable(this.element,undefined,header);
 	    }
             container=document.createElement("div");
             container.classList.add("form_scroll");
