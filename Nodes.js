@@ -7,6 +7,8 @@ require("./Types.js");
 ;(function(){
 
     var _Node=function(d,element){
+        var p;
+      //  console.log("Node got element " + element + " for " + d.node);
         if(!d){
             throw new Error("Apoco: node, No params");
         }
@@ -17,10 +19,23 @@ require("./Types.js");
 	    this[k]=d[k];
 	}
         _getNode[d.node](this);
+        if(element !== undefined){
+            p=element;
+        }
+        else{
+            p=this.element;
+        }
+        if(this.class){
+            if(Apoco.type["string"].check(this.class)){
+                p.classList.add(this.class);
+            }
+            else{
+                for(var i=0;i< this.class.length;i++){
+                   p.classList.add(this.class[i]);
+                }
+            }
+        }
 
-	if(this.class){
-	    this.element.classList.add(this.class);
-	}
 	if(this.id){
 	    this.element.id=this.id;
 	}
@@ -29,6 +44,7 @@ require("./Types.js");
             this.element.setAttribute("name",this.name);
         }
         if(element){
+        //    console.log("APPERNFING NODE TO ELEMENT " + element);
             element.appendChild(this.element);
         }
     };
@@ -202,6 +218,10 @@ require("./Types.js");
             }
             that.element=document.createElement("div"); 
 	    imm.onload=function(){
+                if(that.keepAspectRatio === false){
+                    that.element.appendChild(imm);
+                    return;
+                }
 	//	console.log("+++++ reader onload got width " + this.width + " " + this.height);
                 if(that.width){
                     this.width=that.width;

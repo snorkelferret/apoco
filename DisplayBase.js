@@ -6,10 +6,7 @@ require("./Fields");
 ;(function(){
 
     'use strict';
-    // these are the components allowed in display objects
   
-    var _display_components=["Field","Node","Tab","Grid","Menu"];
-
     Apoco.display={};  //setup container for display Objects
     
     var dp;
@@ -18,7 +15,8 @@ require("./Fields");
 	    parent: null,
 	    element: null,
 	    DOM: null,
-            id: null
+            id: null,
+            components:[]
 	};
         var that=this,t;
        
@@ -73,7 +71,10 @@ require("./Fields");
         };
         // if the execution depends on another node
         if(this.action){
-            if(this.dependsOn && !dp){
+            if( !this.dependsOn){
+                this.action(this);
+            }
+            else if((this.id !== this.dependsOn) && !dp){ // not depending on  itself being in DOM and element not in DOM
                 if(!Apoco.Observer){    // create an observer- only need one
                     Apoco.Utils.observer.create();
                     if(!Apoco.Observer){ 
@@ -84,11 +85,25 @@ require("./Fields");
                 Apoco.Observer.observe(b,{childList:true,subtree:true,attributes:true,attributeFilter:["id"]});
                 Apoco.Utils.observer.add(this.dependsOn, doit,this);
             }
-            else{ 
-                this.action(this);
+            // else the action is added to the show function below
+        }
+
+        this.element=document.createElement("div");
+        this.element.id=this.id;
+        
+        this.element.classList.add("apoco_"+this.display);   //,"ui-widget-content","ui-corner-all");
+        if(this.class){
+            if(Apoco.type["string"].check(this.class)){
+                this.element.classList.add(this.class);
+            }
+            else{
+                for(var i=0;i< this.class.length;i++){
+                    this.element.classList.add(this.class[i]);
+                }
             }
         }
 
+        
 	if(this.listen !== undefined){
 	    Apoco.IO.listen(this);  
 	}
@@ -98,51 +113,58 @@ require("./Fields");
     // var methods= {
     Apoco._DisplayBase.prototype={
 	getChildren: function(){
-	    var comp=[];
-            var k;
-            for(var i=0; i< _display_components.length;i++){
-                k=("get" + _display_components[i]);
-	        if(this[k]){
-                    if(comp.length === 0){
-                        comp=this[k]();
-                    }
-                    else{
-                        comp.concat(this[k]());
-                    }
-                  //  console.log("getChildren got " + comp.length);
-                    return comp; //this[k];
-	        }
+	    if(this.components){
+                return this.components;
             }
             return null;
         },
         getChild:function(name){
-            var k;
-            if(name !== undefined){
-                for(var i=0; i< _display_components.length;i++){
-                    var k=("get" + _display_components[i]);
-                    if(this[k]){
-                        return  this[k](name);
+            if(name !== undefined && this.components){
+                for(var i=0; i< this.components.length;i++){
+                  //  console.log("getChild i is " + i + " with name " + this.components[i].name);
+                    if(this.components[i].name == name){
+                        return this.components[i];
                     }
                 }
-                return null;
             }
             return null;
         },
         deleteChild:function(name,no_splice){
-            var k;
-            if(name !== undefined){
-                for(var i=0; i< _display_components.length;i++){
-                    k=("delete"+_display_components[i]); 
-                    if(this[k]){
-                        this[k](name);
-                        return true;
-                    }
+            var n,index=-1;
+            if(name === undefined){
+                throw new Error("DisplayMenu: deleteMenu needs a name");
+            }
+            for(var i=0;i<this.components.length;i++){
+               // console.log("++++++ before delete component " + i + " name " + this.components[i].name);
+                if(this.components[i].name == name){
+                    index=i;
+                 //   console.log("Found component to delete " + name + " with index " + index);
+                    break;
                 }
             }
-            else{
-                throw new Error("deleteChild- needs a name");
+            if(index === -1){
+                throw new Error("Display:deleteChild  Cannot find component " + name);
             }
+            this.components[index].element.parentNode.removeChild(this.components[index].element);
+            this.components[index].element=null;
+            if(no_splice === undefined){
+              //  console.log("SPLICING OUT COMPONENT");
+                this.components.splice(index,1);
+            }
+ 
             return null;
+        },
+        deleteChildren:function(){
+            for(var i=0;i<this.components.length;i++){
+                if(this.components[i].listen){
+                    Apoco.unsubscribe(this.components[i]);
+                }
+                this.components[i].element.parentNode.removeChild(this.components[i].element);
+            }
+            this.components.length=0;
+        },
+        deleteAll:function(){
+            this.deleteChildren();
         },
         _getMethods:function(){
             var m=[];
@@ -230,6 +252,10 @@ require("./Fields");
                     if(this._afterShow !== undefined){
                      //   console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
+                     }
+                    if(this.action !== undefined && this.id === this.dependsOn){
+                        console.log("RUNNNNINNNNNNNG this.action in show");
+                        this.action(this);
                     }
 		}
 	        else {

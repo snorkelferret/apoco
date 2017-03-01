@@ -17,7 +17,7 @@ require("./DisplayBase");
 
 
     var select_menu=function(that,index){
-        var name=that.menu[index].name;
+        var name=that.components[index].name;
         var p=that.getSibling();
         if(!p){
             throw new Error("Could not find siblings of " + that.parent.name);
@@ -35,29 +35,22 @@ require("./DisplayBase");
     ApocoMakeMenu.prototype={
 	_execute: function(){
             var s,u;
-
-            this.menu=[];
-            this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("menu","ui-widget-content","ui-corner-all");
             if(this.heading){
                 s=document.createElement("span");
                 s.textContent=this.heading;
                 this.element.appendChild(s);
             }
-	    if(this.list === undefined){
-                this.list=[];
-	    }
+
 //	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
-            u.classList.add("apoco_menu_list","ui-menu","ui-widget-content");
+            u.classList.add("apoco_menu_list","ui-menu");
             this.element.appendChild(u);
             
-	    for(var i=0;i<this.list.length;i++){
+	    for(var i=0;i<this.components.length;i++){
                 //  console.log("Making menu item " + i);
-                this.list[i].parent=this;
-                this.addMenu(this.list[i],u);
+                
+                this.addMenu(i,u);
             }
             if(this.selected){
                 this.select(this.selected);
@@ -65,10 +58,10 @@ require("./DisplayBase");
             else{
 	        this.selected=undefined;
             }
-            this.list.length=0; // for garbage collection
+           // this.components.length=0; // for garbage collection
 	},
 	update:function(name){
-	    var p=this.getMenu(name);
+	    var p=this.getChild(name);
 	    if(p !== null){
 		p.element.click();
 	    }
@@ -89,24 +82,25 @@ require("./DisplayBase");
                 p[i].classList.remove("selected","ui-state-active");
             }
         },
-	getMenu: function(name){
-            if(name !== undefined){
-	        for(var i=0;i<this.menu.length;i++){
-		    if(this.menu[i].name == name){
-		        return this.menu[i];
-		    }
-	        }
-                return null;
-            }
-	    return this.menu;
-	},
-        addMenu:function(d,parent_element){
-            var index,s,l,that=this;
+        addMenu:function(index,parent_element){
+            var d,s,l,that=this;
             if(parent_element === undefined){
                 parent_element=this.element.getElementsByClassName("apoco_menu_list")[0];
             }
-            index=this.menu.length;
-           // console.log("addMenu index is " + index);
+            if(Number.isInteger(index)){
+                d=this.components[index];
+            }
+            else{
+                d=index;
+                index=this.components.length;
+                //this.components[index]=d;
+            }        
+            l=d.label? d.label: d.name;
+            if(d.name && this.getChild(d.name) !== null && this.getChild(d.name).parent !== undefined){
+                throw new Error("DisplayMenu: Cannot add component with non-unique name " + d.name);
+            }
+            
+            //console.log("addMenu index is " + index);
             d.element=document.createElement("li");
             if(d.class){
                 d.element.classList.add(d.class);
@@ -120,22 +114,18 @@ require("./DisplayBase");
                 parent_element.appendChild(d.element);
             }
             else{
-                l=d.label? d.label: d.name;
-                if(this.getMenu(l) !== null){
-                    throw new Error("DisplayMenu: get Menu - menu already exists " + l);
-                }
 	        d.element.classList.add("ui-menu-item");
                 d.element.setAttribute("role","menuitem");
                 d.element.textContent=l;
-                //console.log("menu text is "+ d.element.textContent);
+              //  console.log("menu text is "+ d.element.textContent);
 	        d.parent=this;
                 parent_element.appendChild(d.element);
-                this.menu[index]=d;
+               // this.components[index]=d;
                 if(d.action === "default"){
                     d.action=select_menu;
                 }
                 if(d.action !==undefined){
-                    //console.log("menu has action " + this.menu[index].action);
+                    //console.log("menu has action " + this.components[index].action);
 	            d.element.addEventListener("click",
                                  function(t,that){
                                      return function(e){
@@ -151,40 +141,14 @@ require("./DisplayBase");
 	            // }(that,index),false);
                 }
 	    }
+            this.components[index]=d;
         },
-        deleteAll:function(){
-            for(var i=0;i<this.menu.length;i++){
-                if(this.menu[i].listen){
-                    Apoco.unsubscribe(this.menu[i]);
-                }
-                this.menu[i].element.parentNode.removeChild(this.menu[i].element);
-            }
-            this.menu.length=0;
-        },
-        deleteMenu:function(name){
-            var n,index=-1;
-            if(name === undefined){
-                throw new Error("DisplayMenu: deleteMenu needs a name");
-            }
-            for(var i=0;i<this.menu.length;i++){
-                if(this.menu[i].name === name){
-                    index=i;
-                  //  console.log("Found menu to delete " + name + " with index " + index);
-                    break;
-                }
-            }
-            if(index === -1){
-                throw new Error("DisplayMenu: deleteMenu Cannot find menu" + name);
-            }
-            this.menu[index].element.parentNode.removeChild(this.menu[index].element);
-            this.menu[index].element=null;
-            this.menu.splice(index,1);
-        },
+ 
 	select: function(val){
             var c;
-            for(var i=0;i<this.menu.length;i++){
-                if (this.menu[i].name == val){
-                    this.selected=this.menu[i];
+            for(var i=0;i<this.components.length;i++){
+                if (this.components[i].name == val){
+                    this.selected=this.components[i];
                     //           var el=this.element.find("ul li:nth-child(" + (i+1) + ")");
                     c=this.selected.element.parentNode.children;
                     for(var j=0;j<c.length;j++){

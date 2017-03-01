@@ -28,11 +28,11 @@ describe("DisplayTabs-(start without tab items)",function(){
     });
     it("can add a tab",function(){
         t.addTab({name:"tabOne"});
-        assert.strictEqual(t.getTab().length,1);
+        assert.strictEqual(t.getChildren().length,1);
     });
     it("can add another tab",function(){
         t.addTab({name:"tabTwo"});
-        assert.strictEqual(t.getTab().length,2);
+        assert.strictEqual(t.getChildren().length,2);
     });
     it("has a show method that puts the root element into the dom",function(){
         var b=document.getElementById("test_tabs");
@@ -47,8 +47,8 @@ describe("DisplayTabs-(start without tab items)",function(){
         assert.strictEqual(b.length,2);
     });
     it("can delete a tab",function(){
-        t.deleteTab("tabOne");
-        assert.strictEqual(t.getTab().length,1);
+        t.deleteChild("tabOne");
+        assert.strictEqual(t.getChildren().length,1);
     });
 });
 
@@ -61,7 +61,7 @@ describe("DisplayTabs",function(){
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.body.contains(b),true);
         t=Apoco.display.tabs({id:"test_tabs2",DOM:"test2",
-                               tabs:[{name:"tabOne",action:function(that,index){
+                               components:[{name:"tabOne",action:function(that,index){
                                    var p;
                                    if(that.element.style.visibility === "visible"){
                                        p="hidden";
@@ -99,13 +99,13 @@ describe("DisplayTabs",function(){
     });
     it("can add a tab",function(){
         t.addTab({name:"tabFour"});
-        assert.strictEqual(t.getTab().length,4);
+        assert.strictEqual(t.getChildren().length,4);
         var b=document.getElementById("test_tabs2").getElementsByTagName("li");
         assert.strictEqual(b.length,4);
     });
     it("can delete a tab",function(){
-        t.deleteTab("tabTwo");
-        assert.strictEqual(t.getTab().length,3);
+        t.deleteChild("tabTwo");
+        assert.strictEqual(t.getChildren().length,3);
     });
     it("can still execute the action function when clicked",function(){
         var b=document.getElementById("test_tabs2").getElementsByTagName("li")[0];

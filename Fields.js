@@ -52,6 +52,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             throw new Error("Field: element is not a html node");
         }
         this.element.classList.add(this.type);
+
+        if(this.class){
+            if(Apoco.type["string"].check(this.class)){
+                this.element.classList.add(this.class);
+            }
+            else{
+                for(var i=0;i< this.class.length;i++){
+                    this.element.classList.add(this.class[i]);
+                }
+            }
+        }
+        
 	this.element.setAttribute("name",this.name);
         if(this.title !== undefined){
             this.element.title=this.title;
@@ -207,7 +219,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(this.precision){
             this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
         }
-
+        if(this.placeholder){
+            this.input.setAttribute("placeholder",this.placeholder);
+        }
         if(this.required === true){
             this.input.required=true;
         }
@@ -1206,7 +1220,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     var ImageArrayField =function(d,element){
-        var that=this;
+        var that=this,rc=true;
         var new_values=[];
         this.promises=[];
         d.field="ImageArrayField";
@@ -1233,10 +1247,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.input.setAttribute("multiple","multiple");
 	    this.element.appendChild(this.input);
 	    this.input.addEventListener("change",function(e){
-                that._getImageFileSelect(e);
+                rc=that._getImageFileSelect(e);
             });
         }
-  
+        if(!rc){
+            Apoco.popup["dialog"]("Image Load Error","One or more of the selected files is not a readable image");
+        }
+        
         if(this.value && this.value.length>0){  // start pre-loading
             this.loadImages();
         }
@@ -1271,7 +1288,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             return promise;
         }, 
         _getImageFileSelect: function(evt){
-            var that=this;
+            var that=this,rc=true;
             var td=this.element.querySelector("div.thumbnails");
    	    //new_values.length=0; // reset array
 	    evt.stopPropagation();
@@ -1281,13 +1298,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 if (evt.target.files[i].type.match('image.*')) {
                     files.push(evt.target.files[i]);
                 }
+                else{
+                    rc=false;
+                }
             }
             var count=that.value.length;
 	    var last=count+files.length;
 	    for (var i=count,j=0; i<last; i++,j++) {
 		var reader = new FileReader();
 		reader.onload = (function(f,num) {
-                    console.log("getImagefileselect  file is  %j",f);
+                 //   console.log("getImagefileselect  file is  %j",f);
 		    return function(e) {
                         var p;
 			e.stopPropagation();
@@ -1300,6 +1320,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		})(files[j],i);
 		reader.readAsDataURL(files[j]);
 	    }
+            return rc;
         },
         loadImages: function(values){
             var i=0,last,that=this;

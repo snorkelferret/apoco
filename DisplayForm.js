@@ -22,14 +22,16 @@ require("./DisplayFieldset");
     // overwrite methods from base class
     ApocoMakeForm.prototype={
 	_execute: function(){
-	    var that=this,fp,header,container,fc,h;
-            
+	    var that=this,fp,lp,header,container,fc,h;
+            /*console.log("make foem is here");
             this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("apoco_form","resizable","ui-widget-content","ui-corner-all");
-            if(this.class !== undefined){
+            this.element.id=this.id;   
+             if(this.class !== undefined){
                 this.element.classList.add(this.class);
             }
+             */
+            this.element.classList.add("apoco_form","resizable"); //"ui-widget-content","ui-corner-all");
+      
             if(!this.height){
                 this.height=400;
             }
@@ -71,15 +73,10 @@ require("./DisplayFieldset");
             
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
-                    this.components[i].parent=that;
-	            if(this.components[i].node){
-                        this.addNode(this.components[i],fp);
-		    }
-	            else if(this.components[i].field || this.components[i].type){
-	                this.addField(this.components[i],fp);
-		    }
+                    lp=document.createElement("li");
+                    console.log("FORM CREATES ELEMENT " + lp);
+                    this.addChild(i,lp,fp);
                 }                   
-                this.components.length=0; // delete
             }
         
 	    if(this.buttons){
@@ -97,79 +94,7 @@ require("./DisplayFieldset");
                 this.buttons=[];
             }
 	},
-        addNode:function(d,parent_element){
-            var n;
-            var ll=document.createElement("li");
-            if(parent_element === undefined){
-                parent_element=this.element.querySelector("ul.apoco_form_list");
-            }
-            if(d.name && this.getNode(d.name)!==null){
-                    throw new Error("Cannot add node with non-unique name");
-            }
-            if(d.element && d.element.length>0){
-                //console.log("ELEMENT ALREADY EXISTS");
-                if(!d.node){
-                    throw new Error("Apoco.displayFieldset: addNode - object is not a node");
-                }
-                n=d;
-            }
-            else{
-                n=Apoco.node(d,ll);
-            }
-            if(n){
-                if(!n.element){
-                    throw new Error("DisplayForm.addNode element is null");
-                }
-                parent_element.appendChild(ll);
-              
-	        this.nodes.push(n);
-                return n;
-            }
-            else{
-                throw new Error("Apoco,fieldset, doesn't know how to make " + d.node);
-            }
-            return n;
-        },
-        addField: function(d,parent_element){
-            var p;
-            var ll=document.createElement("li");
-            if(parent_element === undefined){
-                parent_element=this.element.querySelector("ul.apoco_form_list");
-            }
-            if(!d.field){
-                if(d.type){
-                    d.field=Apoco.type[d.type].field;
-                }
-                else{
-                    throw new Error("Must supply either a field or a type");
-                }
-            }
-           // console.log("making field " + d.field);
-            if(this.getField(d.name)!== null){
-                throw new Error("Cannot add field with non-unique name " + d.name);
-            }
-            if(Apoco.field.exists(d.field)){
-                // check that the field has not already been created
-                if(d.element){
-                   // console.log("ELEMENT ALREADY EXISTS");
-		    p=d;
-                }
-                else{
-                    p=Apoco.field[d.field](d,ll);
-                }
-		if(!p){
-		    throw new Error("Cannot make field " + d.field);
-		}
-            }
-            else{
-                throw new Error("no field of type " + d.field + " exists");
-            }
-            
-	    this.fields.push(p);
-	    parent_element.appendChild(p.element);
-            
-            return p;
-        },
+   
         addButton:function(d){
             var index,r,b;
             d.node="button";
@@ -208,16 +133,7 @@ require("./DisplayFieldset");
             return this.buttons;
         },
         deleteAll:function(){
-            for(var i=0;i<this.fields.length;i++){
-                this.fields[i].delete();
-            }
-            this.fields.length=0;
-            for(var i=0;i<this.nodes.length;i++){
-                if(this.nodes[i].element.parentNode){
-                    this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
-                }
-            }
-            this.nodes.length=0;
+            this.deleteChildren();
 	    for(var i=0;i<this.buttons.length;i++){
                 if(this.buttons[i].element.parentNode){
                     this.buttons[i].element.parentNode.removeChild(this.buttons[i].element);

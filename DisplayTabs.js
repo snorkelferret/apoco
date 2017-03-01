@@ -31,27 +31,20 @@ require("./DisplayBase.js");
 	_execute: function(){
             var tt=[],tablist;
 	    // console.log("execute of DisplayTabs");
-	   
-            this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("tab_container","ui-tabs","ui-widget-content","ui-corner-all");
-	    if(!this.tabs){
-	        this.tabs=[];
-	    }
 	    //console.log("Tabs creating new element");
 	    
             tablist=document.createElement("ul");
             tablist.role="tablist";
             tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
             // make a copy of the tabs
-            for(var i=0;i<this.tabs.length;i++){
-                tt[i]=this.tabs[i];
+            for(var i=0;i<this.components.length;i++){
+                tt[i]=this.components[i];
             }
-            this.tabs.length=0;  // so we can put them back in clean container
+          //  this.components.length=0;  // so we can put them back in clean container
             this.element.appendChild(tablist);
             for(var i=0;i<tt.length;i++){
             //    console.log("add a tab with index " + i);
-                this.addTab(tt[i],tablist);
+                this.addTab(i,tablist);
 	    }
             if(this.selected){
                 this.select(this.selected);
@@ -60,22 +53,38 @@ require("./DisplayBase.js");
 	},
         addTab:function(t,tablist){
             var label,index,s,that=this;
-            t.label?label=t.label: label=t.name;
+        
             if(tablist === undefined){
                 tablist=this.element.querySelector("ul.ui-tabs-nav");
             }
-            index=this.tabs.length;
+            if(Number.isInteger(t)){
+                t=this.components[t];
+            }
+            else{
+                index=this.components.length;
+                this.components[index]=t;
+            }
+            t.label?label=t.label: label=t.name;   
 	    t.element=document.createElement("li");
             t.element.classList.add("ui-state-default","ui-corner-top");
+            t.element.setAttribute("name",t.name);
+
             if(t.class){
-                t.element.classList.add(t.class);
+                if(Apoco.type["string"].check(t.class)){
+                    t.element.classList.add(t.class);
+                }
+                else{
+                    for(var i=0;i< t.class.length;i++){
+                        t.element.classList.add(t.class[i]);
+                    }
+                }
             }
             s=document.createElement("span");
             s.textContent=label;
             t.element.appendChild(s);
 	    t.parent=this;
-            this.tabs[index]=t;
-            this.tabs[index].parent=this;
+         //   this.components[index]=t;
+          //  this.components[index].parent=this;
             if(t.action){
                 t.element.addEventListener("click",function(e){
                   
@@ -88,52 +97,11 @@ require("./DisplayBase.js");
              }
  	    tablist.appendChild(t.element);
         },
-        getTab:function(name){
-            if(name !== undefined){
-                for(var i=0;i<this.tabs.length;i++){
-                    if(this.tabs[i].name === name){
-                        return this.tabs[i];
-                    }
-                }
-                return null;
-            }
-            return this.tabs;
-        },
-        deleteAll:function(){
-            for(var i=0;i<this.tabs.length;i++){
-                if(this.tabs[i].listen){
-                    Apoco.unsubscribe(this.tabs[i]);
-                }
-                this.tabs[i].element.parentNode.removeChild(this.tabs[i].element);
-                this.tabs[i].element=null;
-            }
-            this.tabs.length=0;
-        },
-        deleteTab:function(name){
-            var index=-1;
-            if(name === undefined){
-                throw new Error("DisplayTabs: deleteTab - needs a name");
-            }
-            for(var i=0;i<this.tabs.length;i++){
-                if(this.tabs[i].name === name){
-                    index=i;
-                    break;
-                }
-            }
-            if(index === -1){
-                throw new Error("DisplayTabs: deleteTab - cannot find name " + name);
-            }
-            if(this.tabs[i].listen){
-                    Apoco.unsubscribe(this.tabs[i]);
-            }
-            this.tabs[index].element.parentNode.removeChild(this.tabs[index].element);
-            this.tabs[index].element=null;
-            this.tabs.splice(index,1);
-        },
+ 
 	update:function(name){
-	    for(var i=0;i<this.tabs.length;i++){
-		if(this.tabs[i].name == name){
-		    var p=this.tabs[i].name;
+	    for(var i=0;i<this.components.length;i++){
+		if(this.components[i].name == name){
+		    var p=this.components[i].name;
 		    break;
 		}
 	    }
@@ -151,21 +119,21 @@ require("./DisplayBase.js");
             return null;
         },
 	select: function(name){
-	    for(var i=0;i<this.tabs.length;i++){
-             	if(this.tabs[i].name == name){
-                    this.selected=this.tabs[i];
-		    this.tabs[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
-                    this.tabs[i].element.classList.remove("ui-state-default");
+	    for(var i=0;i<this.components.length;i++){
+             	if(this.components[i].name == name){
+                    this.selected=this.components[i];
+		    this.components[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
+                    this.components[i].element.classList.remove("ui-state-default");
 		}
 		else{
-                    this.tabs[i].element.classList.add("ui-state-default");
-		    this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
+                    this.components[i].element.classList.add("ui-state-default");
+		    this.components[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
 		}
 	    }
 	},
         reset:function(){
-            for(var i=0;i<this.tabs.length;i++){
-                this.tabs[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
+            for(var i=0;i<this.components.length;i++){
+                this.components[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
             }
             this.selected=null;
         }

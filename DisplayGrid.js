@@ -651,9 +651,6 @@ jsonishData={
 	_execute:function(){
             var rows,body,r,that=this;
             // var t0=performance.now();
-            this.element=document.createElement("div"); 
-            this.element.id=this.id;
-            this.element.classList.add("grid","ui-widget-content");
             // make the header
             this.colElement=document.createElement("div");
             this.colElement.classList.add("head");
@@ -888,6 +885,20 @@ jsonishData={
                 }
             }
             return null;
+        },
+        getChild:function(key,group,closest){
+            var t=this.getRow(key,group,closest);
+            return t;
+        },
+        getChildren:function(group){
+            var grid;
+            if(group && group !== null){
+                grid=this.getGrid(group);
+            }
+            else{
+                grid=this.grid[0];
+            }
+            return   grid.rows;
         },
 	updateRow: function(cell_data){
 	    var row,subGrid,index,g;

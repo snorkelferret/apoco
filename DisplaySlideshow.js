@@ -16,7 +16,9 @@ require("./DisplayBase");
             fadeDuration: 2000,
             current: 0,
             controls: true,
-            fit_to: "height"
+            fit_to: "height",
+            keepAspectRatio: true,
+            sideArrows: false
 	};
 	var f,that=this;
  
@@ -45,13 +47,13 @@ require("./DisplayBase");
             this.thumbnails=document.createElement("div"); 
             this.thumbnails.classList.add("thumbnails");
         }
-        if(this.values){  // start preloading images
+        if(this.components){  // start preloading images
      //       console.log("got some values");
             f=Apoco.field["imageArray"]({name:"slideshow"});
             if(!f){
                 throw new Error("Slideshow: cannot make imageArray");
             }
-            this.promises=f.loadImages(this.values);
+            this.promises=f.loadImages(this.components);
         }
         else if(this.editable === true){   // put up file browser to select images 
             f=Apoco.field["imageArray"]({name:"slideshow",editable: this.editable});
@@ -90,7 +92,28 @@ require("./DisplayBase");
             if(e.type == "visibilitychange"){
                 this._isVisible(e);
             }
-        }, 
+        },
+        _sideArrows:function(){
+            var p,q,t=["right","left"],that=this;
+            var doit=function(e){
+                e.stopPropagation();
+                if(e.target.classList.contains("left")){
+                    that.step("next");
+                }
+                else{
+                    that.step("next");
+                }
+            };
+            for(var i=0;i<2;i++){
+                p=document.createElement("div");
+                p.classList.add(t[i]);
+                p.classList.add("arrow");
+                q=document.createElement("i");
+                p.appendChild(q);
+                this.element.appendChild(p);
+                p.addEventListener("click",doit);
+            }
+        },
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
@@ -148,6 +171,10 @@ require("./DisplayBase");
         _calculateCover:function(v){
             
             var ar,w,h;
+            if(this.keepAspectRatio === false){
+                return;
+            }
+                
             w=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
             h=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
             this.width=parseInt(w);
@@ -167,12 +194,16 @@ require("./DisplayBase");
             if(this.fit_to === "width"){
                 this._setToWidth(v,ar);
             }
+            else if(this.fit_to === "height"){
+                this._setToHeight(v,ar);
+            }
             else if(v.aspect_ratio > ar){
                 this._setToWidth(v,ar);
             }
             else{
-                this._setToHeight(v,ar);
+                  this._setToHeight(v,ar);
             }
+     
         },
    
         _setToHeight:function(v,ar){
@@ -191,42 +222,42 @@ require("./DisplayBase");
         _setToWidth:function(v,ar){
             var w,h,that=this;
             v.SSimage.style.margin="0"; // reset the margin
-          //  console.log("FIT to WIDTH");
+            console.log("FIT to WIDTH");
             h=this.width/v.aspect_ratio;
-          //  console.log("need height " + h);
+           console.log("need height " + h);
             if(this.height< h && this.fit_to=== "width"){
                 h=parseInt(h);
-            //    console.log("setting height to " + h);
+                console.log("setting height to " + h);
                 this.element.style.height=(h + "px");
                 this.height=h;
-              //  console.log("this.height " + this.height);
+                console.log("this.height " + this.height);
             }
            // console.log("image aspect ration is " + v.aspect_ratio + " and window is " + ar);
 	  //  console.log("new image height is " + h);
             w=((that.width).toString() + "px");
-          //  console.log("new image width is " + w);
+             console.log("new image width is " + w);
             v.SSimage.style.width=(w + "px");
             v.SSimage.style.height=(h + "px");
             if(this.fit_to !== "width"){
 	        h=(that.height-h)/2;
                 v.SSimage.style.marginTop=(h + "px"); 
                 v.SSimage.style.marginBottom=(h + "px");
-            }
+            } 
         },
         _afterShow:function(){ //set the width and height when it has been determined
             var that=this,lis=[];
            // console.log("AFTER SHOW IS HERE ");
          
-            for(var i=0;i<this.values.length;i++){
-             //   console.log("after show calc " + i + " this loaded is " + this.values[i].loaded);
-                if(this.values[i].loaded){
+            for(var i=0;i<this.components.length;i++){
+             //   console.log("after show calc " + i + " this loaded is " + this.components[i].loaded);
+                if(this.components[i].loaded){
                 //    console.log("Values loaded = going to calculate cover");
-                    this._calculateCover(this.values[i]);
+                    this._calculateCover(this.components[i]);
                 }
             }
             lis=that.slideshow_container.querySelectorAll("li.slide");
                   //  console.log("lis is " + lis + " lis.length " + lis.length);
-            if(lis.length !== that.values.length){
+            if(lis.length !== that.components.length){
 	        throw new Error("Slideshow: slide lis do not exist");
             }
             
@@ -244,35 +275,38 @@ require("./DisplayBase");
                 else{
                     that.play();
                 }
-            };
+            }
+            else{ // show the first image
+                if(this.components.length>0){
+                    this.components[0].element.style.visibility="visible";
+                    this.current=0;
+                }
+            }
           
             
         },
 	_execute: function(){
-            var that=this,l,temp,pp;
+            var that=this,temp,pp;
 	 //   console.log("execute of DisplaySlideshow");
-	    this.element=document.createElement("div"); 
-            this.element.id=this.id;
-            this.element.classList.add("Apoco_slideshow","ui-widget-content","ui-corner-all");
             this.slideshow_container=document.createElement("div");
             this.slideshow_container.classList.add("slideshow","pic_area");
 	    this.element.appendChild(this.slideshow_container);
             var car=document.createElement("ul");
             car.classList.add("carousel");
  	    that.slideshow_container.appendChild(car);
-            for(var i=0;i<this.values.length;i++){ //create containers for images
-                l=document.createElement("li");
-                l.classList.add("slide");
-                car.appendChild(l);
-                this.values[i].SSimage=document.createElement("img");
-                l.appendChild(this.values[i].SSimage);
-                that.values[i].SSimage.parentElement.style.visibility="hidden";
+            for(var i=0;i<this.components.length;i++){ //create containers for images
+                this.components[i].element=document.createElement("li");
+                this.components[i].element.classList.add("slide");
+                car.appendChild(this.components[i].element);
+                this.components[i].SSimage=document.createElement("img");
+                this.components[i].element.appendChild(this.components[i].SSimage);
+                this.components[i].SSimage.parentElement.style.visibility="hidden";
                
-                if(this.values[i].text){
+                if(this.components[i].text){
                     temp=document.createElement("div");
-                    l.appendChild(temp);
+                    this.components[i].element.appendChild(temp);
                     pp=document.createElement("p");
-                    pp.textContent=this.values[i].text;
+                    pp.textContent=this.components[i].text;
                     temp.appendChild(pp);
                     this.hasText=true;
                 }
@@ -289,16 +323,17 @@ require("./DisplayBase");
             }
             if(that.controls === true){
                 that._controls();
-            }   
-            document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images
-          
-     
+            }
+            if(that.sideArrows === true){
+                that._sideArrows();
+            }
+           // document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images
         },
         deleteAll:function(){
             // delete all the images
-            if(this.values){
-                for(var i=0;i<this.values;i++){
-                    this.slideshow_container.removeChild(this.values[i].SSimage);
+            if(this.components){
+                for(var i=0;i<this.components;i++){
+                    this.slideshow_container.removeChild(this.components[i].SSimage);
                 }
             }
             while(this.element.firstChild){
@@ -399,32 +434,32 @@ require("./DisplayBase");
 //            var step=parseInt(this.fadeDuration/n);
 
          //   console.log("fade step is " + st + " fade duration  is " + n*st);
-            that.values[next].SSimage.parentElement.style.visibility="visible";
-           // that.values[next].SSimage.parentElement.style.position="absolute";
-            that.values[next].SSimage.parentElement.style.top=0;
-            that.values[next].SSimage.parentElement.style.left=0;
-            that.values[next].SSimage.parentElement.style.opacity = op;
-            that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+            that.components[next].element.style.visibility="visible";
+           // that.components[next].SSimage.parentElement.style.position="absolute";
+            that.components[next].element.style.top=0;
+            that.components[next].element.style.left=0;
+            that.components[next].element.style.opacity = op;
+            that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
             
             timer = setInterval(function() {
                 if (op >= 1.0) {
                     clearInterval(timer);
-                   // that.values[prev].SSimage.parentElement.style.position="absolute";
-                    that.values[prev].SSimage.parentElement.style.visibility="hidden";
-                    that.values[prev].SSimage.parentElement.style.opacity=1;
-                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + 100 + ")";
+                   // that.components[prev].SSimage.parentElement.style.position="absolute";
+                    that.components[prev].element.style.visibility="hidden";
+                    that.components[prev].element.style.opacity=1;
+                    that.components[prev].element.style.filter = 'alpha(opacity=' + 100 + ")";
                 }
                 else{
-                    that.values[prev].SSimage.parentElement.style.opacity = (1-op);
-                    that.values[prev].SSimage.parentElement.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
-                    that.values[next].SSimage.parentElement.style.opacity = op;
-                    that.values[next].SSimage.parentElement.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                    that.components[prev].element.style.opacity = (1-op);
+                    that.components[prev].element.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                    that.components[next].element.style.opacity = op;
+                    that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
                     op += op * inc;
                 }
             }, step);
         },
         step: function(dir,caller){
-            var num=this.values.length;
+            var num=this.components.length;
             var next,prev=this.current;
             if(dir==="next"){
                 if(this.current>=(num-1)){
@@ -444,15 +479,15 @@ require("./DisplayBase");
             }
             next=this.current;
          //  console.log("step - prev " + prev + " next " + next);
-            if(this.fade === false  || caller !== "play"){  // don't do crossfade if just stepping thru the images
-               // this.values[prev].SSimage.parentElement.style.position="absolute";
-                this.values[prev].SSimage.parentElement.style.visibility="hidden";
-                this.values[next].SSimage.parentElement.style.visibility="visible"; 
-               // this.values[next].SSimage.parentElement.style.position="absolute";
-                this.values[next].SSimage.parentElement.style.opacity=1;
-                this.values[next].SSimage.parentElement.style.filter = "alpha(opacity=100)";
-                this.values[next].SSimage.parentElement.style.top=0;
-                this.values[next].SSimage.parentElement.style.left=0;
+            if(this.fade === false ){ // || caller !== "play"){  // don't do crossfade if just stepping thru the images
+               // this.components[prev].SSimage.parentElement.style.position="absolute";
+                this.components[prev].element.style.visibility="hidden";
+                this.components[next].element.style.visibility="visible"; 
+               // this.components[next].SSimage.parentElement.style.position="absolute";
+                this.components[next].element.style.opacity=1;
+                this.components[next].element.style.filter = "alpha(opacity=100)";
+                this.components[next].element.style.top=0;
+                this.components[next].element.style.left=0;
             }
             else{
                 this._crossFade(prev,next);

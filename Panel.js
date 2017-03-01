@@ -183,10 +183,10 @@ require("./Window");
                 }
             }
             var c=p.getChildren();
+            if(c === null){
+                return;
+            }
             for(var i=0;i<c.length;i++){
-               // if(!$.contains(window.document.body,c[i].element)){
-              //        c[i].DOM.append(c[i].element);
-                //  }
                 if(c[i].hidden !== true){
                     c[i].show();
                 }
@@ -244,6 +244,9 @@ require("./Window");
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
             var c=p.getChildren();
+            if(c === null){
+                return;
+            }
             for(var i=0;i<c.length;i++){
                 c[i].hide();
             }

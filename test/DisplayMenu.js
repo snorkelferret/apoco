@@ -33,18 +33,18 @@ describe("DisplayMenu-(start without menu items)",function(){
         assert.strictEqual(document.body.contains(b),true);
     });
     it("can add a menu item",function(){
-        assert.strictEqual(t.getMenu().length,0);
+        assert.strictEqual(t.getChildren().length,0);
         t.addMenu({name:"port"});
-        assert.strictEqual(t.getMenu().length,1);
+        assert.strictEqual(t.getChildren().length,1);
     });
     it("has added a menu item to the DOM",function(){
         var b=document.getElementById("test_menu").getElementsByClassName("ui-menu-item");
         assert.strictEqual(b.length,1);
     });
     it("can delete a menu item",function(){
-        assert.strictEqual(t.getMenu().length,1);
-        t.deleteMenu("port");
-        assert.strictEqual(t.getMenu().length,0);
+        assert.strictEqual(t.getChildren().length,1);
+        t.deleteChild("port");
+        assert.strictEqual(t.getChildren().length,0);
     });
     it("can delete itself",function(){
         var b=document.getElementById("test_menu");
@@ -64,7 +64,7 @@ describe("DisplayMenu",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
        
-        t=Apoco.display.menu({id:"test_menu",DOM:"test",list:[{name:"one"},
+        t=Apoco.display.menu({id:"test_menu",DOM:"test",components:[{name:"one"},
                                                                {name:"two",
                                                                 action:function(that){
                                                                     that.element.textContent="clicked";
@@ -88,9 +88,9 @@ describe("DisplayMenu",function(){
     });
     
     it("can add a menu item",function(){
-        assert.strictEqual(t.getMenu().length,3);
+        assert.strictEqual(t.getChildren().length,3);
         t.addMenu({name:"port"});
-        assert.strictEqual(t.getMenu().length,4);
+        assert.strictEqual(t.getChildren().length,4);
     });
     it("has put the added menu into the DOM",function(){
         var b=document.getElementById("test_menu").getElementsByTagName("li");
@@ -98,9 +98,9 @@ describe("DisplayMenu",function(){
     });
     
     it("can delete a menu item",function(){
-        assert.strictEqual(t.getMenu().length,4);
-        t.deleteMenu("one");
-        assert.strictEqual(t.getMenu().length,3);
+        assert.strictEqual(t.getChildren().length,4);
+        t.deleteChild("one");
+        assert.strictEqual(t.getChildren().length,3);
     });
     it("has removed the deleted menu from the DOM",function(){
         var b=document.getElementById("test_menu").getElementsByTagName("li");
@@ -109,7 +109,7 @@ describe("DisplayMenu",function(){
 
     
     it("has added menus to the dom",function(){
-        assert.strictEqual(t.getMenu().length,3);
+        assert.strictEqual(t.getChildren().length,3);
         var b=document.getElementById("test_menu");
         assert.isObject(b);
         var c=b.querySelectorAll("li");
@@ -119,13 +119,13 @@ describe("DisplayMenu",function(){
     it("has a callback ",function(){
         var b=document.getElementById("test_menu").getElementsByTagName("li")[1];
         assert.isObject(b);
-        var b=t.getMenu("two").element;
+        var b=t.getChild("two").element;
         b.click();
         assert.strictEqual(b.textContent,"clicked");
     });
     it("has set the selected menu",function(){
         var b=t.getSelected().element;
-        var c=t.getMenu("two").element;
+        var c=t.getChild("two").element;
         assert.strictEqual(b,c);
     });
     

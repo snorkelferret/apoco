@@ -24,138 +24,78 @@ require("./Nodes.js");
     ApocoMakeFieldset.prototype={
 	_execute: function(){
 	    var el,p,that=this;
-	    this.element=document.createElement("div");
-            this.element.id=this.id;
-            this.element.classList.add("field_container","ui-widget-content","ui-corner-all");
-            
-            if(this.components !== undefined){
-                for(var i=0;i<this.components.length;i++){
-                //    this.components[i].parent=that;
-                    el=document.createElement("div");
-                    el.classList.add("fieldset");
-                    if(this.components[i].class){
-                        el.classList.add(this.components[i].class);
-                    }
- 	            if(this.components[i].node){
-                        this.addNode(this.components[i],el);
-		    }
-	            else if(this.components[i].field || this.components[i].type){
-	                p=this.addField(this.components[i],el);
-		    }
-                }
-                this.components.length=0; // delete
+            //            console.log("length of components is " + this.components.length);
+            for(var i=0;i<this.components.length;i++){
+              //  console.log("++++ adding child +++++ " + i);
+                el=document.createElement("div");
+               // el.classList.add("fieldset_child");
+  	        this.addChild(i,el);
             }
-            else{
-                console.log("components for " + this.id + " is undefined");
-            }
+           // console.log("length of components is NOW " + this.components.length);
 	},
         _afterShow:function(){
             // put the focus on the first field
-            if(this.fields && this.fields.length>0){
-                var e=this.fields[0].getElement();
-                var d=e.getElementsByTagName("input")[0];
-                if(d){
-                    d.focus();
+            if(this.components && this.components.length>0){
+                for(var i=0;i<this.components.length;i++){
+                    if(this.components[i].field){
+                        var e=this.components[i].getElement();
+                        var d=e.getElementsByTagName("input")[0];
+                        if(d){
+                            d.focus();
+                        }
+                        break;
+                    }
                 }
             }
         },
-	getChildren: function(){
-	    var comp;
-            var comp=this.getField();
-           // console.log("fiels is %j",comp);
-            var c=this.getNode();
-           // console.log("node is %j",c);
-            if(comp.length > 0){
-                comp.concat(c);
-                return comp;
+        addChild:function(index,el,parent_element){
+            var n,d,p;
+            if(Number.isInteger(index)){
+                d=this.components[index]; 
             }
-          //  console.log("returning %j",c);
-            return c;
-        },
-        getChild:function(name){
-            var k;
-            if(name !== undefined){
-                k=this.getField(name);
-                if(k !==null && !Apoco.type["array"].check(k)){
-                    return k;
-                }
-                k=this.getNode(name);
-                if(k !==null && !Apoco.type["array"].check(k)){
-                    return k;
-                }
-                return null;
+            else{
+                d=index;
+                index=this.components.length;
+              //  console.log("adding to components " + index);
+            }
+            if(d.name && this.getChild(d.name) !== null && this.getChild(d.name).parent !== undefined){
+                throw new Error("Cannot add component with non-unique name " + d.name);
+            }
+            if(el === undefined && this.display == "form"){
+                el=document.createElement("li");
+            }
+            if(!parent_element){
+                    parent_element=this.element;
             }
             
-            return this.getChildren();
-        },
-	getField: function(name){
-            if(name !== undefined){
-                for(var i=0;i<this.fields.length;i++){
-                    if(this.fields[i].name === name){
-                        return this.fields[i];
-                    }
-                }
-                return null;
-            }
-	    return this.fields;
-	},
-        getNode:function(name){  //nodes don't have to have a name
-            if(name !== undefined){
-                for(var i=0;i<this.nodes.length;i++){
-                    if(this.nodes[i].name !== undefined && this.nodes[i].name === name){
-                        return this.nodes[i];
-                    }
-                }
-                return null;
-            }
-            return this.nodes;
-        },
-        deleteChild:function(name){
-            if(name !== undefined){
-                //is it a node or a field?
-                if(this.getNode(name)!== null){
-                    console.log("getNode got %j" + this.getNode(name));
-                    this.deleteNode(name);
-                }
-                else if(this.getField(name)!== null){
-                    console.log("getField got %j" + this.getField(name));
-                    this.deleteField(name);
-                }
-                else {
-                    throw new Error("DisplayFieldset: deleteChild cannot find " + name);
-                }
-            }
-            else{
-                throw new Error("deleteChild- needs a name");
-            }              
-
-        },
-        addChild:function(d,el){
             if(d.node){
-                this.addNode(d,el);
+                 n=Apoco.node(d,el);
             }
-            else{
-                this.addField(d,el);
-            }
-        },
-        addNode:function(d,el){
-            var n,parent_element;
-            if(d.name && this.getNode(d.name)!==null){
-                throw new Error("Cannot add node with non-unique name");
-            }
-            if(d.element){
-                if(!d.node){
-                    throw new Error("Apoco.displayFieldset: addNode - object is not a node");
+            else if(d.field || d.type){
+                if(!d.field){
+                    d.field=Apoco.type[d.type].field;
                 }
-                n=d;
+                if(Apoco.field.exists(d.field)){
+                    n=Apoco.field[d.field](d,el);
+                }
+                else{
+                    throw new Error("no field of type " + d.field + " exists");
+                }
             }
             else{
-                n=Apoco.node(d,el);
+                throw new Error("Apoco.displayFieldset: meed to specify node type or field");
             }
             if(n){
                 n.parent=this;
-                this.element.appendChild(n.element);
-	        this.nodes.push(n);
+              
+                p=n.element.parentNode; //this is for node entries which use the el parm as a parent not the root this.element like fields
+                if(p){
+                    parent_element.appendChild(p);
+                }
+                else{
+                    parent_element.appendChild(n.element);
+                }
+	        this.components[index]=n;
                 return n;
             }
             else{
@@ -163,126 +103,33 @@ require("./Nodes.js");
             }
             return null;
         },
-        deleteNode: function(name){
-            var n,index=-1;
-            if(name === undefined){
-                throw new Error("DisplayFieldset: deleteNode - must supply a name");
-            }
-            for(var i=0;i<this.nodes.length;i++){
-                if(this.nodes[i].name === name){
-                    index=i;
-                    break;
-                }
-            }
-            if(index===-1){
-                throw new Error("DisplayFieldset: deleteNode cannot find " + name);
-            }
-            this.nodes[index].element.parentNode.removeChild(this.nodes[index].element);
-            this.nodes[index].element=null;
-            this.nodes.splice(index,1);
-        },
-        addField: function(d,el){
-            var p,parent_element;
-            if(!d.field){
-                if(d.type){
-                    d.field=Apoco.type[d.type].field;
-                }
-                else{
-                    throw new Error("Must supply either a field or a type");
-                }
-            }
-           // console.log("making field " + d.field);
-            if(this.getField(d.name)!== null){
-                throw new Error("Cannot add field with non-unique name " + d.name);
-            }
-            if(Apoco.field.exists(d.field)){
-                // check that the field has not already been created
-                if(d.element){
-		    p=d;
-                }
-                else{
-                    p=Apoco.field[d.field](d,el);
-                    p.parent=this;
-                }
-		if(!p){
-		    throw new Error("Cannot make field " + d.field);
-		}
-            }
-            else{
-                throw new Error("no field of type " + d.field + " exists");
-            }
- 	    this.fields.push(p);
-            //console.log("adding field " + d.name);
-	    this.element.appendChild(p.element);
-            
-            return p;
-        },
-        deleteAll:function(){
-            for(var i=0;i<this.fields.length;i++){
-               /* if(this.fields[i].listen){
-                    Apoco.unsubscribe(this.fields[i]);
-                }
-                //this.fields[i].element.empty();
-                this.fields[i].element.parentNode.removeChild(this.fields[i].element); */
-                this.fields[i].delete();
-            }
-            this.fields.length=0;
-            for(var i=0;i<this.nodes.length;i++){
-                if(this.nodes[i].listen){
-                    Apoco.unsubscribe(this.nodes[i]);
-                }
-                if(this.nodes[i].element.parentNode){
-                    //this.nodes[i].element.empty();
-                    //this.nodes[i].element.remove();
-                    this.nodes[i].element.parentNode.removeChild(this.nodes[i].element);
-                }
-            }
-            this.nodes.length=0;
-        },
-        deleteField:function(name){
-            var n,index=-1;
-            if(name === undefined){
-                throw new Error("DisplayFieldset: deleteNode - must supply a name");
-            }
-            for(var i=0;i<this.fields.length;i++){
-                if(this.fields[i].name === name){
-                    index=i;
-                    break;
-                }
-            }
-            if(this.fields[index].listen){
-                    Apoco.unsubscribe(this.fields[i]);
-            }
-            if(index===-1){
-                throw new Error("DisplayFieldset: deleteNode cannot find " + name);
-            }
-            //this.fields[index].element.remove();
-            this.fields[index].element.parentNode.removeChild(this.fields[index].element);
-            this.fields[index].element=null;
-            this.fields.splice(index,1);
-        },
         getJSON: function(){
             var js={};
-	    for(var i=0; i<this.fields.length; i++){
-             //   console.log("this field required is " + this.fields[i].required);
-                if(this.fields[i].required){
-                    if(this.fields[i].checkValue() !== true){
-                        return null;
+	    for(var i=0; i<this.components.length; i++){
+             //   console.log("this field required is " + this.components[i].required);
+                if(this.components[i].field){
+                    if(this.components[i].required){
+                       // console.log("return from checkValue is " + this.components[i].checkValue() );
+                        if(this.components[i].checkValue() !== true){
+                            return null;
+                        }
                     }
+		    js[ this.components[i].getKey()]=this.components[i].getValue();
                 }
-		js[ this.fields[i].getKey()]=this.fields[i].getValue();
 	    }
             return js;
         },
 	check: function(){
             var valid=true;
 
-	    for(var i=0;i<this.fields.length;i++){
+	    for(var i=0;i<this.components.length;i++){
 		//console.log("check components " + i);
-		if(!this.fields[i].checkValue()){
-		    //console.log("Value for " +  this.fields[i].getValue() + " is wrong");
-		    valid=false;
-		}
+                if(this.components[i].field){
+		    if(!this.components[i].checkValue()){
+		        //console.log("Value for " +  this.fields[i].getValue() + " is wrong");
+		        valid=false;
+		    }
+                }
 	    }
 	    return valid;
         },

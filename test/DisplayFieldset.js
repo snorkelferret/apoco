@@ -33,26 +33,28 @@ describe("DisplayFieldset-(no initial data)",function(){
         assert.isObject(t); //$("#test_fieldset").length,0); 
     });
     it("can add a field",function(){
-        t.addField({type: "string", name: "title"});
-        var b=t.getField();//("title");
+        t.addChild({type: "string", name: "title"});
+        var b=t.getChild("title");
         assert.notStrictEqual(b,null);
     });
     it("can add a node",function(){
-        t.addNode({node: "paragraph", name: "blurb"});
-        var b=t.getNode();//("title");
+        t.addChild({node: "paragraph", name: "blurb"});
+        var b=t.getChild("blurb");
         assert.notStrictEqual(b,null);
     });
     it("can find a node",function(){
-        var b=t.getNode("blurb");
+        var b=t.getChild("blurb");
         assert.notStrictEqual(b,null);
     });
     it("can find a field",function(){
-        var b=t.getField("title");
+        var b=t.getChild("title");
         assert.notStrictEqual(b,null);
     });
     it("sets the value of a field",function(){
-        t.getField("title").setValue("Robert");
-        var b=t.getField("title").getValue();
+        var p=t.getChild("title");
+        console.log("setting field with methods %j", p);
+        t.getChild("title").setValue("Robert");
+        var b=t.getChild("title").getValue();
         assert.strictEqual(b,"Robert");
     });
     it("has a show method which puts the root element into the dom",function(){
@@ -75,13 +77,13 @@ describe("DisplayFieldset-(no initial data)",function(){
         assert.strictEqual(b.textContent,"");
     });
     it("can delete a node",function(){
-        t.deleteNode("blurb");
+        t.deleteChild("blurb");
         //var b=$("#test_fieldset").find("div[name='blurb']");
         var b=document.querySelector("#test_fieldset div[name='blurb']"); 
         assert.strictEqual(document.contains(b),false);
     });
     it("returns null if you try to get non-existant node",function(){
-        var b=t.getNode("blurb");
+        var b=t.getChild("blurb");
         assert.strictEqual(b,null);
     });
     
@@ -105,11 +107,11 @@ describe("DisplayFieldset-(start with data)",function(){
         assert.isObject(t);
     });
     it("has created some  fields",function(){
-        var b=t.getField();
+        var b=t.getChildren();
         for(var i=0;i<b.length;i++){
             console.log("field is " + b[i].name);
         }
-        assert.strictEqual(b.length,2);
+        assert.strictEqual(b.length,4);
     });
     it("writes out json for all the fields",function(){
         var b=t.getJSON();
@@ -117,30 +119,40 @@ describe("DisplayFieldset-(start with data)",function(){
     });
     it("throws an error if you try to add a field with the same name",function(){
         var fn=function(){
-            t.addField({name:"howmany",type: "float",value: 10.4});
+            t.addChild({name:"howmany",type: "float",value: 10.4});
         };
-        assert.throws(fn,"Cannot add field with non-unique name");
+        assert.throws(fn,"Cannot add component with non-unique name");
     });
     it("throws an error if you try to add a node with the same name",function(){
         var fn=function(){
-            t.addNode({name:"stuff",node: "heading",size: "h2"});
+            t.addChild({name:"stuff",node: "heading",size: "h2"});
         };
-        assert.throws(fn,"Cannot add node with non-unique name");
+        assert.throws(fn,"Cannot add component with non-unique name");
+    });
+    it("can delete a node",function(){
+        t.deleteChild("stuff");
+        assert.strictEqual(t.getChildren().length,3);
+        assert.strictEqual(t.getChild("stuff"),null);
     });
     it("can delete a field",function(){
-        t.deleteField("howmany");
-        assert.strictEqual(t.getField().length,1);
-        assert.strictEqual(t.getField("howmany"),null);
+        t.deleteChild("howmany");
+        assert.strictEqual(t.getChildren().length,2);
+        assert.strictEqual(t.getChild("howmany"),null);
     });
     it("can add a field",function(){
-        t.addField({type: "string", name: "title"});
-        var b=t.getField("title");
+        t.addChild({type: "string", name: "title",required:true});
+        var b=t.getChild("title");
         assert.notStrictEqual(b,null);
     });
+    it("returns null if all the required fields do not have the correct type",function(){
+        var p=t.getJSON();
+        assert.strictEqual(p,null);
+    });
     it("sets the value of a field",function(){
-        t.getField("title").setValue("Robert");
-        var b=t.getField("title").getValue();
+        t.getChild("title").setValue("Robert");
+        var b=t.getChild("title").getValue();
         assert.strictEqual(b,"Robert");
     });
+    
     
 });

@@ -4,15 +4,15 @@ body{ background-color: #223344}
 #test #Blurb h5{margin: 0.5em 0 0.5em 0}
 #test #left {width: 16em}
 #test #right{width: 60em;margin-left: 16.5em; padding: 0}
-#test .Apoco_slideshow {width: 640px; min-height: 440px; padding-bottom: 10%}
-.Apoco_slideshow div.pic_area {height: 100%; min-height: 440px}
-.Apoco_slideshow div.pic_area img{}
-.Apoco_slideshow div.pic_area div{bottom: -4em}
+#test .apoco_slideshow {width: 640px; min-height: 440px; padding-bottom: 10%}
+.apoco_slideshow div.pic_area {height: 100%; min-height: 440px}
+.apoco_slideshow div.pic_area img{}
+.apoco_slideshow div.pic_area div{bottom: -4em}
 #test button{padding: 0 1em}
 #Head{background: url("images/apoco01.png") no-repeat; width: 300px; height: 140px}
 #Blurb{padding: 2em 3em 2em 3em }
 #Tabs{position: absolute; top: 160px}
-.tab_container{margin: 0; padding: 0}
+.apoco_tabs{margin: 0; padding: 0}
 #test #main{top: 0em;position: inherit}   
 
 #test .bannertop{position: relative; height: inherit; }
@@ -29,6 +29,16 @@ body{ background-color: #223344}
 
 #left{ width: 16em; position: absolute;max-height:40em; overflow-y:auto }
 #left > div{padding:1em}
-#right{ margin-left: 16.25em; padding: 0; display: table} /*width: auto; top: 30em; position: absolute;   } */
+#right{ margin-left: 16.25em; padding: 0; display: table;
+  background: #fcfdfd url("images/ui-bg_inset-hard_100_fcfdfd_1x100.png") repeat-x scroll 50% bottom;
+    border: 1px solid #52a2da;
+    color: #222222;
+      }
+#left div.apoco_menu{
+    background: #fcfdfd url("images/ui-bg_inset-hard_100_fcfdfd_1x100.png") repeat-x scroll 50% bottom;
+    border: 1px solid #52a2da;
+    color: #222222;
+}
+/*width: auto; top: 30em; position: absolute;   } */
 /* ul.apoco_menu_list li{font-size: 10pt} */
 div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }

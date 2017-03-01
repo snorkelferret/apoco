@@ -150,7 +150,7 @@ var UI={};
     // FIELDS
     var fieldManual={
         get_types:function(field){
-            var f=[];
+            var f=[],t;
             for(var k in Apoco.type){
                 if(Apoco.type[k].field == field){
                     f.push(k);
@@ -190,7 +190,8 @@ var UI={};
                                    },
                               value:{type: "any",default: undefined,
                                      params:that.get_types("input"),
-                                     descriptions:[""]}
+                                     descriptions:[""]},
+                              placeholder:{type: "string",default:"none",params: "string",descriptions:["placeholder text for field"]}
                              },
                      descriptions:[""]
                    },
@@ -497,7 +498,7 @@ var UI={};
                                            that.parent.deleteChild(name);
                                        }
                                        //            console.log("adding child");
-                                       that.parent.addField(dataObject);
+                                       that.parent.addChild(dataObject);
                                    }
                                    else{
                                        Apoco.display.dialog("Error", "Input is not a valid object");
@@ -893,7 +894,8 @@ var UI={};
                 required:{items:[{label:"src",descriptions:["type: string","path to image"]}]},
                 options:{
                     items:[{label:"width",descriptions:["type: integer","integer width of the html image node"]},
-                           {label: "height",descriptions:["type: integer","integer height of the html image node"]}]
+                           {label: "height",descriptions:["type: integer","integer height of the html image node"]},
+                           {label: "keepAspectRatio",descriptions:["type: boolean","size image according to parent size"]}]
                 }
             },
             label:{
@@ -1021,7 +1023,7 @@ var UI={};
                                        that.parent.deleteChild(name);
                                    }
                        //            console.log("adding child");
-                                   that.parent.addNode(node);
+                                   that.parent.addChild(node);
                               // console.log("parms are " + node);
 
                                }
@@ -1065,7 +1067,7 @@ var UI={};
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]},
                        {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                   ]},
-            menu:{  required:[{label: "list",descriptions:["type: objectArray","which must contain a name, key value pair and optionally an action and/or label ","<code>{name:'menu1',action:some_function,label:'some_string'}</code>", "action: A function that receives one arg which is 'this'","the action can also be 'default' in which case the following code is substituted",
+            menu:{  required:[{label: "components",descriptions:["type: objectArray","which must contain a name, key value pair and optionally an action and/or label ","<code>{name:'menu1',action:some_function,label:'some_string'}</code>", "action: A function that receives one arg which is 'this'","the action can also be 'default' in which case the following code is substituted",
                                                            "<br><code> var select_menu=function(that,index){<br>" +
                                                            mk_spaces(2) +"var name=that.menu[index].name;<br>" +
                                                            mk_spaces(2) +"var p=that.getSiblings();<br>" +
@@ -1084,7 +1086,7 @@ var UI={};
                              {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                              {label: "heading",descriptions:["type:string","Add a Heading to the top of the menu "]},
                             ]},
-            slideshow:{options:[{label: "values",descriptions:["type: objectArray","array of Image objects","<code> var values=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]},
+            slideshow:{options:[{label: "components",descriptions:["type: objectArray","array of Image objects","<code> var objectArray=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]},
                                 {label: "delay",descriptions:["type: integer","default: 4000", "time in milliseconds to display each image"]},
                                 {label:"fit_to",descriptions:["type: string -  'width'or'height'","default: 'height'","defaults to fitting the slideshow to the height of the parent element, otherwise changes the height of the parent element so the images fit the width "]},
                                 {label:"controls",descriptions:["type: Boolean","default: true","display the controls"]},
@@ -1093,11 +1095,12 @@ var UI={};
                                 {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
 	                        {label:"fullscreen",descriptions:["type: Boolean","default: true","Allow images to be fullscreen"]},
                                 {label: "fade",descriptions:["type: Boolean","default: false","Crossfade between the images"]},
-                                {label: "fadeDuration",descriptions:["type: integer","default:2000","Length of fade in milliseconds- must be less than delay"]}
+                                {label: "fadeDuration",descriptions:["type: integer","default:2000","Length of fade in milliseconds- must be less than delay"]},
+                                {label: "keepAspectRatio",descriptions:["type: boolean","default:true","Calculate width and height to preserve the aspect ratio, if false size is derived from parent"]}
                                ],
                        required:[]
                       },
-            tabs:{required:[{label: "tabs",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label'},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'"]}],
+            tabs:{required:[{label: "components",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label'},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'"]}],
                   options:[{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                           ]
                  }
@@ -1106,9 +1109,9 @@ var UI={};
             fieldset:"components:[{node:'heading',size:'h4',text:'Test'},{field:'select',name:'select_test',options:['one','two','three']}]",
             form:"draggable: true, components:[{node:'heading',size:'h4',text:'Test'},{field:'select',name:'select_test',options:['one','two','three']}],buttons:[{name:'ok',text:'OK',action:function(that){alert('OK clicked');}}]",
             grid:"cols:[{name: 'col1',type:'string',editable: false},{name:'col2',type:'integer',editable: true},{name:'col3',type: 'boolean',editable: true}], rows:[{col1:'abc',col2: 10, col3: false},{col1:'def',col2: 10, col3: false},{col1:'vyd',col2: 15, col3: true},{col1:'per',col2: 23, col3: true},{col1:'ted',col2: 43, col3: false},{col1:'tda',col2: 54, col3: true}]",
-            menu:"heading: 'Test Menu',list:[{name:'menu1',label: 'menu item 1'},{name:'menu2',label: 'menu item 2'},{name:'menu3',label: 'menu item 3'},{name:'menu4',label: 'menu item 4'} ]",
-            slideshow:("values:" +  JSON.stringify(getAType['imageArray']) + ""),
-            tabs:"tabs:[{name:'tab1',label:'tab one'},{name:'tab2',label:'tab two'},{name:'tab3',label:'tab three'},{name:'tab4',label:'tab four'}],selected: 'tab1'"
+            menu:"heading: 'Test Menu',components:[{name:'menu1',label: 'menu item 1'},{name:'menu2',label: 'menu item 2'},{name:'menu3',label: 'menu item 3'},{name:'menu4',label: 'menu item 4'} ]",
+            slideshow:("components:" +  JSON.stringify(getAType['imageArray']) + ""),
+            tabs:"components:[{name:'tab1',label:'tab one'},{name:'tab2',label:'tab two'},{name:'tab3',label:'tab three'},{name:'tab4',label:'tab four'}],selected: 'tab1'"
         };
 
         var HDisplays=HThings.Displays;
@@ -1220,8 +1223,6 @@ var UI={};
             getTab:["<code>var t=my_display.getTab([ ,name]);</code>","params: name (string) or none, name of an existing tab object","return: none"],
             deleteTab:["<code>my_display.deleteTab(name);</code>","params: name(string)","return: none"],
             select: ["<code> my_display.select(name)</code>","params: name(string)","return: none"],
-            addNode:["<code> my_display.addNode(node_object); </code>"],
-            addField:["<code> my_display.addField(field_object); </code>"],
             getJSON: ["<code> var js=my_display.getJSON();</code>"],
             resetInvalid:["<code>my_display.resetInvalid();</code>","params: none","return: none","reset all fields to last known good value"],
             submit: [],
@@ -1439,7 +1440,7 @@ var UI={};
                      },
             listen:{code: "<code>Apoco.IO.listen(object);</code>",
                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
-                    cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addField({field:'input',editable: false,type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addNode({node:'paragraph',text: data});  }}]});  // press go to initialise",
+                    cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addChild({field:'input',editable: false,type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addChild({node:'paragraph',text: data});  }}]});  // press go to initialise",
                     ret:"none",
                     des: "Listens for messages sent by publish,websocket or dispatch methods"
                    },
@@ -1835,12 +1836,13 @@ var UI={};
                              DOM: "Main",
                              id: "Tabs",
                              selected: "About",
+                             class:["ui-tabs","ui-widget-content","ui-corner-all"],
                              action: function(that){
-                                 for(var i=0; i<that.tabs.length;i++){
-                                     that.tabs[i].action=select_tabs;
+                                 for(var i=0; i<that.components.length;i++){
+                                     that.components[i].action=select_tabs;
                                  }
                              },
-                             tabs: [
+                             components: [
                                  {name: "About",label: "About"},
                                  {name: "Types",label: "Types"},
                                  {name: "Fields",label: "Fields"},
@@ -1859,13 +1861,15 @@ var UI={};
                   components:[ {display:"menu",
                                 DOM: "left",
                                 id: "FieldsMenu",
+                                class:["ui-widget-content","ui-corner-all"],                
                             //    selected: "StaticField",
                                 heading:"Field Types",
-                                list: mkMenu(HThings.Fields)
+                                components: mkMenu(HThings.Fields)
                                },
                                { display: "fieldset",
                                  DOM: "right",
                                  id: "Blurb",
+                                 class:["ui-widget-content","ui-corner-all"],
                                  components:[{node:"heading", size: "h2",text: "Apoco Fields"},
                                              {node:"paragraph", text:"Fields.js <br> depends on Utils.js,Sort.js,Types.js, datepicker.js"} ,
                                              {node: "heading", size: "h3", text: "Usage" },
@@ -1889,7 +1893,7 @@ var UI={};
                      id: "AboutMenu",
               //       selected: "heading",
                      heading:"Core Methods",
-                     list: [{label: "start",name: "start",action:select_menu},
+                     components: [{label: "start",name: "start",action:select_menu},
                             {label: "stop",name:"stop",action: select_menu}]
                     },
                     { display: "fieldset",
@@ -1945,9 +1949,9 @@ var UI={};
                     {display:"menu",
                      DOM: "left",
                      id: "NodesMenu",
-              //       selected: "heading",
+               //       selected: "heading",
                      heading:"Node Types",
-                     list: mkMenu(HThings.Nodes)
+                     components: mkMenu(HThings.Nodes)
                     },
                     { display: "fieldset",
                       id:"Blurb",
@@ -1978,13 +1982,14 @@ var UI={};
                        {display:"menu",
                         DOM: "left",
                         id: "DisplaysMenu",
-                      //  selected: "Menu",
+                        //  selected: "Menu",
                         heading:"Display Templates",
-                        list: mkMenu(HThings.Displays)
+                        components: mkMenu(HThings.Displays)
                        },
                        { display: "fieldset",
                          id:"Blurb",
                          DOM: "right",
+                         class:["ui-widget-content","ui-corner-all"],
                          components:[
                              {node: "heading",size:"h2",text: "Apoco Displays"},
                              {node:"paragraph", text:"DisplayMenu.js DisplayFieldset.js DisplayForm.js DisplayTabs.js DisplaySlideshow.js DisplayGrid.js"} ,
@@ -2010,12 +2015,13 @@ var UI={};
                        id: "WindowsMenu",
                        //  selected: "Menu",
                        heading:"Window Templates",
-                       list: mkMenu(HThings.Windows)
+                       components: mkMenu(HThings.Windows)
                       },
                       { display: "fieldset",
-                         id:"Blurb",
-                         DOM: "right",
-                         components:[
+                        id:"Blurb",
+                        DOM: "right",
+                        class:["ui-widget-content","ui-corner-all"],
+                        components:[
                              {node: "heading",size:"h2",text: "Apoco Windows"},
                              {node:"paragraph", text:"Window.js"} ,
                              {node: "heading", size: "h4", text: "Usage" },
@@ -2037,7 +2043,7 @@ var UI={};
                           {node: "heading",size:"h2",text: "Apoco Panels"},
                           {node: "paragraph",text:"Panel.js"},
                           {node: "paragraph",text: "Only display templates can be added to the Panel components array."},
-                          {node: "paragraph",text: ("Apoco panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "tabs:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
+                          {node: "paragraph",text: ("Apoco panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "components:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
                           {node:"paragraph",text: ("This would create a new panel with the name 'MyPanel' with one component, Tabs<br> To add another display component you add it to the components array.")},
 
                           {node: "heading", size: "h3", text: "Usage" },
@@ -2053,7 +2059,7 @@ var UI={};
 
                           {node: "heading",size:"h4",text:"Live Example"},
                           {name: "Input_params",field: "textArea",
-                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',tabs:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
+                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',components:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -2073,9 +2079,9 @@ var UI={};
                       {display:"menu",
                        DOM: "left",
                        id: "PanelsMenu",
-    //                   selected: "Heading",
+                       //                   selected: "Heading",
                        heading:"Panel Methods",
-                       list: mkMenu(HThings.Panels)
+                       components: mkMenu(HThings.Panels)
                       },
                   ]
                 },
@@ -2086,7 +2092,7 @@ var UI={};
                     id: "TypesMenu",
                     //selected: "Menu",
                     heading:"Types",
-                    list: mkMenu(HThings.Types)
+                    components: mkMenu(HThings.Types)
                    },
                    { display: "fieldset",
                      id:"Blurb",
@@ -2128,9 +2134,9 @@ var UI={};
                       {display:"menu",
                        DOM: "left",
                        id: "IOMenu",
-                      // selected: "Heading",
+                       // selected: "Heading",
                        heading:"IO Methods",
-                       list: mkMenu(HThings.IO)
+                       components: mkMenu(HThings.IO)
                       },
                   ]
 
@@ -2139,14 +2145,15 @@ var UI={};
                 components:[
                     {display:"menu",
                     DOM: "left",
-                    id: "PopupsMenu",
-                    //selected: "Menu",
+                     id: "PopupsMenu",
+                     //selected: "Menu",
                     heading:"Popups",
-                    list: mkMenu(HThings.Popups)
+                    components: mkMenu(HThings.Popups)
                    },
                     { display: "fieldset",
                       id:"Blurb",
                       DOM: "right",
+                      class:["ui-widget-content","ui-corner-all"],
                       components:[
                           {node: "heading",size:"h2",text: "Apoco Popups"},
                           {node: "paragraph",text: "Popups.js"},
@@ -2171,9 +2178,9 @@ var UI={};
                       {display:"menu",
                        DOM: "left",
                        id: "UtilsMenu",
-                   //    selected: "Menu",
+                       //    selected: "Menu",
                        heading:"Utility Methods",
-                       list: mkMenu(HThings.Utils)
+                       components: mkMenu(HThings.Utils)
                       }
                   ]
         }
