@@ -254,7 +254,7 @@ require("./Fields");
                         this._afterShow();
                      }
                     if(this.action !== undefined && this.id === this.dependsOn){
-                        console.log("RUNNNNINNNNNNNG this.action in show");
+                       // console.log("RUNNNNINNNNNNNG this.action in show");
                         this.action(this);
                     }
 		}
