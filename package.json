@@ -1,6 +1,6 @@
 {
   "name": "apoco",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "description": "Single Page Web Framework",
   "main": "index.js",
   "scripts": {
