@@ -891,28 +891,44 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.input[index].input=document.createElement("input");
             if(this.checkbox === true ){
                 this.input[index].input.type="checkbox";
+                if(this.editable === false){
+                    this.input[index].input.disabled=true;
+                }
             }
             else{
-                this.input[index].input.type="radio"; 
+                this.input[index].input.type="radio";
+                if(this.editable === false){
+                    if(this.value[index] === false){
+                        this.input[index].input.disabled=true;
+                    }
+                }
             }
+            this.input[index].input.id=this.input[index].label;
             this.input[index].input.checked=this.value[index];
-	    l.appendChild(this.input[index].input);
-            p=document.createElement("p");
+          
+            l.appendChild(this.input[index].input);
+            p=document.createElement("label");
+            p.setAttribute("for",this.input[index].label);
             p.textContent=this.input[index].label;
             l.appendChild(p);
-       
             if(this.checkbox !== true){
-	        this.input[index].input.addEventListener("click",function(that,node){
-		    return function(e){
-		        e.stopPropagation();
-                        for(var i=0;i<that.input.length;i++){
-                            if(that.input[i].input !== node){
-                                that.input[i].input.checked=false;
+                this.element.addEventListener("click",function(e){
+                    var b;
+                  //  console.log("element has tag" + e.target.tagName);
+                    if(e.target.tagName === "INPUT" ){
+                    //    console.log("e.terget has checked = " +  e.target.checked);
+                        // set the siblings to false
+                        b=e.currentTarget.getElementsByTagName('input');
+                        for(var i=0;i<b.length;i++){
+                            if(b[i] !== e.target){
+                                b[i].checked=false;
                             }
                         }
-		    };
-	        }(this,this.input[index].input)); 
-            } 
+                        //(e.target.checked==false)?e.target.checked=true: e.target.checked=false;
+                        e.stopPropagation();
+                    }
+                },false);
+            }
             return true;
 	},
 	resetValue:function(){
@@ -1581,7 +1597,47 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
 
     Apoco.Utils.extend(AutoCompleteField,_Field);
-
+/*
+    var StarRatingField=function(d,element){
+        var k,l,name,v;
+        d.field="StringArrayField";
+        d.type="stringArray";
+	_Field.call(this,d,element);
+	this.popup=false;
+        this.default=null;
+	var that=this;
+        if(!d.start){
+            this.start=1;
+        }
+        if(!d.end){
+            this.end=5;
+        }
+        for(var i=this.end;i> this.start; i--){
+            name="";
+            v=(i).toString();
+            name=name.concat(this.name,v);
+            k=document.createElement("input");
+            k.id=name;
+            l=document.createElement("label");
+            l.setAttribute("for",name);
+            k.value=v;
+            this.element.appendChild(k);
+            this.element.appendChild(l);
+        }
+        
+    };
+    StarRatingField.prototype={
+        getValue: function(){
+            
+        },
+        setValue: function(v){
+            
+        },
+        checkValue:function(){
+            
+        }
+    }; */
+    
     Apoco.field={
         exists:function(field){
             if(this[field]){

@@ -8,6 +8,26 @@ var UI={};
     UI.webSocketURL=".";
     UI.URL=",";
 
+    var history_update=function(name){
+        var a;
+        console.log("location: " + document.location + ", name: " + name);
+        console.log("history update going to tab " + name);
+       
+        if(!name){
+            console.log("state name is wrong or null" + name);
+            // go to first tab1
+         //   select_tabs(a);
+        }
+        else{
+            a=Apoco.Panel.get("Tabs").getChild("Tabs").getChild(name);
+            if(a){
+                select_tabs(a,true);
+            }
+            else console.log("cannot find tab");
+        } 
+    };
+    Apoco.Utils.history.init(history_update);
+
     var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
     var globalEval=function( code ) {
 	var script,indirect = eval;
@@ -1644,7 +1664,13 @@ var UI={};
             getSiblings:{p:"<code>var c=Apoco.Utils.getSiblings(htmlObject); </code>",
                          params:"htmlObject",
                          description:"find all the siblings",
-                         ret: "array of sibling htmlObjects"}
+                         ret: "array of sibling htmlObjects"},
+            history:{ p:"Make the forward and back buttons on the browser work.<br> <code>var c=Apoco.Utils.history.init(callback_function); </code> ",
+                      params:"function",
+                      description:"history.init calls a this function when the forward or back buttons on the browser are pushed <br> Other Methods: <code> <br> Apoco.Utils.history.push('some_name');<code> This is the name that is returned to the callback function ",
+                      ret: "object"}
+                
+            
         };
         for(var i=0;i<HUtils.length;i++){
           //  console.log("making io panel",HUtils[i]);
@@ -1686,17 +1712,19 @@ var UI={};
         }
     };
 
-    var select_tabs=function (that,index){
+    var select_tabs=function (that,pop){
         var name=that.name;
-        //console.log("select_tabs: trying to show " + name);
+        console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Apoco.Panel.hide(that.parent.selected.name);
         }
-       // if(name !== that.selected){
-        //  console.log("select_tabs: trying to show " + that.selected);
-        //Apoco.Panel.hide(that.selected);
-
         Apoco.Panel.show(name);
+        if(!pop){
+            Apoco.Utils.history.push(name);
+        }
+        else{  
+            that.parent.select(name); 
+        }
         var b=Apoco.Panel.get(name);
         if(b){ // may or may not be loaded yet
             var ar=b.getChildren();
@@ -1756,23 +1784,23 @@ var UI={};
           //  console.log("mkPanelMethods making " + HPanels[i]);
             var cmd={
                 UIStart:"Apoco.Panel.UIStart(['Tabs']);",
-                add:"Apoco.Panel.add({name: 'TestField', window:'TestWindow',components:[{display:'fieldset',DOM:'Content',id:'TestFieldSet',components:[{node:'heading',size:'h2',text:'Yippee'},{node:'button', name:'some buttom',label:'another button'},{field:'checkBox',name: 'checkBox',label:'a checkbox' }]}]});",
-                "delete":"Apoco.Panel.delete('TestField');",
+                add:"Apoco.Panel.add({name: 'TestPanel', window:'TestWindow',components:[{display:'fieldset',DOM:'Content',id:'TestFieldSet',components:[{node:'heading',size:'h2',text:'Yippee'},{node:'button', name:'some buttom',label:'another button'},{field:'checkBox',name: 'checkBox',label:'a checkbox' }]}]});",
+                "delete":"Apoco.Panel.delete('TestPanel');",
                 clone:"var v=Apoco.Panel.clone('Tabs');",
                 deleteAll:"Apoco.Panel.deleteAll();",
-                get: "var v=Apoco.Panel.get('TestField');",
+                get: "var v=Apoco.Panel.get('TestPanel');",
                 getList:"var v=Apoco.Panel.getList();",
-                hide:"Apoco.Panel.hide('TestField');",
+                hide:"Apoco.Panel.hide('TestPanel');",
                 hideAll:"Apoco.Panel.hideAll('TestWindow');",
-                inList:"var v=Apoco.Panel.inList('TestField');",
-                show:"Apoco.Panel.show('TestField');",
+                inList:"var v=Apoco.Panel.inList('TestPanel');",
+                show:"Apoco.Panel.show('TestPanel');",
                 showAll:"Apoco.Panel.showAll('TestWindow')",
-                addChild:"Apoco.Panel.get('TestField').addChild({display:'fieldset',id:'testaddChild',DOM:'Content',components:[{node:'paragraph',text:'Adding some text'}]})",
-                deleteChild:"Apoco.Panel.get('TestField').deleteChild('testaddChild');",
-                deleteChildren:"Apoco.Panel.get('TestField').deleteChildren();",
-                findChild:"var v=Apoco.Panel.get('TestField').findChild('TestFieldSet');",
-                getChild:"var v=Apoco.Panel.get('TestField').getChild('TestFieldSet');",
-                getChildren:"var v=Apoco.Panel.get('TestField').getChildren();"
+                addChild:"Apoco.Panel.get('TestPanel').addChild({display:'fieldset',id:'testaddChild',DOM:'Content',components:[{node:'paragraph',text:'Adding some text'}]})",
+                deleteChild:"Apoco.Panel.get('TestPanel').deleteChild('testaddChild');",
+                deleteChildren:"Apoco.Panel.get('TestPanel').deleteChildren();",
+                findChild:"var v=Apoco.Panel.get('TestPanel').findChild('TestFieldSet');",
+                getChild:"var v=Apoco.Panel.get('TestPanel').getChild('TestFieldSet');",
+                getChildren:"var v=Apoco.Panel.get('TestPanel').getChildren();"
             };
             var k={};
             k.display="fieldset";

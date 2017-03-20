@@ -143,6 +143,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 if(e.code !== 1000){ // normal termination
                     Apoco.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
                 }
+                Apoco.webSocket=null;
             };
             Apoco.webSocket.onmessage=function(e){
                 if(!e.data){

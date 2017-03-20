@@ -65,7 +65,7 @@ require("./Nodes.js");
                 el=document.createElement("li");
             }
             if(!parent_element){
-                    parent_element=this.element;
+                parent_element=this.element;
             }
             
             if(d.node){

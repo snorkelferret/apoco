@@ -88,6 +88,13 @@ describe("DisplayTabs",function(){
         var b=document.getElementById("test_tabs2").getElementsByTagName("li");
         assert.strictEqual(b.length,3);
     });
+    it("has added a name attribute to the html elemeny",function(){
+        var c,b=document.getElementById("test_tabs2").getElementsByTagName("li");
+        for(var i=0;i<b.length; i++){
+            c=b[i].getAttribute("name");
+            assert.isDefined(c,"tab has a name");
+        }
+    });
     it("executes the action function when clicked",function(){
         var b=document.getElementById("test_tabs2").getElementsByTagName("li")[0];
         assert.isObject(b);
@@ -96,6 +103,11 @@ describe("DisplayTabs",function(){
         b.click();
         var r=b.style.visibility;
         assert.strictEqual(r,"hidden");
+    });
+    it("can get the selected tab",function(){
+        
+        var v=t.getSelected();
+        assert.notStrictEqual(v,null);
     });
     it("can add a tab",function(){
         t.addTab({name:"tabFour"});

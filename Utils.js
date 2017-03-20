@@ -454,7 +454,34 @@ String.prototype.trim = String.prototype.trim || function trim() {
             else{
                 return false;
             }
-
+        },
+	history: {
+	    init: function(func){
+//		console.log("init history");
+                global.window.addEventListener('popstate',function(event) {
+                    //console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
+                    if(event.state && event.state.name ){
+                       // console.log("FORWARD AND BACK BUTTON name is " + event.state.name);
+                        func(event.state.name);
+                    }
+                    else{
+                        func(null);
+                    }
+                    
+                },false);
+	    },
+  	    currentState: function(){
+		return(history.state);
+	    },
+	    replace: function(c_obj){
+		    history.replaceState(c_obj,c_obj.title,c_obj.url);
+	    },
+	    push: function(name){   // used by callback functions
+                var c_obj={};
+                c_obj.name=name;
+                var p=("index.html?" + name);
+		history.pushState(c_obj,p,p);
+	    }
         }
     };
 
