@@ -132,11 +132,7 @@ require("./Nodes.js");
                 }
 	    }
 	    return valid;
-        },
-	submit: function(url){
-            var j=this.getJSON();
-            Apoco.IO.REST("POST",j,url);
-	}
+        }
     };
 
     Apoco.Utils.extend(ApocoMakeFieldset,Apoco._DisplayBase);

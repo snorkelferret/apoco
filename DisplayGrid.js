@@ -493,17 +493,21 @@ jsonishData={
         addCol:function(col){
             var that=this,index,r,t,rows;
             var was_hidden=this.isHidden();
+            var check_opts=function(c){
+                if(!c.name){
+                    throw new Error("column must have a name");
+                }
+                if(!c.type && !c.field){
+                    throw new Error("displayGrid: column must have type or field");
+                }
+            };
             if(Apoco.type["integer"].check(col)){
                 index=col;
                 col=this.cols[index];
-                if(!col.name || !col.type){
-                    throw new Error("column must have type and name");
-                }
+                check_opts(col);
             }
             else{ // adding a column after creation
-                if(!col.name || !col.type){
-                    throw new Error("column must have type and name");
-                }
+                check_opts(col);
                 index=this.getColIndex(col.name);
                 if(index===null){
                     index=this.cols.length;
@@ -517,13 +521,15 @@ jsonishData={
                     this.hide(); // hide whilst adding column
                 }
             }
+            
          
-            // col.options=$.extend({},col);  // keep a copy of the original parms- so not to copy crap into rows;
-            col.options={};
+            // keep a copy of the original parms- so not to copy crap into rows;
+            // PUT THIS FOLLOWING BACK
+           /* col.options={};
             for(var k in col){
                 col.options[k]=col[k];
-            }
-             if(this.grids){ // add the column rows
+            } */
+              if(this.grids){ // add the column rows
                 for(var i=0;i<this.grids.length;i++){
                     rows=this.grids[i].rows;
                     if(rows){
@@ -697,15 +703,14 @@ jsonishData={
    	},
         _addCell:function(row,col,r){
             var c,type,settings={};
-            
-	    //settings=$.extend({},col.options);
-            for(var k in col.options){
-                settings[k]=col.options[k];
+     
+            for(var k in col){
+                settings[k]=col[k];
             }
             if(row[col.name] === undefined){  // row[col_name] can be null
                 if(this.required === true){
                     
-                    throw new Error("Field " + col.name + "is required");
+                   throw new Error("Field " + col.name + "is required");
                 }
                 row[col.name]=null;
             }
@@ -713,11 +718,18 @@ jsonishData={
 	    settings.value=row[col.name];
   	    c=document.createElement("td");
             c.className=col.type;
+            if(col.field !== undefined){
+             //   console.log("Called from grid %j",settings);
+             //   console.log("row data %j",row);
+             //   console.log("col is %j",col);
+                row[col.name]=Apoco.field[col.field](settings,c);
+            }
+           else{ 
+               row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
+            }
             
-            row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
             if(col.display !== false){
 		r.appendChild(row[col.name].element);
-            
                 row[col.name].element.data={};
                 row[col.name].element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
 	    }
@@ -777,10 +789,7 @@ jsonishData={
               //  console.log("key is " + t);
                 if(closest.dir === "after"){
                     closest.index++;
-                    //grid.rows.splice(closest.index,0,row_data); //insert row
-                    // grid.rows[closest.index][t].element.parent().after(r); // insert the element
                     e= grid.rows[closest.index][t].element;
-                    
                     e.parentNode.insertBefore(e,r.nextSibling); // insert after r
                     grid.rows.splice(closest.index,0,row_data); //insert row
                 }
@@ -1067,63 +1076,8 @@ jsonishData={
                 }
             }
             return n;
-        },
-	submit: function(row,field_name){
-	    var cols,rk,rv;
+        }
 
-	    var jsq=this.submitDefaults;
-	    jsq.type="POST";
-
-	    if(row && field_name){
-		if(this.uniqueKey){
-		    rk=(row[this.uniqueKey].name).toString();
-		    rv=(row[field_name].name).toString();
-		    jsq.data.push({rk: row[this.uniqueKey].getValue(),
-			       rv: row[field_name].getValue()});
-		}
-		else{
-		    for(var i=0;i<row.length;i++){
-			rk=row[i].name;
-			jsq.data.push({rk: row[i].getValue()});
-	//		console.log("value is " + row[i].getValue());
-	//		console.log("key is " + row[i].name);
-		    }
-		    return;
-		}
-	    }
-	    else { // submit the whole thing
-
-	    }
-	    if(this.DEBUG) console.log("jsq is " + JSON.stringify(jsq));
-
-	    var submit_promise=Apoco.ajax.jsq(jsq,{url:"/JSQ/cbm",
-						    type:"POST",
-						    dataType:'json',
-						    contentType:"application/json"});
-
-
-	    submit_promise.done(function(that,p){
-		return function(jq,textStatus){
-		    if(this.DEBUG) console.log("Form.submit: promise success");
-		    if(textStatus === "success"){
-	//		if(this.DEBUG) console.log("Form.submit: deferred-resolve");
-			Apoco.display.dialog(that.options.action + " of " +  that.template, p.name + " has been successfully committed to the Database");
-		    }
-		    else{
-			if(this.DEBUG) console.log("Form.submit: deferred-reject");
-			//	deferred.reject();
-		    }
-		};
-	    }(this,jsq.properties));
-
-	    submit_promise.fail(function(jq, textStatus){
-	//	console.log(" textStatus is " + textStatus);
-		var msg=("callback Fail- status  " +  jq.status + "  "+ jq.statusText + " "  + jq.responseText );
-		Apoco.display.dialog("Update Failed",msg);
-		// highlight from components which were not accepted
-	//	if(this.DEBUG) console.log("grid.submit: failed to commit to db");
-	    });
-	}
     };
 
 

@@ -489,6 +489,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         d.field="checkBox";
         d.type="boolean";
   	_Field.call(this,d,element);
+   
         this.input=document.createElement("input");
         this.input.setAttribute("type",this.html_type);
         this.input.className="check_box";
@@ -712,28 +713,27 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     var SelectField=function(d,element){
-	var i,o,that=this;
+	var i,o,that=this,select_el;
         d.field="select";
         d.type="string";
 	_Field.call(this,d,element);
-
-        var options=document.createElement("select");
+        select_el=document.createElement("select");
         if(this.required === true){
-            options.required=true;
+            select_el.required=true;
         }
 	for(i=0; i<this.options.length; i++){
-
             o=document.createElement("option");
             o.value=this.options[i];
             o.textContent=this.options[i];
-            options.appendChild(o);
+            select_el.appendChild(o);
 	}
 	if(this.blank_option === true){ // add a blank option at the head of the list
             o=document.createElement("option");
             o.value="";
-            options.appendChild(o);
+            select_el.appendChild(o);
 	}
-        this.select=options;
+        this.select=select_el;
+     
 	var cd=function(that){
 		return function(e){
 		    e.stopPropagation();
@@ -1597,46 +1597,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
 
     Apoco.Utils.extend(AutoCompleteField,_Field);
-/*
-    var StarRatingField=function(d,element){
-        var k,l,name,v;
-        d.field="StringArrayField";
-        d.type="stringArray";
-	_Field.call(this,d,element);
-	this.popup=false;
-        this.default=null;
-	var that=this;
-        if(!d.start){
-            this.start=1;
-        }
-        if(!d.end){
-            this.end=5;
-        }
-        for(var i=this.end;i> this.start; i--){
-            name="";
-            v=(i).toString();
-            name=name.concat(this.name,v);
-            k=document.createElement("input");
-            k.id=name;
-            l=document.createElement("label");
-            l.setAttribute("for",name);
-            k.value=v;
-            this.element.appendChild(k);
-            this.element.appendChild(l);
-        }
-        
-    };
-    StarRatingField.prototype={
-        getValue: function(){
-            
-        },
-        setValue: function(v){
-            
-        },
-        checkValue:function(){
-            
-        }
-    }; */
+
     
     Apoco.field={
         exists:function(field){

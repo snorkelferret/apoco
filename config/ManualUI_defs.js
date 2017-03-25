@@ -1077,8 +1077,8 @@ var UI={};
                   options:[{label:"buttons",descriptions:["an array of button objects","example","<code> buttons: [{name: 'string',text:'string',action: function(that){ //some code }}]</code>"]},{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                            {label:"draggable",descriptions:["type: boolean","default: true","if true the form is detached and can be dragged around the browser window"]},
                            {label: "label",description: "type: string"}]},
-            grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1}]<code>"]},
-                            {label:"rows",descriptions:["type:objectArray","if the cols were defined as above then the rows would be","<code> rows:[{colname1:'some_string',colname2:23.53},{colname1:'another_string',colname2:34.66}]"]}],
+            grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type or the field may be specified directly","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1},{field:'select',name:'choose',options:['one','two','three']}]<code>"]},
+                            {label:"rows",descriptions:["type:objectArray","if the cols were defined as above then the rows would be","<code> rows:[{colname1:'some_string',colname2:23.53,choose:'one'},{colname1:'another_string',colname2:34.66,choose:'three'}]"]}],
                   options:[
                       {label:"userSortable",descriptions:["type: boolean","can the user sort the cols","userSortable and sortOrder are mutually exclusive"]},
                       {label:"sortOrder",descriptions:["type:stringArray","column names to sort the grid rows","example","<code>sortOrder:['colname1','colname2']<code","sort the rows first by colname1 and then colname2"]},
@@ -1245,7 +1245,6 @@ var UI={};
             select: ["<code> my_display.select(name)</code>","params: name(string)","return: none"],
             getJSON: ["<code> var js=my_display.getJSON();</code>"],
             resetInvalid:["<code>my_display.resetInvalid();</code>","params: none","return: none","reset all fields to last known good value"],
-            submit: [],
             play:["<code>my_display.play();</code>","start playback"],
             step:["<code>my_display.step(dir);</code>","params: dir (string) either 'next' or 'prev'","step forward one frame"],
             showFullscreen:["<code>my_display.showFullscreen();</code>","params: none","return: none","toggles fullscreen mode, i.e called once makes the display fullscreen called again it pops it back into the DOM tree"],
@@ -1691,12 +1690,12 @@ var UI={};
                 k.components.push({node:'heading',size:'h5',text:'Live Example'});
                 k.components.push({field:'textArea',name:'input_params',value: items[HUtils[i]].cmd});
                 k.components.push({node: "button",name: 'Go',action:function(that){
-                    var f=that.parent.getField('input_params');
+                    var f=that.parent.getChild('input_params');
                     if(!f){
                         throw new Error("can't get input params");
                     }
                     globalEval(f.getValue());
-                    var p=that.parent.getNode('Result');
+                    var p=that.parent.getChild('Result');
                     if(Apoco.type['function'].check(v)){
                         p.setText(v);
                     }

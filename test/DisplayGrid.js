@@ -144,6 +144,42 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         var c=b.textContent;
         console.log("td is " + c);
     });
+    it("can add a column using the field option instead of a type",function(){
+        var b=t.getCol().length;
+        b++;
+        t.addCol({name:"selection",field:"select",editable:true,options:["one","two","three"]});
+        var c=t.getCol().length;
+        assert.strictEqual(b,c);
+    });
+    it("can get a row",function(){
+        var b=t.getRow({stock:'AAB',maturity:"2017-03-27"});
+        assert.notStrictEqual(b,null);
+       /* console.log("row is %j",b);
+        for(var k in b){
+            console.log("cell " + k + " values %j",b[k]);
+            for(var m in b[k]){
+                console.log("cell values " + m + " values %j " ,b[k][m]);
+            }
+        } */
+    });
+    it("can get a cell",function(){
+        var b=t.getRow({stock:'AAB',maturity:"2017-03-27"});
+        assert.notStrictEqual(b,null);
+        console.log("got cell " + b['selection']);
+        var c=b['selection'];
+        assert.notStrictEqual(c,null);
+    });
+    it("has added the options to the select cell",function(){
+        var b=t.getRow({stock:'AAB',maturity:"2017-03-27"});
+        assert.notStrictEqual(b,null);
+        console.log("got cell " + b['selection']);
+        var c=b['selection'];
+        assert.notStrictEqual(c,null);
+        var d=b['selection'].select;
+        assert.strictEqual(d.length,3);
+        console.log("options is %j",d);
+    });
+    
     it("can add a column",function(){
         var b=t.getCol().length;
         b++;
