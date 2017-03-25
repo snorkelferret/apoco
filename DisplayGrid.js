@@ -521,9 +521,7 @@ jsonishData={
                     this.hide(); // hide whilst adding column
                 }
             }
-            
-         
-            // keep a copy of the original parms- so not to copy crap into rows;
+             // keep a copy of the original parms- so not to copy crap into rows;
             // PUT THIS FOLLOWING BACK
            /* col.options={};
             for(var k in col){
@@ -542,14 +540,15 @@ jsonishData={
                     }
                 }
             }
-	    if(this.cols[index].display !== false){
+	    if(this.cols[index].hidden !== true){
 		//console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
                 var h=document.createElement("div");
-                var s=document.createElement("soan");
+                var s=document.createElement("span");
                 h.appendChild(s);
-                h.classList.add(this.cols[index].type);
-                h.type=this.cols[index].type;
+                (this.cols[index].type)?h.classList.add(this.cols[index].type):h.classList.add(this.cols[index].field);
+                
+               // h.type=this.cols[index].type; seems to do nothing
                 s.textContent=label;
 		this.cols[index].element=h;
 		this.cols[index].sortable=Apoco.isSortable(this.cols[index].type);
@@ -728,7 +727,7 @@ jsonishData={
                row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
             }
             
-            if(col.display !== false){
+            if(col.hidden !== true){
 		r.appendChild(row[col.name].element);
                 row[col.name].element.data={};
                 row[col.name].element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
@@ -829,7 +828,7 @@ jsonishData={
                 if(!parent){
                     parent=row[this.cols[i].name].getElement().parentNode;
                 }
-                if(this.cols[i].display !== false){
+                if(this.cols[i].hidden !== true){
                     el=row[this.cols[i].name].getElement();
                     el.parentNode.removeChild(el);
                     el=null;
@@ -934,7 +933,7 @@ jsonishData={
 		for(var k in cell_data){               
  		    row[k].setValue(cell_data[k]);
                     var cl="cell_updated";
-		    if(row[k].display !== false){
+		    if(row[k].hidden !== true){
                         cell=row[k].getElement();
 			if(cell.classList.contains(cl)){  // add colours to the cells to show update frequency
 			    cell.classList.remove(cl);
@@ -971,28 +970,31 @@ jsonishData={
             }
             return this.grids;
 	},
+        deleteChild:function(){
+            
+        },
+        deleteChildren:function(){
+            this.deleteAll();
+        },
 	deleteAll:function(){
-            var el,parent,row;
+            var el,row;
             if(this.grids){
                 for(var i=0;i<this.grids.length;i++){
                     for(var j=0;j<this.grids[i].rows.length;j++){
                         row=this.grids[i].rows[j];
                         for(var k=0;k<this.cols.length;k++){
                             el=row[this.cols[k].name].element;
-                            if(this.cols[k].display !== false){
-                                if(k===0){
-                                    parent=el.parentNode;
-                                }
-                                parent.removeChild(el);
+                        //    console.log("el is " + el);
+                        //    console.log("cell is " + j + " " + k);
+                            if(el && el.parentNode){
+                                el.parentNode.removeChild(el);
                             }
-                        }
-                        if(parent){
-                            parent.parentNode.removeChild(parent);
                         }
                     }
                     this.grids[i].rows.length=0;
                     this.grids[i].element.parentNode.removeChild(this.grids[i].element);
                 }
+                this.cols.length=0;
                 this.grids.length=0;
             }
         },

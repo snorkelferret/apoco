@@ -78,7 +78,7 @@ describe("DisplayGrid-(start without rows)",function(){
     it("dumps the contents of the grid as a JSON object",function(){
         var b=t.getJSON();
         assert.isObject(b);
-        //console.log("JSON %j",b);
+        console.log("JSON %j",b);
     });
     it("updates a row only if unique key",function(){
         var fn=function(){
@@ -87,8 +87,9 @@ describe("DisplayGrid-(start without rows)",function(){
         assert.throws(fn,"No method available to find this cell");
     });
     it("has a delete method",function(){
-        t.delete();
         var b=document.getElementById("test_grid");
+        console.log("delete grid got element" + b);
+        t.delete();
         assert.strictEqual(document.body.contains(b),false);
         console.log("t is now " + t);
     });
@@ -200,6 +201,14 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     });
     it("deletes a column",function(){
         t.deleteCol("bid");
+    });
+    it("can delete itself with hidden cols",function(){
+        var b=document.getElementById("Blotter");
+        console.log("delete grid got element" + b);
+        t.delete();
+        assert.strictEqual(document.body.contains(b),false);
+        console.log("t is now " + t);
+        
         
     });
     

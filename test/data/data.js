@@ -11,8 +11,8 @@ window.data={ DOM: "Content",
                      {name:"client_bid",type:"integer",editable: false,required: false},  
                      {name: "volume",type: "integerArray",size:2, delimiter: "X", editable: false,required: false},           
                      {name:"client_offer",type:"integer",editable: false,required: false},              
-                     {name: "maturity",type: "date",editable: false,display: false},           
-	       	     {name: "class",type:"string",editable: false,display: false}
+                     {name: "maturity",type: "date",editable: false,hidden: true},           
+	       	     {name: "class",type:"string",editable: false,hidden: true}
 	       	     
 		    ],
 	    rows:[	

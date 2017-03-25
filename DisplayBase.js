@@ -284,7 +284,7 @@ require("./Fields");
             }
         },
 	delete: function(msg_from_parent){
-	   // console.log("delete display object is here " + msg_from_parent);
+	//    console.log("delete display object is here msg is " + msg_from_parent);
             if(this.parent && msg_from_parent === undefined){
 		this.parent.deleteChild(this);
 	    }
@@ -298,7 +298,9 @@ require("./Fields");
                 }
                 this.deleteAll();
                 if(this.element){
+                  //  console.log("displayBase:delete this.element exists " + this.element);
                     if(this.element.parentNode){ // no parentNode if hidden
+                    //    console.log("DisplayBase.delete: deleting this.element");
                         this.element.parentNode.removeChild(this.element);  //removes events and data as well
                     }
                     this.element=null;  

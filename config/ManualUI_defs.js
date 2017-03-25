@@ -103,7 +103,7 @@ var UI={};
     function mkArrays(){
         var thing;
         for(var k in HThings){
-           // console.log("k is " + k);
+            console.log("k is " + k);
             switch(k){
             case "Fields":
                 thing=Apoco.field;
@@ -149,7 +149,7 @@ var UI={};
                         
                    }
                    else if(k==="Displays"){
-                    //   console.log("got display " + n);
+                      console.log("got display " + n);
                        if(n.indexOf("Methods")<= -1){
                            HThings[k].push(n);
                        }
@@ -1285,12 +1285,12 @@ var UI={};
         };
         var items=[];
         for(var i=0;i<HDisplays.length;i++){
-           //console.log("mkFieldMethods making " + HDisplays[i]);
+            console.log("mkFieldMethods making " + HDisplays[i]);
             var k={};
             items[i]=[];
             for(var j in Methods[HDisplays[i]]){
                 var m=Methods[HDisplays[i]][j];
-             //   console.log("Methods " + m);
+                console.log("Methods " + m);
                 items[i].push({label:m,
                                descriptions:display_methods_list[m]});
             }
@@ -1306,12 +1306,12 @@ var UI={};
                            value: "var v=window." + HDisplays[i]+"_obj.getKey();"},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
-                               //                  console.log("button action is here");
+                                               console.log("button action is here");
                                var f=that.parent.getChild("Input_params");
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-                              // console.log("text area is " + f.getValue());
+                              console.log("text area is " + f.getValue());
                                globalEval(f.getValue());
                                var nf=that.parent.getChild("Result");
                                try{
