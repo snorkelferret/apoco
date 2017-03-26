@@ -30,7 +30,7 @@ require("./DisplayFieldset");
                 this.element.classList.add(this.class);
             }
              */
-            this.element.classList.add("apoco_form","resizable"); //"ui-widget-content","ui-corner-all");
+            this.element.classList.add("apoco_form","resizable"); 
       
             if(!this.height){
                 this.height=400;
@@ -41,7 +41,7 @@ require("./DisplayFieldset");
             this.element.innerHeight=this.height;
             this.element.innerWidth=this.width;
             header=document.createElement("div");
-            header.classList.add("form_header","ui-state-default", "ui-widget-header","ui-corner-all");
+            header.classList.add("form_header");
 	    this.element.appendChild(header);
 	    if(this.draggable !== false){
                 this.draggable=Apoco.Utils.draggable(this.element,undefined,header);
@@ -58,8 +58,7 @@ require("./DisplayFieldset");
 	    }
 	    header.appendChild(h);
             var close=document.createElement("span");
-            close.innerHTML="&#x2715;"; 
-            close.classList.add("ui-icon","ui-icon-close");
+            close.classList.add("close");
             header.appendChild(close);
 	    var c=function(e){
 		e.stopPropagation();
@@ -74,14 +73,14 @@ require("./DisplayFieldset");
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
                     lp=document.createElement("li");
-                    console.log("FORM CREATES ELEMENT " + lp);
+                    //console.log("FORM CREATES ELEMENT " + lp);
                     this.addChild(i,lp,fp);
                 }                   
             }
         
 	    if(this.buttons){
                 var button_container=document.createElement("div");
-                button_container.classList.add("form_button_container","ui-widget-content");
+                button_container.classList.add("form_button_container");
 		this.element.appendChild(button_container);
 		for(var i=0;i<this.buttons.length;i++){
                     this.buttons[i].node="button";
@@ -110,7 +109,7 @@ require("./DisplayFieldset");
             if(index ===0){
 	        // no buttons so create button_container
                 r=document.createElement("div");
-		r.classList.add("form_button_container","ui-widget-content");
+		r.classList.add("form_button_container");
                 this.element.appendChild(r);
             }
             else{

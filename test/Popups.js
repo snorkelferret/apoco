@@ -45,20 +45,20 @@ describe("Popups",function(){
         assert(Apoco !== undefined); 
     });
     it("defines Apoco.popup",function(){
-        console.log("here is Apoco.popup " + Apoco.popup);
+        console.log("here is apoco.popup " + Apoco.popup);
        // assert(Apoco.popup !== undefined);
         assert.isObject(Apoco.popup);
         
     });
     it("creates an alert",function(){
         Apoco.popup.alert();
-        var b=document.getElementById("Apoco_alert");
+        var b=document.getElementById("apoco_alert");
         assert.strictEqual(document.contains(b),true);
     });
     
     it('makes a dialog popup', function () {
         Apoco.popup.dialog("what","here i am");
-        var b=document.getElementsByClassName("Apoco_dialog")[0];
+        var b=document.getElementsByClassName("apoco_dialog")[0];
         assert.strictEqual(document.contains(b),true);;
         
     });

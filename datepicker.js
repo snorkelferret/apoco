@@ -86,7 +86,7 @@ var Apoco=require('./declare').Apoco;
                     throw new Error("datepicker: element must be an input node");
                 }
                // console.log("datepicker here");
-                element.classList.add("Apoco_datepicker_input");
+                element.classList.add("apoco_datepicker_input");
                 element.addEventListener("click",click,false);
                 element.addEventListener("change",change,false);
             }
@@ -111,66 +111,66 @@ var Apoco=require('./declare').Apoco;
         },
         mkCalendarHeader:function(date){
             var table,row,body,head,col,title,span,that=this;
-            var icons=[{id:"Apoco_datepicker_prevYear",
+            var icons=[{id:"apoco_datepicker_prevYear",
                         func: function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
                                 var f=that.selectedDate.getFullYear()-1;
                                 that.selectedDate.setFullYear(f);
                                 that.mkCalendarBody(this.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
+                                var p=that.calendar.querySelector("td.selected");
                                 if(p){
-                                    p.classList.remove("ui-state-active");
+                                    p.classList.remove("selected");
                                 }
                             }
                         }
                        },
-                       {id:"Apoco_datepicker_prevMonth",
+                       {id:"apoco_datepicker_prevMonth",
                         func:function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
                                 var f=that.selectedDate.getMonth()-1;
                                 that.selectedDate.setMonth(f);
                                 that.mkCalendarBody(that.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
+                                var p=that.calendar.querySelector("td.selected");
                                 if(p){
-                                    p.classList.remove("ui-state-active");
+                                    p.classList.remove("selected");
                                 }
                             }
                         }
                        },
-                       {id:"Apoco_datepicker_nextYear",
+                       {id:"apoco_datepicker_nextYear",
                         func:function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
                                 var f=that.selectedDate.getFullYear()+1;
                                 that.selectedDate.setFullYear(f);
                                 that.mkCalendarBody(that.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
+                                var p=that.calendar.querySelector("td.selected");
                                 if(p){
-                                    p.classList.remove("ui-state-active");
+                                    p.classList.remove("selected");
                                 }
                             }
                         }
                        },
-                       {id:"Apoco_datepicker_nextMonth",
+                       {id:"apoco_datepicker_nextMonth",
                         func:function(e){
                             e.stopPropagation();
                             if(that.selectedDate){
                                 var f=that.selectedDate.getMonth()+1;
                                 that.selectedDate.setMonth(f);
                                 that.mkCalendarBody(that.selectedDate);
-                                var p=that.calendar.querySelector("td.ui-state-active");
+                                var p=that.calendar.querySelector("td.selected");
                                 if(p){
-                                    p.classList.remove("ui-state-active");
+                                    p.classList.remove("selected");
                                 }
                             }
                         }
                        }
                       ];
             table=document.createElement("table");
-            table.id="Apoco_datepicker_controls";
-            table.classList.add("ui-datepicker-header","ui-widget-header","ui-helper-clearfix","ui-corner-all");
+            table.id="apoco_datepicker_controls";
+           // table.classList.add("ui-datepicker-header","ui-widget-header","ui-helper-clearfix","ui-corner-all");
             this.element.appendChild(table);
             body=document.createElement("tbody");
             table.appendChild(body);
@@ -184,17 +184,17 @@ var Apoco=require('./declare').Apoco;
                 span=document.createElement("span");
                 span.id=icons[i].id;
                 if(i===0){
-                    span.classList.add("ui-icon","ui-icon-circle-arrow-w");
+                    span.classList.add("big_west");
                 }
                 else{
-                    span.classList.add("ui-icon","ui-icon-circle-triangle-w");
+                    span.classList.add("west");
                 }
                 span.addEventListener("click",icons[i].func,false);
                 col.appendChild(span);
             }
             title=document.createElement("td");
-            title.id="Apoco_datepicker_title";
-            title.classList.add("ui-datepicker-title");
+            title.id="apoco_datepicker_title";
+           // title.classList.add("ui-datepicker-title");
             row.appendChild(title);
             col=document.createElement("td");
             col.classList.add("arrows");
@@ -204,17 +204,17 @@ var Apoco=require('./declare').Apoco;
                 span=document.createElement("span");
                 span.id=icons[i].id;
                 if(i===2){
-                    span.classList.add("ui-icon","ui-icon-circle-arrow-e");
+                    span.classList.add("big_east");
                     //"ui-icon-seek-next");
                 }
                 else{
-                    span.classList.add("ui-icon","ui-icon-circle-triangle-e");
+                    span.classList.add("east");
                 }
                 span.addEventListener("click",icons[i].func,false);
                 col.appendChild(span);
             }
             this.calendar=document.createElement("table");
-            this.calendar.id="Apoco_datepicker_grid";
+            this.calendar.id="apoco_datepicker_grid";
             this.element.appendChild(this.calendar);
             body=document.createElement("tbody");
             this.calendar.appendChild(body);
@@ -227,28 +227,29 @@ var Apoco=require('./declare').Apoco;
             }
             var selectDay=function(e){
                 var day,s,p;
-               // console.log("selectDay is here");
-              //  console.log("target type is " + e.target.type);
-              //  console.log("target classlist " + e.target.classList.contains("Apoco_date"));
-                if(e.target.classList.contains("Apoco_date")){
+                console.log("selectDay is here");
+                console.log("target type is " + e.target.type);
+                console.log("target classlist " + e.target.classList.contains("apoco_date"));
+                if(e.target.classList.contains("apoco_date")){
                     day=e.target.textContent;
-                //    console.log("got day " + day);
+                    console.log("got day " + day);
                     e.stopPropagation();
                     e.preventDefault();
                     //find the previous selection
-                    p=that.calendar.querySelector("td.ui-state-active");
+                    p=that.calendar.querySelector("td.selected");
                     if(p){
-                        p.classList.remove("ui-state-active");
+                        p.classList.remove("selected");
                     }
-                    e.target.classList.add("ui-state-active");
+                    e.target.classList.add("selected");
                     //e.target.siblings.classList.remove("ui-state-active");
                     that.selectedDate.setDate(day);
                     s=that.dateToString(that.selectedDate);
                     
                     that.current_element.value=s;
-                  //  console.log("setected day is " + that.selectedDate);
+                    console.log("setected day is " + that.selectedDate);
                 }
             };
+            console.log("adding event listener to apoco_datepicker_grid");
             this.calendar.addEventListener("click",selectDay,false);
         },
         dateToString:function(date){
@@ -286,7 +287,7 @@ var Apoco=require('./declare').Apoco;
            // console.log("mkCalendarBody this.calendar is " + this.calendar);
             
             // fill in the title
-            c=document.getElementById("Apoco_datepicker_title");
+            c=document.getElementById("apoco_datepicker_title");
             c.textContent=(this.months[current_month].name + " " + current_year).toString();
             //remove the previous body if it exists
             var tbody=this.calendar.getElementsByTagName("tbody")[0];
@@ -333,27 +334,27 @@ var Apoco=require('./declare').Apoco;
                 }
                 c=document.createElement("td");
                 if(i<start_day){
-                    c.className="ui-state-disabled";
+                    c.className="disabled";
                 }
                 else if (i=== start_day){
                     p=1;
-                    c.classList.add("Apoco_date");
+                    c.classList.add("apoco_date");
                 }
                 else if(i=== ml+start_day){
                     p=1;
-                    c.className="ui-state-disabled";
+                    c.className="disabled";
                 }
                 else if(i>(ml+start_day)){
-                    c.className="ui-state-disabled";
+                    c.className="disabled";
                 }
                 c.textContent=p;
                 if(i>=start_day && i<(ml+start_day) ){
-                    c.classList.add("Apoco_date");
+                    c.classList.add("apoco_date");
                     if(p=== today){ 
-                        c.classList.add("ui-state-highlight");
+                        c.classList.add("highlight");
                     }
                     if(p===day){
-                        c.classList.add("ui-state-active");
+                        c.classList.add("selected");
                     }
                 }
                 r.appendChild(c);
@@ -365,8 +366,8 @@ var Apoco=require('./declare').Apoco;
 	    if (this.element=== undefined) {
 		this.element = document.createElement('div');
 		//this.element.onselectstart = function () { return false; };
-		this.element.id = "Apoco_datepicker";
-                this.element.classList.add("ui-datepicker","ui-widget-content","ui-corner-all");
+		this.element.id = "apoco_datepicker";
+               // this.element.classList.add("ui-datepicker","ui-widget-content","ui-corner-all");
 		document.getElementsByTagName("body").item(0).appendChild(this.element);
                 this.mkCalendarHeader();
 	    }

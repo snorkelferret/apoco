@@ -2,24 +2,19 @@
 
 
 .apoco_form{position: fixed; top: 25%; left: 25%; 
-                font-weight: normal; /*width: 60em; */
-                /*min-height: 40em !important;  min-width: 43em !important; */
+                font-weight: normal;
                 z-index:600;
                 min-width: 12em;
                 min-height:18em;
-                /* width: 30em;
-                height: 25em; */
-                /* padding:1em 25px 1em 2em; */
-                 max-height: 80em;
+                background-color: #ffffff;
+                max-height: 80em;
                  overflow: hidden;
                  display: inline-block}
-.form_header{cursor: move; height: 2em ; background-color:#000; color:#fff; min-width:inherit; width: inherit}
-.form_header span{color: #fff}
+.form_header{cursor: move; height: 2em ; background-color:#ddd; color: #000;  min-width:inherit; width: inherit}
+
 .apoco_form .form_header h5{display:inline; margin: 0;position: absolute; top:0.4em; left:0.4em  }
 
-/* .form_drag{ height: 100%; width: 100%;  } */
-.form_content{  /*width: 100%;  */
-                margin: 1em;
+.form_content{ margin: 1em;
                overflow: hidden;
                z-index:600; }
 
@@ -36,51 +31,26 @@
 .apoco_form ul li{display: table-row; height: 3em; }
 .apoco_form ul li.seperator{width: 100%; background: #222; border-bottom: 1px solid #777; cursor: auto }
 
-/*
-.apoco_form{position: absolute; top: 16em; left: 24em; 
-                 font-size: 12pt; font-weight: normal; width: 60em; min-height: 40em !important;  min-width: 40em !important; 
-                 z-index:600; padding:1em 0em 0em 2em;
-                 border: 1px solid #555;
-                 overflow: hidden;
-                 display: inline-block}
-.apoco_form .form_content{ height: 100%; width: 100%;  overflow: auto; z-index:600; }
-*/
-
 
 .apoco_form li.invalid_input{ color: #cc0000 /*border: 2px solid #cc0000 */ }
-
-/* padding: top right bottom left */
-/*
-.apoco_form .form_list {overflow-y: auto; overflow-x: hidden;  margin: 0 0 1em 0; font-size: 10pt; border: 1px solid #777; width: 20em; height: 10em; padding: 0; }
-.apoco_form ul.apoco_form_list {margin: 0 ;padding: 0em; list-style: none;}
-.apoco_form ul.apoco_form_list li{float: left; clear: both; width: 100%; padding: 5px 0em 5px 1em; cursor: pointer ; height:15px }
-.apoco_form ul.apoco_form_list li.selected{ background: #666; }
-.apoco_form ul.apoco_form_list li.seperator{width: 100%; background: #222; border-bottom: 1px solid #777; cursor: auto }
-*/
 
 .apoco_form .form_header span{display: inline; cursor: pointer; vertical-align: middle; float: right;
                                     width: 16px; height: 16px; margin:0.2em}
 
 
 .apoco_form h4 {text-align: center;  }
-/*
-.apoco_form ul{ margin: auto; 
-                    list-style: none; 
-                    padding: 0em;  top: em; }
-.apoco_form ul li{height: 35px; display: inline-block}
-*/
+
 .apoco_form ul li label { height: 1.5em; margin: 0 1em 0 0; display: inline;
                               text-align: right;
-                              
                               float: left;
-                              width: 4em} /*display: table-cell; text-align: right} */
-/*.apoco_form ul li input{ width: 23em; } */
+                              width: 4em} 
+
 .apoco_form ul li ul.fieldset{display: inline-block; }
 
 .apoco_form ul li.count input,
 .apoco_form div.count input{ display: inline-block; 
                                   width: 10em; }
-/*.apoco_form ul li.text{display: block  } */
+
 .apoco_form ul li input::-webkit-inner-spin-button{
     webkit-appearance: none;
     margin: 0; }  /* for chrome to stop up/down arrows */

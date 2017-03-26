@@ -240,7 +240,7 @@ require("./Types.js");
         },
 	clock: function(that){  
             that.element=document.createElement("div");  
-            that.element.classList.add("Apoco_clock");
+            that.element.classList.add("apoco_clock");
             var cb=function(t){
                 var d=new Date();
                 that.element.textContent=d.toLocaleTimeString();
@@ -251,7 +251,7 @@ require("./Types.js");
             var t=that.text?that.text: that.name;
             that.element=document.createElement("button");
             that.element.type="button";
-            that.element.classList.add("ui-button");
+            that.element.classList.add("button");
             that.element.textContent=t;
             if(that.disabled === true){
                 that.element.setAttribute("disabled","disabled");
@@ -273,14 +273,14 @@ require("./Types.js");
             //console.log("paginator init with number " + that.number);
 	    // var that=this;
             that.element=document.createElement("div");
-            that.element.classList.add("Apoco_paginate");
+            that.element.classList.add("apoco_paginate");
             var cb=function(index,el){
               //  console.log("index is " + index);
                 n=el.parentNode.childNodes;
                 for(var i=0;i<n.length;i++){
-                    n[i].classList.remove("ui-state-active");
+                    n[i].classList.remove("selected");
                 }
-                el.classList.add("ui-state-active");   
+                el.classList.add("selected");   
                 that.current_num=index;
                 that.action(that);
             };

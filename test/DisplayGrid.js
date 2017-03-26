@@ -74,6 +74,10 @@ describe("DisplayGrid-(start without rows)",function(){
     it("can add yet another row",function(){
         t.addRow({name:"Sam",job:"Manager"});
     });
+    it("san add a column with a label",function(){
+        t.addCol({name: "things",label:"whatever",type:"string"});
+        assert.strictEqual(t.getColIndex("things"),3);
+    });
   
     it("dumps the contents of the grid as a JSON object",function(){
         var b=t.getJSON();

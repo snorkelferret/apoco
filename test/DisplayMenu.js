@@ -38,7 +38,7 @@ describe("DisplayMenu-(start without menu items)",function(){
         assert.strictEqual(t.getChildren().length,1);
     });
     it("has added a menu item to the DOM",function(){
-        var b=document.getElementById("test_menu").getElementsByClassName("ui-menu-item");
+        var b=document.getElementById("test_menu").getElementsByTagName("li");
         assert.strictEqual(b.length,1);
     });
     it("can delete a menu item",function(){

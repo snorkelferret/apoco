@@ -44,7 +44,7 @@ require("./DisplayBase");
 //	    console.log("Menus creating new element");
 	    u=document.createElement("ul");
             u.role="menubar";
-            u.classList.add("apoco_menu_list","ui-menu");
+            u.classList.add("apoco_menu_list");
             this.element.appendChild(u);
             
 	    for(var i=0;i<this.components.length;i++){
@@ -79,7 +79,7 @@ require("./DisplayBase");
             this.selected=null;
             var p=this.element.getElementsByTagName("li");
             for(var i=0;i<p.length;i++){
-                p[i].classList.remove("selected","ui-state-active");
+                p[i].classList.remove("selected");
             }
         },
         addMenu:function(index,parent_element){
@@ -114,7 +114,7 @@ require("./DisplayBase");
                 parent_element.appendChild(d.element);
             }
             else{
-	        d.element.classList.add("ui-menu-item");
+	       // d.element.classList.add("ui-menu-item");
                 d.element.setAttribute("role","menuitem");
                 d.element.textContent=l;
               //  console.log("menu text is "+ d.element.textContent);
@@ -152,9 +152,9 @@ require("./DisplayBase");
                     //           var el=this.element.find("ul li:nth-child(" + (i+1) + ")");
                     c=this.selected.element.parentNode.children;
                     for(var j=0;j<c.length;j++){
-                        c[j].classList.remove("selected","ui-state-active");
+                        c[j].classList.remove("selected");
                     }
-                    this.selected.element.classList.add("selected","ui-state-active");
+                    this.selected.element.classList.add("selected");
                     return;
                 }
             }

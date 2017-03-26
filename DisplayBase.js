@@ -91,7 +91,7 @@ require("./Fields");
         this.element=document.createElement("div");
         this.element.id=this.id;
         
-        this.element.classList.add("apoco_"+this.display);   //,"ui-widget-content","ui-corner-all");
+        this.element.classList.add("apoco_"+this.display);  
         if(this.class){
             if(Apoco.type["string"].check(this.class)){
                 this.element.classList.add(this.class);

@@ -10,8 +10,8 @@ var UI={};
 
     var history_update=function(name){
         var a;
-        console.log("location: " + document.location + ", name: " + name);
-        console.log("history update going to tab " + name);
+       // console.log("location: " + document.location + ", name: " + name);
+       // console.log("history update going to tab " + name);
        
         if(!name){
             console.log("state name is wrong or null" + name);
@@ -103,7 +103,7 @@ var UI={};
     function mkArrays(){
         var thing;
         for(var k in HThings){
-            console.log("k is " + k);
+          //  console.log("k is " + k);
             switch(k){
             case "Fields":
                 thing=Apoco.field;
@@ -149,7 +149,7 @@ var UI={};
                         
                    }
                    else if(k==="Displays"){
-                      console.log("got display " + n);
+                   //   console.log("got display " + n);
                        if(n.indexOf("Methods")<= -1){
                            HThings[k].push(n);
                        }
@@ -1296,12 +1296,12 @@ var UI={};
         };
         var items=[];
         for(var i=0;i<HDisplays.length;i++){
-            console.log("mkFieldMethods making " + HDisplays[i]);
+           // console.log("mkFieldMethods making " + HDisplays[i]);
             var k={};
             items[i]=[];
             for(var j in Methods[HDisplays[i]]){
                 var m=Methods[HDisplays[i]][j];
-                console.log("Methods " + m);
+                //console.log("Methods " + m);
                 items[i].push({label:m,
                                descriptions:display_methods_list[m]});
             }
@@ -1724,7 +1724,7 @@ var UI={};
 
     var select_tabs=function (that,pop){
         var name=that.name;
-        console.log("select_tabs: trying to show " + name);
+      //  console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Apoco.Panel.hide(that.parent.selected.name);
         }
@@ -1874,7 +1874,6 @@ var UI={};
                              DOM: "Main",
                              id: "Tabs",
                              selected: "About",
-                             class:["ui-tabs","ui-widget-content","ui-corner-all"],
                              action: function(that){
                                  for(var i=0; i<that.components.length;i++){
                                      that.components[i].action=select_tabs;
@@ -1899,15 +1898,12 @@ var UI={};
                   components:[ {display:"menu",
                                 DOM: "left",
                                 id: "FieldsMenu",
-                                class:["ui-widget-content","ui-corner-all"],                
-                            //    selected: "StaticField",
                                 heading:"Field Types",
                                 components: mkMenu(HThings.Fields)
                                },
                                { display: "fieldset",
                                  DOM: "right",
                                  id: "Blurb",
-                                 class:["ui-widget-content","ui-corner-all"],
                                  components:[{node:"heading", size: "h2",text: "Apoco Fields"},
                                              {node:"paragraph", text:"Fields.js <br> depends on Utils.js,Sort.js,Types.js, datepicker.js"} ,
                                              {node: "heading", size: "h3", text: "Usage" },
@@ -2027,7 +2023,6 @@ var UI={};
                        { display: "fieldset",
                          id:"Blurb",
                          DOM: "right",
-                         class:["ui-widget-content","ui-corner-all"],
                          components:[
                              {node: "heading",size:"h2",text: "Apoco Displays"},
                              {node:"paragraph", text:"DisplayMenu.js DisplayFieldset.js DisplayForm.js DisplayTabs.js DisplaySlideshow.js DisplayGrid.js"} ,
@@ -2058,7 +2053,6 @@ var UI={};
                       { display: "fieldset",
                         id:"Blurb",
                         DOM: "right",
-                        class:["ui-widget-content","ui-corner-all"],
                         components:[
                              {node: "heading",size:"h2",text: "Apoco Windows"},
                              {node:"paragraph", text:"Window.js"} ,
@@ -2191,7 +2185,6 @@ var UI={};
                     { display: "fieldset",
                       id:"Blurb",
                       DOM: "right",
-                      class:["ui-widget-content","ui-corner-all"],
                       components:[
                           {node: "heading",size:"h2",text: "Apoco Popups"},
                           {node: "paragraph",text: "Popups.js"},

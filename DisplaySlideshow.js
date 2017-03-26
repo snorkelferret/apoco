@@ -79,7 +79,7 @@ require("./DisplayBase");
                  //   console.log("visible");
                     if(that.autoplay){
                         if(that.controls){
-                            that.element.querySelector("span.ui-icon-play").click();
+                            that.element.querySelector(".play").click();
                         }
                         else{
                             that.play();
@@ -117,11 +117,11 @@ require("./DisplayBase");
         _controls:function(){
             var that=this;
             var d,u,l,s,sibs;
-            var icons=[{class:"ui-icon-seek-prev",action: "step",params:"prev"},
-                       {class:"ui-icon-play",action: "play"},
-                       {class:"ui-icon-pause",action: "stop"},
-                       {class:"ui-icon-seek-next",action: "step",params: "next"},
-                       {class:"ui-icon-arrow-4-diag",action:"showFullscreen"}];
+            var icons=[{class:"prev",action: "step",params:"prev"},
+                       {class:"play",action: "play"},
+                       {class:"pause",action: "stop"},
+                       {class:"next",action: "step",params: "next"},
+                       {class:"fullscreen",action:"showFullscreen"}];
             d=document.createElement("div");
             d.classList.add("slideshow_controls");
             u=document.createElement("ul");
@@ -131,13 +131,13 @@ require("./DisplayBase");
                     continue;  //don't show the fullscreen icon
                 }
                 l=document.createElement("li");
-                l.classList.add("ui-state-default","ui-corner-all");
+               
                 l.addEventListener("click",(function(icon,that){
                     return function(e){
                         e.stopPropagation();
                         if(icon.action === "play" && that.interval){
                             //    console.log("already in play mode");
-                            e.currentTarget.classList.remove("ui-state-active");
+                            e.currentTarget.classList.remove("selected");
                             that["stop"]();
                             that.autoplay=false;
                             return;
@@ -145,11 +145,11 @@ require("./DisplayBase");
                         if(icon.action === "step" && that.interval){
                             that.stop();
                         }
-                        e.currentTarget.classList.add("ui-state-active");
+                        e.currentTarget.classList.add("selected");
                         sibs=Apoco.Utils.getSiblings(e.currentTarget);
                         //   console.log("got siblings length " + sibs.length);
                         for(var j=0;j<sibs.length;j++){
-                            sibs[j].classList.remove("ui-state-active");
+                            sibs[j].classList.remove("selected");
                         }
                         if(icon.params){
                             that[icon.action](icon.params);
@@ -161,7 +161,6 @@ require("./DisplayBase");
                 })(icons[i],this),false);
                 s=document.createElement("span");
                 s.classList.add(icons[i].class);
-                s.classList.add("ui-icon"); // add replicated for ie11
                 l.appendChild(s);
                 u.appendChild(l);
             }
@@ -270,7 +269,7 @@ require("./DisplayBase");
                     that.stop();
                 }
                 if(that.controls){
-                    that.element.querySelector("span.ui-icon-play").click();
+                    that.element.querySelector(".play").click();
                 }
                 else{
                     that.play();

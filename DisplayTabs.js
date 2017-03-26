@@ -35,15 +35,12 @@ require("./DisplayBase.js");
 	    
             tablist=document.createElement("ul");
             tablist.role="tablist";
-            tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
-            // make a copy of the tabs
-            for(var i=0;i<this.components.length;i++){
-                tt[i]=this.components[i];
-            }
-          //  this.components.length=0;  // so we can put them back in clean container
+            //  tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
+            tablist.classList.add("tabs");
+          
             this.element.appendChild(tablist);
-            for(var i=0;i<tt.length;i++){
-            //    console.log("add a tab with index " + i);
+            for(var i=0;i<this.components.length;i++){
+               // console.log("add a tab with index " + i);
                 this.addTab(i,tablist);
 	    }
             if(this.selected){
@@ -53,20 +50,28 @@ require("./DisplayBase.js");
 	},
         addTab:function(t,tablist){
             var label,index,s,that=this;
-        
+            var alreadyHaveName=function(rr,index){
+                for(var i=0;i<that.components.length;i++){
+                    if(index !== i && that.components[i].name == rr){
+                        throw new Error("DsiplayTabs: Already has a tab named " + rr);
+                    }
+                }
+            };
             if(tablist === undefined){
-                tablist=this.element.querySelector("ul.ui-tabs-nav");
+                tablist=this.element.querySelector("ul.tabs");
             }
             if(Number.isInteger(t)){
+                alreadyHaveName(this.components[t].name,t);
                 t=this.components[t];
             }
             else{
                 index=this.components.length;
+                alreadyHaveName(t.name,index);
                 this.components[index]=t;
             }
             t.label?label=t.label: label=t.name;   
 	    t.element=document.createElement("li");
-            t.element.classList.add("ui-state-default","ui-corner-top");
+      
             t.element.setAttribute("name",t.name);
 
             if(t.class){
@@ -96,6 +101,7 @@ require("./DisplayBase.js");
                 },false);
              }
  	    tablist.appendChild(t.element);
+            return;
         },
  
 	update:function(name){
@@ -122,18 +128,18 @@ require("./DisplayBase.js");
 	    for(var i=0;i<this.components.length;i++){
              	if(this.components[i].name == name){
                     this.selected=this.components[i];
-		    this.components[i].element.classList.add("selected","ui-state-active","ui-tabs-active");
-                    this.components[i].element.classList.remove("ui-state-default");
+		    this.components[i].element.classList.add("selected");
+                    //this.components[i].element.classList.remove("ui-state-default");
 		}
 		else{
-                    this.components[i].element.classList.add("ui-state-default");
-		    this.components[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
+                    //this.components[i].element.classList.add("ui-state-default");
+		    this.components[i].element.classList.remove("selected");
 		}
 	    }
 	},
         reset:function(){
             for(var i=0;i<this.components.length;i++){
-                this.components[i].element.classList.remove("selected","ui-state-active","ui-tabs-active");
+                this.components[i].element.classList.remove("selected");
             }
             this.selected=null;
         }

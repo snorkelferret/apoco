@@ -67,8 +67,8 @@ jsonishData={
 		    var cc=$("<div></div>").css({'width': '100px','height': '100px','background':'#101010'});
 
 		    d.append(cc);
-		    var ok=$("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
-		    var cancel=$("<button class='ui-button ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
+		    var ok=$("<button class='button'> <span class='button_text'>  OK  </span> </button>");
+		    var cancel=$("<button class='button'> <span class='button_text'> Cancel </span> </button>");
 		    d.append(ok);
 		    d.append(cancel);
 		    $(this).parent().append(d);
@@ -117,7 +117,7 @@ jsonishData={
 			cell.setValue(val);
 		    }
 		     // just remove the class
-		    that.selection_list[i].classList.remove("ui-selected");
+		    that.selection_list[i].classList.remove("selected");
 		}
 	    }
 	    else{
@@ -179,11 +179,11 @@ jsonishData={
 
 	if(that.cellEdit.popup){
 	    console.log("popup is here for " + n);
-	    var d=$("<div class='popup' id='grid_popup'> </div>");
+	   // var d=$("<div class='popup' id='grid_popup'> </div>");
 	    that.field=Apoco.field[n](that.cellEdit.data["apoco"],d);
 	    that.cellEdit.getEelement().append(d);
-	    var ok=$("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'>  OK  </span> </button>");
-	    var cancel=$("<button class='ui-button  ui-state-default ui-corner-all ui-button-text-only '> <span class='ui-button-text'> Cancel </span> </button>");
+	   // var ok=$("<button class='button'> <span class='button_text'>  OK  </span> </button>");
+	   // var cancel=$("<button""> <span class='ui-button-text'> Cancel </span> </button>");
 	    d.append(ok);
 	    d.append(cancel);
 	    that.field.element.focus();
@@ -475,7 +475,7 @@ jsonishData={
 	    if(name !== undefined){
 	        div.id=name;
                 h=document.createElement("h4");
-                h.classList.add("ui-widget-header");
+            //    h.classList.add("ui-widget-header");
                 h.textContent=name;
                 div.appendChild(h);
 	    }
@@ -556,9 +556,9 @@ jsonishData={
                     var dec=document.createElement("div");
                     dec.classList.add("arrows");
                     var up=document.createElement("span");
-                    up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
+                    up.classList.add("up");
                     var down=document.createElement("span");
-                    down.classList.add("down","ui-icon","ui-icon-triangle-1-n");
+                    down.classList.add("down");
 		    dec.appendChild(up);
 		    dec.appendChild(down);
 		    h.appendChild(dec);
@@ -579,15 +579,6 @@ jsonishData={
 			    sort_callback(col_num,that,"down");
 			};
 		    }(index,that),false);
-		    
-		    h.addEventListener("mouseover",function(e){
-                        e.stopPropagation();
-		        e.target.classList.add('ui-state-hover');
-                    }, false);
-		    h.addEventListener("mouseout",function(e){
-                        e.stopPropagation();
-			e.target.classList.remove('ui-state-hover');
-                    }, false);
                 }
  		this.colElement.appendChild(h);
 		if(this.cols[index].hidden){
@@ -716,7 +707,7 @@ jsonishData={
 	    //console.log("value is " + row[col_name]);
 	    settings.value=row[col.name];
   	    c=document.createElement("td");
-            c.className=col.type;
+            (col.type)?c.classList.add(col.type):c.classList.add(col.field);
             if(col.editable === false){
                 row[col.name]=Apoco.field["static"](settings,c);
             }

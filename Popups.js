@@ -9,6 +9,7 @@ var Apoco=require('./declare').Apoco;
             var t="ERROR ";
             if(Apoco.error === undefined){
                 title=t.concat(title);
+              //  console.log("error title is " + t);
                 Apoco.error=this.dialog(title,message,true);
                 Apoco.error.close=function(){
                     document.body.removeChild();
@@ -50,51 +51,45 @@ var Apoco=require('./declare').Apoco;
                 this.create=function(){
                     var s,b,t,header;
                     Hdialog=document.createElement("div");
-                    Hdialog.classList.add("Apoco_dialog","ui-dialog","resizable","ui-widget","ui-widget-content","ui-corner-all");
+                    Hdialog.classList.add("apoco_dialog");
                     draggable=Apoco.Utils.draggable(Hdialog);
 
                     // create header
                     header=document.createElement("div");
-                    header.classList.add("ui-dialog-titlebar","ui-widget-header","ui-corner-all");
+                    header.classList.add("titlebar");
                     title_text=document.createElement("span");
-                    title_text.classList.add("ui-dialog-title");
                     title_text.textContent=title;
                     header.appendChild(title_text);
                     b=document.createElement("button");
-                    b.classList.add("ui-button","ui-widget","ui-state-default","ui-corner-all","ui-button-icon-only","ui-dialog-titlebar-close");
+                    b.classList.add("button");
                     header.appendChild(b);
                     b.role="button";
-                    b.style.float="right";
                     s=document.createElement("span");
-                    s.classList.add("ui-button-icon-primary","ui-icon","ui-icon-closethick");
+                    s.classList.add("close");
                     b.addEventListener("click",this.close,false);
                     b.appendChild(s);
                     Hdialog.appendChild(header);
                     //Content
                     s=document.createElement("div");
-                    s.classList.add("ui-dialog-content","ui-widget-content");
-                    
+                    s.classList.add("message");
                     message_text=document.createElement("p");
                     message_text.style.float="right";
                     message_text.textContent=message;
                     b=document.createElement("span");
-                    b.classList.add("ui-icon","ui-icon-circle-check");
                     s.appendChild(b);
                     s.appendChild(message_text);
                     Hdialog.appendChild(s);
                     // Tail
 	            s=document.createElement("div");
-                    s.classList.add("ui-dialog-buttonpane","ui-widget-content");
                     t=document.createElement("div");
-                    t.classList.add("ui-dialog-buttonset");
                     s.appendChild(t);
                     b=document.createElement("button");
-                    b.classList.add("ui-button","ui-widget","ui-state-default","ui-corner-all","ui-button-text-only");
+                    b.classList.add("button");
                     b.type="button";
                     b.addEventListener("click",this.close,false);
                     t.appendChild(b);
                     t=document.createElement("span");
-                    t.classList.add("ui-button-text");
+                    t.classList.add("text");
                     t.textContent="OK";
                     b.appendChild(t);
                     Hdialog.appendChild(s);
@@ -137,43 +132,37 @@ var Apoco=require('./declare').Apoco;
         },
 	spinner: function(on){
 	
-            if(!document.contains(document.getElementById("Apoco_spinner"))){
+            if(!document.contains(document.getElementById("apoco_spinner"))){
 		var spinner=document.createElement("div");
-                spinner.id="Apoco_spinner";
+                spinner.id="apoco_spinner";
 		document.body.appendChild(spinner);
 	    }
 	    if(on === true ){
-		console.log("Apoco spinner on");
-                document.getElementById("Apoco_spinner").style.display="inherit";
+		//console.log("apoco spinner on");
+                document.getElementById("apoco_spinner").style.display="inherit";
 	    }
 	    else{
-		console.log("Apoco spinner off");
-                document.getElementById("Apoco_spinner").style.display="none";
+		//console.log("apoco spinner off");
+                document.getElementById("apoco_spinner").style.display="none";
 
 	    }
             return spinner;
 	},
 	alert: function(text,time){
 	    var nd,ns,np,s;
+          //  console.log("creating alert");
             nd=document.createElement("div");
-            nd.id="Apoco_alert";
-            nd.classList.add("ui-widget");
+            nd.id="apoco_alert";
             Apoco.Utils.draggable(nd);
             ns=document.createElement("div");
-            ns.classList.add("ui-state-error","ui-corner-all");
-            ns.style.padding="10px";
+            ns.classList.add("alert");
             np=document.createElement("p");
-            np.classList.add("ui-state-error-text");
             s=document.createElement("span");
-            s.classList.add("ui-icon","ui-icon-alert");
-            s.style.float="left";
-            s.style.margin="1em";
             np.appendChild(s);
             s=document.createElement("strong");
             s.textContent="Alert";
             np.appendChild(s);
             s=document.createElement("span");
-            s.style.margin="1em";
             s.textContent=text;
             np.appendChild(s);
             
@@ -195,7 +184,7 @@ var Apoco=require('./declare').Apoco;
 	},
 	trouble: function(heading,text){
             var a=document.createElement("div");
-            a.id="Apoco_trouble";
+            a.id="apoco_trouble";
 
             var b=document.createElement("h1");
             b.textContent=heading;

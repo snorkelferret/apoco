@@ -245,10 +245,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         var s=document.createElement("input");
         s.setAttribute("type",this.html_type);
         this.input=s;
-        if(this.min){
+        if( this.min !== undefined){
             this.input.setAttribute("min",this.min);
         }
-        if(this.max){
+        if(this.max !== undefined){
             this.input.setAttribute("max",this.max);
         }
         if(this.step){
@@ -328,9 +328,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             dec.className="arrows";
             el.appendChild(dec);
             var up=document.createElement("span");
-            up.classList.add("up","ui-icon","ui-icon-triangle-1-n");
+            up.classList.add("up");
             var down=document.createElement("span");
-            down.classList.add("down","ui-icon","ui-icon-triangle-1-s");
+            down.classList.add("down");
             dec.appendChild(up);
 	    dec.appendChild(down);
             if(this.step === undefined){
@@ -361,14 +361,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	        }
 	    };
 	    var eObj={
-	        mouseover: function(e) {
-                    e.stopPropagation();
-		    e.currentTarget.parentNode.classList.add('ui-state-hover');
-	        },
-	        mouseout: function(e) {
-                    e.stopPropagation();
-		    e.currentTarget.parentNode.classList.remove('ui-state-hover');
-	        },
                 click:function(e){
                     e.preventDefault();
 		    e.stopPropagation();
@@ -1128,11 +1120,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	if(this.editable !== false){
 	    // add a glyph
             var sp=document.createElement("span");
-            sp.classList.add("plus","ui-icon","ui-icon-plusthick");
+            sp.classList.add("plus");
             var p=this.element.getElementsByTagName("li")[(this.element.getElementsByTagName("li").length-1)];
             p.appendChild(sp);
             var sm=document.createElement("span");
-            sm.classList.add("minus","ui-icon","ui-icon-minusthick");
+            sm.classList.add("minus");
             p.appendChild(sm);
             var addremove=function(add){
                 var l=that.input.length,n;
@@ -1476,7 +1468,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
         var p=document.createElement("span");
-        p.classList.add("ui-icon","ui-icon-magnify-left");
+        p.classList.add("search");
         p.innerHTML="&#x26B2;";
         box.appendChild(p);
         this.input=document.createElement("input");
@@ -1488,7 +1480,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         box.appendChild(this.input);
       
         this.select=document.createElement("ul");
-        this.select.classList.add("choice","ui-autocomplete","ui-menu","ui-front","ui-widget-content");
+        this.select.classList.add("choice");
         this.select.style.visibility="hidden";
         box.appendChild(this.select);
         var handleEvent=function(e){
