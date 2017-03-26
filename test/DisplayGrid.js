@@ -192,6 +192,13 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         //  t.updateRow({stock:"XXX",subclass:1,maturity:20160830,other:"something"});
         t.updateRow({stock:"AAB",class:"index_linked",maturity:"2017-03-27",other:"something"});
         var b=t.getRow({stock:"AAB",class:"index_linked",maturity:"2017-03-27"});
+        console.log("displayGrid:update row got %j",b);
+     /*   for(var k in b){
+            console.log("row key is " + k + " value " + b[k]);
+            for (var n in b[k]){
+                console.log("value object has key " + n + " value " + b[k][n]);
+            }
+        } */
         assert.notStrictEqual(b,null);
         assert.strictEqual(b["other"].getValue(),"something");
     });

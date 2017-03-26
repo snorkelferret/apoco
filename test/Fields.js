@@ -121,6 +121,54 @@ describe("InputField",function(){
     
 });
 
+describe("StaticField",function(){
+    require("../Fields.js");
+       
+    it("defines Apoco.field",function(){
+        console.log("here is Apoco.field " + Apoco.field);
+       // assert(Apoco.popup !== undefined);
+        assert.isObject(Apoco.field,true);
+        
+    });
+    var t=Apoco.field["static"]({name: "staticNode",value:"bob",type: "string"});
+    it("creates a static field",function(){
+        assert.isObject(t);
+    });
+    it("has a getElement method",function(){
+        assert(t.getElement() !== null); 
+    });
+    it("creates a div element",function(){
+        var b=t.getElement();
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+    it("gets a value",function(){
+        assert.strictEqual(t.getValue(),"bob"); 
+    });
+    var w=Apoco.field["static"]({name: "staticNode",value:[1,2,3,4,5],type: "integerArray"});
+    it("reads an array",function(){
+        var b=w.getElement();
+        assert.isObject(b);
+        var s=b.getElementsByTagName("span");
+        assert.strictEqual(s.length,1);
+    });
+    it("can get a value",function(){
+        var b=w.getValue();
+        console.log("static value is %j", b);
+        assert.isArray(b);
+        assert.deepEqual(b,[1,2,3,4,5]);
+    });
+    it("has not deranged numbers",function(){
+        var b=w.getValue();
+        console.log("static value is %j", b);
+        assert.isArray(b);
+        for(var i=0;i<b.length;i++){
+            assert.isNotNaN(b[i]);
+        }
+    });
+
+});
+
 describe("FloatField",function(){
 
     require("../Fields.js");

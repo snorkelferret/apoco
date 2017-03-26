@@ -717,24 +717,24 @@ jsonishData={
 	    settings.value=row[col.name];
   	    c=document.createElement("td");
             c.className=col.type;
-            if(col.field !== undefined){
-             //   console.log("Called from grid %j",settings);
-             //   console.log("row data %j",row);
-             //   console.log("col is %j",col);
+            if(col.editable === false){
+                row[col.name]=Apoco.field["static"](settings,c);
+            }
+            else if(col.field !== undefined){
                 row[col.name]=Apoco.field[col.field](settings,c);
             }
-           else{ 
+            else{ 
                row[col.name]=Apoco.field[Apoco.type[col.type].field](settings,c);
             }
             
-            if(col.hidden !== true){
+            if(col.hidden !== true){  //only put in DOM if not hidden
 		r.appendChild(row[col.name].element);
                 row[col.name].element.data={};
                 row[col.name].element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
 	    }
-	    if(col.hidden){
+	   /* if(col.hidden){  
 		row[col.name].element.visibility="hidden";
-	    }
+	    } */
         },
         addRow: function(row_data){
 	    var row=null,r,grid,name,l,t,sortOrder=[],e;
@@ -858,7 +858,7 @@ jsonishData={
             }
             //console.log("getRow this.sortOrder length is " + this.sortOrder.length);
             for(var i=0;i<grid.length;i++){
-               // console.log("searching grid ",grid[i].name);
+                console.log("searching grid ",grid[i].name);
                 if(grid[i].sorted){
                     if(this.closest){
                         if(this.sortOrder === undefined){
@@ -876,12 +876,12 @@ jsonishData={
                                 throw new Error("getRow: key is not unique needs " + this.sortOrder[j] );
                             }
                         }
-                        for(var j=0;j<grid[i].rows.length;j++){
-                            for(k=0;k<this.cols.length;k++){
-                                var v=this.cols[k].name;
-                                //console.log("val is " + grid[i].rows[j][v].getValue());
-                            }
-                        }
+                       // for(var j=0;j<grid[i].rows.length;j++){
+                       //     for(k=0;k<this.cols.length;k++){
+                         //       var v=this.cols[k].name;
+                               // console.log("val is " + grid[i].rows[j][v].getValue());
+                           // }
+                       // }
                     }
 		    row=Apoco.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
                     if(row){

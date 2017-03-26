@@ -181,18 +181,28 @@ var UI={};
         field_options: function(){
             var that=this;
             return{
-            required:{name:{type: "string",descriptions:["tag used in Field methods"]}},
-            common: {required:{type:"boolean",default: false,descriptions:["Is the cell allowed to be blank"]},
-                     editable:{type:"boolean",default:true,descriptions:["If false user input is disabled"]},
-                     label:{type: "string",default: undefined,descriptions:["added next to the input field"]},
-                     title:{type: "string",default: undefined,descriptions:["add a tooltip"]}
-                    },
-            IO:{
-                action:{type:"function",default: undefined,descriptions:["Function run after field has beenn created <br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
-                listen:{type:"objectArray",default:undefined ,descriptions:["e.g <code> listen:[{name:'some_name',action:function(that,data){ alert('got data ' + data);}}]</code>"]},
-                publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that,name){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Apoco.IO.dispatch(name,data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
-            },
-            input: { options:{type:{type:"string",
+                required:{name:{type: "string",descriptions:["tag used in Field methods"]}},
+                common: {required:{type:"boolean",default: false,descriptions:["Is the cell allowed to be blank"]},
+                         editable:{type:"boolean",default:true,descriptions:["If false user input is disabled"]},
+                         label:{type: "string",default: undefined,descriptions:["added next to the input field"]},
+                         title:{type: "string",default: undefined,descriptions:["add a tooltip"]}
+                        },
+                IO:{
+                    action:{type:"function",default: undefined,descriptions:["Function run after field has beenn created <br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
+                    listen:{type:"objectArray",default:undefined ,descriptions:["e.g <code> listen:[{name:'some_name',action:function(that,data){ alert('got data ' + data);}}]</code>"]},
+                    publish:{type: "objectArray",default: undefined,descriptions:["array can contain either an action function or static data e.g"," <code> publish:[{name:'some_name', <br> " + mk_spaces(4) + "action:function(that,name){ <br> " + mk_spaces(8) + " var data={user:'me',password:'you'}; <br> "+ mk_spaces(8) + "Apoco.IO.dispatch(name,data);}<br> " + mk_spaces(4) + "}];</code>","or","<code> publish:[{name:'some_name',data: my_data}]; </code> "]}
+                },
+                static:{options:{type:{type:"string",
+                                       default: "string",
+                                       params:"any",
+                                       descriptions:["any type at all"]},
+                                 value:{type: "any",default:"undefined",
+                                        params: "any",
+                                        descriptions:["single value or an array"]}
+                                },
+                        descriptions:["For fields that are not editable but need to have field methods"]
+                       },
+                input: { options:{type:{type:"string",
                                     default:"string",
                                     params:that.get_types("input"),
                                     dependsOn:{float:{min:"default: undefined",
@@ -208,12 +218,12 @@ var UI={};
                                                         }
                                               }
                                    },
-                              value:{type: "any",default: undefined,
+                                  value:{type: "any",default: undefined,
                                      params:that.get_types("input"),
                                      descriptions:[""]},
-                              placeholder:{type: "string",default:"none",params: "string",descriptions:["placeholder text for field"]}
-                             },
-                     descriptions:[""]
+                                  placeholder:{type: "string",default:"none",params: "string",descriptions:["placeholder text for field"]}
+                                 },
+                         descriptions:[""]
                    },
             select:{ required:{ options:{type:"stringArray",
                                          default: undefined,
@@ -412,6 +422,7 @@ var UI={};
                 autoComplete:["options"],
                // static:["value"],
                 stringArray:["value"],
+                static:["type","value"],
                 float:["value"],
                 numberArray:["value","type"],
                 input:["value","type"],

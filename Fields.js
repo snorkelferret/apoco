@@ -198,8 +198,46 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	}
     };
 
- 
+    var StaticField=function(d,element){
+        var that=this;
+        d.field="static";
+        _Field.call(this,d,element);
+        this.span=document.createElement("span");
+        //s.setAttribute("type",this.html_type);
+        this.setValue(this.value);
+        this.element.appendChild(this.span);
+    };
+    StaticField.prototype={
+        setValue:function(v){
+            var t=new String,p;
+            if(!v){
+                v=this.value;
+            }
+            else{
+                this.value=v;
+            }
+            if(Apoco.type["array"].check(v)){
+                for(var i=0;i<v.length;i++){
+                    p=v[i];
+                    t=t.concat(p.toString());
+                    if(i<(v.length-1)){
+                        t=t.concat(", ");
+                    }
+                }
+                this.span.textContent=t;
+            }
+            else{
+                this.span.textContent=v;
+            }
+            
+        },
+        getValue:function(){
+            return this.value;
+        }
+    };
 
+    Apoco.Utils.extend(StaticField,_Field);
+    
     var InputField=function(d,element){
         var that=this;
         d.field="input";
@@ -211,7 +249,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.input.setAttribute("min",this.min);
         }
         if(this.max){
-            this.input.setAttribute("min",this.max);
+            this.input.setAttribute("max",this.max);
         }
         if(this.step){
             this.input.setAttribute("step",this.step);
@@ -280,7 +318,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         }
         if(this.editable === false){
             this.input[0].readOnly=true;
-            this.input[0].readOnly=true;
+            this.input[1].readOnly=true;
             this.spinner=false;
         }
         if(this.spinner){
@@ -1606,6 +1644,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             return false;
         },
+        static: function(options,element){return new StaticField(options,element)},
+        staticMethods:function(){var n=[]; for(var k in StaticField.prototype){  n.push(k);} return n;},
         input:function(options,element){return new InputField(options,element);},
         inputMethods:function(){var n=[]; for(var k in InputField.prototype){  n.push(k);} return n;},
         float:function(options,element){return new FloatField(options,element);},
