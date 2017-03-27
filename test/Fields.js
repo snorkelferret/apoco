@@ -552,13 +552,12 @@ describe("ButtonSetField",function(){
         //var s=$(e).prop("checked");
         assert.strictEqual(b.checked,true);
     });
-    it("has a getter method which returns an array",function(){
+    it("has a getter method which returns an array of one for boolean fields",function(){
         var b=f.getValue();
-        assert.strictEqual(b.length,3);
+        console.log("return for boolean buttonset is %j",b);
+        assert.strictEqual(b.length,1);
         assert.strictEqual(b[0].one,true);
-        assert.strictEqual(b[1].two,false);
-        assert.strictEqual(b[2].three,false);
-        
+             
     });
     it("can add a new entry",function(){
         f.addValue("four");
@@ -590,25 +589,21 @@ describe("ButtonSetField",function(){
         assert.throws(fn,"ButtonSetField: values array length 1 does not match labels 4");
     });
 
-    it("has a set method",function(){
+    it("has a set method for booleans",function(){
         f.setValue([false,false,true,false]);
         var b=f.getValue();
+        assert.strictEqual(b.length,1);
         for(var i=0;i<b.length;i++){
-            assert.strictEqual(b[0].one,false);
-            assert.strictEqual(b[1].two,false);
-            assert.strictEqual(b[2].three,true);
-            assert.strictEqual(b[3].four,false);
+            assert.strictEqual(b[0].three,true);
         }
         
     });
     it("has a set method to set a single value",function(){
         f.setValue(true,1);
         var b=f.getValue();
+        assert.strictEqual(b.length,1);
         for(var i=0;i<b.length;i++){
-            assert.strictEqual(b[0].one,false);
-            assert.strictEqual(b[1].two,true);
-            assert.strictEqual(b[2].three,false);
-            assert.strictEqual(b[3].four,false);
+            assert.strictEqual(b[0].two,true);
         }
         
     });
@@ -619,17 +614,11 @@ describe("ButtonSetField",function(){
         var b=f.getValue();
         for(var i=0;i<b.length;i++){
             assert.strictEqual(b[0].one,true);
-            assert.strictEqual(b[1].two,false);
-            assert.strictEqual(b[2].three,false);
-            assert.strictEqual(b[3].four,false);
         }
         f.resetValue();
         b=f.getValue();
         for(var i=0;i<b.length;i++){
-            assert.strictEqual(b[0].one,false);
-            assert.strictEqual(b[1].two,true);
-            assert.strictEqual(b[2].three,false);
-            assert.strictEqual(b[3].four,false);
+            assert.strictEqual(b[0].two,true);
         }
         
     });

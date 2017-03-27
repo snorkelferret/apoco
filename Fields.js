@@ -1027,11 +1027,20 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 	},
 	getValue:function(){
-            var ar=[],p;
+            var ar=[],p={};
             for(var i=0;i<this.input.length;i++){
                 p={};
-                p[this.input[i].label]=this.input[i].input.checked;
-                ar[i]=p;
+                if(this.checkbox === true){  // allows multiple selections - so return an array  
+                    p[this.input[i].label]=this.input[i].input.checked;
+                    ar[i]=p;
+                }
+                else{    // only one value at most will be checked
+                    if(this.input[i].input.checked){
+                        p[this.input[i].label]=this.input[i].input.checked;
+                        ar.push(p);
+                        return ar;
+                    }
+                }
             }
 	    return ar;
 	},

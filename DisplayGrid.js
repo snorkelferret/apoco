@@ -25,10 +25,10 @@ jsonishData={
          type: // see ApocoTypes  // required key
          editable: boolean, (default true)
          unique: boolean,(default false)
-         hidden: boolean,(default false)
-         display: boolean, (default true) // setting to false means no dom element is created.
+         hidden: boolean,(default false)// setting to true means no dom element is created.
+         display: boolean, (default true) - not implemented
          userSortable: boolean (default: false)
-         required: boolean (default: true)
+         required: boolean (default: false)
          step: float, default(0.1) // FloatField only
          precision: integer, default(2) // FloatField only
  },
@@ -293,6 +293,9 @@ jsonishData={
             throw new Error("DisplayGrid: need to supply a least one column");
         }
         if(this.uniqueKey){
+            if(!Apoco.type["stringArray"].check(this.uniqueKey)){
+                throw new Error("DisplayGrid: unique key is not a stringArray");
+            }
           //  console.log("this,uniquekey length is " + this.uniqueKey.length);
             this.sortOrderUnique=true;
             if(this.sortOrder){
@@ -319,6 +322,10 @@ jsonishData={
                // }
                // console.log("After MakeGrid sortOrder length is " + this.sortOrder.length);
             }
+            else{  // sortOrder is the uniqueKey
+                this.sortOrder=this.uniqueKey.slice();
+            }
+            
         }
         
   
@@ -430,7 +437,8 @@ jsonishData={
                 sortOrder=this.sortOrder.slice();
             }
             else if(this.uniqueKey){
-                sortOrder[0]=this.uniqueKey;
+                console.log("this.uniquekey length is" + this.uniqueKey.length);
+                sortOrder=this.uniqueKey.slice();
             }
 	    if(sortOrder.length > 0){
 		var ar=[],t,s;
@@ -439,7 +447,7 @@ jsonishData={
                     console.log("this is sortOrder " + sortOrder[i]);
 		    t=this.getColIndex(sortOrder[i]);
 		    console.log("col index is " + t);
-		    s=this.sortOrder[i];  // name of the column in the row
+		    s=sortOrder[i];  // name of the column in the row
 		    console.log("name is " + s);
 		    if(this.cols){
 			ar.push({type: this.cols[t].type,
@@ -542,7 +550,7 @@ jsonishData={
             }
 	    if(this.cols[index].hidden !== true){
 		//console.log("grid col " + this.cols[index].name);
-		var label=(this.cols[index].label)?this.cols[i].label:this.cols[index].name;
+		var label=(this.cols[index].title)?this.cols[index].title:this.cols[index].name;
                 var h=document.createElement("div");
                 var s=document.createElement("span");
                 h.appendChild(s);
@@ -590,6 +598,56 @@ jsonishData={
                 Apoco.popup.spinner(false);   
                 this.show();
             }
+        },
+        rowEditPopup: function(row,buttons,editable){
+            var b,d,override=false,that=this,p={},
+                settings={draggable: true,
+                          components:[]
+                         };
+            console.log("this DOM is " + this.DOM);
+            if(Apoco.type["string"].check(this.DOM)){
+                settings.DOM=this.DOM;
+            }
+            else{  // is this.DOM a html element - if so get id
+                settings.DOM=this.DOM.id;
+            }
+            console.log("rowEditPopup: got row %j",row);
+            
+            settings.id="rowEditPopup";
+            b=document.getElementById(settings.id);
+            if(document.contains(b)){
+                //throw new Error("rowEditpopup: this element already ecists" + settings.id);
+                b.parentNode.removeChild(b);
+               // return null;
+            }
+            if(editable && Apoco.type["objectArray"].check(editable)){ // do we have edit overrides
+                override=true;
+            }
+            if(buttons && Apoco.type["object"].check(buttons)){
+                settings["buttons"]=buttons;
+            }
+            for(var i=0; i<this.cols.length;i++){
+                p={};
+                for(var k in this.cols[i]){
+                    console.log("k in cols is " + k);
+               
+                    if(k === "editable" && override && editable[k] !== undefined){
+                        p[k]=editable[k];
+                    }
+                    else if(k === "title" ){ // || k === "name"){
+                        p["label"]=this.cols[i][k];
+                    }
+                    else{
+                        p[k]=this.cols[i][k];
+                    }
+                }
+                p["value"]=row[this.cols[i].name].value;
+                settings.components[i]=p;
+            }
+            console.log("+++++ adding form with settings %j",settings);
+            var f=Apoco.display["form"](settings);
+            return f;
+            
         },
         deleteCol:function(name){
             var el,index=this.getColIndex(name);
@@ -778,10 +836,16 @@ jsonishData={
                 t=Object.keys(grid.rows[closest.index])[0];
               //  console.log("key is " + t);
                 if(closest.dir === "after"){
-                    closest.index++;
-                    e= grid.rows[closest.index][t].element;
-                    e.parentNode.insertBefore(e,r.nextSibling); // insert after r
-                    grid.rows.splice(closest.index,0,row_data); //insert row
+                    closest.index++;  // check not stepping off end of array
+                    if(closest.index >= grid.rows.length ){
+                        grid.rows.push(row_data);
+                        grid.element.getElementsByTagName("tbody")[0].appendChild(r);
+                    }
+                    else{
+                        e= grid.rows[closest.index][t].element;
+                        e.parentNode.insertBefore(e,r.nextSibling); // insert after r
+                        grid.rows.splice(closest.index,0,row_data); //insert row
+                    }
                 }
                 else{
                     // grid.rows.splice(closest.index,0,row_data);

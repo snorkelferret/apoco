@@ -229,6 +229,7 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
     var t;
     require("../DisplayGrid.js");
     var data={ id:"test_grid",DOM:"test",
+               uniqueKey: ["one"],
                cols:[{name:"one",type: "integer" },
                      {name: "two",type: "string"}],
                rows:[{one: 20 ,two: "hat"},
@@ -255,5 +256,26 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         console.log("b is " + b +  " and c " + c);
         assert.strictEqual(b,c);
     });
+    it("can create a rowEditPopup",function(){
+        var b=t.getRow({one:20});
+        assert.notStrictEqual(b,null);
+        var f=t.rowEditPopup(b);
+        assert.isObject(f);
+        f.show();
+        var b=document.getElementById("rowEditPopup");
+        assert.strictEqual(document.contains(b),true);
+        
+    });
+    it("rowEditpopup recreates itself it already in DOM",function(){
+        var b=t.getRow({one:22});
+        assert.notStrictEqual(b,null);
+        var f=t.rowEditPopup(b);
+        assert.isObject(f);
+        f.show();
+        var b=document.getElementById("rowEditPopup");
+        assert.strictEqual(document.contains(b),true);
+    });
+
+    
     
 });
