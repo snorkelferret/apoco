@@ -240,7 +240,7 @@ div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0em; position:absolute
 div.apoco_autocomplete ul li{display: block; 
                              z-index:10; width: inherit}
 div.apoco_autocomplete ul li:hover{font-weight:bold}
-div.apoco_autocomplete input{margin: 0; border:none;width: 18em;}
+div.apoco_autocomplete input{margin: 0; width: 18em;}
 div.apoco_autocomplete span{width: 20px; height: 17px; float:right;
                             padding: 0 0.5em;
                            background-color:#fff}

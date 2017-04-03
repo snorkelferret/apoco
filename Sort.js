@@ -92,6 +92,7 @@ require("./Types")
 	}
 	return false;
     };
+  
     Apoco.sort=function(r,type_data){
 	var compare,fn,t;
         if(r === undefined){
@@ -144,8 +145,6 @@ require("./Types")
         }
         return r;
     };
- 
-
-	
+  	
 })();
 

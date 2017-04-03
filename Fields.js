@@ -16,7 +16,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             required:false,
             editable: true,
             type: "any",
-            value: ""
+            value: null
         };
         if(!d){
             throw new Error("Field: must have some options");
@@ -108,13 +108,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	},
 	getValue:function(){
             if(this.input.pending){
-                return undefined;
+                return null;
             }
 	    var v=this.input.value;
 	    if( v && v.length > 0){
 		return this.input.value;
 	    }
-	    return undefined;
+	    return null;
 	},
 	setValue:function(v){
             if(!Apoco.type[this.type].check(v)){
@@ -181,6 +181,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.input.value=this.value;
             return this.value;
         },
+        valueChanged:function(){
+            console.log("Value Changed getValue is " + this.getValue() + " and value is " + this.value);
+         
+            if(this.getValue() != this.value){
+                console.log("ValueChanged: return true");
+                return true;
+            }
+            console.log("ValueChanged: return false");
+            return false;
+        }, 
 	checkValue:function(){
 	    var array=false;
             var v=this.getValue();
@@ -231,8 +241,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             
         },
-        getValue:function(){
-            return this.value;
+        getValue:function(){  
+           return this.value; // OK because static field can only be changed by a call to setValue 
         }
     };
 
@@ -339,7 +349,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             
 	    var timer;
 	    var step_fn=function (direction){
-	        var t=that.getValue();
+	        var t=that.getValue(),p;
 	        if(t=== null || t===""){
 		    clearInterval(timer);
 		    return;
@@ -355,10 +365,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		    t=parseFloat(t,10)-that.step;
 	        }
 	        t=parseFloat(t,10).toFixed(that.precision);
-	        if(that.setValue(t) === null){
+               
+	        p=t.toString().split(".");
+	        if(p.length !== 2){
+		    throw new Error("value is not a floating point number" + v);
+	        }
+                that.input[0].value=p[0];
+                that.input[1].value=p[1];
+                
+	  /*      if(that.setValue(t) === null){   // do not call setValue !!!!!!!!!!!!
 		    clearInterval(timer);
 		    throw new Error("step_fn val is not floating point " + t);
-	        }
+	        } */
 	    };
 	    var eObj={
                 click:function(e){
@@ -404,32 +422,33 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
     FloatField.prototype={
 	getValue: function(){
+            var v;
             var a=this.input[0].value;
             var b=this.input[1].value;
 	    if(Apoco.type.blank.check(a)) {
 		if(Apoco.type.blank.check(b)){
-		    return this.value="";
+		    return null;
 		}
 		else{
-		    this.value=parseFloat(("0."+b),10).toFixed(this.precision);
+		    v=parseFloat(("0."+b),10).toFixed(this.precision);
 		}
 	    }
 	    else if(Apoco.type.blank.check(b)){
-		this.value=parseFloat((a + ".000"),10).toFixed(this.precision);
+		v=parseFloat((a + ".000"),10).toFixed(this.precision);
 	    }
 	    else{
                 if(a<0){
-		    this.value=(parseInt(a,10)-parseFloat(("." + b),10)).toFixed(this.precision);
+		    v=(parseInt(a,10)-parseFloat(("." + b),10)).toFixed(this.precision);
                 }
                 else{
-                    this.value=(parseInt(a,10)+parseFloat(("." + b),10)).toFixed(this.precision);
+                    v=(parseInt(a,10)+parseFloat(("." + b),10)).toFixed(this.precision);
                 }
 	    }
-	    if(!Apoco.type.float.check(this.value)){
-		throw new Error("getValue: this is not a floating point number " + this.value);
+	    if(!Apoco.type.float.check(v)){
+		throw new Error("getValue: this is not a floating point number " + v);
 		return null;
 	    }
-	    return this.value;
+	    return v;
 	},
         resetValue:function(){
             this.setValue(this.value);
@@ -560,7 +579,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		        func(that.input.checked);
 		    };
 	        }(this);
-	        this.input.AddEventListener("click",cb,false);
+	        this.input.addEventListener("click",cb,false);
             }
         }
     };
@@ -869,7 +888,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
     var ButtonSetField=function(d,element){   // like select field - but not in a dropdown and not editable
         d.field="ButtonSetField";
-        d.type="boolean";
+        if(d.checkbox !== true){
+            d.type="boolean";
+        }
+        else{
+            d.type="booleanArray";
+        }
         if(!d.labels || d.labels.length ===0){
 	    throw new Error("must have a labels array for ButtonSetField");
 	}
@@ -1434,11 +1458,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 that._addThumbnail(td,i);
             }
   	},
-        resetValue:function(){
+        resetValue:function(){ // wrong
             return;
         },
 	getValue:function(){ // images are in this.value[i].image
-	    return this.value;
+	    return this.value; // wrong
 	},
 	checkValue:function(){
 	    return true;
@@ -1501,7 +1525,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 var v=that.input.value;
               
                 e.stopPropagation();
-                Apoco.IO.dispatch(pubsub,v);
                 that.select.style.visibility="hidden";
                 r=that.contains(that.options,v);
                 if(r.length>0){
@@ -1522,49 +1545,19 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         for(var i=0;i<10;i++){
             this.select.appendChild(document.createElement("li"));
         }
-        
-        //click event triggers after the blur so the link gets hidden.
+          //click event triggers after the blur so the link gets hidden.
         // Instead of click use mousedown it will work.
         
         this.select.addEventListener("mousedown", function(e){
             e.stopPropagation();
-            pubsub=(that.name + "_value_selected");
             that.input.value=e.target.textContent;
-            Apoco.IO.dispatch(pubsub,that.input.value);
-        //    console.log("setting value to " + that.input.value);
             that.select.style.visibility="hidden";
         },false);
         
-        this.input.addEventListener("input", function(e){
-            var r;
-             //  console.log("INPUT event on %j ",e.target);
-            var v=that.input.value;
-            pubsub=(that.name + "_value_changed");
-            e.stopPropagation();
-            Apoco.IO.dispatch(pubsub,v);
-            that.select.style.visibility="hidden";
-            r=that.contains(that.options,v);
-            if(r.length>0){
-                that._make_list(r);
-                that.select.style.visibility="visible";
-            }
-       },false);
-        
-        this.input.addEventListener("keyup",function(e){
-            e.stopPropagation();
-            if(e.key === "Enter"){
-                pubsub=(that.name + "_value_selected");
-             //   console.log("key was " + e.key);
-                var v=that.input.value;
-                Apoco.IO.dispatch(pubsub,v);
-            }
-        },true);
-       this.input.addEventListener("blur", function(e){
-            e.stopPropagation();
-            that.select.style.visibility="hidden";
-        },true); 	
-       
-       
+        this.input.addEventListener("input",handleEvent,false); 
+        this.input.addEventListener("keyup",handleEvent,true);
+        this.input.addEventListener("blur",handleEvent,true); 
+                   
         if(this.action){
             this.action(this);
         }

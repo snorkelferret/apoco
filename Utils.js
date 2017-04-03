@@ -116,7 +116,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
          
             if(sort_order === null){
                 compare=function(aa){
-                 //   console.log("testing " + aa + " with " + data);
+                   // console.log("testing " + aa + " with " + data);
                     if(aa == data){
                    //     console.log(aa + " is equal to " + data);
                         return 0;
@@ -137,11 +137,11 @@ String.prototype.trim = String.prototype.trim || function trim() {
             else{
 	        compare=function(aa){
 		    var field,item;
-                    //console.log("Compare: sort_order.length is " + sort_order.length);
+                    console.log("Compare: sort_order is %j", sort_order);
 		    for(var i=0;i<sort_order.length;i++){
 		        field=sort_order[i];
 		        item=data[field];
-		      // console.log("field is " + field);
+		         console.log("field is " + field + " value is " + item);
                         if(aa[field].value == item){ // && i === sort_order.length -1){
 		        //    console.log(aa[field].value + " equals " + item);
 		            //found[i]=true;
@@ -156,7 +156,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
 			    return -1;
 		        }
 	                else{
-                            throw new Error("binarySearch: should never get here");
+                            throw new Error("binarySearch: should never get here- trying to find "+ JSON.stringify(item) + " field is " + field);
                         }
 		    }
                     return 0;

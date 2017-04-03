@@ -19,15 +19,12 @@ jsonishData={
       DOM: "Content",
       sortOrder: [cols[i].name,cols[j].name],
       groupby: some column name,
-
+      userSortable: [cosl[i].name],
       cols:  // have these keys
       {  name: string, // required key
          type: // see ApocoTypes  // required key
          editable: boolean, (default true)
-         unique: boolean,(default false)
          hidden: boolean,(default false)// setting to true means no dom element is created.
-         display: boolean, (default true) - not implemented
-         userSortable: boolean (default: false)
          required: boolean (default: false)
          step: float, default(0.1) // FloatField only
          precision: integer, default(2) // FloatField only
@@ -43,204 +40,8 @@ jsonishData={
 
 ;(function(){
     "use strict";
- 
-    function rmouse_popup(element){
-
-	element.bind("contextmenu", function(e){
-	    var x,y;
-	    x=e.pageX;
-	    y=e.pageY;
-	    log("got mouse co-ords x " + x + " y " + y);
-	    if(e.which === 3){
-                //		alert("right mouse button");
-		var p=$(this).parent().position();
-		x=x-Math.floor(p.left);
-		y=y-Math.floor(p.top);
-		log("NEW mouse co-ords x " + x + " y " + y);
-		log("parent position is " + p.top + " " + p.left);
-		var d=$(this).parent().find('#grid_popup');
-		if(d && d.length>0){
-		    d.css({'position': "absolute",'top':(y + "px"), 'left': (x + "px")});
-		}
-		else {
-		    var d=$("<div class='popup' id='grid_popup'> </div>").css({'position': "absolute",'top':(y + "px"), 'left': (x + "px")});
-		    var cc=$("<div></div>").css({'width': '100px','height': '100px','background':'#101010'});
-
-		    d.append(cc);
-		    var ok=$("<button class='button'> <span class='button_text'>  OK  </span> </button>");
-		    var cancel=$("<button class='button'> <span class='button_text'> Cancel </span> </button>");
-		    d.append(ok);
-		    d.append(cancel);
-		    $(this).parent().append(d);
-
-		    var cb=function(that){
-			return function(e){
-			    e.stopPropagation();
-			    //func(that.textarea.val());
-			};
-		    }(this);
-		    var bb=function(d){
-			return function(e){
-			    e.stopPropagation();
-			    d.remove();
-			};
-		    }(d);
-		    ok.on("click",cb);
-		    cancel.on("click",bb);
-		}
-		d.focus();
-	    }
-	    return false;
-	});
-    }
-
-    function stop_edits(that){
-	if(that.DEBUG) console.log("stop allowing edits");
-	that.allowEdit=false;
-    }
-
-    function start_edits(that){
-	if(that.DEBUG) console.log("start allowing edits");
-	that.allowEdit=true;
-    }
-
-    function update_column(that,val,update){
-	var p,cell;
-	if(that.cellEdit){
-	    console.log("undo_cellEDIT: text in restore is " + val);
-	    if(that.selection_list){
-		for(var i=0;i< that.selection_list.length;i++){
-		    console.log("value was " + that.selection_list[i].textContent);
-		    if(update){
-			p=that.selection_list[i].data["apoco"];
-			cell=that.rows[p.row][that.cols[p.col].name];
-			cell.setValue(val);
-		    }
-		     // just remove the class
-		    that.selection_list[i].classList.remove("selected");
-		}
-	    }
-	    else{
-		that.cellEdit.setValue(val);
-		that.cellEdit=null;
-	    }
-	}
-    }
-
-
-    function do_edit(e,that){
-	if(that == null){
-	    throw new Error("that is null");
-	}
-	if(!that.allowEdit) {
-	    console.log("Not allowing editing " + that.allowEdit);
-	    return;
-	}
-	if(that.selection_list.length === 0){
-	    return;
-	}
-	// select the last in the column and make it active
-	var cell=that.selection_list[that.selection_list.length-1];
-	if(!cell){
-	    throw new Error("grid cell is null");
-	}
-
-	if( that.cellEdit &&  that.cellEdit.getElement() === cell){
-	     console.log("already editing this" + cell);
-	    return;
-	}
-	that.cellEdit=cell.data("apoco").context;
-
-	if(that.cellEdit === null){
-	    console.log("cell is null");
-	    throw new Error("cell is null");
-	}
-	console.log("do_cell edit got  " + that.selection_list.length + " number of cells");
-	var type=that.cellEdit["type"];
-	if(!type){
-	    throw new Error("edit cannot find field type");
-	}
-	var old_value=that.cellEdit.getValue();
-	console.log("cell has value " + old_value + " and type " + type);
-	// convert to html type
-
-	var n=that.cellEdit.html_type;
-
-	// if the col has options then it is a selectField
-	//if( that.cellEdit.options){ //horrible
-	//  n="SelectField";
-	//}
-	var input=that.cellEdit.input.detach();
-	that.cellEdit.getElement().empty();
-	that.cellEdit.getElement().append(input);
-	that.cellEdit.setValue(old_value);
-	that.cellEdit.input.show();
-
-
-	if(that.cellEdit.popup){
-	    console.log("popup is here for " + n);
-	   // var d=$("<div class='popup' id='grid_popup'> </div>");
-	    that.field=Apoco.field[n](that.cellEdit.data["apoco"],d);
-	    that.cellEdit.getEelement().append(d);
-	   // var ok=$("<button class='button'> <span class='button_text'>  OK  </span> </button>");
-	   // var cancel=$("<button""> <span class='ui-button-text'> Cancel </span> </button>");
-	    d.append(ok);
-	    d.append(cancel);
-	    that.field.element.focus();
-	    that.field.editor(edit_callback,ok,cancel);
-	}
-	else{
-	    that.cellEdit.editor(edit_callback);
-	    that.cellEdit.input.focus();
-	   // that.cellEdit.input.off("focus");
-	}
-
-	function edit_callback(value){
-	    console.log("edit_callback got value " + value);
-	    if(value === null){
-		// restore the original value
-		update_column(that,old_value,false);
-		return;
-	    }
-	    if(that.cellEdit.checkValue()){  // check that there is a real value
-		update_column(that,value,true);
-	    }
-	    else{
-		Apoco.display.dialog("Invalid Input","Incorrect type for this field should be a " + type);
-	    }
-	}
-
-
-    }
-
-
-    function sort_callback(col_num,that,dir){ //user sort
-	// turn it into an array
-	var type=that.cols[col_num].type;
-	if(that.DEBUG) console.log("START SORT =======================  got sort type " + type);
-	stop_edits(that);
-	for(var k in that.grids){
-	    Apoco.sort(that.grids[k].rows,{ type: type,
-			                     fn: function(a){ return a[col_num];}
-                                           });
-	    if(dir === "down"){
-		that.grids[k].rows.reverse();
-	    }
-	    that.redrawRows(k);
-            that.grids[k].sorted=true;
-	}
-
-	for(var i=0;i<that.cols.length;i++){
-	    that.cols[i].sorted=false;
-	}
-	that.cols[col_num].sorted=true;
-	start_edits(that);
-    }
-
+    
     function sort_into_subGrids(that){
-//	if(that.rows){
-//	    console.log("sort_into_subGrids got that.rows length " + that.rows.length);
-//	}
 	// see if the data has been put into subgrids
 	if(that.rows && Apoco.type["array"].check(that.rows)){ // not sorted into subgrids
 	    var n,tg,subgrid= new Object;
@@ -253,7 +54,7 @@ jsonishData={
                     n=n.toString();
 		    if (!subgrid[n]){
 			subgrid[n]={};
-			subgrid[n].name = that.rows[i][that.groupBy];
+			subgrid[n].name = n;
 			subgrid[n].rows = new Array;
 		    }
 		    subgrid[n]["rows"].push(that.rows[i]); 
@@ -262,9 +63,9 @@ jsonishData={
 	    }
 	    else{
                 subgrid["all"]=new Object;
+                subgrid["all"].name="all"; // very smelly
 		subgrid["all"].rows=that.rows;
 	    }
-	    that.grids=new Array;
 	    var i=0;
 	    for(var k in subgrid){
 		that.grids[i]=subgrid[k];
@@ -279,116 +80,169 @@ jsonishData={
 
     var ApocoMakeGrid=function(options,win){
 	var DEBUG=true;
-	var that=this,found,not_found=[];
-
+	var that=this,t;
+        
        	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-	this.selection_list=[];
+
 	this.cellEdit=null; // cell currently being edited- this is of type Apoco.field
 	this.allowEdit=true;  // are edits allowed?
-        
-	if(this.sortOrder && this.userSortable){
-	    throw new Error("Cannot specify both sortOrder and sortable");
-	}
+        this.grids=[];
+        this.resort=false; // if any of the cols in sortOrder or userSortable are editable - will need resort
+    
         if(this.cols === undefined || this.cols.length === 0){
             throw new Error("DisplayGrid: need to supply a least one column");
         }
-        if(this.uniqueKey){
-            if(!Apoco.type["stringArray"].check(this.uniqueKey)){
-                throw new Error("DisplayGrid: unique key is not a stringArray");
-            }
-          //  console.log("this,uniquekey length is " + this.uniqueKey.length);
-            this.sortOrderUnique=true;
-            if(this.sortOrder){
-            //    console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
-                // to determine the absolute ordering is unique
-                // uniqueKey must be a subset of sortOrder
-                for(var i=0;i<this.uniqueKey.length;i++){
-                    found=false;
-                    for(var j=0;j<this.sortOrder.length;j++){
-                        if(this.uniqueKey[i] == this.sortOrder[j]){
-                            found=true;
-                        }
-                    }
-                    if(!found){
-                    //    console.log("not found was " + this.uniqueKey[i]);
-                        not_found.push(this.uniqueKey[i]);
+        for(var i=0;i<this.cols.length;i++){   // are there any duplicated columns
+            for(var j=0;j<this.cols.length;j++){
+                if(i !== j){
+                    if(this.cols[i].name === this.cols[j].name){
+                        throw new Error("DisplayGrid: Cannot have duplicate column names " + this.cols[i].name);
                     }
                 }
-               // if(found !== this.uniqueKey.length){
-                for(var i=0;i<not_found.length;i++){
-                   // console.log("not found is pushing " + not_found[i]);
-                    this.sortOrder.push(not_found[i]);
-                }
-               // }
-               // console.log("After MakeGrid sortOrder length is " + this.sortOrder.length);
             }
-            else{  // sortOrder is the uniqueKey
-                this.sortOrder=this.uniqueKey.slice();
-            }
-            
+        }
+        if(this.sortOrder && !Apoco.type["stringArray"].check(this.sortOrder)){
+            throw new Error("DisplayGrid: sortOrder must be an array of strings ");
+        }
+        if(this.uniqueKey && !Apoco.type["stringArray"].check(this.uniqueKey)){
+            throw new Error("DisplayGrid: uniqueKey must be an array of strings");
+        }
+        if(this.userSortable && !Apoco.type["stringArray"].check(this.userSortable)){
+             throw new Error("DisplayGrid: userSortable must be an array of strings");
         }
         
-  
+        for(var i=0;i<this.cols.length; i++){
+            if(this.userSortable){
+                for(var j=0;j<this.userSortable.length;j++){
+                    if(this.cols[i].name === this.userSortable[j] && this.cols[i].editable === true){
+                        this.resort=true;
+                    }
+                }
+            }
+            if(this.sortOrder){
+                for(var j=0;j<this.sortOrder.length;j++){
+                    if(this.cols[i].name === this.sortOrder[j] && this.cols[i].editable === true){
+                        this.resort=true;
+                    }
+                }
+            }
+        }
+        if(!this.uniqueKey){ // add a hidden column that is a unique key
+            this.cols.push({name:"_aid",type: "integer",hidden: true, editable: false});
+            this.idKey=0; // start id value
+            this.uniqueKey=["_aid"];
+        }
+        else{  // make sure that the unique key is not editable
+            for(var i=0;i<this.cols.length;i++){
+                for(var j=0;j<this.uniqueKey.length;j++){
+                    if(this.cols[i].name === this.uniqueKey[j] && this.cols[i].editable === true){
+                        throw new Error("DisplayGrid: cols that are unique cannot be edited " + this.uniqueKey[j]);
+                    }
+                }
+            }
+        }
+        if(this.sortOrder){   // make sure the sortOrder makes a unique ordering
+            this.sortOrder=this._mkSortOrder(this.sortOrder);
+        }
+        else{
+            this.sortOrder=this.uniqueKey.slice(0);  // copy the array
+        }
+        //console.log("SORT ORDER from MakeGrid is %j",this.sortOrder);
         this._execute();
     };
 
 
     ApocoMakeGrid.prototype={
+        _mkSortOrder: function(s){ // what is our sort policy?
+            var found,not_found=[],sortOrder=[];
+            if(Apoco.type["stringArray"].check(s)){
+                sortOrder=s.slice(0); // copy the array
+            }
+            else{
+                throw new Error("DisplayGrid: _mkSortorder needs a string array");
+            }
+            console.log("MakeSortOrder: got initial sortOrder %j" , sortOrder + "param  was %j",s);
+            if(this.uniqueKey){
+                if(!Apoco.type["stringArray"].check(this.uniqueKey)){
+                    throw new Error("DisplayGrid: unique key is not a stringArray");
+                }
+                //  console.log("this,uniquekey length is " + this.uniqueKey.length);
+                this.sortOrderUnique=true;
+                if(sortOrder.length>0){
+                    //    console.log("MakeGrid sortOrder length is " + this.sortOrder.length);
+                    // to determine the absolute ordering is unique
+                    // uniqueKey must be a subset of sortOrder
+                    for(var i=0;i<this.uniqueKey.length;i++){
+                        found=false;
+                        for(var j=0;j<sortOrder.length;j++){
+                            if(this.uniqueKey[i] == sortOrder[j]){
+                                found=true;
+                            }
+                        }
+                        if(!found){
+                            //    console.log("not found was " + this.uniqueKey[i]);
+                            not_found.push(this.uniqueKey[i]);
+                        }
+                    }
+                    // if(found !== this.uniqueKey.length){
+                    for(var i=0;i<not_found.length;i++){
+                        // console.log("not found is pushing " + not_found[i]);
+                        sortOrder.push(not_found[i]);
+                    }
+                    // }
+                    console.log("_MakeSortOrder: sortOrder length is " + this.sortOrder.length);
+                }
+            }
+            console.log("MakeSortOrder returning array %j",sortOrder);
+            return sortOrder;  
+        },
+	_execute:function(){
+            var rows,body,r,that=this;
+            // var t0=performance.now();
+            // make the header
+            this.colElement=document.createElement("div");
+            this.colElement.classList.add("head");
+            this.element.appendChild(this.colElement);
 
-	_select_data: function(){
-	    var that=this;
-	 /*   return{
-		selected: function(event,ui){
-		    console.log("selected is here");
-		    for(var k in ui){
-			console.log("got key " + k + " value " + ui[k]);
-			that.selection_list.push(ui[k]);
-		    }
-		},
-		selecting: function(event,ui){
-		    if(that.current_index === null){
-			that.current_index=$(ui["selecting"]).index();
-			return;
-		    }
-		    if( $(ui["selecting"]).index() !== that.current_index){
-			console.log("undo selecting " );
-			$(ui["selecting"]).removeClass("ui-selecting");
-		    }
-		},
-		start: function(event,ui){
-		    that.selection_list.length=0; // empty out the selection list
-		    that.current_index=null;
-		    console.log("start got " + event.target);
+            this.grid_container=document.createElement("div");
+            this.grid_container.classList.add("grid_content");
 
-		    console.log(" cellEdit is " + that.cellEdit);
-		    if(that.cellEdit !== null){   // moved focus without updating cell
-			var old_value=that.cellEdit.getValue();
-			console.log("value in field is " +  old_value);
-			if(that.cellEdit.checkValue(old_value)){
-			    console.log("setting text to cellEdit value " + old_value);
-			    update_column(that,old_value,false);
-			}
-			// else text=null;
-			// update_column(that,old_value,true);
-		    }
-
-		},
-		stop: function(event,ui){
-		    console.log("stop event is here");
-		    if(that.cellEdit){
-			console.log("cellEdit is here");
-		    }
-		    else {
-			console.log("cellEdit is null");
-		    }
-		    //make_cellEdit(event,that);
-		    do_edit(event,that);
-		    //		that.selection_list.length=0;
-		},
-		filter: ".editable"
-		// filter: 'td:not(:first-child)'
-	    }; */
-	},
+            if(this.resizable){
+                this.element.classList.add("resizable");
+            }
+            //   console.log("this.rows is " + this.rows)
+            
+            this.element.appendChild(this.grid_container);
+            for(var i=0; i< this.cols.length; i++){
+                this.addCol(i);
+            }
+            
+            if(this.rows !== undefined){
+                // add a unique key to the rows if needed
+                if(this.uniqueKey[0] === "_aid"){  // need to do this before sorting!!!
+                    for(var j=0;j<this.rows.length;j++){
+                        this.rows[j]["_aid"]=this.idKey;
+                        this.idKey++;
+                    }
+                }
+                //   console.log("sorting into subgrids");
+                sort_into_subGrids(this);
+              
+	        for(var i=0;i<this.grids.length;i++){
+                  //  console.log("this is grid " + i);
+                    this.addGrid(this.grids[i]);
+                    body=this.grids[i].element.getElementsByTagName("tbody")[0]; //.find("tbody");
+                    rows=this.grids[i].rows;
+                //    console.log("grid has " + rows.length + " number of rows");
+                    for(var j=0;j<rows.length;j++){
+                        //  console.log("adding row");
+                        r=this._mkRow(rows[j]);
+                        body.appendChild(r);
+                    }
+                }
+                this.sort();
+            }
+   	},
         _afterShow:function(){
             var v,c,width=0,d,t;
             var that=this;
@@ -429,50 +283,41 @@ jsonishData={
                 console.log("cannot find head element ");
             }
         },
-	sort: function(grid){
-	    var isSortable=false,grids=[],sortOrder=[];
-           
-            if(this.sortOrder){
-                console.log("this.sortOrder.length is " + this.sortOrder.length);
-                sortOrder=this.sortOrder.slice();
+    	sort: function(dir){
+	    var isSortable=false;
+            var ar=[],t,s;
+            if(!this.sortOrder || this.sortOrder.length === 0){
+                throw new Error("DisplayGrid: sort there is no sortOrder specified");
             }
-            else if(this.uniqueKey){
-                console.log("this.uniquekey length is" + this.uniqueKey.length);
-                sortOrder=this.uniqueKey.slice();
-            }
-	    if(sortOrder.length > 0){
-		var ar=[],t,s;
-                console.log("sortOrder.length is " + sortOrder.length);
-		for(var i=0; i< sortOrder.length; i++){
-                    console.log("this is sortOrder " + sortOrder[i]);
-		    t=this.getColIndex(sortOrder[i]);
-		    console.log("col index is " + t);
-		    s=sortOrder[i];  // name of the column in the row
-		    console.log("name is " + s);
-		    if(this.cols){
-			ar.push({type: this.cols[t].type,
-				 fn:(function(s){
-				     return function (a){
-					 return  a[s]; };
-				 })(s)
-				});
-		    }
-		    this.cols[t].sorted=true;
+	    for(var i=0; i< this.sortOrder.length; i++){
+             //   console.log("this is sortOrder " + this.sortOrder[i]);
+		t=this.getColIndex(this.sortOrder[i]);
+	//	console.log("col index is " + t);
+		s=this.sortOrder[i];  // name of the column in the row
+	        //	console.log("name is " + s);
+		if(this.cols){
+		    ar.push({type: this.cols[t].type,
+			     fn:(function(s){
+				 return function (a){
+				     return  a[s].value; };
+			     })(s)
+			    });
 		}
-                isSortable=true;
+	//	this.cols[t].sorted=true;
 	    }
-	    if(isSortable){
-                if(grid){
-                    grids[0]=grid;
+          //  for(var i=0;i<this.cols.length;i++){
+          //      this.cols[i].sorted=false;
+          //  }
+          //  console.log("sortOrder.length is " + this.sortOrder.length);
+	               
+	    for(var j=0;j<this.grids.length;j++){
+		Apoco.sort(this.grids[j].rows,ar);
+                this.grids[j].sorted=true;
+                if(dir === "down"){
+                    this.grids[j].rows.reverse();
                 }
-                else{
-                    grids=this.grids;
-                }
-		for(var j=0;j<grids.length;j++){
-		    Apoco.sort(grids[j].rows,ar);
-                    grids[j].sorted=true;
-		}
 	    }
+	    
 	},
         addGrid:function(grid){
             var div,h;
@@ -480,7 +325,7 @@ jsonishData={
 	    var rows=grid.rows;
             div=document.createElement("div");
             div.classList.add("inner_table");
-	    if(name !== undefined){
+	    if(name !== undefined && name !== "all"){
 	        div.id=name;
                 h=document.createElement("h4");
             //    h.classList.add("ui-widget-header");
@@ -489,18 +334,24 @@ jsonishData={
 	    }
 	    
 	    var table=document.createElement("table");
-            //table.style.width=this.element.style.width;
 	    div.appendChild(table);
-	    //var body=$("<tbody class='selectable'></tbody>");
 	    var body=document.createElement("tbody");//$("<tbody class=''></tbody>");
 	    table.appendChild(body);
-           
 	    this.grid_container.appendChild(div);
             grid.element=div;
+            grid.sorted=false;
         },
         addCol:function(col){
             var that=this,index,r,t,rows;
             var was_hidden=this.isHidden();
+            if(this.grids.length !== 0){  //adding a column after creation
+                //check that the col does not already exist
+                for(var i=0;i<this.cols.length; i++){
+                    if(this.cols[i].name === col.name){
+                        throw new Error("DisplayGrid: cannot add column with duplicate name " + col.name);
+                    }
+                }
+            }
             var check_opts=function(c){
                 if(!c.name){
                     throw new Error("column must have a name");
@@ -508,7 +359,9 @@ jsonishData={
                 if(!c.type && !c.field){
                     throw new Error("displayGrid: column must have type or field");
                 }
+     
             };
+
             if(Apoco.type["integer"].check(col)){
                 index=col;
                 col=this.cols[index];
@@ -529,13 +382,8 @@ jsonishData={
                     this.hide(); // hide whilst adding column
                 }
             }
-             // keep a copy of the original parms- so not to copy crap into rows;
-            // PUT THIS FOLLOWING BACK
-           /* col.options={};
-            for(var k in col){
-                col.options[k]=col[k];
-            } */
-              if(this.grids){ // add the column rows
+ 
+            if(this.grids){ // add the rows with null value for a new col - only after grids have already been created - (initially addCol is called in execute before the grids have been created) 
                 for(var i=0;i<this.grids.length;i++){
                     rows=this.grids[i].rows;
                     if(rows){
@@ -547,20 +395,27 @@ jsonishData={
                         }
                     }
                 }
-            }
+            }  
 	    if(this.cols[index].hidden !== true){
 		//console.log("grid col " + this.cols[index].name);
 		var label=(this.cols[index].title)?this.cols[index].title:this.cols[index].name;
                 var h=document.createElement("div");
                 var s=document.createElement("span");
+                h.setAttribute("name",this.cols[index].name);
                 h.appendChild(s);
                 (this.cols[index].type)?h.classList.add(this.cols[index].type):h.classList.add(this.cols[index].field);
-                
-               // h.type=this.cols[index].type; seems to do nothing
                 s.textContent=label;
 		this.cols[index].element=h;
-		this.cols[index].sortable=Apoco.isSortable(this.cols[index].type);
-		if(this.cols[index].sortable && this.userSortable){
+                if(this.userSortable !== undefined){
+                    for(var i=0;i<this.userSortable.length;i++){
+                        if(this.userSortable[i] === this.cols[index].name){
+                            if(Apoco.isSortable(this.cols[index].type)){
+        	                this.cols[index].sortable=true;                    
+                            }
+                        }
+                    }
+                }
+		if(this.cols[index].sortable){
                     var dec=document.createElement("div");
                     dec.classList.add("arrows");
                     var up=document.createElement("span");
@@ -571,22 +426,24 @@ jsonishData={
 		    dec.appendChild(down);
 		    h.appendChild(dec);
 
-		    up.addEventListener("click",function(col_num,that){
-			return function(e){
-                            e.stopPropagation();
-                            e.preventDefault();
-                            console.log("got that.cols " + that.cols[col_num].name);
-			    sort_callback(col_num,that,"up");
-			};
-		    }(i,that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
-		    down.addEventListener("click",function(col_num,that){
-			return function(e){
-                            e.stopPropagation();
-                            e.preventDefault();
-                            console.log("got that.cols " + that.cols[col_num].name);
-			    sort_callback(col_num,that,"down");
-			};
-		    }(index,that),false);
+		    dec.addEventListener("click",function(col,that){
+		        return function(e){
+                            var dir;
+                            if(e.target.tagName === "SPAN"){
+                                if(e.target.classList.contains("up")){
+                                    dir="up";
+                                }
+                                else{
+                                    dir="down";
+                                }
+                                e.stopPropagation();
+                                e.preventDefault();
+                                that.sortOrder=that._mkSortOrder([col.name]);
+                                that.sort(dir);
+                                console.log("got that.cols " + col.name);
+			    }
+		        };
+		    }(this.cols[index],that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
                 }
  		this.colElement.appendChild(h);
 		if(this.cols[index].hidden){
@@ -702,53 +559,6 @@ jsonishData={
       	    }
             return this.cols;
  	},
-	_execute:function(){
-            var rows,body,r,that=this;
-            // var t0=performance.now();
-            // make the header
-            this.colElement=document.createElement("div");
-            this.colElement.classList.add("head");
-            this.element.appendChild(this.colElement);
-
-            this.grid_container=document.createElement("div");
-            this.grid_container.classList.add("grid_content");
-
-            if(this.resizable){
-                this.element.classList.add("resizable");
-            }
-         //   console.log("this.rows is " + this.rows)
-            this.element.appendChild(this.grid_container);
-            //body.selectable(this.select_data()); // allow multiple cells to be selected
-	    for(var i=0; i< this.cols.length; i++){
-                this.addCol(i);
-            }
-            
-            if(this.rows !== undefined){
-             //   console.log("sorting into subgrids");
-                sort_into_subGrids(this);
-                this.sort();
-	        for(var i=0;i<this.grids.length;i++){
-                  //  console.log("this is grid " + i);
-                    this.addGrid(this.grids[i]);
-                    body=this.grids[i].element.getElementsByTagName("tbody")[0]; //.find("tbody");
-                    rows=this.grids[i].rows;
-                //    console.log("grid has " + rows.length + " number of rows");
-                    for(var j=0;j<rows.length;j++){
-                      //  console.log("adding row");
-                        r=document.createElement("tr");
-                        for(var k=0;k<this.cols.length;k++){
-                         //   console.log("adding cell");
-                            this._addCell(rows[j],this.cols[k],r);
-                        }
-                        body.appendChild(r);
-                    }
-                }
-            }
-        //   if(this.sortOrder){
-       //         console.log("End of execute this.sortOrder length is " + this.sortOrder.length);
-        //   }
-   
-   	},
         _addCell:function(row,col,r){
             var c,type,settings={};
      
@@ -757,7 +567,6 @@ jsonishData={
             }
             if(row[col.name] === undefined){  // row[col_name] can be null
                 if(this.required === true){
-                    
                    throw new Error("Field " + col.name + "is required");
                 }
                 row[col.name]=null;
@@ -778,81 +587,191 @@ jsonishData={
             
             if(col.hidden !== true){  //only put in DOM if not hidden
 		r.appendChild(row[col.name].element);
-                row[col.name].element.data={};
-                row[col.name].element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
-	    }
-	   /* if(col.hidden){  
-		row[col.name].element.visibility="hidden";
-	    } */
+            }
+        },
+        _addRowElementData:function(row_data,el){  // only add the uniqueKey whose values don't change 
+            var s,c;
+            if(!this.uniqueKey){
+                return;
+            }
+            if(!row_data){
+                throw new Error("DisplayGrid:No data ");
+            }
+            if(!el){
+                throw new Error("DisplayGrid: element is undefined");
+            }
+            if(el.tagName !== "TR"){
+                throw new Error("Can only add data to a row element");
+            }
+            //el.dataset={};
+           
+            for(var i=0;i< this.uniqueKey.length;i++){
+                //  console.log("ADD row has unique key " + this.uniqueKey[i]);
+                // console.log("ADD row has unique key value is " + row_data[this.uniqueKey[i]].value);
+                if(row_data[this.uniqueKey[i]]){
+                    s="data-";
+                    s=s.concat(this.uniqueKey[i]);
+                        el.setAttribute(s,row_data[this.uniqueKey[i]].value);
+                }
+            }
+            
+            if(this.groupBy){
+                s="data-";
+                s=s.concat(this.groupBy);
+                el.setAttribute(s,row_data[this.groupBy].value);
+            }
+            for(var i=0; i<this.uniqueKey.length;i++){
+                s="data-";
+                s=s.concat(this.uniqueKey[i].toString());
+                c=el.getAttribute(s);
+               // console.log("ADD addRowElementData got data %j" , c);
+            }
+        },
+        getRowFromElement: function(element){  
+            var s,c,ci,key={},g,need_more_data=false;
+            if(!this.uniqueKey){
+                return null;
+            }
+            if(element.tagName === "TD"){
+                c=element.parentNode;  // get the row
+            }
+            for(var i=0;i<this.uniqueKey.length;i++){
+                s="data-";
+                s=s.concat(this.uniqueKey[i]);
+                console.log("getRowFromElement: uniqueKey is " + this.uniqueKey[i] + " attribute " + s);
+                c=element.getAttribute(s);
+                console.log("Rowfromelement got data " + c);
+                key[this.uniqueKey[i]]=c;
+                for(var k in c){
+                    console.log("getRowFromElement got key " + k + " with value  " + c[k]);
+                }
+            }
+            if(this.groupBy){
+                s='data-';
+                s=s.concat(this.groupBy);
+                g=element.getAttribute(s);
+            }
+            // if the sortOrder is the same as uniqueKey - solution is trivial
+            for(var i=0;i<this.sortOrder.length;i++){
+                if(this.sortOrder[i] !== this.uniqueKey[i]){
+                    need_more_data=true;
+                }
+            }
+            if(!need_more_data){
+                var r=this.getRow(key,g);
+                return r;
+            }
+            // get the cell data
+            c=element.childNodes;
+            
+            for(var i=0;i<this.sortOrder.length; i++){
+                if(!key[this.sortOrder[i]]){
+                    for(var j=0; j<c.length; j++){
+                        if(c[j].getAttribute("name") === this.sortOrder[i]){
+                            for(var k=0;k<this.cols.length;k++){
+                                if(this.cols[k].name === this.sortOrder[i]){
+                                    if(this.cols[k].editable === false ){  // value is in static span tex
+                                        key[this.sortOrder[i]]=c[j].textContent;
+                                        break;
+                                    }
+                                    // is there an input node ....?
+                                    ci=c[j].getElementsByTagName("input");
+                                    if(ci && ci.length === 1){
+                                        key[this.sortOrder[i]]=ci[0].value;
+                                        break;
+                                    }
+                                    return null; // can't find it
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            var r=this.getRow(key,g);
+            return r;
+        }, 
+        _mkRow:function(row_data){
+            var r=document.createElement("tr");
+         
+            for(var k=0;k<this.cols.length;k++){
+                //   console.log("adding cell");
+                this._addCell(row_data,this.cols[k],r);
+            }
+            this._addRowElementData(row_data,r); // put the data onto the element
+            return r;
+        },
+        _insertRow:function(row_data,r,grid){
+            var row=null,e,t,key={},closest={val: -1};
+            for(var i=0;i<this.sortOrder.length;i++){
+                key[this.sortOrder[i]]=row_data[this.sortOrder[i]].value;
+            }
+            row=this.getRow(key,grid.name,closest);
+            //  console.log("grid element is %j ", closest.val);//grid.rows[index]);
+            //  console.log("slosest index is " + closest.index);
+            t=Object.keys(grid.rows[closest.index])[0];
+            //  console.log("key is " + t);
+            if(closest.dir === "after"){
+                closest.index++;  // check not stepping off end of array
+                if(closest.index >= grid.rows.length ){
+                    grid.rows.push(row_data);
+                    grid.element.getElementsByTagName("tbody")[0].appendChild(r);
+                }
+                else{
+                    e= grid.rows[closest.index][t].element;
+                    e.parentNode.insertBefore(r,e.nextSibling); // insert after e
+                    grid.rows.splice(closest.index,0,row_data); //insert row
+                }
+            }
+            else{
+                // grid.rows.splice(closest.index,0,row_data);
+                e=grid.rows[closest.index][t].element;
+                e.parentNode.insertBefore(r,e); // insert the element
+                grid.rows.splice(closest.index,0,row_data);
+            }
         },
         addRow: function(row_data){
-	    var row=null,r,grid,name,l,t,sortOrder=[],e;
-            var closest={val:-1};
+	    var row=null,r,grid,name,t,sortOrder=[],e,key={};
+            var closest={val:-1},l=this.grids.length;
+         
 	    if(this.groupBy){
                 if(row_data[this.groupBy] === undefined){
-		    throw new Error("no field in row data matches " + this.groupBy);
+		    throw new Error("Cannot add row - no field in row data matches " + this.groupBy);
 		}
                 name=row_data[this.groupBy];
 	    }
 	    else{
                 name="all";
 	    }
-            grid=this.getGrid(name);
-            console.log("addRow grid is " + grid);
-            if(grid===null || grid === undefined){  // create a new grid
-                console.log("creating grid");
-                if(this.grids){
-                    l=this.grids.length;
-                }
-                else{
-                    this.grids=[];
-                    l=0;
-                }	
+            t=this.getGrid(name);
+            if(t === null){  // no grid for this group has been created
                 this.grids[l]={name:name,rows:[]};
-                this.addGrid(this.grids[l]);
-                grid=this.grids[l];
-                
-            }
-	    if(grid.sorted ){
-               // console.log("addRow calling getRow length is " + this.sortOrder.length);
-                row=this.getRow(row_data,name,closest);
-                if(row!==null){
-                    throw new Error("row already exists");
+                t=this.addGrid(this.grids[l]);
+                if(t=== null){
+                    throw new Error("DisplayGrid: Could not create grid " + name);
                 }
-	    }
-            r=document.createElement("tr");
-	    for(var i=0;i<this.cols.length;i++){
-                this._addCell(row_data,this.cols[i],r);
             }
-         
+            grid=this.getGrid(name);
+          //  console.log("addRow grid is " + grid);
+            if(grid===null || grid === undefined){  // create a new grid
+                throw new Error("DisplayGrid: addRow grid is not defined");
+            }
+            
+            if(this.uniqueKey[0] === "_aid"){  // add the unique key to the row
+                row_data["_aid"]=this.idKey;
+                this.idKey++;
+            }
+            r=this._mkRow(row_data);
+                        
             if(!grid.sorted){
-            //    console.log("adding row to end");
+                if(grid.rows.length===0){
+                    grid.sorted=true; // grid has just been created
+                }
+             //   console.log("adding row to end");
                 grid.rows.push(row_data);
                 grid.element.getElementsByTagName("tbody")[0].appendChild(r);//.find("tbody").append(r);
             }
             else{
-              //  console.log("grid element is %j ", closest.val);//grid.rows[index]);
-              //  console.log("slosest index is " + closest.index);
-                t=Object.keys(grid.rows[closest.index])[0];
-              //  console.log("key is " + t);
-                if(closest.dir === "after"){
-                    closest.index++;  // check not stepping off end of array
-                    if(closest.index >= grid.rows.length ){
-                        grid.rows.push(row_data);
-                        grid.element.getElementsByTagName("tbody")[0].appendChild(r);
-                    }
-                    else{
-                        e= grid.rows[closest.index][t].element;
-                        e.parentNode.insertBefore(e,r.nextSibling); // insert after r
-                        grid.rows.splice(closest.index,0,row_data); //insert row
-                    }
-                }
-                else{
-                    // grid.rows.splice(closest.index,0,row_data);
-                    e=grid.rows[closest.index][t].element;
-                    e.parentNode.insertBefore(r,e); // insert the element
-                    grid.rows.splice(closest.index,0,row_data);
-                }
+                this._insertRow(row_data,r,grid);
             }
             return row_data;
         },
@@ -894,10 +813,11 @@ jsonishData={
         },
         getRow:function(key,group,closest){
             var grid=[],row,sortOrder=[];
-            if(!closest && this.sortOrderUnique !== true){
-                throw new Error("No unique key to find row");
-            }
-            if(group && group !== null){
+ 
+           // if(!closest && this.sortOrderUnique !== true){
+           //     throw new Error("No unique key to find row");
+           // }
+            if(group && group !== undefined){
                 grid[0]=this.getGrid(group);
             }
             else{
@@ -908,20 +828,20 @@ jsonishData={
                     }
                 }
                 else{
-                    grid=this.grids;
+                    grid=this.grids.slice(0);
                 }
             }
-            //console.log("getRow this.sortOrder length is " + this.sortOrder.length);
+         //   console.log("getRow this.sortOrder length is " + this.sortOrder.length);
+         //   console.log("key is %j",key);
             for(var i=0;i<grid.length;i++){
+                if(grid[i].name === undefined){
+                    throw new Error("grid " + i + "name is " + grid[i].name);
+                }
                 console.log("searching grid ",grid[i].name);
                 if(grid[i].sorted){
                     if(this.closest){
                         if(this.sortOrder === undefined){
-                            for(var k=0; k<this.cols.length;k++){
-                                if(this.cols[k].sorted=== true){
-                                    sortOrder.push(this.cols[k].name);
-                                }
-                            }
+                            throw new Error("DisplayGrid: getRow sortOrder is undefined");
                         }
                     }
                     else{
@@ -931,49 +851,35 @@ jsonishData={
                                 throw new Error("getRow: key is not unique needs " + this.sortOrder[j] );
                             }
                         }
-                       // for(var j=0;j<grid[i].rows.length;j++){
-                       //     for(k=0;k<this.cols.length;k++){
-                         //       var v=this.cols[k].name;
-                               // console.log("val is " + grid[i].rows[j][v].getValue());
-                           // }
-                       // }
                     }
 		    row=Apoco.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
-                    if(row){
+                    if(row !== null){
                         return row;
                     }
                 }
                 else{
-                     throw new Error("grid is not sorted");
+                     throw new Error("DisplayGrid: grid is not sorted " + grid[i].name);
                 }
             }
             return null;
         },
-        getChild:function(key,group,closest){
-            var t=this.getRow(key,group,closest);
-            return t;
+        getChild:function(group){
+            return this.getGrid(group);
         },
-        getChildren:function(group){
-            var grid;
-            if(group && group !== null){
-                grid=this.getGrid(group);
-            }
-            else{
-                grid=this.grid[0];
-            }
-            return   grid.rows;
+        getChildren:function(){
+            return this.getGrid();
         },
-	updateRow: function(cell_data){
-	    var row,subGrid,index,g;
+	updateRow: function(cell_data,override_editable){
+	    var row,index,g,n,closest={val:-1},resort;
 	    if(this.groupBy){
 		g=cell_data[this.groupBy];
 		if(g === undefined){
-                    throw new Error("No subGrid called " + this.groupBy + " in cell update data " + g);
+                    throw new Error("No subGrid called " + this.groupBy + " in cell update data ");
 		}
 	    }
 	    var grid=this.getGrid(g);
             if(grid.sorted){  // grids have a sort order and have been sorted
-                row=this.getRow(cell_data,g);
+                row=this.getRow(cell_data,g,closest);
                 if(row === null){
 	            throw new Error("UpdateRow: cannot find row");
                 }
@@ -984,26 +890,39 @@ jsonishData={
 	    }
 	  //  console.log("UpdateRow: found row %j" ,row);
 	    if(row){   // need to check that we are not overwritting a sortOrder key, making sort invalid
-		var to,cell;
-		for(var k in cell_data){               
- 		    row[k].setValue(cell_data[k]);
-                    var cl="cell_updated";
-		    if(row[k].hidden !== true){
-                        cell=row[k].getElement();
-			if(cell.classList.contains(cl)){  // add colours to the cells to show update frequency
-			    cell.classList.remove(cl);
-                            cell.classList.add("cell_updated_fast");
-			    cl="cell_updated_fast";
-			}
-			else{
-			    row[k].getElement().classList.add(cl);
-			}
-			if(to){ clearTimeout(to);}
-			to=setTimeout(function(){
-			    row[k].getElement().classList.remove(cl);},15000);
+		var to,cell,cl;
+		for(var k in cell_data){
+                    // if this cell is in current sort order grid may now be unsorted
+                    if(row[k].editable !== false || override_editable === true){  // need to force update --- see rowEdit override !!!!
+ 		        row[k].setValue(cell_data[k]);  
+		        if(row[k].hidden !== true){
+                            cl="cell_updated";
+                            cell=row[k].getElement();
+			    if(cell.classList.contains(cl)){  // add colours to the cells to show update frequency
+			        cell.classList.remove(cl);
+                                cell.classList.add("cell_updated_fast");
+			        cl="cell_updated_fast";
+			    }
+			    else{
+			        row[k].getElement().classList.add(cl);
+			    }
+			    if(to){ clearTimeout(to);}
+			    to=setTimeout(function(){
+			        row[k].getElement().classList.remove(cl);},15000);
+		        }
 		    }
-		}
-	    }
+                }
+                for(var i=0;i<this.sortOrder.length;i++){  // do we need to resort the grid
+                    if(row[this.sortOrder[i]].getValue() !== cell_data[this.sortOrder[i]] ){
+                        resort=true;
+                    }
+                }
+                if(!resort){
+                    return;
+                }
+                grid.rows.splice(index,1);
+                this._insertRow(cell_data,row,grid);
+            }
 	    else{
 		throw new Error("No matching entry found in grid data");
 	    }
@@ -1025,8 +944,8 @@ jsonishData={
             }
             return this.grids;
 	},
-        deleteChild:function(){
-            
+        deleteChild:function(grid){
+            this.hideGrid(grid);
         },
         deleteChildren:function(){
             this.deleteAll();
@@ -1099,25 +1018,7 @@ jsonishData={
 		b.appendChild(this.grids[grid_name].rows[i].element);
 	    }
 	},
-        getRowFromElement: function(element){  
-            var s,row=[];
-            var c=element.data.apoco;
-            //element.data.apoco={name: col.name,"context": row[col.name],"type": col.type};
-           // console.log("name is " + c.name + " context " + c.context + " type " + c.type);
-            row.push({context:c.context,name: c.name,
-                      value:c.context.value });
-            s=element.parentNode.childNodes;
-           // console.log("got siblings " + s.length);   
-            for(var i=0;i<s.length;i++){
-                if(s[i] !== element){
-                    c=s[i].data.apoco;
-             //       console.log( "sib " + c.name + " value " + c.context.value);
-                    row.push({context: c.context,name: c.name,
-                              value: c.context.value });
-                }
-            }
-            return row;
-        }, 
+ 
         getJSON: function(){
             var c,t,m;
             var n={rows:[]};

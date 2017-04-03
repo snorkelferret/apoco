@@ -45,12 +45,17 @@ describe("DisplayGrid-(start without rows)",function(){
         };
         assert.throws(fn,"Columns must have unique names");
     });
+    it("has added a column if a uniqueKey is not specified",function(){
+        var v=t.getCol();
+        assert.strictEqual(v.length,2);
+    });
     it("can add a column ",function(){
         t.addCol({name: "index",type:"integer"});     
-        assert.strictEqual(t.getColIndex("index"),1);
+        assert.strictEqual(t.getColIndex("index"),2);
     });
     it("can add a row",function(){
-        t.addRow({name:"Bill",index:10});
+        var b=t.addRow({name:"Bill",index:10});
+        assert.notStrictEqual(b,null);
     });
     it("creates a grid",function(){
         assert.notStrictEqual(t.getGrid(),null);
@@ -60,23 +65,23 @@ describe("DisplayGrid-(start without rows)",function(){
        // var n=t.getGrid();
         assert.notStrictEqual(t.getGrid().rows.length,0);
     });
-    it("can add another row",function(){
+    it("getRow throws an error if key is not unique",function(){
         t.addRow({name:"Homer",index:6});
         var fn=function(){
             var b=t.getRow({name:"Homer",index:6},null,{val:-1});
         };
-        assert.throws(fn,"grid is not sorted" );
+        assert.throws(fn,"getRow: key is not unique" );
     });
-     it("can add more columns ",function(){
+    it("can add more columns ",function(){
         t.addCol({name: "job",type:"string"});     
-        assert.strictEqual(t.getColIndex("job"),2);
+        assert.strictEqual(t.getColIndex("job"),3);
     });
     it("can add yet another row",function(){
         t.addRow({name:"Sam",job:"Manager"});
     });
-    it("san add a column with a label",function(){
+    it("can add a column with a label",function(){
         t.addCol({name: "things",label:"whatever",type:"string"});
-        assert.strictEqual(t.getColIndex("things"),3);
+        assert.strictEqual(t.getColIndex("things"),4);
     });
   
     it("dumps the contents of the grid as a JSON object",function(){
@@ -88,7 +93,7 @@ describe("DisplayGrid-(start without rows)",function(){
         var fn=function(){
             t.updateRow({name:"Sam",index:12});
         };
-        assert.throws(fn,"No method available to find this cell");
+        assert.throws(fn,"getRow: key is not unique");
     });
     it("has a delete method",function(){
         var b=document.getElementById("test_grid");
@@ -120,6 +125,14 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         t=Apoco.display.grid(data);
         assert.isObject(t);
     });
+
+    it("has sorted all the grids",function(){
+        var b=t.getGrid();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[i].sorted,true);
+        }
+    });
+    
      it("can add a row",function(){
         var b=t.getGrid("swaps").rows.length;
         b++;
@@ -131,9 +144,17 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
        // console.log("JSON %j",n);
     });
     it("can add another row",function(){
+        var b=t.getGrid("swaps").rows.length;
+        b++;
         var n=t.addRow({stock:"XXX",class: "swaps",bid:109,maturity:"2016-08-30"});
-        var b=t.getRow({stock:"XXX",class: "swaps",bid:109,maturity:"2016-08-30"});
-        assert.notStrictEqual(b,null);
+        var c=t.getGrid("swaps").rows.length;
+        assert.strictEqual(b,c);
+        
+    });
+    it("can retrieve a row that has been added after initialisation",function(){
+        console.log("trying to find a row");
+        var b=t.getRow({stock:"XXX",maturity:"2016-08-30"});
+        assert.notStrictEqual(b,null); 
     });
     it("has a show method which adds the root element to the DOM",function(){
         var b=document.getElementById("Blotter");
@@ -142,7 +163,11 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         var b=document.getElementById("Blotter");
         assert.strictEqual(document.body.contains(b),true);
     });
-    
+    it("can update a row",function(){
+        t.updateRow({stock:"FG63",bid:40,class:"swaps",maturity:"2020-05-21"});
+        var b=t.getRow({stock:"FG63",maturity:"2020-05-21"});
+        assert.equal(b["bid"].getValue(),40.000);
+    });
     it("has added a row to the dom",function(){
         var b=document.getElementById("straight").getElementsByTagName("tr")[0].getElementsByTagName("td")[0];//querySelector("#1 tr:first td:first");
         assert.isObject(b);
@@ -188,7 +213,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     it("can add a column",function(){
         var b=t.getCol().length;
         b++;
-        t.addCol({name:"other",type:"string",editable:false});
+        t.addCol({name:"other",type:"string",editable:true});
         var c=t.getCol().length;
         assert.strictEqual(b,c);
     });
@@ -248,10 +273,17 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         var b=document.getElementById("test_grid");
         assert.strictEqual(document.contains(b),true);
     });
+    it("has sorted all the grids",function(){
+        var b=t.getGrid();
+        for(var i=0;i<b.length;i++){
+            assert.strictEqual(b[i].sorted,true);
+        }
+    });
     it("can add a row",function(){
         var b=t.getGrid("all").rows.length;
         b++;
-        var n=t.addRow({one: 33 , two: "fig"});
+        var n=t.addRow({one:33, two: "fig"});
+        assert.isObject(n);
         var c=t.getGrid("all").rows.length;
         console.log("b is " + b +  " and c " + c);
         assert.strictEqual(b,c);
@@ -277,5 +309,85 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
     });
 
     
+    
+});
+describe("DisplayGrid-(start with data but no subgrids and no unique key)",function(){
+    var t;
+    require("../DisplayGrid.js");
+    var data={ id:"test_grid",DOM:"test",
+               userSortable:["two"],
+               cols:[{name:"one",type: "integer" },
+                     {name: "two",type: "string"}],
+               rows:[{one: 20 ,two: "hat"},
+                     {one: 22, two: "big"}]
+             };
+    it("creates a grid display object",function(){
+        var b=document.createElement("div");
+        b.id="test";
+        document.body.appendChild(b);
+        assert.strictEqual(document.contains(b),true);
+        t=Apoco.display.grid(data);
+        assert.isObject(t);
+        t.show();
+    });
+    it("can get the grid",function(){
+        var b=t.getGrid("all");
+        assert.isObject(b);
+    });
+    it("can add a row",function(){
+        var p=t.addRow({one: 36, two:"haha"});
+        assert.notStrictEqual(p,null);
+    });
+    it("can add another row",function(){
+        var b=t.getGrid("all").rows.length;
+        b++;
+        t.addRow({one: 44,two: "bigger"});
+        var c=t.getGrid("all").rows.length;
+        assert.strictEqual(b,c);
+    });
+    it("can get a row from data in row element",function(){
+        var c=document.getElementById("test_grid").getElementsByTagName("tr");
+        assert.strictEqual(c.length,4);
+        var p=c[0];
+        assert.isObject(p);
+        console.log("got data " + p.getAttribute("data-_aid"));
+        var b=t.getRowFromElement(p);
+        assert.isObject(b);
+        assert.strictEqual(b["one"].value,20);
+    });
+    it("creates up and down buttons on user sortable columns",function(){
+        var c=document.getElementById("test_grid").getElementsByClassName("head")[0];
+        assert.isObject(c);
+       // var b=c.getElementsByName("two")[0];
+        var d=c.getElementsByClassName("arrows")[0];
+        assert.isObject(d);
+    });
+    it("can sort a column if the buttom is clicked",function(){
+        var s=t.sortOrder;
+        console.log("sort order is %j",s);
+        //var d=document.getElementsByClassName("up")[0];
+        var e=document.getElementsByClassName("arrows")[0]; //.getElementsByTagName("li")[1];
+        assert.isObject(e);
+        var up=e.querySelector("span.up");
+       // var down=e.getElemenstByClassName("down")[0];
+        assert.isObject(up);
+        up.focus();
+        up.click();
+        var v=t.sortOrder;
+        console.log("sort order is %j",v);
+        assert.notDeepEqual(v,s);
+        assert.oneOf("two",v);
+    });
+
+    it("can get a row from data in row element after user sort",function(){
+        var c=document.getElementById("test_grid").getElementsByTagName("tr");
+        assert.strictEqual(c.length,4);
+        var p=c[0];
+        assert.isObject(p);
+        console.log("got data " + p.getAttribute("data-_aid"));
+        var b=t.getRowFromElement(p);
+        assert.isObject(b);
+        assert.strictEqual(b["one"].value,20);
+    });
     
 });

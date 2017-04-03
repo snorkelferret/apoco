@@ -85,12 +85,20 @@ describe("InputField",function(){
         console.log("CCCCCCCCCCCCCCCC name is " + b.getAttribute("name"));
         assert.strictEqual(b.getAttribute("name"),"inputNode");
     });
+    it("knows the value has not been changed in the browser",function(){
+        assert.strictEqual(t.valueChanged(),false);
+    });
     it("sets the value",function(){
         t.setValue(10);
         var b=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];
         assert.strictEqual(b.value,'10');
     });
- 
+    it("knows the value has been changes in the browser",function(){
+        var b=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];
+        b.value=5;
+        assert.strictEqual(t.valueChanged(),true);
+    });
+    
     it("checks the type of the value",function(){
         assert.strictEqual(t.checkValue(),true); 
     });
@@ -183,7 +191,7 @@ describe("FloatField",function(){
         assert.isObject(Apoco.field);
         
     });
-    var f=Apoco.field["float"]({name:"floatField",type: "float",precision: 3});
+    var f=Apoco.field["float"]({name:"floatField",precision: 3});
     it("has a getElement method",function(){
         assert(f.getElement() !== null); 
     });
@@ -217,9 +225,18 @@ describe("FloatField",function(){
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),"-23.468"); 
     });
+    it("knows the value has been changed in the browser",function(){
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
+        e[0].value="33";
+        e[1].value="424";
+        assert.strictEqual(f.valueChanged(),true);
+    });
     it("rounds a negative number down",function(){
         f.setValue(-23.45542467);
         assert.strictEqual(f.getValue(),"-23.455"); 
+    });
+    it("knows the value has been updated by setValue()",function(){
+        assert.strictEqual(f.valueChanged(),false);
     });
     it("rounds a negative number up where appropriate",function(){
         f.setValue(-23.4555567);
@@ -238,6 +255,9 @@ describe("FloatField",function(){
         b[1].value="34";
         assert.strictEqual("29.340",f.getValue());
         assert.notStrictEqual(29.340,f.resetValue());
+    });
+    it("knows the value has been changed in the browser",function(){
+        f.valueChanged(f.getValue(),true);
     });
     it("can delete itself",function(){
         f.delete();
@@ -263,7 +283,9 @@ describe("FloatField- with spinner",function(){
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
         assert.strictEqual(e.length,2);
     });
-    
+    it("knows a value has not been changed",function(){
+        assert.strictEqual(f.valueChanged(),false);
+    });
     it("has a spinner which increments the value",function(){
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("li")[1];
         assert.isObject(e);
@@ -272,18 +294,25 @@ describe("FloatField- with spinner",function(){
         assert.isObject(up);
         up.focus();
         up.click();
-    /*    var ce=document.createEvent("MouseEvents");
-        ce.initEvent("mousedown",true,true);
-        up.dispatchEvent(ce);
-        var ne=document.createEvent("MouseEvents");
-        ne.initEvent("mouseup",true,true);
-        up.dispatchEvent(ne);
-        */
         
         var b=f.getValue();
         //var b=document.getElementsByName("floatField")[0].getElementsByTagName("input")[0];
         assert.strictEqual(b,"10.100"); 
     });
+    it("knows a value has been changed in the browser",function(){
+        assert.strictEqual(f.valueChanged(),true);
+                
+    });
+    it("can set a value",function(){
+        f.setValue(16.555);
+        assert.strictEqual(f.getValue(),"16.555");
+    });
+    it("knows a value has been changed by setValue",function(){
+        assert.strictEqual(f.valueChanged(),false);
+                
+    });
+
+    
 });
 
 describe("DateField",function(){
@@ -331,6 +360,11 @@ describe("DateField",function(){
         assert.strictEqual(b.value,f.getValue());
         assert.notStrictEqual(b.value,f.resetValue());
     });
+    it("knows the value has been changed in the browser",function(){
+        var b=(document.getElementsByName("dateField")[0]).getElementsByTagName("input")[0];
+        b.value="20230525";
+        assert.strictEqual(f.valueChanged(),true);
+    });
 });
 
 describe("CheckBoxField",function(){
@@ -370,6 +404,9 @@ describe("CheckBoxField",function(){
       //  e.click();
       //  assert.strictEqual(f.getValue(),"true"); 
     });
+    it("knows the value has been changed in the browser",function(){
+        assert.strictEqual(f.valueChanged(),true);
+    });
     
 });
 
@@ -406,6 +443,11 @@ describe("NumberArrayField-Integer",function(){
         var s=f.getValue();
         assert.notStrictEqual(s,f.resetValue());
     });
+    it("knows the value has been changed in the browser",function(){
+        var b=(document.getElementsByName("numberArrayField")[0]).getElementsByTagName("input")[0];
+        b.value="6798";
+        assert.strictEqual(f.valueChanged(),true);
+    });
 });
 
 describe("TextAreaField",function(){
@@ -436,11 +478,19 @@ describe("TextAreaField",function(){
        // var e=$("body").find("div[name='textAreaField']").find("textarea").val();
         assert.equal(e.value,"some other text");
     });
+    it("knows the value has not been changed in the brower",function(){
+        assert.strictEqual(f.valueChanged(),false);
+    });
     it("only changes internal value with setValue",function(){
         var b=(document.getElementsByName("textAreaField")[0]).getElementsByTagName("textarea")[0];
         b.value="some user input";
         var s=f.getValue();
         assert.notStrictEqual(s,f.resetValue());
+    });
+    it("knows the value has been changed in the browser",function(){
+        var b=(document.getElementsByName("textAreaField")[0]).getElementsByTagName("textarea")[0];
+        b.value="whatever";
+        assert.strictEqual(f.valueChanged(),true);
     });
     
 });
@@ -466,7 +516,7 @@ describe("SelectField",function(){
         assert.strictEqual(e.length,3);
        
     });
-    it("sets a value",function(){
+    it("gets a value from browser",function(){
         //var e=$("body").find("div[name='selectField']").find("option:contains('two')");
         var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
         for(var i=0;i<e.length;i++){
@@ -482,17 +532,27 @@ describe("SelectField",function(){
         var b=f.getValue();
         assert.strictEqual(b,"two");
     });
+    it("knows the value has been changed in the browser",function(){
+        assert.strictEqual(f.valueChanged(),true);
+    });
     it("has a method to set a value",function(){
         f.setValue("three");
         //var b=$("body").find("div[name='selectField']").find("select").val();
         var b=document.getElementsByName("selectField")[0].getElementsByTagName("select")[0].value;;
         assert.equal(b,"three");
     });
+    it("knows the value has been changed by setValue",function(){
+        assert.strictEqual(f.valueChanged(),false); 
+    });
     it("only changes internal value with setValue",function(){
         var b=(document.getElementsByName("selectField")[0]).getElementsByTagName("select")[0];
         b.value="one";
         var s=f.getValue();
         assert.notStrictEqual(s,f.resetValue());
+    });
+    it("knows the value has been changed by setValue",function(){
+        f.setValue("two");
+        assert.strictEqual(f.valueChanged(),false);
     });
     
 });
@@ -538,6 +598,9 @@ describe("ButtonSetField",function(){
             throw new Error("cannot find two");
         }
     });
+    it("knows the value has been changed in the browser",function(){
+        assert.strictEqual(f.valueChanged(),true);
+    });
     it("uses a setter method for value",function(){
         var index=-1;
         f.setValue([true,false,false]);
@@ -551,6 +614,9 @@ describe("ButtonSetField",function(){
         var b=e[i].getElementsByTagName("input")[0];
         //var s=$(e).prop("checked");
         assert.strictEqual(b.checked,true);
+    });
+    it("knows the value has been set by setValue",function(){
+        assert.strictEqual(f.valueChanged(),true);
     });
     it("has a getter method which returns an array of one for boolean fields",function(){
         var b=f.getValue();
@@ -712,6 +778,15 @@ describe("SliderField",function(){
         p=f.getValue();
         assert.strictEqual(p,"5");
     });
+    it("knows the value has been changed in the browser",function(){
+        var r=document.getElementsByName("sliderField")[0].getElementsByTagName("input")[0];
+        r.value=2;
+        assert.strictEqual(f.valueChanged(),true);
+    });
+    it("knows the value has been set by setValue",function(){
+        f.setValue(3);
+        assert.strictEqual(f.valueChanged(),false);
+    });
     
 });
 
@@ -774,6 +849,10 @@ describe("StringArrayField",function(){
         }
         assert.strictEqual(p.length,3);
     });
+    it("knows the value has been changed in the browser",function(){
+        f.addValue("nnn");
+        assert.strictEqual(f.valueChanged(),true);
+    });
 
     
 });
@@ -811,21 +890,17 @@ describe("AutoCompleteField",function(){
         var b=f.getElement();
         assert.isObject(b); 
         document.getElementsByTagName("body")[0].appendChild(b);
-       
     });
     it("has added the initial options",function(){
         assert.strictEqual(f.options.length,3);
-        
     });
     it("can add options",function(){
         var p=["adfgd","aa","safsd","bbbbndsa","dff"];
         f.addOptions(p);
         assert.strictEqual(f.options.length,8);
-
     });
     it("can add a subset of the options to the select element",function(){
         var t=f.contains(f.options,"a");
-   
         assert.strictEqual(t.length,2); // only 2 elements start with a
     });
     it("puts the matching options into the DOM ",function(){
@@ -842,7 +917,16 @@ describe("AutoCompleteField",function(){
         }
         assert.strictEqual(c,3);
     });
-    
+    it("has a getValue method",function(){
+        var b=f.getValue();
+        assert.strictEqual(b,null);     
+    });
+    it("knows the value has changed in the browser",function(){
+        var b=document.getElementsByName("autoCompleteField")[0].getElementsByTagName("input")[0];
+        b.value="note";
+        assert.strictEqual(f.getValue(),"note");
+        assert.strictEqual(f.valueChanged(),true);
+    });
 
 });
 

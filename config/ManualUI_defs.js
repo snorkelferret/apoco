@@ -554,6 +554,10 @@ var UI={};
                     "return: void",
                     "If the field is an array, value is an array, or a single value and index into the array<br> Set Value is the way to update values in memory"
                 ]},
+                valueChanged: {descriptions: [  "<code>var r=field.valueChanged();</code>",
+                                                "return: boolean",
+                                                "If the value has been changes in the browser return true"
+                ]},
                 checkValue:{descriptions:[
                     "<code>var r=field.checkValue();</code>",
                     "return: boolean",
@@ -1044,7 +1048,6 @@ var UI={};
                                if(!f){
                                    throw new Error("can't get input params");
                                }
-
                                globalEval(f.getValue());
                                if(Apoco.type["object"].check(node)){
                       //             console.log("and it is an object");
@@ -1091,10 +1094,10 @@ var UI={};
             grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type or the field may be specified directly","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1},{field:'select',title; 'Pick one',name:'choose',options:['one','two','three']}]<code>","options are the same as for the fields with the addition of the title option - which is the text displayed in the head - defaults to name"]},
                             {label:"rows",descriptions:["type:objectArray","if the cols were defined as above then the rows would be","<code> rows:[{colname1:'some_string',colname2:23.53,choose:'one'},{colname1:'another_string',colname2:34.66,choose:'three'}]"]}],
                   options:[
-                      {label:"userSortable",descriptions:["type: boolean","can the user sort the cols","userSortable and sortOrder are mutually exclusive"]},
-                      {label:"sortOrder",descriptions:["type:stringArray","column names to sort the grid rows","example","<code>sortOrder:['colname1','colname2']<code","sort the rows first by colname1 and then colname2"]},
+                      {label:"userSortable",descriptions:["type:stringArray","default: cols are not sortable","list the columns by name that he user can sort"]},
+                      {label:"sortOrder",descriptions:["type:stringArray","column names to sort the grid rows","example","<code>sortOrder:['colname1','colname2']<code","Initial sortOrder-  sort the rows first by colname1 and then colname2","default: sort the grid with the uniqueKey"]},
                       {label:"groupBy",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a title it will be used as a the subgrid seperator"]},
-                      {label:"uniqueKey",descriptions:["type: stringArray","the set of column names that  uniquely determine a row (f it exists)"]},
+                      {label:"uniqueKey",descriptions:["type: stringArray","the set of column names that  uniquely determine a row (f it exists)","If no uniqueKey is given an id is added called '_aid'","You can access the uniqeKey with <code> var key=mygrid.uniqueKey;<code> which returns a string array "]},
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]},
                        {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                   ]},
@@ -1290,7 +1293,7 @@ var UI={};
             redrawRows: ["<code> var v=my_display.redrawRows(grid_name); </code>"],
             updateRow: ["<code> var v=my_display.updateRow(row); </code>"],
             rowEditPopup:["<code> my_display.rowEdirPopup(row,buttons,editOverrides)</code>","Creates a form","where"," row is a grid row - e.g return from getRow()","buttons : an Object array (see form) e.g buttons=[{name:'OK',action:function(that){ console.loh('hullo')}}]","editOverrides: override the editable status of the cols ","e.g var editable=[{'col1': true},{col2:false}]"],
-            getRowFromElement: ["<code> var v=my_display.getRowFromElement(htmlObject); </code>"],
+            getRowFromElement: ["<code> var v=my_display.getRowFromElement(htmlObject); </code>","where the element has a tagName which is either a row (TR) or cell (TD) ","if you need just the uniqueKey fields, use var data=element.dataset; (see html5 dataset)"],
             print: ["<code> var v=my_display.print(); </code>"],
             start: ["<code> var v=my_display.start(); </code>"]
         };
