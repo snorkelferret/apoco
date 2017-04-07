@@ -407,7 +407,7 @@ require("./Window");
                 throw new Error("Apoco.Panel: already have a child with id " + display_object.id);
             }
             if(!display_object.display){
-                throw new Error("You can only add display objects to a window");
+                throw new Error("You can only add display objects to a panel");
             }
             if(!display_object.displayType){ //has not been instantiated
                 d=display_object;
@@ -416,13 +416,14 @@ require("./Window");
                     throw new Error("Panel.addChild: could not create display object " + d.display);
                 }
             }
-     //       console.log("adding child length is " + this.components.length);
+        //   console.log("adding child length is " + this.components.length);
             display_object.parent=this;
  	    this.components.push(display_object);
             if(display_object.hidden !== true){
                 display_object.show();
             }
-       //     console.log("after add adding child length is " + this.components.length);
+            //   console.log("after add adding child length is " + this.components.length);
+            return display_object;
 	},
         deleteChildren: function(){
             if(!this.components){

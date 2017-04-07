@@ -43,8 +43,8 @@ require("./DisplayFieldset");
             header=document.createElement("div");
             header.classList.add("form_header");
 	    this.element.appendChild(header);
-	    if(this.draggable !== false){
-                this.draggable=Apoco.Utils.draggable(this.element,undefined,header);
+	    if(this.draggable === true){
+                Apoco.Utils.draggable(this.element,undefined,header);
 	    }
             container=document.createElement("div");
             container.classList.add("form_scroll");
@@ -73,8 +73,15 @@ require("./DisplayFieldset");
             if(this.components){
                 for(var i=0;i<this.components.length;i++){
                     lp=document.createElement("li");
+                    if(this.components[i].editable === false){
+                        this.components[i].field="static";
+                    } 
+                    
                     //console.log("FORM CREATES ELEMENT " + lp);
                     this.addChild(i,lp,fp);
+                    if(this.components[i].hidden === true){
+                        lp.style.display="none";
+                    }
                 }                   
             }
         

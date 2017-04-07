@@ -446,9 +446,9 @@ jsonishData={
 		    }(this.cols[index],that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
                 }
  		this.colElement.appendChild(h);
-		if(this.cols[index].hidden){
-		    h.visibility="hidden";
-		}
+	//	if(this.cols[index].hidden){
+	//	    h.visibility="hidden";
+        //		}
 	    }
             
             if(!was_hidden){
@@ -456,8 +456,8 @@ jsonishData={
                 this.show();
             }
         },
-        rowEditPopup: function(row,buttons,editable){
-            var b,d,override=false,that=this,p={},
+        rowEditPopup: function(row,buttons,editOverride){
+            var b,d,that=this,p={},label,
                 settings={draggable: true,
                           components:[]
                          };
@@ -469,7 +469,9 @@ jsonishData={
                 settings.DOM=this.DOM.id;
             }
             console.log("rowEditPopup: got row %j",row);
-            
+            if(editOverride && !Apoco.type["object"].check(editOverride)){ // do we have edit overrides
+                throw new Error("rowEditPopup: edit override should be an object not %j ",editOverride);
+            }
             settings.id="rowEditPopup";
             b=document.getElementById(settings.id);
             if(document.contains(b)){
@@ -477,29 +479,34 @@ jsonishData={
                 b.parentNode.removeChild(b);
                // return null;
             }
-            if(editable && Apoco.type["objectArray"].check(editable)){ // do we have edit overrides
-                override=true;
-            }
-            if(buttons && Apoco.type["object"].check(buttons)){
-                settings["buttons"]=buttons;
-            }
+            console.log("got edit overrides %j",editOverride);
+  
             for(var i=0; i<this.cols.length;i++){
                 p={};
+                label=(this.cols[i].titile)?this.cols[i].title: this.cols[i].name;
                 for(var k in this.cols[i]){
-                    console.log("k in cols is " + k);
-               
-                    if(k === "editable" && override && editable[k] !== undefined){
-                        p[k]=editable[k];
+                    if(this.cols[i].hasOwnProperty(k) && k !== "element"){
+                            p[k]=this.cols[i][k];
                     }
-                    else if(k === "title" ){ // || k === "name"){
-                        p["label"]=this.cols[i][k];
-                    }
-                    else{
-                        p[k]=this.cols[i][k];
-                    }
+                }
+                if(!p.label){
+                    p.label=label;
                 }
                 p["value"]=row[this.cols[i].name].value;
                 settings.components[i]=p;
+            }
+          
+            
+            for(var i=0;i<settings.components.length;i++){
+                for(var k in editOverride){
+                    if(settings.components[i].name === k){
+                        settings.components[i].editable=editOverride[k];
+                    }
+                }
+            }     
+             
+            if(buttons && Apoco.type["object"].check(buttons)){
+                settings["buttons"]=buttons;
             }
             console.log("+++++ adding form with settings %j",settings);
             var f=Apoco.display["form"](settings);

@@ -87,7 +87,6 @@ require("./Nodes.js");
             }
             if(n){
                 n.parent=this;
-              
                 p=n.element.parentNode; //this is for node entries which use the el parm as a parent not the root this.element like fields
                 if(p){
                     parent_element.appendChild(p);
@@ -121,7 +120,6 @@ require("./Nodes.js");
         },
 	check: function(){
             var valid=true;
-
 	    for(var i=0;i<this.components.length;i++){
 		//console.log("check components " + i);
                 if(this.components[i].field){

@@ -241,25 +241,29 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	},
   
         draggable:function(source,destination,handle){
+            handle=undefined;    // the handle is not working in all cases disable 
             if(destination === undefined){
                 destination=document.body;
             }
             if(handle === undefined){
-            //    console.log("handle is undefined");
+              //  console.log("handle is undefined");
                 handle=source;
+            }
+            if(!source){
+                throw new Error("draggable: source is undefined");
             }
             handle.classList.add("isdraggable");
             
             var allowDrag=function(e){
-               // console.log("allow drag is here");
+              //  console.log("allow drag is here");
                 e.preventDefault();
                 return false;
             };
             var dragEnd=function(e){
-               // console.log("dragEnd is here " + e.target);
+              //  console.log("dragEnd is here " + e.target);
                 if(e.currentTarget === e.target){
                     e.stopPropagation();
-                 //   console.log("dragend is here");
+                //    console.log("dragend is here");
                     e.currentTarget.classList.remove("draggable");
                     destination.removeEventListener("drop",drop);
                     destination.removeEventListener("dragover",allowDrag);
@@ -268,15 +272,16 @@ String.prototype.trim = String.prototype.trim || function trim() {
             };
             var drop=function(e){
                 // return function(e){
-              //  console.log("drop is here");
+               // console.log("drop is here");
                 e.preventDefault();
                 e.stopPropagation();
                 var data=e.dataTransfer.getData("text").split(",");
+                //console.log("drop git data %j",data );
                 if(!source){
                     throw new Error("source is undefined");
                 }
                 if(handle.classList.contains("draggable")){
-                 //   console.log("source has class draggable ");
+                  //  console.log("source has class draggable ");
                     source.style.left = (e.clientX + parseInt(data[0],10)) + 'px';
                     source.style.top = (e.clientY + parseInt(data[1],10)) + 'px';
                     handle.classList.remove("draggable");
@@ -287,23 +292,27 @@ String.prototype.trim = String.prototype.trim || function trim() {
             };
             
             var dragStart=function(e){
-             //   console.log("current target is " + e.currentTarget.id + " target " + e.target.id);
+                var a,b;
+                //console.log("current target is " + e.currentTarget.id + " target " + e.target.id);
                 if(e.currentTarget === e.target){
                     e.stopPropagation();
-                 //   console.log("dragStart is here " + e.target);     
+                  //  console.log("dragStart is here " + e.target);     
                     e.currentTarget.classList.add("draggable");
                     destination.addEventListener("dragover",allowDrag,false);
                     destination.addEventListener("drop",drop,false);
                     var style=window.getComputedStyle(e.target, null);
                     //e.dataTransfer.setData("text", e.target.id);
+                    a=style.getPropertyValue("left");
+                    b=style.getPropertyValue("top");
+             //       console.log("setting data to " + a + " and " + b);
                     e.dataTransfer.setData("text",  (parseInt(style.getPropertyValue("left"),10) - e.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - e.clientY));
                 }
              
             };
             
-            //console.log("draggable is here draggable is " + source.draggable);
+            //console.log("draggable is here- source.draggable is " + source.draggable);
             if(handle.draggable=== false){
-               // console.log("dragable is false");
+              //  console.log("dragable is false");
                 handle.draggable=true;
                 handle.addEventListener("dragstart",dragStart,false);
                 handle.addEventListener("dragend",dragEnd,false);

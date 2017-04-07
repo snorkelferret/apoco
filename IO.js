@@ -2,7 +2,7 @@ var Apoco=require('./declare').Apoco;
 var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 ;(function(){
-
+    'use strict';
     Apoco.IO={
         _subscribers:{},
         dispatch:function(name,args){  //pubsub
@@ -82,87 +82,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		    that.publish[i].action(that,that.publish[i].name);
 	        }
 	        else{
-		    throw new Error("incorrect method for apoco.publish");
+	            throw new Error("incorrect method for apoco.publish");
 	        }
 	    }
         },
-        webSocket:function(options,data){
-            var that=this;
-            if(UI && UI.webSocketURL){
-                var defaults={url: UI.webSocketURL};     
-            }
-            else{
-                 var defaults={url: "."}; 
-            }
-            var settings={};
-            var sendMessage=function(data){
-              //  console.log("Trying to send message ___________________________________");
-                var msg=JSON.stringify(data);
-              //  console.log("got some data " + msg);
-                try{
-                    Apoco.webSocket.send(msg+'\n');
-                }
-                catch(err){
-                    Apoco.popup.error("websocket send", ("Could not send websocket message %j ",err));
-                }
-            };
-            settings.url=defaults.url;
-            for(var k in options){
-                settings[k]=options[k];
-            }
-            
-            if(!Apoco.webSocket){
-              //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
-                var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
-              //  console.log("a is " + a + " protocol " + window.location.protocol);
-                if(!a){
-                    throw new Error("IO: Cannot get protocol for window " + window.location);
-                }
-              //  console.log("location host " + window.location.host + " hostname " + window.location.hostname);
-                try{
-                    Apoco.webSocket=new WebSocket(a + "//" + window.location.host + settings.url);
-                    Apoco.webSocket.onopen = function (e) {
-                          //     console.log("created websocket + + + + + + + + + + + + + + ++");
-                        if(data !== undefined){ // in case of timing issue
-                              sendMessage(data);
-                        }
-                    };
-                }
-                catch(err){
-                    throw new Error(("webSocket: failed to open" + err));
-                }
-	    }
-            else if(data !== undefined){
-                sendMessage(data);
-            }
-
-            Apoco.webSocket.onerror=function(e){
-                Apoco.popup.error("webSocket","Received an error msg");
-            };
-            Apoco.webSocket.onclose=function(e){
-                if(e.code !== 1000){ // normal termination
-                    Apoco.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
-                }
-                Apoco.webSocket=null;
-            };
-            Apoco.webSocket.onmessage=function(e){
-                if(!e.data){
-                    throw new Error("webSocket: no data or name from server");
-                }
-                var d=JSON.parse(e.data);
-                console.log("got: %j %j",d[0],d[1]);
-                if(d[0] === "error"){
-                    Apoco.popup.dialog("Error",JSON.stringify(d[1]));
-                }
-                else{
-                    that.dispatch(d[0],d[1]);
-                }
-            };
-            //if(data !== undefined){
-            //    sendMessage(data);
-           // }
-
-        },
+ 
+  
         REST:function(type,options,data){
             var defaults={dataType: 'json',mimeType: 'application/json'};
             if(UI && UI.URL){
@@ -229,4 +154,125 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             return promise;
         }
     };
+
+    var _webSocket=function(options,data){
+        var that=this,defaults={url: "."};
+        this.buffer=[];
+        this.socket=null;
+        
+        if(UI && UI.webSocketURL){
+            defaults={url: UI.webSocketURL};     
+        }
+        this.settings={};
+        this.settings.url=defaults.url;
+        for(var k in options){
+            this.settings[k]=options[k];
+        }
+        that.init();
+        
+        this.socket.onerror=function(e){
+            Apoco.popup.error("webSocket","Received an error msg");
+        };
+        this.socket.onclose=function(e){
+            if(e.code !== 1000){ // normal termination
+                Apoco.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
+            }
+            this.socket=null;
+        };
+        this.socket.onmessage=function(e){
+            if(!e.data){
+                throw new Error("webSocket: no data or name from server");
+            }
+            var d=JSON.parse(e.data);
+            console.log("Websocket: got: %j %j",d[0],d[1]);
+            
+            if(that.corking){
+               // console.log("corking data %j",d);
+                that.buffer.push(d);
+            }
+            else if(d[0] === "error"){
+                Apoco.popup.dialog("Error",JSON.stringify(d[1]));
+            }
+            else{
+                Apoco.IO.dispatch(d[0],d[1]);
+            }
+        };
+    };
+    
+    _webSocket.prototype={
+        init:function(data){
+            var that=this;
+            //console.log("webSocket -init: settings %j",that.settings);
+            if(!that.socket){
+            //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
+                var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
+                //  console.log("a is " + a + " protocol " + window.location.protocol);
+                if(!a){
+                    throw new Error("IO: Cannot get protocol for window " + window.location);
+                }
+            
+                try{
+                    that.socket=new WebSocket(a + "//" + window.location.host + that.settings.url);
+                    that.socket.onopen = function (e) {
+                    //     console.log("created websocket + + + + + + + + + + + + + + ++");
+                   /* if(data !== undefined){ // in case of timing issue
+                        that.send(data);
+                    }*/
+                    };
+                }
+                catch(err){
+                    throw new Error(("webSocket: failed to open" + err));
+                }
+	    }
+        },
+        close:function(){
+            this.socket.close();
+        },
+        send:function(data){
+            var that=this;
+            //  console.log("Trying to send message ___________________________________");
+            var msg=JSON.stringify(data);
+            //  console.log("got some data " + msg);
+            if(!that.socket){
+                that.init();
+            }
+            try{
+                that.socket.send(msg+'\n');
+            }
+            catch(err){
+                Apoco.popup.error("websocket send", ("Could not send websocket message %j ",err));
+            } 
+        },
+        cork:function(on){
+          //  console.log("tippppppppppppppppppppppppppppppppp");
+         //   console.log("Yippppeeeeee cork is here");
+            var msg,that=this;
+            if(on){
+                that.corking=true;
+            }
+            else{
+               while ((msg=that.buffer.shift())!==undefined){
+               //    console.log("uncorking %j",msg);
+                   Apoco.IO.dispatch(msg[0],msg[1]);
+                }
+                if(that.buffer.length !==0){
+                    throw new Error("Apoco.IO.websocket: corked buffer length is not 0");
+                } 
+                that.corking=false;
+            }
+        },
+        setToNull: function(){
+            var that=this;
+            that.socket=null;
+        },
+        getSocket:function(){
+            var that=this;
+            return that.socket;
+        }
+    };
+    Apoco.IO.webSocket=function(options,data){
+        return new _webSocket(options,data);  // need to call new so prototype methods are instantiated 
+    };
+
+    
 })();

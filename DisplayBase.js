@@ -18,7 +18,7 @@ require("./Fields");
             id: null,
             components:[]
 	};
-        var that=this,t;
+        var that=this,t,dp;
        
         for(var k in defaults){
             if(options[k] === undefined){
@@ -74,7 +74,7 @@ require("./Fields");
             if( !this.dependsOn){
                 this.action(this);
             }
-            else if((this.id !== this.dependsOn) && !dp){ // not depending on  itself being in DOM and element not in DOM
+            else if(!dp){ //element not already in DOM
                 if(!Apoco.Observer){    // create an observer- only need one
                     Apoco.Utils.observer.create();
                     if(!Apoco.Observer){ 
@@ -102,7 +102,6 @@ require("./Fields");
                 }
             }
         }
-
         
 	if(this.listen !== undefined){
 	    Apoco.IO.listen(this);  
@@ -232,7 +231,7 @@ require("./Fields");
 	        Apoco.IO.publish(this);
 	    }
             if(!this.DOM.contains(this.element)){
-              //  console.log("Showing element that is not in DOM");
+              //  console.log("Showing element that is not in DOM" + this.element);
 	        if(this.element){
 		  //  console.log("show found non null element");
                     if(this.after){
@@ -253,10 +252,7 @@ require("./Fields");
                      //   console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
                      }
-                    if(this.action !== undefined && this.id === this.dependsOn){
-                       // console.log("RUNNNNINNNNNNNG this.action in show");
-                        this.action(this);
-                    }
+                 
 		}
 	        else {
 		    //console.log(" --- invalid element");

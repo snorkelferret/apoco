@@ -41,10 +41,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
     Apoco.stop=function(){
         Apoco.Panel.deleteAll();
-        if(Apoco.webSocket){
-            Apoco.webSocket.close();
-        }
-
+        
     };    
  
 })();
