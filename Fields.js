@@ -1142,7 +1142,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    this.length=4;
 	}
 	for(var i=0;i<this.length;i++){
-            if(this.value[i]){
+            if(this.value && this.value[i]){
 	        this.addValue(this.value[i],i);
             }
             else{

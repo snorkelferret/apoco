@@ -1292,7 +1292,7 @@ var UI={};
             insertRow: ["<code> var v=my_display.insertRow(row); </code>"],
             redrawRows: ["<code> var v=my_display.redrawRows(grid_name); </code>"],
             updateRow: ["<code> var v=my_display.updateRow(row); </code>"],
-            rowEditPopup:["<code> my_display.rowEdirPopup(row,buttons,editOverrides)</code>","Creates a form","where"," row is a grid row - e.g return from getRow()","buttons : an Object array (see form) e.g buttons=[{name:'OK',action:function(that){ console.loh('hullo')}}]","editOverrides: override the editable status of the cols ","e.g <code> var editable={'col1': true,col2:false};</code>"],
+            rowEditPopup:["<code> my_display.rowEdirPopup(row,buttons,editOverrides)</code>","Creates a form","where"," row is a grid row - e.g return from getRow()","buttons : an Object array (see form) e.g buttons=[{name:'OK',action:function(that){ console.loh('hullo')}}]","editOverrides: override the editable status of the cols ","e.g <code> var overrides={'col1': {editable:true},col2:{editable:false,label:'my_new_label'};</code>"],
             getRowFromElement: ["<code> var v=my_display.getRowFromElement(htmlObject); </code>","where the element has a tagName which is either a row (TR) or cell (TD) ","if you need just the uniqueKey fields, use var data=element.dataset; (see html5 dataset)"],
             print: ["<code> var v=my_display.print(); </code>"],
             start: ["<code> var v=my_display.start(); </code>"]

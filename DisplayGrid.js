@@ -456,21 +456,21 @@ jsonishData={
                 this.show();
             }
         },
-        rowEditPopup: function(row,buttons,editOverride){
+        rowEditPopup: function(row,buttons,override){
             var b,d,that=this,p={},label,
                 settings={draggable: true,
                           components:[]
                          };
-            console.log("this DOM is " + this.DOM);
+          //  console.log("this DOM is " + this.DOM);
             if(Apoco.type["string"].check(this.DOM)){
                 settings.DOM=this.DOM;
             }
             else{  // is this.DOM a html element - if so get id
                 settings.DOM=this.DOM.id;
             }
-            console.log("rowEditPopup: got row %j",row);
-            if(editOverride && !Apoco.type["object"].check(editOverride)){ // do we have edit overrides
-                throw new Error("rowEditPopup: edit override should be an object not %j ",editOverride);
+        //    console.log("rowEditPopup: got row %j",row);
+            if(override && !Apoco.type["object"].check(override)){ // do we have edit overrides
+                throw new Error("rowEditPopup: edit override should be an object not %j ",override);
             }
             settings.id="rowEditPopup";
             b=document.getElementById(settings.id);
@@ -479,7 +479,7 @@ jsonishData={
                 b.parentNode.removeChild(b);
                // return null;
             }
-            console.log("got edit overrides %j",editOverride);
+  //          console.log("got edit overrides %j",override);
   
             for(var i=0; i<this.cols.length;i++){
                 p={};
@@ -498,9 +498,11 @@ jsonishData={
           
             
             for(var i=0;i<settings.components.length;i++){
-                for(var k in editOverride){
+                for(var k in override){
                     if(settings.components[i].name === k){
-                        settings.components[i].editable=editOverride[k];
+                        for(var m in override[k]){
+                            settings.components[i][m]=override[k][m];
+                        }
                     }
                 }
             }     
@@ -508,7 +510,7 @@ jsonishData={
             if(buttons && Apoco.type["object"].check(buttons)){
                 settings["buttons"]=buttons;
             }
-            console.log("+++++ adding form with settings %j",settings);
+    //        console.log("+++++ adding form with settings %j",settings);
             var f=Apoco.display["form"](settings);
             return f;
             
