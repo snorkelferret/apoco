@@ -32,7 +32,7 @@ describe("setup",function(){
         assert(Apoco); 
     });
     it('creates a virtual console',function(){
-        console.log("I am a virtual console");
+      //  console.log("I am a virtual console");
         assert(console.log !== undefined); 
     });
     
@@ -43,7 +43,7 @@ describe("InputField",function(){
     require("../Fields.js");
     
     it("defines Apoco.field",function(){
-        console.log("here is Apoco.field " + Apoco.field);
+    //    console.log("here is Apoco.field " + Apoco.field);
        // assert(Apoco.popup !== undefined);
         assert.isObject(Apoco.field,true);
         
@@ -53,7 +53,7 @@ describe("InputField",function(){
     it("creates an InputField",function(){
        // var t=Apoco.field["InputField"]({name: "inputNode",type: "integer",value: 10});
         assert(t!== null);
-        console.log("got an element " + t.element);
+     //   console.log("got an element " + t.element);
         //assert(t.element);
     });
     it("has a getElement method",function(){
@@ -62,7 +62,7 @@ describe("InputField",function(){
     it("creates a div element",function(){
         var b=t.getElement();
         assert.isObject(b);
-        console.log("8888888888888888899999999999999 name is " + b.getAttribute("name"));
+      //  console.log("8888888888888888899999999999999 name is " + b.getAttribute("name"));
         document.getElementsByTagName("body")[0].appendChild(b);
         
     });
@@ -74,15 +74,15 @@ describe("InputField",function(){
   
         //var b=document.getElementsByTagName("div").getElementsByTagName("input")[0];
      //   var b=$("body").find("div[title='inputNode']").find("input");
-        console.log("iiiiiiiiiiiiiiiiiinput node is %j " , b);
+     //   console.log("iiiiiiiiiiiiiiiiiinput node is %j " , b);
         assert.isObject(b);
     });
     
     it("adds a name attribute",function(){
         //var b=$("body").find("div[title='inputNode']");
         var b= document.getElementsByName("inputNode")[0];
-        console.log("b is %j " , b);
-        console.log("CCCCCCCCCCCCCCCC name is " + b.getAttribute("name"));
+     //   console.log("b is %j " , b);
+     //   console.log("CCCCCCCCCCCCCCCC name is " + b.getAttribute("name"));
         assert.strictEqual(b.getAttribute("name"),"inputNode");
     });
     it("knows the value has not been changed in the browser",function(){
@@ -133,8 +133,7 @@ describe("StaticField",function(){
     require("../Fields.js");
        
     it("defines Apoco.field",function(){
-        console.log("here is Apoco.field " + Apoco.field);
-       // assert(Apoco.popup !== undefined);
+      //  console.log("here is Apoco.field " + Apoco.field);
         assert.isObject(Apoco.field,true);
         
     });
@@ -162,13 +161,13 @@ describe("StaticField",function(){
     });
     it("can get a value",function(){
         var b=w.getValue();
-        console.log("static value is %j", b);
+       // console.log("static value is %j", b);
         assert.isArray(b);
         assert.deepEqual(b,[1,2,3,4,5]);
     });
     it("has not deranged numbers",function(){
         var b=w.getValue();
-        console.log("static value is %j", b);
+      //  console.log("static value is %j", b);
         assert.isArray(b);
         for(var i=0;i<b.length;i++){
             assert.isNotNaN(b[i]);
@@ -210,7 +209,7 @@ describe("FloatField",function(){
         f.setValue(12.124234);
         //var e=$("body").find("div[name='floatField']").find("input");
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
-        console.log("first fields value is " + e[0].value);
+      //  console.log("first fields value is " + e[0].value);
         assert.strictEqual(e[0].value,'12');
         assert.strictEqual(e[1].value,'124');
     });
@@ -218,7 +217,7 @@ describe("FloatField",function(){
         f.setValue(-23.4678);
         //var e=$("body").find("div[name='floatField']").find("input");
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
-        console.log("first fields value is " + e[0].value);
+     //   console.log("first fields value is " + e[0].value);
         assert.strictEqual(e[0].value,'-23');
         assert.strictEqual(e[1].value,'468');
     });
@@ -324,7 +323,7 @@ describe("DateField",function(){
         assert(Apoco !== undefined); 
     });
     it("defines Apoco.field",function(){
-        console.log("here is Apoco.field " + Apoco.field);
+     //   console.log("here is Apoco.field " + Apoco.field);
        // assert(Apoco.popup !== undefined);
         assert.isObject(Apoco.field,true);
     });
@@ -590,7 +589,6 @@ describe("ButtonSetField",function(){
         }
         if(index > -1){
             var b=e[index].getElementsByTagName("input")[0];  //find("input").trigger("click");
-            //var b=$(e[index]).find('input').prop("checked");
             b.click();
             assert.strictEqual(b.checked,true);
         }
@@ -620,7 +618,7 @@ describe("ButtonSetField",function(){
     });
     it("has a getter method which returns an array of one for boolean fields",function(){
         var b=f.getValue();
-        console.log("return for boolean buttonset is %j",b);
+      //  console.log("return for boolean buttonset is %j",b);
         assert.strictEqual(b.length,1);
         assert.strictEqual(b[0].one,true);
              
@@ -844,9 +842,9 @@ describe("StringArrayField",function(){
     it("has a reset method",function(){
         f.resetValue();
         var p=f.getValue();
-        for(var i=0;i<p.length;i++){
-            console.log("reset %j",p);
-        }
+     //   for(var i=0;i<p.length;i++){
+    //        console.log("reset %j",p);
+    //    }
         assert.strictEqual(p.length,3);
     });
     it("knows the value has been changed in the browser",function(){

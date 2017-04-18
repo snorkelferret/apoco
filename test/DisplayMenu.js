@@ -113,7 +113,7 @@ describe("DisplayMenu",function(){
         var b=document.getElementById("test_menu");
         assert.isObject(b);
         var c=b.querySelectorAll("li");
-        console.log("+++++++++++++++++++++++++++ added nmenys to dom %j ",c);
+//        console.log("+++++++++++++++++++++++++++ added nmenys to dom %j ",c);
         assert.strictEqual(c.length,3);
     });
     it("has a callback ",function(){

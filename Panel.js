@@ -443,9 +443,6 @@ require("./Window");
             if(Apoco.type['string'].check(obj)){
                 obj=this.getChild(obj);
             }
-           // if(obj.listen){ // remove the listener
-	//	Apoco.unsubscribe(obj);
-	  //  }
 	    for(var i=0;i<this.components.length;i++){
 		if(obj === this.components[i]){
                     index=i;
@@ -459,11 +456,7 @@ require("./Window");
             else{
                 throw new Error("Panel: deleteChild could not find child " + obj.id);
             }
-	  //  if(this.components.length === 0){
-	//	console.log("No components left");
-	 //       Apoco.Panel.delete(this.name);
-	 //   }
-	  //  console.log("after delete child length is " + this.components.length);
+
 	},
 	getChildren: function(){
 	    if (this.components && this.components.length>0){

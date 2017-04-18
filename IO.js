@@ -184,7 +184,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 throw new Error("webSocket: no data or name from server");
             }
             var d=JSON.parse(e.data);
-            console.log("Websocket: got: %j %j",d[0],d[1]);
+        //    console.log("Websocket: got: %j %j",d[0],d[1]);
             
             if(that.corking){
                // console.log("corking data %j",d);

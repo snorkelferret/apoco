@@ -87,7 +87,7 @@ describe("DisplayGrid-(start without rows)",function(){
     it("dumps the contents of the grid as a JSON object",function(){
         var b=t.getJSON();
         assert.isObject(b);
-        console.log("JSON %j",b);
+//        console.log("JSON %j",b);
     });
     it("updates a row only if unique key",function(){
         var fn=function(){
@@ -97,10 +97,10 @@ describe("DisplayGrid-(start without rows)",function(){
     });
     it("has a delete method",function(){
         var b=document.getElementById("test_grid");
-        console.log("delete grid got element" + b);
+//        console.log("delete grid got element" + b);
         t.delete();
         assert.strictEqual(document.body.contains(b),false);
-        console.log("t is now " + t);
+//        console.log("t is now " + t);
     });
 });
 
@@ -138,7 +138,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         b++;
         var n=t.addRow({stock:"FG63",class: "swaps",bid:10,maturity:"2020-05-21"});
         var c=t.getGrid("swaps").rows.length;
-        console.log("b is " + b +  " and c " + c);
+//        console.log("b is " + b +  " and c " + c);
         //var b=t.getRow({stock:"FG63",subclass: 1,bid:10});
         assert.strictEqual(b,c);
        // console.log("JSON %j",n);
@@ -152,7 +152,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         
     });
     it("can retrieve a row that has been added after initialisation",function(){
-        console.log("trying to find a row");
+//        console.log("trying to find a row");
         var b=t.getRow({stock:"XXX",maturity:"2016-08-30"});
         assert.notStrictEqual(b,null); 
     });
@@ -172,7 +172,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         var b=document.getElementById("straight").getElementsByTagName("tr")[0].getElementsByTagName("td")[0];//querySelector("#1 tr:first td:first");
         assert.isObject(b);
         var c=b.textContent;
-        console.log("td is " + c);
+//        console.log("td is " + c);
     });
     it("can add a column using the field option instead of a type",function(){
         var b=t.getCol().length;
@@ -195,19 +195,19 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     it("can get a cell",function(){
         var b=t.getRow({stock:'AAB',maturity:"2017-03-27"});
         assert.notStrictEqual(b,null);
-        console.log("got cell " + b['selection']);
+//        console.log("got cell " + b['selection']);
         var c=b['selection'];
         assert.notStrictEqual(c,null);
     });
     it("has added the options to the select cell",function(){
         var b=t.getRow({stock:'AAB',maturity:"2017-03-27"});
         assert.notStrictEqual(b,null);
-        console.log("got cell " + b['selection']);
+//        console.log("got cell " + b['selection']);
         var c=b['selection'];
         assert.notStrictEqual(c,null);
         var d=b['selection'].select;
         assert.strictEqual(d.length,3);
-        console.log("options is %j",d);
+//        console.log("options is %j",d);
     });
     
     it("can add a column",function(){
@@ -221,7 +221,7 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
         //  t.updateRow({stock:"XXX",subclass:1,maturity:20160830,other:"something"});
         t.updateRow({stock:"AAB",class:"index_linked",maturity:"2017-03-27",other:"something"});
         var b=t.getRow({stock:"AAB",class:"index_linked",maturity:"2017-03-27"});
-        console.log("displayGrid:update row got %j",b);
+//        console.log("displayGrid:update row got %j",b);
      /*   for(var k in b){
             console.log("row key is " + k + " value " + b[k]);
             for (var n in b[k]){
@@ -240,10 +240,10 @@ describe("DisplayGrid-(start with data and subgrids)",function(){
     });
     it("can delete itself with hidden cols",function(){
         var b=document.getElementById("Blotter");
-        console.log("delete grid got element" + b);
+//        console.log("delete grid got element" + b);
         t.delete();
         assert.strictEqual(document.body.contains(b),false);
-        console.log("t is now " + t);
+//        console.log("t is now " + t);
         
         
     });
@@ -285,7 +285,7 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         var n=t.addRow({one:33, two: "fig"});
         assert.isObject(n);
         var c=t.getGrid("all").rows.length;
-        console.log("b is " + b +  " and c " + c);
+//        console.log("b is " + b +  " and c " + c);
         assert.strictEqual(b,c);
     });
     it("can create a rowEditPopup",function(){
@@ -350,7 +350,7 @@ describe("DisplayGrid-(start with data but no subgrids and no unique key)",funct
         assert.strictEqual(c.length,4);
         var p=c[0];
         assert.isObject(p);
-        console.log("got data " + p.getAttribute("data-_aid"));
+//        console.log("got data " + p.getAttribute("data-_aid"));
         var b=t.getRowFromElement(p);
         assert.isObject(b);
         assert.strictEqual(b["one"].value,20);
@@ -364,8 +364,7 @@ describe("DisplayGrid-(start with data but no subgrids and no unique key)",funct
     });
     it("can sort a column if the buttom is clicked",function(){
         var s=t.sortOrder;
-        console.log("sort order is %j",s);
-        //var d=document.getElementsByClassName("up")[0];
+//        console.log("sort order is %j",s);
         var e=document.getElementsByClassName("arrows")[0]; //.getElementsByTagName("li")[1];
         assert.isObject(e);
         var up=e.querySelector("span.up");
@@ -374,7 +373,7 @@ describe("DisplayGrid-(start with data but no subgrids and no unique key)",funct
         up.focus();
         up.click();
         var v=t.sortOrder;
-        console.log("sort order is %j",v);
+//        console.log("sort order is %j",v);
         assert.notDeepEqual(v,s);
         assert.oneOf("two",v);
     });
@@ -384,7 +383,7 @@ describe("DisplayGrid-(start with data but no subgrids and no unique key)",funct
         assert.strictEqual(c.length,4);
         var p=c[0];
         assert.isObject(p);
-        console.log("got data " + p.getAttribute("data-_aid"));
+//        console.log("got data " + p.getAttribute("data-_aid"));
         var b=t.getRowFromElement(p);
         assert.isObject(b);
         assert.strictEqual(b["one"].value,20);

@@ -52,7 +52,7 @@ describe("DisplayFieldset-(no initial data)",function(){
     });
     it("sets the value of a field",function(){
         var p=t.getChild("title");
-        console.log("setting field with methods %j", p);
+//        console.log("setting field with methods %j", p);
         t.getChild("title").setValue("Robert");
         var b=t.getChild("title").getValue();
         assert.strictEqual(b,"Robert");
@@ -108,9 +108,9 @@ describe("DisplayFieldset-(start with data)",function(){
     });
     it("has created some  fields",function(){
         var b=t.getChildren();
-        for(var i=0;i<b.length;i++){
-            console.log("field is " + b[i].name);
-        }
+//        for(var i=0;i<b.length;i++){
+//            console.log("field is " + b[i].name);
+//        }
         assert.strictEqual(b.length,4);
     });
     it("writes out json for all the fields",function(){

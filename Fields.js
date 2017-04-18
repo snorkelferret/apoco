@@ -182,13 +182,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             return this.value;
         },
         valueChanged:function(){
-            console.log("Value Changed getValue is " + this.getValue() + " and value is " + this.value);
+           // console.log("Value Changed getValue is " + this.getValue() + " and value is " + this.value);
          
             if(this.getValue() != this.value){
-                console.log("ValueChanged: return true");
+               // console.log("ValueChanged: return true");
                 return true;
             }
-            console.log("ValueChanged: return false");
+           // console.log("ValueChanged: return false");
             return false;
         }, 
 	checkValue:function(){
@@ -1287,7 +1287,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
             }
             if(this.input.length > this.length && this.length>0){
-                console.log("this input length " + this.input.length + " original length " + this.length);
+      //          console.log("this input length " + this.input.length + " original length " + this.length);
                 for(var i=this.input.length-1; i>this.length;i--){
                     this.deleteValue(i);
                 }

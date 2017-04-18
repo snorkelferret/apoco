@@ -1792,7 +1792,7 @@ var UI={};
             show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>"]}],
             showAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.showAll([ ,win])</code>","params: none or string window name, or window Object"]}],
             addChild:[{label:"Usage",descriptions:["<code>var d=Apoco.Panel.get(string).addChild(object);</code>","<br> return: object","parms: object","a Apoco display Object of key value pairs"]}],
-            deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).deleteChild(object);</code>"]}],
+            deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(panel_name).deleteChild(c);</code>","params: object or string","where object is the child object returned by getChild or string the id of the child node "]}],
             deleteChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).deleteChildren();</code>"]}],
             findChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).findChild(object);</code>"]}],
             getChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).getChild(string);</code>"]}],

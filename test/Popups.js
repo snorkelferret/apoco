@@ -29,7 +29,7 @@ describe("JSDOM",function(){
         assert(Apoco); 
     });
     it('creates a virtual console',function(){
-        console.log("I am a virtual console");
+     //   console.log("I am a virtual console");
         assert(console.log !== undefined); 
     });
     
@@ -45,7 +45,7 @@ describe("Popups",function(){
         assert(Apoco !== undefined); 
     });
     it("defines Apoco.popup",function(){
-        console.log("here is apoco.popup " + Apoco.popup);
+   //    console.log("here is apoco.popup " + Apoco.popup);
        // assert(Apoco.popup !== undefined);
         assert.isObject(Apoco.popup);
         

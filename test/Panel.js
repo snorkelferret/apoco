@@ -86,7 +86,7 @@ describe("Panel",function(){
     });
     it("can delete itself",function(){
         Apoco.Panel.delete(t.name);
-        console.log("t is %j", t);
+//        console.log("t is %j", t);
         assert.strictEqual(Apoco.Panel._inList("test_panel"),null);
     });
 });
@@ -95,35 +95,19 @@ describe("Panel",function(){
 describe("Panel - from data file",function(){
     //var $= global.jQuery; 
     var t;
-  
-        /*const UI={
-        Panels:{
-            TestPanel:{
-                name: "TestPanel",
-                components: [
-	            {display: "fieldset",
-	             DOM: "test",
-	             id: "Create",
-	             components:[{ field: "select", name: "selection_dropdown", options: [ "Blotter","Broker","Bigfig","Auction-control","Trades","robo-broker","knock-down-ginger","auction"]},
-                                 {node: "paragraph",text:"kkkkkkk"}
-                                ]
-                    }
-	        ]
-            }
-        }
-    };  */
+
 
     require("../Panel.js");
     require("./data/TestUI_defs.js");
     
     it("creates a tab display object",function(){
         if(!document.getElementById("test")){
-            console.log("creating element test");
+//            console.log("creating element test");
             var t=document.createElement("div");
             t.id="test";
         }
         
-        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX trying to add TestPanel %j",UI);
+//        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXX trying to add TestPanel %j",UI);
        
           
        t=Apoco.Panel.add("TestPanel");

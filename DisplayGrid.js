@@ -161,7 +161,7 @@ jsonishData={
             else{
                 throw new Error("DisplayGrid: _mkSortorder needs a string array");
             }
-            console.log("MakeSortOrder: got initial sortOrder %j" , sortOrder + "param  was %j",s);
+            //console.log("MakeSortOrder: got initial sortOrder %j" , sortOrder + "param  was %j",s);
             if(this.uniqueKey){
                 if(!Apoco.type["stringArray"].check(this.uniqueKey)){
                     throw new Error("DisplayGrid: unique key is not a stringArray");
@@ -184,16 +184,14 @@ jsonishData={
                             not_found.push(this.uniqueKey[i]);
                         }
                     }
-                    // if(found !== this.uniqueKey.length){
                     for(var i=0;i<not_found.length;i++){
                         // console.log("not found is pushing " + not_found[i]);
                         sortOrder.push(not_found[i]);
                     }
-                    // }
-                    console.log("_MakeSortOrder: sortOrder length is " + this.sortOrder.length);
+                    // console.log("_MakeSortOrder: sortOrder length is " + this.sortOrder.length);
                 }
             }
-            console.log("MakeSortOrder returning array %j",sortOrder);
+            //console.log("MakeSortOrder returning array %j",sortOrder);
             return sortOrder;  
         },
 	_execute:function(){
@@ -440,7 +438,7 @@ jsonishData={
                                 e.preventDefault();
                                 that.sortOrder=that._mkSortOrder([col.name]);
                                 that.sort(dir);
-                                console.log("got that.cols " + col.name);
+                                //console.log("got that.cols " + col.name);
 			    }
 		        };
 		    }(this.cols[index],that),false);  // col is + 1 for first row outside for loop +1 for index starts at 1 -
@@ -647,13 +645,13 @@ jsonishData={
             for(var i=0;i<this.uniqueKey.length;i++){
                 s="data-";
                 s=s.concat(this.uniqueKey[i]);
-                console.log("getRowFromElement: uniqueKey is " + this.uniqueKey[i] + " attribute " + s);
+             //   console.log("getRowFromElement: uniqueKey is " + this.uniqueKey[i] + " attribute " + s);
                 c=element.getAttribute(s);
-                console.log("Rowfromelement got data " + c);
+             //   console.log("Rowfromelement got data " + c);
                 key[this.uniqueKey[i]]=c;
-                for(var k in c){
-                    console.log("getRowFromElement got key " + k + " with value  " + c[k]);
-                }
+               // for(var k in c){
+               //     console.log("getRowFromElement got key " + k + " with value  " + c[k]);
+               // }
             }
             if(this.groupBy){
                 s='data-';
@@ -846,7 +844,7 @@ jsonishData={
                 if(grid[i].name === undefined){
                     throw new Error("grid " + i + "name is " + grid[i].name);
                 }
-                console.log("searching grid ",grid[i].name);
+            //    console.log("searching grid ",grid[i].name);
                 if(grid[i].sorted){
                     if(this.closest){
                         if(this.sortOrder === undefined){
