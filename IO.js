@@ -44,7 +44,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    }
         },
         unsubscribe:function(that){ //pubsub
-	    var index=-1;
+	   // var names=[];
 
 	    for(var i=0; i< that.listen.length; i++){
 	     //   console.log("finding name " + that.listen[i].name);
@@ -52,21 +52,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		    for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
 		        if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){
 			    this._subscribers[that.listen[i].name].splice(j,1);
-			    index=j;
 		        }
 		    }
 	        }
 	    }
-	    if(index !== -1){
-	        if(this._subscribers[that.listen[index].name].length === 0){ // nobody listening
-		    delete this._subscribers[that.listen[index].name];
-	        }
-                return undefined;
-	    }
-	    else{
-                console.log("Apoco.unsubscribe could not find listener");
-                return null;
+            for(var k in this._subscribers){
+                if(this._subscribers[k].length === 0){ //nobody listening
+                    delete this._subscribers[k];
+                }
             }
+	    
         },
         publish:function(that) {//pubsub
             if(that === undefined || that.publish === undefined){
