@@ -173,6 +173,17 @@ describe("StaticField",function(){
             assert.isNotNaN(b[i]);
         }
     });
+   
+    it("can set a date field",function(){
+        var p=Apoco.field["static"]({name: "statich",value:"2017-09-23",type: "date"});
+        assert.strictEqual(p.getValue(),"2017-09-23");
+    });
+    it("can set a date specified in milliseconds",function(){
+        var p=Apoco.field["static"]({name: "statich",value:1486998999898,type: "date"});
+        assert.strictEqual(p.getValue(),"2017-02-13");
+    });
+    
+    
 
 });
 
@@ -405,7 +416,16 @@ describe("CheckBoxField",function(){
     });
     it("knows the value has been changed in the browser",function(){
         assert.strictEqual(f.valueChanged(),true);
+    });  
+    it("can set a date field",function(){
+        var p=Apoco.field["date"]({name: "statich",value:"2017-09-23",type: "date"});
+        assert.strictEqual(p.getValue(),"2017-09-23");
     });
+    it("can set a date specified in milliseconds",function(){
+        var p=Apoco.field["date"]({name: "statich",value:1486998999898,type: "date"});
+        assert.strictEqual(p.getValue(),"2017-02-13");
+    });
+    
     
 });
 

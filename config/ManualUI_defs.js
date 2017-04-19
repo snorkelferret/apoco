@@ -278,8 +278,8 @@ var UI={};
                          },
             checkBox:{ options:{ value:{type: "boolean",default: false}},
                        descriptions: [""]},
-            date:{options:{value:{type:"time",default:undefined,params:["Date","string"] }},
-                  descriptions:["This uses the browser datepicker(where available) or Apoco.datepicker"]
+            date:{options:{value:{type:"date",default:undefined,params:["Date","string"] }},
+                  descriptions:["An ISO string- e.g '2018-04-23'","or an integer milliseconds past 1970","This uses the browser datepicker(where available) or Apoco.datepicker"]
                  },
             time:{options:{value:{type:"time",default:undefined,
                                   description:"A valid partial-time as defined in [RFC 3339]."}},

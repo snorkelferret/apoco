@@ -226,6 +226,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             else{
                 this.value=v;
             }
+            if(this.type === "date"){  // this is if the date is given in milliseconds past 1970
+                if(Apoco.type["integer"].check(this.value)){
+                    t=new Date(this.value).toISOString(); //
+                    t=t.split("T");
+                    if(t.length !==2){
+                        throw new Error("staticField cannot parse input value " + this.value);
+                    }
+                    this.value=t[0];
+                }
+            }
             if(Apoco.type["array"].check(v)){
                 for(var i=0;i<v.length;i++){
                     p=v[i];
@@ -237,7 +247,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.span.textContent=t;
             }
             else{
-                this.span.textContent=v;
+                this.span.textContent=this.value;
             }
             
         },
@@ -479,7 +489,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     Apoco.Utils.extend(FloatField,_Field);
 
     var DateField=function(d,element){
-        var that=this;
+        var that=this,t;
         d.field="date";
         d.type="date";
         _Field.call(this,d,element);
@@ -490,7 +500,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         }
         this.element.appendChild(this.input);
         if(this.value){
-            this.input.value=this.value;
+            if(Apoco.type["integer"].check(this.value)){
+                t=new Date(this.value).toISOString(); //
+                t=t.split("T");
+                if(t.length !==2){
+                    throw new Error("DateField cannot parse input value " + this.value);
+                }
+                this.input.value=t[0];
+            }
+            else{
+                this.input.value=this.value;
+            }
+            
 	}
 	if(this.editable !== false){
             if(navigator.appCodeName === "Mozilla"){ //add a datepicker cause none on Mozilla
