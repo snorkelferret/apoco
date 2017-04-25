@@ -8,7 +8,7 @@ require("./Types")
 
     function chunkify(t) {
 	var tz = [], x = 0, y = -1, n = 0, i, j;
-	
+	t=t.toString();
 	while (i = (j = t.charAt(x++)).charCodeAt(0)) {
 	    var m = (i == 46 || (i >=48 && i <= 57));
 	    if (m !== n) {
@@ -41,8 +41,8 @@ require("./Types")
 	case "string":
 	case "float":
 	case "positiveInteger":
-	case "date":
-	    return generic_compare;
+            return generic_compare;
+	case "date":  // date is in format 2018-04-22
 	case "token":	
 	case "alphaNum":
 	    return (function(s,t,fn){
@@ -73,8 +73,8 @@ require("./Types")
 	case "boolean":
 	case "currency":
 	case "email":
-	case "integers2":
-	case "floats2":
+	case "integerArray":
+	case "floatsArray":
 	case "text":	
 	case "time":
 	default:

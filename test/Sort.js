@@ -38,6 +38,11 @@ describe("Sort",function() {
         };
         assert.throws(fn,"Sort: don't know how to sort " );
     });
+    it("can sort dates of the form YYYY-MM-DD",function(){
+        var b=["2018-05-12","2013-04-22","2020-03-21","2010-10-01"];
+        Apoco.sort(b,"date");
+        expect(b).to.eql(["2010-10-01","2013-04-22","2018-05-12","2020-03-21"]);
+    });
     it("can sort a complex object",function(){
         var b=[{stock: "AAB" ,maturity: 20171105 ,subclass: 12 },
                {stock: "AAE" ,maturity: 20201129 ,subclass: 11 },
