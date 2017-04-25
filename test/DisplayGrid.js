@@ -386,7 +386,7 @@ describe("DisplayGrid-(start with data but no subgrids and no unique key)",funct
 //        console.log("got data " + p.getAttribute("data-_aid"));
         var b=t.getRowFromElement(p);
         assert.isObject(b);
-        assert.strictEqual(b["one"].value,20);
+        assert.strictEqual(b["one"].value,22);
     });
     
 });

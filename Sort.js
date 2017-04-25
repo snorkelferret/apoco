@@ -107,9 +107,9 @@ require("./Types")
                 if(!type_data[i].fn){
                      throw new Error("Apoco.sort needs a function to retrieve the array element"); 
                 }
-	        //	console.log("sort: array index " + i + " has type " + type_data[i].type)
+	  //      console.log("sort: array index " + i + " has type " + type_data[i].type);
 		type_data[i].compare=sort_fn(type_data[i].type);
-	        //	console.log("sort: type data function is " + type_data[i].fn);
+	  //      console.log("sort: type data function is " + type_data[i].fn);
 	    }
 	    r.sort(function(a,b){ 
 		for(var i=0;i<type_data.length;i++){

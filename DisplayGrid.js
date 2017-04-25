@@ -191,7 +191,7 @@ jsonishData={
                     // console.log("_MakeSortOrder: sortOrder length is " + this.sortOrder.length);
                 }
             }
-            //console.log("MakeSortOrder returning array %j",sortOrder);
+         //   console.log("MakeSortOrder returning array %j",sortOrder);
             return sortOrder;  
         },
 	_execute:function(){
@@ -225,7 +225,7 @@ jsonishData={
                 }
                 //   console.log("sorting into subgrids");
                 sort_into_subGrids(this);
-              
+                
 	        for(var i=0;i<this.grids.length;i++){
                   //  console.log("this is grid " + i);
                     this.addGrid(this.grids[i]);
@@ -239,6 +239,7 @@ jsonishData={
                     }
                 }
                 this.sort();
+                this.redrawRows();
             }
    	},
         _afterShow:function(){
@@ -292,26 +293,29 @@ jsonishData={
 		t=this.getColIndex(this.sortOrder[i]);
 	//	console.log("col index is " + t);
 		s=this.sortOrder[i];  // name of the column in the row
-	        //	console.log("name is " + s);
+	  //      console.log("name is " + s);
 		if(this.cols){
 		    ar.push({type: this.cols[t].type,
 			     fn:(function(s){
 				 return function (a){
+                                    // console.log("value is " + a[s].value);
 				     return  a[s].value; };
 			     })(s)
 			    });
 		}
-	//	this.cols[t].sorted=true;
 	    }
-          //  for(var i=0;i<this.cols.length;i++){
-          //      this.cols[i].sorted=false;
-          //  }
           //  console.log("sortOrder.length is " + this.sortOrder.length);
 	               
 	    for(var j=0;j<this.grids.length;j++){
 		Apoco.sort(this.grids[j].rows,ar);
                 this.grids[j].sorted=true;
-                if(dir === "down"){
+               /* for(var n=0;n<this.grids[j].rows.length;n++){
+                    for(var m=0;m<this.sortOrder.length; m++){
+                        var mn=this.sortOrder[m];
+                        console.log("row " + mn + " is " + this.grids[j].rows[n][mn].value );
+                    }
+                } */
+                if(dir && dir === "down"){
                     this.grids[j].rows.reverse();
                 }
 	    }
@@ -438,6 +442,7 @@ jsonishData={
                                 e.preventDefault();
                                 that.sortOrder=that._mkSortOrder([col.name]);
                                 that.sort(dir);
+                                that.redrawRows();
                                 //console.log("got that.cols " + col.name);
 			    }
 		        };
@@ -1009,23 +1014,36 @@ jsonishData={
 	    }
 	},
 	redrawRows: function(grid_name){
+            var b,g,p,name,grids=[];
 	    if(!grid_name){
-		if(this.grids.length === 1){
-		    grid_name="all";
-		}
-		else{
-		    throw new Error("redrawRows: must specify the grid group name");
-		    return null;
-		}
+	        grids=this.grids;
 	    }
-	    var b=this.grids[grid_name].element.getElementsByTagName("tbody")[0];
-	    b.innerHTML="";
-
-	    for(var i=0; i<this.grids[grid_name].rows.length; i++){
-		b.appendChild(this.grids[grid_name].rows[i].element);
-	    }
+            else{
+                grids[0]=this.getGrid(grid_name);
+                if(!grids[0]){
+                    throw new Error("DisplayGrid: cannot find grid named " + grid_name);
+                }
+            }
+            //find the col that has an element i.e not hidden
+            for(var i=0;i<this.cols.length;i++){
+                if(this.cols[i].hidden !== true){
+                    name=this.cols[i].name;
+                    break;
+                }
+            }
+            if(!name)throw new Error("DisplayGrid: Cannot find col that is not hidden");
+            for(var i=0;i<grids.length;i++){
+	        b=grids[i].element.getElementsByTagName("tbody")[0];
+	        b.innerHTML="";
+                /*   while (b.firstChild) {
+                 b.removeChild(b.firstChild);
+                 } */
+    	        for(var j=0; j<grids[i].rows.length; j++){
+                    p=grids[i].rows[j][name].element.parentNode;
+		    b.appendChild(p);
+	        }
+            }
 	},
- 
         getJSON: function(){
             var c,t,m;
             var n={rows:[]};

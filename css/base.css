@@ -49,7 +49,8 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 .big_west:before{content:"\25C0"}
 
 
-
+.up:before{ content:"\25B2";}
+.down:before{content:"\25BC";}
 
 /* fieldSet */
 .apoco_fieldset{padding: 1em; width: inherit}
@@ -162,6 +163,7 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 .apoco_grid .inner_table table td th { word-wrap: break-word}
 /* set the row colours */
 .apoco_grid .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
+.apoco_grid .arrows span{height: 50%; width: 16px}
 
 
 /* padding: top right bottom left */

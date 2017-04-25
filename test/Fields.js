@@ -196,7 +196,7 @@ describe("FloatField",function(){
         assert(Apoco !== undefined); 
     });
     it("defines Apoco.field",function(){
-        console.log("here is Apoco.field " + Apoco.field);
+        //console.log("here is Apoco.field " + Apoco.field);
        // assert(Apoco.popup !== undefined);
         assert.isObject(Apoco.field);
         
