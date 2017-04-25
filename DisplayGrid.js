@@ -650,13 +650,13 @@ jsonishData={
             for(var i=0;i<this.uniqueKey.length;i++){
                 s="data-";
                 s=s.concat(this.uniqueKey[i]);
-             //   console.log("getRowFromElement: uniqueKey is " + this.uniqueKey[i] + " attribute " + s);
+              //  console.log("getRowFromElement: uniqueKey is " + this.uniqueKey[i] + " attribute " + s);
                 c=element.getAttribute(s);
-             //   console.log("Rowfromelement got data " + c);
+            //    console.log("Rowfromelement got data " + c);
                 key[this.uniqueKey[i]]=c;
-               // for(var k in c){
-               //     console.log("getRowFromElement got key " + k + " with value  " + c[k]);
-               // }
+             /*  for(var k in c){
+                    console.log("getRowFromElement got key " + k + " with value  " + c[k]);
+               }*/
             }
             if(this.groupBy){
                 s='data-';
@@ -673,7 +673,7 @@ jsonishData={
                 var r=this.getRow(key,g);
                 return r;
             }
-            // get the cell data
+            // get the cell data from the DOM
             c=element.childNodes;
             
             for(var i=0;i<this.sortOrder.length; i++){
@@ -683,7 +683,8 @@ jsonishData={
                             for(var k=0;k<this.cols.length;k++){
                                 if(this.cols[k].name === this.sortOrder[i]){
                                     if(this.cols[k].editable === false ){  // value is in static span tex
-                                        key[this.sortOrder[i]]=c[j].textContent;
+                                        ci=c[j].getElementsByTagName("span");
+                                        key[this.sortOrder[i]]=ci[0].textContent;
                                         break;
                                     }
                                     // is there an input node ....?
@@ -844,12 +845,12 @@ jsonishData={
                 }
             }
          //   console.log("getRow this.sortOrder length is " + this.sortOrder.length);
-         //   console.log("key is %j",key);
+        //    console.log("key is %j",key);
             for(var i=0;i<grid.length;i++){
                 if(grid[i].name === undefined){
                     throw new Error("grid " + i + "name is " + grid[i].name);
                 }
-            //    console.log("searching grid ",grid[i].name);
+       //         console.log("searching grid ",grid[i].name);
                 if(grid[i].sorted){
                     if(this.closest){
                         if(this.sortOrder === undefined){
