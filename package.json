@@ -3,8 +3,11 @@
   "version": "0.3.7",
   "description": "Single Page Web Framework",
   "keywords": [
-    "SPA",
-    "web framework"
+      "SPA",
+      "web framework",
+      "Framework",
+      "apoco",
+      "Single Page "
   ],
   "main": "index.js",
   "scripts": {

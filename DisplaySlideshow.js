@@ -97,11 +97,14 @@ require("./DisplayBase");
             var p,q,t=["right","left"],that=this;
             var doit=function(e){
                 e.stopPropagation();
-                if(e.target.classList.contains("left")){
+                if(that.autoplay){
+                    that.stop();
+                }
+                if(e.target.classList.contains("left") || e.target.parentNode.classList.contains("left")){
                     that.step("next");
                 }
                 else{
-                    that.step("next");
+                    that.step("prev");
                 }
             };
             for(var i=0;i<2;i++){
@@ -167,23 +170,38 @@ require("./DisplayBase");
             that.element.appendChild(d);
             
         },
+        _getTopOffset:function(){
+            var e,y=this.element.offsetTop;
+            e=this.element;
+          //  console.log("initial offset is " +y);
+            while(e=e.offsetParent){
+                y+=e.offsetTop;
+            //    console.log("offset is " + y);
+            }
+            return y;
+        },
         _calculateCover:function(v){
             
-            var ar,w,h;
+            var ar,w,h,y;
             if(this.keepAspectRatio === false){
                 return;
             }
-                
+             if(!document.contains(this.element)){ // not currently active
+                return;
+            }    
             w=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("width").split("px");
             h=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
             this.width=parseInt(w);
             this.height=parseInt(h);
-          //  console.log("slideshow container width " + this.width + " height " + this.height);
+         //   console.log("slideshow container width " + this.width + " height " + this.height);
+            if(parseInt(this.height) === 0){ // if height is not set on slideshow_container
+                y=this._getTopOffset();
+                this.height=window.innerHeight-y;
+            }
             
             if(parseInt(this.height)>0 ){
-               
                 ar=this.width/this.height;
-            //    console.log("height " + this.height + " is > 0 ; and ar is " + ar );
+           //     console.log("height " + this.height + " is > 0 ; and ar is " + ar );
             }
             else{
                 ar=0;
@@ -219,24 +237,30 @@ require("./DisplayBase");
             v.SSimage.style.marginRight=(w + "px");
         },
         _setToWidth:function(v,ar){
-            var w,h,that=this;
+            var w,h,m,that=this;
             v.SSimage.style.margin="0"; // reset the margin
-            console.log("FIT to WIDTH");
+          //  console.log("FIT to WIDTH");
             h=this.width/v.aspect_ratio;
-           console.log("need height " + h);
-            if(this.height< h && this.fit_to=== "width"){
+         //   console.log("need height " + h);
+            if(this.height< h && this.fit_to === "width"){ //crop the image
                 h=parseInt(h);
-                console.log("setting height to " + h);
-                this.element.style.height=(h + "px");
-                this.height=h;
-                console.log("this.height " + this.height);
+           //     console.log("cropping height to " + this.height);
+                m=parseInt((h-this.height)/2);
+                v.SSimage.style.height=(h + "px");
+                v.SSimage.style.marginTop=(-m + "px");
+                v.SSimage.style.marginBottom=(-3*m + "px");
+               // this.element.style.height=(h + "px");
+                //this.height=h;
+               // console.log("this.height " + this.height);
             }
+            else{
            // console.log("image aspect ration is " + v.aspect_ratio + " and window is " + ar);
 	  //  console.log("new image height is " + h);
-            w=((that.width).toString() + "px");
-             console.log("new image width is " + w);
-            v.SSimage.style.width=(w + "px");
-            v.SSimage.style.height=(h + "px");
+        //    w=((that.width).toString() + "px");
+         //    console.log("new image width is " + w);
+         //   v.SSimage.style.width=(w + "px");
+                v.SSimage.style.height=(h + "px");
+            }
             if(this.fit_to !== "width"){
 	        h=(that.height-h)/2;
                 v.SSimage.style.marginTop=(h + "px"); 
@@ -250,7 +274,7 @@ require("./DisplayBase");
             for(var i=0;i<this.components.length;i++){
              //   console.log("after show calc " + i + " this loaded is " + this.components[i].loaded);
                 if(this.components[i].loaded){
-                //    console.log("Values loaded = going to calculate cover");
+                   // console.log("Values loaded = going to calculate cover");
                     this._calculateCover(this.components[i]);
                 }
             }
@@ -285,8 +309,9 @@ require("./DisplayBase");
             
         },
 	_execute: function(){
-            var that=this,temp,pp;
-	 //   console.log("execute of DisplaySlideshow");
+            var that=this,temp,pp,element;
+	    //   console.log("execute of DisplaySlideshow");
+          
             this.slideshow_container=document.createElement("div");
             this.slideshow_container.classList.add("slideshow","pic_area");
 	    this.element.appendChild(this.slideshow_container);
@@ -301,13 +326,26 @@ require("./DisplayBase");
                 this.components[i].element.appendChild(this.components[i].SSimage);
                 this.components[i].SSimage.parentElement.style.visibility="hidden";
                
-                if(this.components[i].text){
-                    temp=document.createElement("div");
-                    this.components[i].element.appendChild(temp);
-                    pp=document.createElement("p");
-                    pp.textContent=this.components[i].text;
-                    temp.appendChild(pp);
-                    this.hasText=true;
+                if(this.components[i].content){
+                    element=document.createElement("div");
+                    element.classList.add("slideshow_content");
+                    this.components[i].element.appendChild(element);
+                    
+                    if(!element){
+                        throw new Error("cannot find slideshow element");
+                    }
+                    for(var j=0;j<this.components[i].content.length;j++){
+                        temp=this.components[i].content[j];
+                        if(temp["node"]){
+                            pp=Apoco.node(temp,element);
+                        }
+                        else if(temp["field"] ){
+                            pp=Apoco.field(temp,element);
+                        }
+                        else{
+                            throw new Error("content array must contain either nodes or fields");
+                        }
+                    }
                 }
                                
                 this.promises[i].then(function(v){
@@ -326,7 +364,31 @@ require("./DisplayBase");
             if(that.sideArrows === true){
                 that._sideArrows();
             }
-           // document.addEventListener("visibilitychange", this, false); // stop weird flicker from stacks of images
+            if(that.fit_to){
+                window.addEventListener("resize",function(e){
+                    var resizeTimeout;
+                 //   console.log("resize event");
+                    e.stopPropagation();
+                
+                    if(!resizeTimeout){
+                        resizeTimeout=setTimeout(function(){
+                            resizeTimeout=null;
+                           // that.height=window.innerHeight-that.element.offsetTop;
+                             //that.element.style.height=(that.height + "px");
+                            //that._afterShow();
+                            for(var i=0;i<that.components.length;i++){
+                            //    console.log("after show calc " + i + " this loaded is " + that.components[i].loaded);
+                                if(that.components[i].loaded){
+                              //      console.log("Values loaded = going to calculate cover");
+                                    that._calculateCover(that.components[i]);
+                                }
+                            }
+                        },100); // animate at 10 fps
+                    }
+                
+                },false);
+            }
+
         },
         deleteAll:function(){
             // delete all the images
@@ -406,6 +468,9 @@ require("./DisplayBase");
         },
         play:function(){
             var that=this;
+            if(!document.contains(this.element)){
+                return;
+            }
             this.step("next"); // update immediately for user feedback
           //  console.log("play is here " + that);
             this.autoplay=true;
@@ -413,15 +478,33 @@ require("./DisplayBase");
         },
         stop:function(){
           //  console.log("stop is here");
-            var that=this;
+            var that=this,found=0;
             if(this.interval){
                 clearInterval(that.interval);
             }
             this.interval=null;
+         
+            if(that.fade_timer !== 0){
+                clearInterval(that.fade_timer);
+                that.fade_timer=0; // make sure the fade has stopped cleanly
+                for(var i=0;i<this.components.length;i++){
+                    if(this.components[i].element.style.visibility === "visible"){
+                        if(found === 0){
+                            that.components[i].element.style.opacity=1.0;
+                        }
+                        else{
+                            that.components[i].element.style.opacity=1.0;
+                            that.components[i].element.style.visibility="hidden";
+                        }
+                        found++;
+                    }
+                }
+            }
+        
         },
         _crossFade: function(prev,next){
             var that=this;
-            var timer,op=0.05,inc=0.1,step=40;
+            var op=0.05,inc=0.1,step=40;
             // we want about 25 steps per second. i.e st=40
             var n=parseInt(this.fadeDuration/step);
             // calculate the increment for a given number of steps
@@ -440,10 +523,13 @@ require("./DisplayBase");
             that.components[next].element.style.opacity = op;
             that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
             
-            timer = setInterval(function() {
+            that.fade_timer = setInterval(function() {
                 if (op >= 1.0) {
-                    clearInterval(timer);
-                   // that.components[prev].SSimage.parentElement.style.position="absolute";
+                    clearInterval(that.fade_timer);
+                  //  console.log("clearInterval"+ that.fade_timer);
+                    that.fade_timer=0;
+                    op=1.0;
+                    // that.components[prev].SSimage.parentElement.style.position="absolute";
                     that.components[prev].element.style.visibility="hidden";
                     that.components[prev].element.style.opacity=1;
                     that.components[prev].element.style.filter = 'alpha(opacity=' + 100 + ")";
@@ -456,10 +542,16 @@ require("./DisplayBase");
                     op += op * inc;
                 }
             }, step);
+           
         },
         step: function(dir,caller){
-            var num=this.components.length;
+            var that=this,num=this.components.length;
             var next,prev=this.current;
+            // stop the current fade if one is in progress
+            if(this.fade_timer !== 0){
+                that.stop();
+            }
+            
             if(dir==="next"){
                 if(this.current>=(num-1)){
                     this.current=0;

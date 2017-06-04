@@ -127,6 +127,10 @@ describe("Panel - from data file",function(){
         var b=document.getElementById("Create1");
         assert.strictEqual(document.contains(b),true);
     });
-    
+    it("can dump out the html",function(){
+        var b=Apoco.Panel.get("TestPanel");
+        Apoco.Panel._dumpHTML("TestPanel");
+        
+    });
     
 });

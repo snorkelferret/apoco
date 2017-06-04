@@ -40,8 +40,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(this.editable===false){
             this.popup=false; // no popup editor if not editable
         }
-        
-	this.html_type=Apoco.type[this.type].html_type;
+        if(Apoco.type[this.type]){
+	    this.html_type=Apoco.type[this.type].html_type;
+        }
+        else{ 
+            throw new Error("Apoco field does not support type " + this.type);
+        }
         if(element === undefined){
             this.element=document.createElement("div");
         }

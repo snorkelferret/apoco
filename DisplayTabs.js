@@ -62,7 +62,8 @@ require("./DisplayBase.js");
             }
             if(Number.isInteger(t)){
                 alreadyHaveName(this.components[t].name,t);
-                t=this.components[t];
+                index=t;
+                t=this.components[index];
             }
             else{
                 index=this.components.length;
@@ -94,7 +95,7 @@ require("./DisplayBase.js");
                 t.element.addEventListener("click",function(e){
                   
                     e.stopPropagation();
-                    var p=t.action(t,index);
+                    var p=t.action(t); //used to return index as well
                     if(p !== false && p !== null){
                         that.select(t.name);
                     }

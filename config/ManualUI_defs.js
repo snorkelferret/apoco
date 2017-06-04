@@ -10,7 +10,7 @@ var UI={};
 
     var history_update=function(name){
         var a;
-       // console.log("location: " + document.location + ", name: " + name);
+        console.log("location: " + document.location + ", name: " + name);
        // console.log("history update going to tab " + name);
        
         if(!name){
@@ -74,10 +74,15 @@ var UI={};
         boolean: true,
         text: "Some text",
         stringArray: ["some","string","array"],
-        imageArray: [{src:"css/images/alchemist1.jpg",url:"",text:"alchemist"},
-                     {src:"css/images/alchemist2.jpg",url:"",text:"another alchemist" },
-                     {src:"css/images/rabbit_img1.jpg",url:"",text:"A lovely rabbit"},
-                     {src:"css/images/alien1.jpg",url:"",text:"What is it?"}],
+        imageArray: [{src:"css/images/alchemist1.jpg",url:"",
+                      content:[{node:"paragraph",text:"alchemist"}]},
+                     {src:"css/images/alchemist2.jpg",url:"",
+                      content:[{node: "paragraph",text:"another alchemist" }]},
+                     {src:"css/images/rabbit_img1.jpg",url:"",
+                      content:[{node:"paragraph", text:"A lovely rabbit"}]},
+                     {src:"css/images/alien1.jpg",url:"",
+                      content:[{node:"paragraph",text:"What is it?"}]}
+                     ],
         password: "MyBadPassword1",
         array: ["One","Two","Three","Four"],
         path: "css/images/rabbit_img1.jpg",
@@ -1120,7 +1125,7 @@ var UI={};
                              {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                              {label: "heading",descriptions:["type:string","Add a Heading to the top of the menu "]},
                             ]},
-            slideshow:{options:[{label: "components",descriptions:["type: objectArray","array of Image objects","<code> var objectArray=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]"]},
+            slideshow:{options:[{label: "components",descriptions:["type: objectArray","array of Image objects","<code> var objectArray=[{src:'css/images/image1.png'},{src:'css/images/image2.png'}]","optional content objectArray e.g <code>var objectArray=[src:'css/images/im1.jpg', content:[{node:'paragraph',text:'slide text'}]]"]},
                                 {label: "delay",descriptions:["type: integer","default: 4000", "time in milliseconds to display each image"]},
                                 {label:"fit_to",descriptions:["type: string -  'width'or'height'","default: 'height'","defaults to fitting the slideshow to the height of the parent element, otherwise changes the height of the parent element so the images fit the width "]},
                                 {label:"controls",descriptions:["type: Boolean","default: true","display the controls"]},
@@ -1169,7 +1174,7 @@ var UI={};
                 };
             },
             k.components=[{node: "heading",size: "h3", text: HDisplays[i]},
-                          {node:"paragraph", text: "<code>var node=Apoco.display['" + HDisplays[i] + "'](dataObject);</code>"},
+                          {node:"paragraph", text: "As a standalone call <br> <code>var node=Apoco.display['" + HDisplays[i] + "'](dataObject);</code> <br> or as part of UI.Panel<br> <code> {DOM:'myparent',id:'someid',display:" + HDisplays[i] + ",components:[ObjectArray]}"},
                           {node: "heading",size: "h4",text: "dataObject settings"},
                           {node: "heading",size: "h5",text: "required"},
                           {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string","an existing node with an id (do not include #) which is used as the parent for the display"]},
@@ -1512,7 +1517,23 @@ var UI={};
                                 {label:"getSocket",descriptions:["<code>var p=s.getSocket();</code>","return the websoxket"]},
                                 {label: "cork",descriptions:["<code> s.cork(true);</code>","true: buffer incoming the messages ","<code>s.cork(false);</code>","dispatch the messages in the buffer (if any)"]},
                                 {label: "close",descriptions:["<code>s.close();<code>","close the websocket"]}
-                               ]}
+                               ]},
+            
+            dropZone:{code:"<code>Apoco.IO.dropZone(element,[opts]) </code>",
+                   
+                      items:[{label:"element",description:"any html element"},
+                             {label:"opts",description:"An object array <br> <code> opts={action:function(promise_array){// input is  an array of promises},<br> maxSize:integer_bytes}"
+                             }],
+                      ret: "object",
+                      des:"Create a dropZone, for browser drag and drop<br>e.g<br> <code>var v=Apoco.IO.dropZone(elememt,<br>{action:function(promises){ <br>for(var i=0;i<promises.length;i++){<br> promises[i].then(function(file){<br> e.textContent=file;})}}});<code>",
+                      methods:[{label:"getFilelist",description:"return an array of files"},
+                               {label:"getPromises",description:"return an array of promises"},
+                               {label:"clearFilelist",description:"destroy the file array"},
+                               {label:"clearPromises",description:"destroy the promises array"}
+                               ]
+                                           
+                    //  cmd:"var e=document.createElement('div'); e.id='test_dropZone'; document.getElementById('dropZoneMethods').appendChild(e); 
+                     }
         };
         for(var i=0;i<HIO.length;i++){
            // console.log("making io panel",HIO[i]);
@@ -1691,7 +1712,6 @@ var UI={};
                       params:"function",
                       description:"history.init calls a this function when the forward or back buttons on the browser are pushed <br> Other Methods: <code> <br> Apoco.Utils.history.push('some_name');<code> This is the name that is returned to the callback function ",
                       ret: "object"}
-                
             
         };
         for(var i=0;i<HUtils.length;i++){
@@ -1736,12 +1756,14 @@ var UI={};
 
     var select_tabs=function (that,pop){
         var name=that.name;
+        console.log("pop is " + pop);
       //  console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Apoco.Panel.hide(that.parent.selected.name);
         }
         Apoco.Panel.show(name);
         if(!pop){
+            console.log("pushing " + name);
             Apoco.Utils.history.push(name);
         }
         else{  
@@ -2239,8 +2261,16 @@ var UI={};
     mkIO();
     mkUtils();
     mkWindows();
-
-    UI.start=["Tabs","About"];
+   // see if the query string exists on url
+    var name=Apoco.Utils.history.queryString();
+    if(name){
+        UI.Panels.Tabs.components[0].selected=name;
+        UI.start=["Tabs",name];
+       // Apoco.Panel.show(name);
+    }
+    else{
+        UI.start=["Tabs","About"];
+    }
     //console.log("UI.start is %j " + UI.start);
 
 })();

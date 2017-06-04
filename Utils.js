@@ -1,6 +1,5 @@
 var Apoco=require('./declare').Apoco;
 
-
 // check that we have the string methos to remove leading and trailing whitespace
 
 String.prototype.trim = String.prototype.trim || function trim() {
@@ -453,6 +452,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             }
             return siblings;
         },
+        
         detectMobile: function(){
             if(navigator.userAgent.match(/Android/i)
                ||navigator.userAgent.match(/iPhone/i)
@@ -464,6 +464,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 return false;
             }
         },
+  
 	history: {
 	    init: function(func){
 //		console.log("init history");
@@ -483,14 +484,23 @@ String.prototype.trim = String.prototype.trim || function trim() {
 		return(history.state);
 	    },
 	    replace: function(c_obj){
-		    history.replaceState(c_obj,c_obj.title,c_obj.url);
+		history.replaceState(c_obj,c_obj.title,c_obj.url);
 	    },
 	    push: function(name){   // used by callback functions
                 var c_obj={};
                 c_obj.name=name;
                 var p=("index.html?" + name);
 		history.pushState(c_obj,p,p);
-	    }
+	    },
+            queryString:function(){
+                var name=null,u=window.location.href;
+                var p=u.split("?");
+                console.log(" got string to start ",p[1]);
+                if(p.length ===2){
+                    name=p[1].toString();
+                }
+                return name;
+            }
         }
     };
 

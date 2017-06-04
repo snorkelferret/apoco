@@ -269,5 +269,113 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         return new _webSocket(options,data);  // need to call new so prototype methods are instantiated 
     };
 
+    var _dropZone=function(element,opts){
+        var that=this,p;
+        this.opts=opts;
+        if (!window.File && !window.FileReader && !window.FileList && !window.Blob) {
+            return false;
+        }
+        if(!element){
+            throw new Error("Utils:dropZone - element does not exist");
+        }
+        element.addEventListener("dragover",function(e){
+            console.log("in drop zone");
+            // var p=document.getElementById("CreateIdeaDrop");
+            if(!element.classList.contains("drop_zone")){
+                element.classList.add("drop_zone");
+            }
+            e.preventDefault();
+            e.stopPropagation();
+        },false);
+        element.addEventListener("dragenter",function(e){
+            console.log("enter drop zone");
+            // var p=document.getElementById("CreateIdeaDrop");
+            element.classList.add("drop_zone");
+            e.stopPropagation();
+        },false);
+        element.addEventListener("dragleave",function(e){
+            console.log("leave drop zone");
+            //var p=document.getElementById("CreateIdeaDrop");
+            element.classList.remove("drop_zone");
+            e.stopPropagation();
+        },false);
+        element.addEventListener("drop",function(e){
+            console.log("drop is here");
+            //       var p=document.getElementById("CreateIdeaDrop");
+            element.classList.remove("drop_zone");
+            e.preventDefault();
+                    e.stopPropagation();
+            //       Apoco.Utils.dropZone.getFiles(e);
+            that._getFiles(e);
+        },false);
+        return true;
+    };
+    _dropZone.prototype={
+        _promises: [],
+        _files:[],
+        _getFiles:function(e) {
+            var f,that=this,promise;
+            e.stopPropagation();
+            e.preventDefault();
+            f=e.dataTransfer.files; // FileList object.
+            // f is a FileList of File objects. List some properties.
+            for (var i = 0; i<f.length; i++) {
+                console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
+                if(that.opts["maxSize"]){
+                    if(f[i].size > that.opts.maxSize ){
+                        Apoco.popup.dialog("File too large","File " + f[i].name + "exceeds the maximum allowable file size");
+                        continue;
+                    }
+                }
+                //f[i].lastModifiedDate.toLocaleDateString(
+                
+                // Only process image files.
+                /* if (!f[i].type.match('image.*')) {
+                 continue;
+                 } */
+                promise=new Promise(function(resolve,reject){
+                    var reader = new FileReader();
+                    reader.onerror=function(e){
+                        reject("DropZone Error " + e.target.error.code);
+                    };
+                    // Closure to capture the file information.
+                    reader.onload = (function(file) {
+                        return function(im) {
+                            console.log("reader im is %j",im);
+                            that._files.push(im);
+                            resolve(file);
+                            /* if(that._opts["progressBar"]){
+                             
+                             }*/
+                        };
+                    })(f[i]);
+                    
+                    // Read in the image file as a data URL.
+                    reader.readAsDataURL(f[i]);
+                });
+                    that._promises.push(promise);
+            }
+            if(this.opts["action"]){
+                this.opts.action(this._promises);
+            }
+            // return Promise.all(this._promises);
+        },
+        getPromises:function(){
+            return this._promises;
+        },
+        getFileList:function(){
+            return this._files; //Promise.all(this._promises);
+        },
+        clearPromises: function(){
+            this._promises.length=0; 
+        },
+        clearFileList:function(){
+            this._files.length=0;
+        }
+        
+    };
+    Apoco.IO.dropZone=function(element,options){
+        return new _dropZone(element,options);  // need to call new so prototype methods are instantiated 
+    };
     
 })();
