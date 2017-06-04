@@ -1,13 +1,13 @@
 {
   "name": "apoco",
-  "version": "0.3.7",
+  "version": "0.4.0",
   "description": "Single Page Web Framework",
   "keywords": [
-      "SPA",
-      "web framework",
-      "Framework",
-      "apoco",
-      "Single Page "
+    "SPA",
+    "web framework",
+    "Framework",
+    "apoco",
+    "Single Page "
   ],
   "main": "index.js",
   "scripts": {
