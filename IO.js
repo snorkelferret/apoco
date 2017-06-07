@@ -91,8 +91,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             else{
                 defaults.url=".";
             }
-            if(type !== "GET" && type !== "POST"){
-                throw new Error("REST: only knows about GET and POST not " + type);
+            if(type !== "GET" && type !== "POST" && type !== "PUT"){
+                throw new Error("REST: only knows about GET PUT and POST not " + type);
             }
 	    
             var settings={};
@@ -136,8 +136,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 request.onreadystatechange=stateChange;
                 request.open(type,settings.url);
                 request.addEventListener('error',reqFail);
-                if(type === "POST"){
+                if(type === "POST"  || type === "PUT"){
                     request.setRequestHeader("Content-Type", settings.mimeType);
+                    if(settings['X-Auth-Token']){
+                        request.setRequestHeader("X-Auth-Token",settings['X-Auth-Token']);
+                    }
+                    console.log("PUT request %j",request );
                     request.send(data);
                 }
                 else{
@@ -278,6 +282,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(!element){
             throw new Error("Utils:dropZone - element does not exist");
         }
+        if(this.opts && this.opts.progressBar){
+            if(this.opts.progressBar.tagName !== "DIV"){
+                throw new Error("Apoco.IO.dropZone - progressBar needs to be a div");
+            }
+        }
         element.addEventListener("dragover",function(e){
             console.log("in drop zone");
             // var p=document.getElementById("CreateIdeaDrop");
@@ -304,7 +313,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             //       var p=document.getElementById("CreateIdeaDrop");
             element.classList.remove("drop_zone");
             e.preventDefault();
-                    e.stopPropagation();
+            e.stopPropagation();
             //       Apoco.Utils.dropZone.getFiles(e);
             that._getFiles(e);
         },false);
@@ -314,63 +323,108 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         _promises: [],
         _files:[],
         _getFiles:function(e) {
-            var f,that=this,promise;
+            var f,that=this,promise,found;
             e.stopPropagation();
             e.preventDefault();
             f=e.dataTransfer.files; // FileList object.
             // f is a FileList of File objects. List some properties.
             for (var i = 0; i<f.length; i++) {
-                console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
-                if(that.opts["maxSize"]){
-                    if(f[i].size > that.opts.maxSize ){
-                        Apoco.popup.dialog("File too large","File " + f[i].name + "exceeds the maximum allowable file size");
+                //console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
+                if(that.opts){
+                  //  console.log("dropZone setting options");
+                    if(that.opts["maxSize"]){
+                        if(f[i].size > that.opts.maxSize ){
+                            Apoco.popup.dialog("File too large","File " + f[i].name + "exceeds the maximum allowable file size");
+                            continue;
+                        }
+                    }
+                    found=true;
+                    if(that.opts["mimeType"]){
+                        found=false;
+                        for(var j=0;j<that.opts["mimeType"].length;j++){ //e.g application/pdf
+                            if(f[i].type === that.opts["mimeType"][j]){
+                                found=true;
+                            }
+                        }
+                    }
+                    if(!found){
                         continue;
                     }
                 }
                 //f[i].lastModifiedDate.toLocaleDateString(
-                
-                // Only process image files.
-                /* if (!f[i].type.match('image.*')) {
-                 continue;
-                 } */
+  
                 promise=new Promise(function(resolve,reject){
-                    var reader = new FileReader();
-                    reader.onerror=function(e){
-                        reject("DropZone Error " + e.target.error.code);
+                    var pb=null,pc,reader = new FileReader();
+                    reader.onerror=function(evt){
+                        reject("DropZone Error " + evt.target.error.code);
                     };
+                    if(that.opts && that.opts.progressBar){
+            //            console.log("making progressBar");
+                        reader.onprogress=function(that){
+                            return that._doProgress(e);
+                        }(that);
+                        pb=that.opts.progressBar;
+                    }
                     // Closure to capture the file information.
                     reader.onload = (function(file) {
-                        return function(im) {
-                            console.log("reader im is %j",im);
-                            that._files.push(im);
-                            resolve(file);
-                            /* if(that._opts["progressBar"]){
-                             
-                             }*/
+                        return function(evt) {
+                            evt.stopPropagation();
+                          //  console.log("reader im is %j",evt);
+                            //  console.log("evt.target.result " + evt.target.result);
+                            that._files.push(evt.target.result);
+                          //  for(var j=0;j<that._files.length;j++){
+                          //      console.log("got file %j",that._files[j] );
+                          //  }
+                            resolve(evt.target.result);
+                            if(pb){
+                                pb.textContent=("Uploaded " + file.name);
+                            }
                         };
                     })(f[i]);
-                    
                     // Read in the image file as a data URL.
                     reader.readAsDataURL(f[i]);
                 });
-                    that._promises.push(promise);
+                that._promises.push(promise);
             }
             if(this.opts["action"]){
                 this.opts.action(this._promises);
             }
-            // return Promise.all(this._promises);
+        },
+        _doProgress:function(evt){
+            var pl,pb,that=this;
+           // console.log("do progress options %j", that.opts);
+            if(that.opts && that.opts["progressBar"]){
+                pb=that.opts.progressBar;
+            }
+            else{
+                throw new Error("Cannot find progressBar");
+            }
+          //  console.log("do progress is here");
+            if(!pb){ return;}
+            if (evt.lengthComputable) {
+                pl = Math.round((evt.loaded / evt.total) * 100);
+                // Increase the progress bar length.
+                if (pl< 100) {
+                    pb.style.width = pl + '%';
+                    pb.textContent = pl + '%';
+                }
+            }
         },
         getPromises:function(){
-            return this._promises;
+            return this._promises; //Promise.all(this._promises);
         },
         getFileList:function(){
-            return this._files; //Promise.all(this._promises);
+            return this._files; 
         },
         clearPromises: function(){
             this._promises.length=0; 
         },
         clearFileList:function(){
             this._files.length=0;
+        },
+        reset:function(){
+            this.clearFileList();
+            this.clearPromises();
         }
         
     };

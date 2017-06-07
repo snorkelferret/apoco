@@ -368,7 +368,7 @@ var Apoco=require('./declare').Apoco;
 	        if(Apoco.type.blank.check(s)){
 		    return false;
 	        }
-                if(Apoco.type.token.check(s)){
+                if(Apoco.type.string.check(s)){
                     return true;
                 }
                 return false;

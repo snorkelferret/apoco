@@ -1461,7 +1461,7 @@ var UI={};
         var HIO=HThings["IO"];
         var items={
             REST:{code: "<code>var v=Apoco.IO.REST(type,options,data);</code>",
-                  items:[{label: "type",descriptions:["string","'GET' or 'POST'"]},
+                  items:[{label: "type",descriptions:["string","'GET' 'PUT' or 'POST'"]},
                          {label: "options",descriptions:["key-value object","  var defaults={url: UI.URL,dataType: 'json',mimeType: 'application/json'};"," keys url(required) dataType(optional)"," defaults to 'json' mimeType(optional) defaults to 'application/json', any other values in the options object will be passed directly to the server","e.g <code>var options={url:'http://my_site/whatever'};</code>"]},
 
                          {label:"data",descriptions:["any data the can be stringified using JSON.stringify "]}],
@@ -1522,14 +1522,15 @@ var UI={};
             dropZone:{code:"<code>Apoco.IO.dropZone(element,[opts]) </code>",
                    
                       items:[{label:"element",description:"any html element"},
-                             {label:"opts",description:"An object array <br> <code> opts={action:function(promise_array){// input is  an array of promises},<br> maxSize:integer_bytes}"
+                             {label:"opts",description:"An object array of options <br> <code> opts={action:function(promise_array){// input is  an array of promises},<br> maxSize:integer_bytes <br> mimeType:'/application/json' //is the default <br> progressBar: html_div_element}"
                              }],
                       ret: "object",
                       des:"Create a dropZone, for browser drag and drop<br>e.g<br> <code>var v=Apoco.IO.dropZone(elememt,<br>{action:function(promises){ <br>for(var i=0;i<promises.length;i++){<br> promises[i].then(function(file){<br> e.textContent=file;})}}});<code>",
                       methods:[{label:"getFilelist",description:"return an array of files"},
                                {label:"getPromises",description:"return an array of promises"},
                                {label:"clearFilelist",description:"destroy the file array"},
-                               {label:"clearPromises",description:"destroy the promises array"}
+                               {label:"clearPromises",description:"destroy the promises array"},
+                               {label:"reset",description:"clear the promises and filelist"}
                                ]
                                            
                     //  cmd:"var e=document.createElement('div'); e.id='test_dropZone'; document.getElementById('dropZoneMethods').appendChild(e); 

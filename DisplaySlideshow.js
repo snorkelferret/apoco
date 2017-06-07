@@ -113,7 +113,8 @@ require("./DisplayBase");
                 p.classList.add("arrow");
                 q=document.createElement("i");
                 p.appendChild(q);
-                this.element.appendChild(p);
+                // this.element.appendChild(p);
+                this.slideshow_container.appendChild(p);
                 p.addEventListener("click",doit);
             }
         },
