@@ -377,7 +377,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                           //  }
                             resolve(evt.target.result);
                             if(pb){
-                                pb.textContent=("Uploaded " + file.name);
+                                pb.textContent=("Staged for upload " + file.name);
                             }
                         };
                     })(f[i]);
@@ -425,6 +425,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         reset:function(){
             this.clearFileList();
             this.clearPromises();
+            if(this.opts && this.opts.progressBar){
+                this.opts.progressBar.innerHTML="";
+            }
         }
         
     };

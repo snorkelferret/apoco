@@ -1321,8 +1321,77 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
 
     Apoco.Utils.extend(StringArrayField,_Field);
-
-
+/*
+    // base class for Image file reads and other input type "file"
+    var _BaseFileField=function(d,element){
+        var that=this,rc=true;
+       // d.field="ImageArrayField";
+       // d.type="imageArray";
+	_Field.call(this,d,element);
+        if(!this.value){
+            this.value=[];
+        }
+        if(this.editable !== false){
+	    if(!window.FileReader){
+	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
+	        throw new Error("No FileReader");
+	    }
+            this.input=document.createElement("input");
+            this.input.type="file";
+            if(this.required===true){
+                this.input.required=true;
+            }
+            this.input.setAttribute("name","files");
+            this.input.setAttribute("multiple","multiple");
+	    this.element.appendChild(this.input);
+	    this.input.addEventListener("change",function(e){
+                rc=that._getFileSelect(e);
+            });
+        }
+        if(!rc){
+            Apoco.popup["dialog"]("Image Load Error","One or more of the selected files is not a readable image");
+        }
+        return this;
+    };
+    _BaseFileField.prototype={
+        _getFileSelect: function(evt){
+            var that=this,rc=true;
+            //new_values.length=0; // reset array
+	    evt.stopPropagation();
+	    var files = new Array; //evt.target.files;
+            //check that the files are images
+            for(var i=0;i<evt.target.files.length;i++){
+                if (evt.target.files[i].type.match('image.*')) {
+                    files.push(evt.target.files[i]);
+                }
+                else{
+                    rc=false;
+                }
+            }
+            var count=that.value.length;
+	    var last=count+files.length;
+	    for (var i=count,j=0; i<last; i++,j++) {
+		var reader = new FileReader();
+                reader.onerror=handleError;
+		reader.onload = (function(f,num) {
+                 //   console.log("getImagefileselect  file is  %j",f);
+		    return function(e) {
+                        var p;
+			e.stopPropagation();
+                        that.value[num]={src: e.target.result,name:f.name};
+                        that.promises[num]=that._getImage(that.value[num]);
+                        if(that.thumbnails === true){
+                            that._addThumbnail(td,num);
+                        }
+ 		    };
+		})(files[j],i);
+		reader.readAsDataURL(files[j]);
+	    }
+            return rc;
+        }
+    };
+*/
+    
     var ImageArrayField =function(d,element){
         var that=this,rc=true;
         var new_values=[];

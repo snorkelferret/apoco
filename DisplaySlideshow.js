@@ -94,7 +94,7 @@ require("./DisplayBase");
             }
         },
         _sideArrows:function(){
-            var p,q,t=["right","left"],that=this;
+            var c,p,q,t=["right","left"],that=this;
             var doit=function(e){
                 e.stopPropagation();
                 if(that.autoplay){
@@ -107,6 +107,10 @@ require("./DisplayBase");
                     that.step("prev");
                 }
             };
+            // make a container for the arrows
+            c=document.createElement("div");
+            c.classList.add("arrows");
+            this.element.appendChild(c);
             for(var i=0;i<2;i++){
                 p=document.createElement("div");
                 p.classList.add(t[i]);
@@ -114,7 +118,8 @@ require("./DisplayBase");
                 q=document.createElement("i");
                 p.appendChild(q);
                 // this.element.appendChild(p);
-                this.slideshow_container.appendChild(p);
+                c.appendChild(p);
+              //  this.slideshow_container.appendChild(p);
                 p.addEventListener("click",doit);
             }
         },
@@ -194,7 +199,7 @@ require("./DisplayBase");
             h=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
             this.width=parseInt(w);
             this.height=parseInt(h);
-         //   console.log("slideshow container width " + this.width + " height " + this.height);
+          // console.log("slideshow container width " + this.width + " height " + this.height);
             if(parseInt(this.height) === 0){ // if height is not set on slideshow_container
                 y=this._getTopOffset();
                 this.height=window.innerHeight-y;
@@ -207,7 +212,7 @@ require("./DisplayBase");
             else{
                 ar=0;
             }
-          //  console.log("window aspect ratio is " + ar);
+            //  console.log("window aspect ratio is " + ar);
               
             if(this.fit_to === "width"){
                 this._setToWidth(v,ar);
