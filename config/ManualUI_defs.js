@@ -1139,7 +1139,7 @@ var UI={};
                                ],
                        required:[]
                       },
-            tabs:{required:[{label: "components",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label'},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'"]}],
+            tabs:{required:[{label: "components",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label',hidden:true},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'","Note: setting the tab option to hidden:true sets the display of the element to 'nome'"]}],
                   options:[{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                           ]
                  }
@@ -1259,6 +1259,8 @@ var UI={};
             getTabs:["<code> var v=my_display.getTabs(); </code>","params: none"],
             addTab:["<code> my_display.addTab(tab_object,[ ,html_tab_object]);</code>","params: tab_object, e.g <code> tab_object={name:'new_tab_name',action: my_func}</code> <br> html_tab_object- html object type ul (optional) defaults to the current object","return: none "],
             getTab:["<code>var t=my_display.getTab([ ,name]);</code>","params: name (string) or none, name of an existing tab object","return: none"],
+            showTab:["<code> my_displau.showTab(tab_name)<code> sets the display to none"],
+            hideTab:["<code> my_displau.hideTab(tab_name)<code> sets the display to unset"],
             deleteTab:["<code>my_display.deleteTab(name);</code>","params: name(string)","return: none"],
             select: ["<code> my_display.select(name)</code>","params: name(string)","return: none"],
             getJSON: ["<code> var js=my_display.getJSON();</code>"],

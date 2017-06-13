@@ -72,9 +72,11 @@ require("./DisplayBase.js");
             }
             t.label?label=t.label: label=t.name;   
 	    t.element=document.createElement("li");
-      
+            
             t.element.setAttribute("name",t.name);
-
+            if(t.hidden === true){
+                t.element.style.display="none";
+            }
             if(t.class){
                 if(Apoco.type["string"].check(t.class)){
                     t.element.classList.add(t.class);
@@ -104,14 +106,26 @@ require("./DisplayBase.js");
  	    tablist.appendChild(t.element);
             return;
         },
- 
+        showTab:function(name){
+            var p=this.getChild(name);
+            if(p){
+                p.element.style.display="unset";
+            }
+        },
+        hideTab:function(name){
+            var p=this.getChild(name);
+            if(p){
+                p.element.style.display="none";
+            }
+        },
 	update:function(name){
-	    for(var i=0;i<this.components.length;i++){
+            var p=this.getChild(name);
+	   /* for(var i=0;i<this.components.length;i++){
 		if(this.components[i].name == name){
 		    var p=this.components[i].name;
 		    break;
 		}
-	    }
+	    } */
 	    if(p){
 		p.element.click();
 	    }

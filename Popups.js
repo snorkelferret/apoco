@@ -162,7 +162,7 @@ var Apoco=require('./declare').Apoco;
             s=document.createElement("strong");
             s.textContent="Alert";
             np.appendChild(s);
-            s=document.createElement("span");
+            s=document.createElement("p");
             s.textContent=text;
             np.appendChild(s);
             

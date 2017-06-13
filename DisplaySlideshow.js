@@ -117,7 +117,7 @@ require("./DisplayBase");
                 p.classList.add("arrow");
                 q=document.createElement("i");
                 p.appendChild(q);
-                // this.element.appendChild(p);
+                this.element.appendChild(p);
                 c.appendChild(p);
               //  this.slideshow_container.appendChild(p);
                 p.addEventListener("click",doit);
@@ -278,7 +278,7 @@ require("./DisplayBase");
            // console.log("AFTER SHOW IS HERE ");
          
             for(var i=0;i<this.components.length;i++){
-             //   console.log("after show calc " + i + " this loaded is " + this.components[i].loaded);
+              //  console.log("after show calc " + i + " this loaded is " + this.components[i].loaded);
                 if(this.components[i].loaded){
                    // console.log("Values loaded = going to calculate cover");
                     this._calculateCover(this.components[i]);
@@ -294,15 +294,19 @@ require("./DisplayBase");
             var car=this.slideshow_container.getElementsByTagName("ul")[0];
 
             if(that.autoplay === true){
-                //         console.log("trigger autoplay");
+                //  console.log("trigger autoplay");
                 if(that.interval){
+                  //  console.log("stopping");
                     that.stop();
                 }
                 if(that.controls){
                     that.element.querySelector(".play").click();
                 }
                 else{
-                    that.play();
+                    that.components[this.current].element.style.visibility="visible";
+                    setTimeout(function(){
+                        that.play();
+                    },that.delay);
                 }
             }
             else{ // show the first image
@@ -355,7 +359,7 @@ require("./DisplayBase");
                 }
                                
                 this.promises[i].then(function(v){
-                  //  console.log("image loaded " + v.src);
+                    //console.log("image loaded " );
                     v.SSimage.src=v.src;
                     v.loaded=true;
                     that._calculateCover(v);
@@ -477,10 +481,12 @@ require("./DisplayBase");
             if(!document.contains(this.element)){
                 return;
             }
-            this.step("next"); // update immediately for user feedback
-          //  console.log("play is here " + that);
-            this.autoplay=true;
-            this.interval=setInterval(function(){that.step("next","play");},this.delay);
+         
+            that.step("next"); // update immediately for user feedback
+//            console.log("play is here- current " + that.current);
+            that.autoplay=true;
+            that.interval=setInterval(function(){that.step("next","play");},this.delay);
+          
         },
         stop:function(){
           //  console.log("stop is here");
@@ -516,19 +522,16 @@ require("./DisplayBase");
             // calculate the increment for a given number of steps
             inc=Math.pow(1/op,1/n) -1.0;
             if(inc <= 0) return; // something has gone badly wrong
-          //  console.log("inc is " + inc);            
-            // calculate the number of steps for a given increment 
-//            var n=Math.log(1.0/op)/Math.log(1+inc);
-//            var step=parseInt(this.fadeDuration/n);
+          //  console.log("inc is " + inc);             
 
          //   console.log("fade step is " + st + " fade duration  is " + n*st);
             that.components[next].element.style.visibility="visible";
-           // that.components[next].SSimage.parentElement.style.position="absolute";
             that.components[next].element.style.top=0;
             that.components[next].element.style.left=0;
             that.components[next].element.style.opacity = op;
             that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
-            
+       //     console.log("cross fade prev is " + prev + " next " + next);
+      
             that.fade_timer = setInterval(function() {
                 if (op >= 1.0) {
                     clearInterval(that.fade_timer);
@@ -554,8 +557,10 @@ require("./DisplayBase");
             var that=this,num=this.components.length;
             var next,prev=this.current;
             // stop the current fade if one is in progress
+         //   console.log("fade timer is " + this.fade_timer);
             if(this.fade_timer !== 0){
                 that.stop();
+            //    console.log("step called stop");
             }
             
             if(dir==="next"){
@@ -575,12 +580,10 @@ require("./DisplayBase");
                 }
             }
             next=this.current;
-         //  console.log("step - prev " + prev + " next " + next);
+          //  console.log("step - prev " + prev + " next " + next);
             if(this.fade === false ){ // || caller !== "play"){  // don't do crossfade if just stepping thru the images
-               // this.components[prev].SSimage.parentElement.style.position="absolute";
                 this.components[prev].element.style.visibility="hidden";
                 this.components[next].element.style.visibility="visible"; 
-               // this.components[next].SSimage.parentElement.style.position="absolute";
                 this.components[next].element.style.opacity=1;
                 this.components[next].element.style.filter = "alpha(opacity=100)";
                 this.components[next].element.style.top=0;
