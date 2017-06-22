@@ -140,6 +140,7 @@ require("./DisplayBase.js");
             return null;
         },
 	select: function(name){
+         //   console.log("tab select is here " + name);
 	    for(var i=0;i<this.components.length;i++){
              	if(this.components[i].name == name){
                     this.selected=this.components[i];

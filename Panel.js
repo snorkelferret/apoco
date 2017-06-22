@@ -176,6 +176,7 @@ require("./Window");
                 return;
             }
             for(var i=0;i<c.length;i++){
+              //  console.log("Panel show " + c[i].id + " hidden " + c[i].hidden);
                 if(c[i].hidden !== true){
                     c[i].show();
                 }

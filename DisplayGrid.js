@@ -560,7 +560,7 @@ jsonishData={
 	},
 	getCol: function(name){ //grid_name){
 	    // console.log("getting columns");
-	    var index=-1,col=new Array;
+	    //var index=-1,col=new Array;
             if(name !== undefined){
 	        for(var i=0;i< this.cols.length;i++){
 	            //	console.log("col is " + this.cols[i].name);
@@ -962,6 +962,42 @@ jsonishData={
         },
         deleteChildren:function(){
             this.deleteAll();
+        },
+        hideCol:function(name,state){
+            var b,current_state=false;
+            if(!name){ throw new Error("Grid: hideCol needs a name"); }
+            if(!state){state="toggle";}
+            
+            b=this.getColIndex(name);
+            if(!b){
+                throw new Error("grid: hideCol cannot find column called " + name);
+            }
+            if(this.cols[b].element.classList.contains("hidden")){
+                current_state=true;
+            }
+            if(state === current_state){
+                return;  // already in the correct state
+            }
+            if(state === "toggle"){
+                state=(current_state)?false:true;
+            }
+            
+            for(var i=0;i<this.grids.length;i++){
+                if(state){
+                    this.cols[b].element.classList.add("hidden");
+                }
+                else{
+                    this.cols[b].element.classList.remove("hidden");
+                }
+                for(var j=0;j<this.grids[i].rows.length;j++){
+                    if(state){
+                        this.grids[i].rows[j][name].element.classList.add("hidden");
+                    }
+                    else{
+                        this.grids[i].rows[j][name].element.classList.remove("hidden");
+                    }
+                }
+            }
         },
 	deleteAll:function(){
             var el,row;

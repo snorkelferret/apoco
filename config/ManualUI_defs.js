@@ -151,8 +151,7 @@ var UI={};
                         if(n !== "exists" &&  n.indexOf("Methods")<= -1){  // method  not a field
                             HThings[k].push(n);
                         }
-                        
-                   }
+                    }
                    else if(k==="Displays"){
                    //   console.log("got display " + n);
                        if(n.indexOf("Methods")<= -1){
@@ -253,7 +252,7 @@ var UI={};
                              },
                      descriptions:["This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Apoco setValue and getValue methods "]
                    },
-            numberArray:{ options:{type:{type:"string",
+                numberArray:{ options:{type:{type:"string",
                                          default: "integerArray",
                                          params:that.get_types("numberArray")
                                         },
@@ -263,6 +262,17 @@ var UI={};
                                   },
                           descriptions:[""]
                         },
+                fileReader:{ options:{ type:{type:"string",default: "file"},
+                                       hideFiles:{type:"boolean",default: false},
+                                       resizable:{type: "boolean",default: false},
+                                       width:{type:"integer",default: 400,description:"width of the file object"},
+                                       height:{type:"integer",default: 400,description:"height of the file object"},
+                                       multiple:{type:"boolean",default: true,description:"allow multiple file selects"}
+                    
+                                     },
+                             descriptions:[""]
+                
+                },
             imageArray:{options:{value:{type:"imageArray",
                                         default: undefined,
                                         description: "key value javascript object"},
@@ -592,6 +602,16 @@ var UI={};
                 contains:{descriptions:[
                     "<code> var array=field.contains(options_array,value);<code>"
                 ]},
+                getFileNames:{descriptions:["<code> var array=field.getFileNames();<code>",
+                                            "returns an array of filenames"]},
+                findFile:{descriptions:["<code> var object=field.findFile(name);<code>"
+                                       ]},
+                showFile:{descriptions:["<code> field.showFile(name);<code>"
+                                       ]},
+                hideFile:{descriptions:["<code> field.hideFile(name);<code>"
+                                       ]},
+                getPromises:{descriptions:["<code>var promises=field.getPromises();<code>",
+                                          "returns an array of promises of file loads"]},
                 resetValue:{descriptions:[
                     "<code>var r=field.resetValue()</code>",
                     "set the values of the DOM to the last good setValue() call or initial values"
@@ -1028,12 +1048,12 @@ var UI={};
             k.display="fieldset";
             k.DOM="right";
             k.id=HNodes[i];
-            k.dependsOn=HNodes[i];
+                /*  k.dependsOn=HNodes[i];
             k.action=function(that){
                 var p=that.getChild("doit");
                 //$(p.element).trigger("click");
-                p.element.click();
-            },
+               // p.element.click();
+            }, */
             k.hidden=true;
             k.components=[{node: "heading",size: "h3", text: HNodes[i]},
                           // {node:"paragraph", text: "<code>var node=Apoco.node({node:'" + HNodes[i] + "'" + t_opts + "});</code>"},
@@ -1055,13 +1075,14 @@ var UI={};
                                }
                                globalEval(f.getValue());
                                if(Apoco.type["object"].check(node)){
-                      //             console.log("and it is an object");
+                                 console.log("and it is an object");
                                    var name=node.name;
+                                   console.log("node name is " + node.name);
                                    if(that.parent.getChild(name)){
                                        console.log("deleting child");
                                        that.parent.deleteChild(name);
                                    }
-                       //            console.log("adding child");
+                                   console.log("adding child");
                                    that.parent.addChild(node);
                               // console.log("parms are " + node);
 
@@ -1139,7 +1160,7 @@ var UI={};
                                ],
                        required:[]
                       },
-            tabs:{required:[{label: "components",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label',hidden:true},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'","Note: setting the tab option to hidden:true sets the display of the element to 'nome'"]}],
+            tabs:{required:[{label: "components",descriptions:["type: objectArray","example","<code> tabs:[{name:'some_string',label:'lovely label',hidden:true,action:function(that){ // do something }},{name:'another_name',label:'very lovely label'}]","this would creates two tabs with the labels displayed as 'lovely label', 'very lovely label'","Note: setting the tab option to hidden:true sets the display of the element to 'none'.","Returning false in the action function stops the tab from being set to selected"]}],
                   options:[{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                           ]
                  }
@@ -1296,6 +1317,7 @@ var UI={};
             getGrid: ["<code> var v=my_display.getGrid([ ,grid_name]); </code>","params: none or grid_name","return the grid object for named grid_name or an array of grids if the name is not supplied"],
             showGrid: ["<code> var v=my_display.showGrid(grid_name); </code>"],
             hideGrid: ["<code> var v=my_display.hideGrid(grid_name); </code>"],
+            hideCol:["<code> my_display.hideCol(col_name,[state]<code>","return: none","params: col_name (string)","state: boolean (optional)","if state is not given toggles the display","Adds a class 'hidden' to cols"],
             insertRow: ["<code> var v=my_display.insertRow(row); </code>"],
             redrawRows: ["<code> var v=my_display.redrawRows(grid_name); </code>"],
             updateRow: ["<code> var v=my_display.updateRow(row); </code>"],
@@ -1520,14 +1542,23 @@ var UI={};
                                 {label: "cork",descriptions:["<code> s.cork(true);</code>","true: buffer incoming the messages ","<code>s.cork(false);</code>","dispatch the messages in the buffer (if any)"]},
                                 {label: "close",descriptions:["<code>s.close();<code>","close the websocket"]}
                                ]},
-            
+            getFiles:{ code:"<code> Apoco.IO.getFiles(file_array,object);<code>",
+                       items:[{label:"file_array",
+                               description:"an array of files - typically returned by event.dataTransfer.files or event.target.files etc "},
+                              {label:"object",
+                               descriptions:["<b>object</b><br> <code> var object={opts:{maxSize:integer_bytes,<br> mimeType:'/application/json', // any type of valid mimeType<br> action:function(promises){// passes the array of promises} },<br> progressBar: html_div_element }<code>}","Creates an array of _promises and _files (if they do not already exist) otherwise pushes to the arrays"]
+                              }
+                               
+                              
+                       ]
+            },
             dropZone:{code:"<code>Apoco.IO.dropZone(element,[opts]) </code>",
                    
                       items:[{label:"element",description:"any html element"},
                              {label:"opts",description:"An object array of options <br> <code> opts={action:function(promise_array){// input is  an array of promises},<br> maxSize:integer_bytes <br> mimeType:'/application/json' //is the default <br> progressBar: html_div_element}"
                              }],
                       ret: "object",
-                      des:"Create a dropZone, for browser drag and drop<br>e.g<br> <code>var v=Apoco.IO.dropZone(elememt,<br>{action:function(promises){ <br>for(var i=0;i<promises.length;i++){<br> promises[i].then(function(file){<br> e.textContent=file;})}}});<code>",
+                      des:"Create a dropZone, for browser drag and drop<br>e.g<br> <code>var v=Apoco.IO.dropZone(elememt,<br>{action:function(promises){ <br>for(var i=0;i<promises.length;i++){<br> promises[i].then(function(file){<br> e.textContent=file.name; //puts the data in file.data})}}});<code>",
                       methods:[{label:"getFilelist",description:"return an array of files"},
                                {label:"getPromises",description:"return an array of promises"},
                                {label:"clearFilelist",description:"destroy the file array"},
@@ -1814,7 +1845,7 @@ var UI={};
             hide:[{label:"Usage",descriptions:["<code>Apoco.Panel.hide(string);</code>","return: none","parms: string",("" + mk_spaces(7) + "name of the window")]}],
             hideAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.hideAll();</code>","return: none","parms: none","Remove all the panels from the DOM"]}],
             getList:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.getList();</code>","return: stingArray","list the names of all the windows in Apoco"]}],
-            show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>"]}],
+            show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>","puts all the display pbjects into the DOM - unless the display has hidden=true e.g my_display.hidden=true"]}],
             showAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.showAll([ ,win])</code>","params: none or string window name, or window Object"]}],
             addChild:[{label:"Usage",descriptions:["<code>var d=Apoco.Panel.get(string).addChild(object);</code>","<br> return: object","parms: object","a Apoco display Object of key value pairs"]}],
             deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(panel_name).deleteChild(c);</code>","params: object or string","where object is the child object returned by getChild or string the id of the child node "]}],
@@ -2128,7 +2159,7 @@ var UI={};
 
                           {node: "heading",size:"h4",text:"Live Example"},
                           {name: "Input_params",field: "textArea",
-                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',components:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
+                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'MyPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',components:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -2136,8 +2167,8 @@ var UI={};
                                    throw new Error("can't get input params");
                                }
 
-                               if(Apoco.Panel.get('TestPanel')){
-                                   Apoco.Panel.delete('TestPanel');
+                               if(Apoco.Panel.get('MyPanel')){
+                                   Apoco.Panel.delete('MyPanel');
                                }
                                // $.globalEval(f.getValue());
                                globalEval(f.getValue());

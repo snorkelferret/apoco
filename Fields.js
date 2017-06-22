@@ -3,6 +3,8 @@ require('./Utils');
 require("./Sort");
 require('./Types');
 require("./datepicker");
+require("./IO");
+
 var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 // editable: true by default
@@ -1321,15 +1323,21 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     };
 
     Apoco.Utils.extend(StringArrayField,_Field);
-/*
+
     // base class for Image file reads and other input type "file"
-    var _BaseFileField=function(d,element){
+    var FileField=function(d,element){
         var that=this,rc=true;
-       // d.field="ImageArrayField";
-       // d.type="imageArray";
+        d.field="FileField";
+        d.type="file";
 	_Field.call(this,d,element);
         if(!this.value){
             this.value=[];
+        }
+        if(!this.width){
+            this.width=400;
+        }
+        if(!this.height){
+            this.height=400;
         }
         if(this.editable !== false){
 	    if(!window.FileReader){
@@ -1342,55 +1350,153 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.input.required=true;
             }
             this.input.setAttribute("name","files");
-            this.input.setAttribute("multiple","multiple");
+            if(this.opts && this.opts.multiple !== false){
+                this.input.setAttribute("multiple","multiple");
+            }
 	    this.element.appendChild(this.input);
 	    this.input.addEventListener("change",function(e){
-                rc=that._getFileSelect(e);
-            });
+                rc=that._getFileSelect(e,that);
+                for(var i=0;i<that._promises.length; i++){
+                    that._promises[i].then(function(file){
+                        that.addValue(file);
+                    }).catch(function(msg){
+                        console.log("Apoco.field.fileReader Error " + msg);
+                    });
+                }
+             });
+        }
+        if(this.values > 0){
+            if(!that.checkValue()){
+                throw new Error("file must have a name");
+            }
+            for(var i=0;i<this.value.length;i++){
+                this.addValue(this.value[i]);
+            }
         }
         if(!rc){
-            Apoco.popup["dialog"]("Image Load Error","One or more of the selected files is not a readable image");
+            Apoco.popup["dialog"]("File Load Error","One or more of the selected files is not a readable file");
+        }
+        if(this.action){
+            this.action(this);
         }
         return this;
     };
-    _BaseFileField.prototype={
-        _getFileSelect: function(evt){
-            var that=this,rc=true;
-            //new_values.length=0; // reset array
-	    evt.stopPropagation();
-	    var files = new Array; //evt.target.files;
-            //check that the files are images
-            for(var i=0;i<evt.target.files.length;i++){
-                if (evt.target.files[i].type.match('image.*')) {
-                    files.push(evt.target.files[i]);
+    FileField.prototype={
+        checkValue:function(v){
+            var that=this,ar=[];
+            if(v){
+                ar.push(v);
+            }
+            else{
+                ar=that.value;
+            }
+            for(var i=0;i<ar.length;i++){
+                if(!ar[i].name){
+                    return false;
                 }
-                else{
-                    rc=false;
+                if(!ar[i].data){
+                    return false;
+                }
+                if(!ar[i].type){
+                    return false;
                 }
             }
-            var count=that.value.length;
-	    var last=count+files.length;
-	    for (var i=count,j=0; i<last; i++,j++) {
-		var reader = new FileReader();
-                reader.onerror=handleError;
-		reader.onload = (function(f,num) {
-                 //   console.log("getImagefileselect  file is  %j",f);
-		    return function(e) {
-                        var p;
-			e.stopPropagation();
-                        that.value[num]={src: e.target.result,name:f.name};
-                        that.promises[num]=that._getImage(that.value[num]);
-                        if(that.thumbnails === true){
-                            that._addThumbnail(td,num);
-                        }
- 		    };
-		})(files[j],i);
-		reader.readAsDataURL(files[j]);
-	    }
-            return rc;
+            return true;
+        },
+        getValue:function(){
+            return this.value;
+        },
+        getFileNames:function(){
+            var that=this,f=[];
+            for(var i=0;i<that.value.length;i++){
+                f[i]=that.value[i].name;
+            }
+            return f;
+        },
+        getPromises:function(){
+            return this._promises;
+        },
+        findFile:function(name){
+            var that=this;
+            for(var i=0;i<that.value.length;i++){
+                if (that.value[i].name === name){
+                    if(that.value[i].object){ //maybe should be promise
+                        return that.value[i];
+                    }
+                }
+            }
+            return null;
+        },
+        hideFile:function(name){
+            var that=this,f;
+            f=that.findFile(name);
+            if(f && f.element){
+                f.element.style.display="none";
+            } 
+        },
+        showFile:function(name){
+            var that=this,f;
+            f=that.findFile(name);
+            if(f && f.element){
+                f.element.style.display="unset";
+            }
+        },
+        setValue:function(v){ // add to the input node
+            
+        },
+        addValue:function(v){
+            var that=this;
+          // . if(v.object){return v;} // already done
+            if(!that.checkValue(v)){
+           //     console.log("add value failed check %j",v);
+                return null;
+            }
+            v.element=document.createElement("div");
+            if(that.resizable === true || v.resizable === true){
+                v.element.classList.add("resizable");
+                console.log("adding resizable");
+            }
+            v.object=document.createElement("embed");
+            v.object.setAttribute("name",v.name);
+            v.object.setAttribute("type",v.type);
+            v.object.setAttribute("src",v.data);
+            v.object.setAttribute("scale","tofit");
+            if(that.width){
+                v.object.width=that.width; 
+            }
+            if(that.height){
+                v.object.height=that.height; 
+            }
+            if(v.width){
+                v.object.width=v.width; 
+            }
+            if(v.height){
+                v.object.height=v.height; 
+            }
+            
+            if(that.hideFiles === true || v.hidden === true){
+                v.object.style.display="none";
+            }
+            v.element.appendChild(v.object);
+           // console.log("appending child");
+            // that.element.appenChild(v.object);
+            that.value.push(v);
+            that.element.appendChild(v.element);
+            return v;
+        },
+        _getFileSelect: function(evt){
+            var that=this,rc=0;
+            that._promises=[];
+           // console.log("reading file");
+            //new_values.length=0; // reset array
+	    evt.stopPropagation();
+	    var files = evt.target.files;
+            rc=Apoco.IO.getFiles(files,that);
+            return rc; // the number of valid files
         }
     };
-*/
+
+    Apoco.Utils.extend(FileField,_Field);
     
     var ImageArrayField =function(d,element){
         var that=this,rc=true;
@@ -1459,6 +1565,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 };
             });
             return promise;
+        },
+        getValue:function(){
+            return this.value;
         }, 
         _getImageFileSelect: function(evt){
             var that=this,rc=true;
@@ -1555,9 +1664,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         resetValue:function(){ // wrong
             return;
         },
-	getValue:function(){ // images are in this.value[i].image
-	    return this.value; // wrong
-	},
 	checkValue:function(){
 	    return true;
 	},
@@ -1738,6 +1844,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         inputMethods:function(){var n=[]; for(var k in InputField.prototype){  n.push(k);} return n;},
         float:function(options,element){return new FloatField(options,element);},
         floatMethods:function(){var n=[]; for(var k in FloatField.prototype){ n.push(k);} return n;},
+        fileReader:function(options,element){ return new FileField(options,element);},
+        fileReaderMethods:function(){var n=[]; for(var k in FileField.prototype){ n.push(k);} return n;},
         date:function(options,element){return new DateField(options,element);},
         dateMethods:function(){var n=[]; for(var k in DateField.prototype){  n.push(k);} return n;},
         time:function(options,element){return new TimeField(options,element);},

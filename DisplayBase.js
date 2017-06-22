@@ -16,6 +16,7 @@ require("./Fields");
 	    element: null,
 	    DOM: null,
             id: null,
+            hidden: false,
             components:[]
 	};
         var that=this,t,dp;
@@ -251,7 +252,7 @@ require("./Fields");
                     if(this._afterShow !== undefined){
                      //   console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
-                     }
+                    }
                  
 		}
 	        else {
@@ -259,7 +260,8 @@ require("./Fields");
 		    throw new Error("No valid element for " + this.getKey());
 		    return null;
 	        }
-             }
+            }
+           
             return true;
  	},
         isHidden:function(){

@@ -18,7 +18,12 @@ require("./Types.js");
   	for(var k in d){
 	    this[k]=d[k];
 	}
-        _getNode[d.node](this);
+        if(_getNode[d.node]){
+            _getNode[d.node](this);
+        }
+        else{
+            throw new Error("Node: no node called " + d.node + " exists");
+        }
         if(element !== undefined){
             p=element;
         }
@@ -241,11 +246,20 @@ require("./Types.js");
 	clock: function(that){  
             that.element=document.createElement("div");  
             that.element.classList.add("apoco_clock");
+            if(that.timer){
+                that.timer=null;
+            }
             var cb=function(t){
                 var d=new Date();
-                that.element.textContent=d.toLocaleTimeString();
+                if(!t.element){   //if the element has been deleted
+                    window.clearInterval(t.timer);
+                    return;
+                }
+             //   console.log("date is " + d);
+             //   console.log("element is " + t.element);
+                t.element.textContent=d.toLocaleTimeString();
             };
-	    window.setInterval(function(){cb(that);},1000);
+	    that.timer=window.setInterval(function(){cb(that);},1000);
 	},
         button:function(that){
             var t=that.text?that.text: that.name;

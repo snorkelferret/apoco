@@ -4,7 +4,7 @@
 
 [Online manual](https://snorkelferret.github.io)
 
-Apoco is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. Apoco is arranged hierarchically.
+Apoco is a data-driven enterprise level SPA library/Frontend real time framework. The components can be used together or individually. Apoco is arranged hierarchically.
 
 
 (SPA - Single Page Application. )
@@ -16,27 +16,19 @@ Apoco is a data-driven enterprise level SPA library/Frontend framework. The comp
 
 ##### Windows
 
-
     Windows contain
-
 
 ##### Panels
 
-
     Panels contain
-
 
 ##### displays
 
-
     displays contain
-
 
 ##### fields or nodes
 
-
     which contain
-
 
 ##### types
 

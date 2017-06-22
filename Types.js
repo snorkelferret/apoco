@@ -191,6 +191,9 @@ var Apoco=require('./declare').Apoco;
             html_type:"file",
             field: "input",
             check: function(s){
+                if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
                 return true;
             }},
         float:{

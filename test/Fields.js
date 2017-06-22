@@ -899,6 +899,64 @@ describe("ImageArrayField",function(){
 
 });
 
+describe("FileReaderField",function(){
+    require("../Fields.js");
+    var f=Apoco.field["fileReader"]({type:"file",name:"fileReader"});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert.isObject(b); 
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+     it("creates an input element",function(){
+         var b=f.getElement();
+         assert.isObject(b);
+         var r=document.getElementsByName("fileReader")[0].getElementsByTagName("input")[0];
+         assert.isObject(r);
+     });
+   /* it("can read a file",function(){
+        var r=document.getElementsByName("fileReader")[0].getElementsByTagName("input")[0];
+       // r.value="../css/images/alchemist1.jpg";
+        // var p=f.getValue();
+     //   r.trigger("../css/images/alchemist1.jpg");
+       // var event = new window.Event('change');
+        // Dispatch it.
+       // r.dispatchEvent(event);
+        var p=f.getPromises();
+        // assert.strictEqual(p.length,1);
+        assert(p.length,1);
+        p.then(function(){
+            var pp=document.getElementsByName("fileReader")[0].getElementsByTagName("embed")[0];
+            assert.isObject(pp);
+        });
+
+    
+    });*/
+    it("can read a file from value array",function(){
+        var o={},file;
+        // calling getFiles to get the data
+        var promise=Apoco.IO.getFiles([{name:"../css/images/alchemist1.jpg",
+                                        type: "/images/jpeg"}],o);
+        
+        promise[0].then(function(ff){
+            file=ff;
+            var f=Apoco.field["fileReader"]({type:"file",
+                                             value:[{name:ff.name,
+                                                     type: "/images/jpeg",
+                                                     data:ff.data}
+                                                   ],
+                                             name:"fileReader"});
+            var r=document.getElementsByName("fileReader")[0].getElementsByTagName("input")[0];
+            assert.isObject(r);
+            var r=document.getElementsByName("fileReader")[0].getElementsByTagName("embed")[0];
+            assert.isObject(r);
+        });
+        
+    });
+    
+    
+    
+});
+
 describe("AutoCompleteField",function(){
   
     require("../Fields.js");

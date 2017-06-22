@@ -84,7 +84,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
  
   
         REST:function(type,options,data){
-            var defaults={dataType: 'json',mimeType: 'application/json'};
+            var defaults={dataType: 'json',
+                          mimeType: 'application/json'};
             if(UI && UI.URL){
                 defaults.url=UI.URL;
             }
@@ -113,7 +114,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 var stateChange=function(){
                     if(request.readyState === XMLHttpRequest.DONE){
                         if(request.status === 200){ //success
-                            //  console.log("return from server is " + request.responseText);
+                           // console.log("return from server is %j ", request.response);
                             if(settings.mimeType === 'application/json'){
                                 resolve(JSON.parse(request.responseText));
                             }
@@ -136,11 +137,15 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 request.onreadystatechange=stateChange;
                 request.open(type,settings.url);
                 request.addEventListener('error',reqFail);
-                if(type === "POST"  || type === "PUT"){
-                    request.setRequestHeader("Content-Type", settings.mimeType);
-                    if(settings['X-Auth-Token']){
-                        request.setRequestHeader("X-Auth-Token",settings['X-Auth-Token']);
+                for(var k in settings){
+                    if(k === "mimeType"){
+                        request.setRequestHeader("Content-Type", settings.mimeType);            
                     }
+                    else if(k !== "url"){
+                        request.setRequestHeader(k,settings[k]);
+                    }
+                }
+                if(type === "POST"  || type === "PUT"){
                     console.log("PUT request %j",request );
                     request.send(data);
                 }
@@ -151,7 +156,80 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             });
 
             return promise;
+        },
+        getFiles:function(f,that,event){
+            var promise,found=false;
+            if(!that){
+                throw new Error("getFiles: meeds options object");
+            }
+            if(!that._promises){
+                that._promises=[];
+            }
+            if(!that._files){
+                that._files=[];
+            }
+            for (var i = 0; i<f.length; i++) {
+                //console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
+                if(that.opts){
+                 //   console.log("dropZone setting options");
+                    if(that.opts["maxSize"]){
+                        if(f[i].size > that.opts.maxSize ){
+                            Apoco.popup.dialog("File too large","File " + f[i].name + "exceeds the maximum allowable file size");
+                            continue;
+                        }
+                    }
+                    found=true;
+                    if(that.opts["mimeType"]){
+                        found=false;
+                        for(var j=0;j<that.opts["mimeType"].length;j++){ //e.g application/pdf
+                            if(f[i].type === that.opts["mimeType"][j]){
+                           
+                                found=true;
+                            }
+                        }
+                    }
+                    if(!found){
+                        continue;
+                    }
+                }
+                if(!found){
+                    Apoco.popup.dialog("File incorrect","File " + f[i].name + " cannot be uploaded");
+                }
+                //f[i].lastModifiedDate.toLocaleDateString(
+  
+                promise=new Promise(function(resolve,reject){
+                    var pb=null,pc,reader = new FileReader();
+                    reader.onerror=function(evt){
+                        reject("DropZone Error " + evt.target.error.code);
+                    };
+                    if(that.opts && that.opts.progressBar){
+                        reader.onprogress=function(evt){
+                            that._doProgress(evt);
+                        };
+                        pb=that.opts.progressBar; 
+                    }
+                    // Closure to capture the file information.
+                    reader.onload = (function(file) {
+                        return function(evt) {
+                            evt.stopPropagation();
+                            file.data=evt.target.result;
+                           // console.log("reader file  is "+ file.name);
+                            //console.log("evt.target.result " + evt.target.result);
+                            that._files.push(file);//(evt.target.result);
+                            resolve(file); //evt.target.result);
+                            if(pb){
+                                pb.textContent=("Staged for upload " + file.name);
+                            }
+                        };
+                    })(f[i]);
+                    // Read in the image file as a data URL.
+                    reader.readAsDataURL(f[i]);
+                });
+                that._promises.push(promise);
+            }
+            return that._promises;
         }
+        
     };
 
     var _webSocket=function(options,data){
@@ -288,7 +366,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
         }
         element.addEventListener("dragover",function(e){
-            console.log("in drop zone");
+           // console.log("in drop zone");
             // var p=document.getElementById("CreateIdeaDrop");
             if(!element.classList.contains("drop_zone")){
                 element.classList.add("drop_zone");
@@ -297,19 +375,19 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             e.stopPropagation();
         },false);
         element.addEventListener("dragenter",function(e){
-            console.log("enter drop zone");
+         //   console.log("enter drop zone");
             // var p=document.getElementById("CreateIdeaDrop");
             element.classList.add("drop_zone");
             e.stopPropagation();
         },false);
         element.addEventListener("dragleave",function(e){
-            console.log("leave drop zone");
+           // console.log("leave drop zone");
             //var p=document.getElementById("CreateIdeaDrop");
             element.classList.remove("drop_zone");
             e.stopPropagation();
         },false);
         element.addEventListener("drop",function(e){
-            console.log("drop is here");
+           // console.log("drop is here");
             //       var p=document.getElementById("CreateIdeaDrop");
             element.classList.remove("drop_zone");
             e.preventDefault();
@@ -323,76 +401,20 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         _promises: [],
         _files:[],
         _getFiles:function(e) {
-            var f,that=this,promise,found;
+            var f,that=this;
             e.stopPropagation();
             e.preventDefault();
             f=e.dataTransfer.files; // FileList object.
+          //  console.log("got files %j",f);
             // f is a FileList of File objects. List some properties.
-            for (var i = 0; i<f.length; i++) {
-                //console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
-                if(that.opts){
-                  //  console.log("dropZone setting options");
-                    if(that.opts["maxSize"]){
-                        if(f[i].size > that.opts.maxSize ){
-                            Apoco.popup.dialog("File too large","File " + f[i].name + "exceeds the maximum allowable file size");
-                            continue;
-                        }
-                    }
-                    found=true;
-                    if(that.opts["mimeType"]){
-                        found=false;
-                        for(var j=0;j<that.opts["mimeType"].length;j++){ //e.g application/pdf
-                            if(f[i].type === that.opts["mimeType"][j]){
-                                found=true;
-                            }
-                        }
-                    }
-                    if(!found){
-                        continue;
-                    }
-                }
-                //f[i].lastModifiedDate.toLocaleDateString(
-  
-                promise=new Promise(function(resolve,reject){
-                    var pb=null,pc,reader = new FileReader();
-                    reader.onerror=function(evt){
-                        reject("DropZone Error " + evt.target.error.code);
-                    };
-                    if(that.opts && that.opts.progressBar){
-            //            console.log("making progressBar");
-                        reader.onprogress=function(that){
-                            return that._doProgress(e);
-                        }(that);
-                        pb=that.opts.progressBar;
-                    }
-                    // Closure to capture the file information.
-                    reader.onload = (function(file) {
-                        return function(evt) {
-                            evt.stopPropagation();
-                          //  console.log("reader im is %j",evt);
-                            //  console.log("evt.target.result " + evt.target.result);
-                            that._files.push(evt.target.result);
-                          //  for(var j=0;j<that._files.length;j++){
-                          //      console.log("got file %j",that._files[j] );
-                          //  }
-                            resolve(evt.target.result);
-                            if(pb){
-                                pb.textContent=("Staged for upload " + file.name);
-                            }
-                        };
-                    })(f[i]);
-                    // Read in the image file as a data URL.
-                    reader.readAsDataURL(f[i]);
-                });
-                that._promises.push(promise);
-            }
+            Apoco.IO.getFiles(f,that,e);
             if(this.opts["action"]){
                 this.opts.action(this._promises);
             }
         },
         _doProgress:function(evt){
             var pl,pb,that=this;
-           // console.log("do progress options %j", that.opts);
+         //   console.log("do progress options %j", that.opts);
             if(that.opts && that.opts["progressBar"]){
                 pb=that.opts.progressBar;
             }
