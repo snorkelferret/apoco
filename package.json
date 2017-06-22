@@ -1,6 +1,6 @@
 {
   "name": "apoco",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Single page real time web framework",
   "keywords": [
     "SPA",
@@ -22,16 +22,16 @@
     "prepublish": "npm run apoco",
     "apoco": "browserify  ./index.js -o apoco.js"
   },
-    "author":{
-        "name":"Basil Valentine",
-        "email": "snorkelferret@gmail.com"
-    },
-    "repository":{
-        "type":"git",
-        "url":"https://github.com/snorkelferret/apoco"
-    } ,   
-    "license": "ISC",
-    "devDependencies": {
+  "author": {
+    "name": "Basil Valentine",
+    "email": "snorkelferret@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snorkelferret/apoco"
+  },
+  "license": "ISC",
+  "devDependencies": {
     "chai": "^3.5.0",
     "cross-env": "^1.0.7",
     "browserify": "^13.0.0",
