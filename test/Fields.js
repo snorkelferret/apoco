@@ -518,7 +518,7 @@ describe("SelectField",function(){
   
     require("../Fields.js");
      
-    var f=Apoco.field["select"]({name:"selectField",type: "string",options:["one","two","three"]});
+    var f=Apoco.field["select"]({name:"selectField",type: "string",options:["four","two","three"]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);
@@ -565,10 +565,36 @@ describe("SelectField",function(){
     });
     it("only changes internal value with setValue",function(){
         var b=(document.getElementsByName("selectField")[0]).getElementsByTagName("select")[0];
-        b.value="one";
+        b.value="four";
         var s=f.getValue();
         assert.notStrictEqual(s,f.resetValue());
     });
+    it("can add an option",function(){
+        f.addValue("ninety");
+        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
+        assert.strictEqual(e.length,4);
+        
+    });
+    it("can add a value with key value object",function(){
+        f.addValue({label:"sixty",value:77});
+        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
+        assert.strictEqual(e.length,5);
+    });
+    
+    it("gets a value from browser with key value options ",function(){
+        //var e=$("body").find("div[name='selectField']").find("option:contains('two')");
+        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
+        for(var i=0;i<e.length;i++){
+            if(e[i].textContent === "sixty"){
+                break;
+            }
+        }
+        e[i].selected=true;
+        e[i].click();
+        var b=f.getValue();
+        assert.strictEqual(b,"77");
+    });
+    
     it("knows the value has been changed by setValue",function(){
         f.setValue("two");
         assert.strictEqual(f.valueChanged(),false);

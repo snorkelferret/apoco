@@ -157,7 +157,7 @@ require("./Fields");
         deleteChildren:function(){
             for(var i=0;i<this.components.length;i++){
                 if(this.components[i].listen){
-                    Apoco.unsubscribe(this.components[i]);
+                    Apoco.IO.unsubscribe(this.components[i]);
                 }
                 this.components[i].element.parentNode.removeChild(this.components[i].element);
             }

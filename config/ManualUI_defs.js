@@ -229,18 +229,19 @@ var UI={};
                                  },
                          descriptions:[""]
                    },
-            select:{ required:{ options:{type:"stringArray",
-                                         default: undefined,
-                                         descriptions: [""]}
+                select:{ required:{ options:{type:"stringArray",
+                                             params:that.get_types("stringArray"),
+                                             default: undefined,
+                                             descriptions: ["where the options can be a stringArray or an objectArray"," the objectArray has two key value pairs","<code> options=[{label:'my label',value:10},{label:'another label',value:'pig'}]</code>","where label is of type string and value is of type any"]}
                               },
                      options:{blank_option:{type:"boolean",
                                             default: false,
                                             descriptions:[""]},
-                              value:{type: "string",default: undefined,descriptions:[ "An element from the options string Array"]}
+                              value:{type: "string",default: undefined,descriptions:[ "An element from the options string Array or object array"]}
                              },
                      descriptions:[""]
                    },
-            buttonSet:{required:{labels:{type:"stringArray"}},
+                buttonSet:{required:{labels:{type:"stringArray"}},
                        options:{checkbox:{type:"boolean",
                                           default: false},
                                 value:{type:"booleanArray"}},
@@ -253,8 +254,8 @@ var UI={};
                      descriptions:["This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Apoco setValue and getValue methods "]
                    },
                 numberArray:{ options:{type:{type:"string",
-                                         default: "integerArray",
-                                         params:that.get_types("numberArray")
+                                             default: "integerArray",
+                                             params:that.get_types("numberArray")
                                         },
                                    value:{type:"any",
                                           params:that.get_types("numberArray"),
@@ -1790,14 +1791,14 @@ var UI={};
 
     var select_tabs=function (that,pop){
         var name=that.name;
-        console.log("pop is " + pop);
+       // console.log("pop is " + pop);
       //  console.log("select_tabs: trying to show " + name);
         if(that.parent.selected){
             Apoco.Panel.hide(that.parent.selected.name);
         }
         Apoco.Panel.show(name);
         if(!pop){
-            console.log("pushing " + name);
+           // console.log("pushing " + name);
             Apoco.Utils.history.push(name);
         }
         else{  

@@ -153,6 +153,18 @@ describe("DisplayFieldset-(start with data)",function(){
         var b=t.getChild("title").getValue();
         assert.strictEqual(b,"Robert");
     });
+    it("can add a child with a listener",function(){
+        t.addChild({type: "string", name: "ssss",required:true,
+                    listen:[{name:"something",action:function(that){}}]
+                   });
+        var b=t.getChild("title");
+        assert.notStrictEqual(b,null);
+    });
+    it("can delete itself",function(){
+        t.delete();
+        var b=document.contains(document.getElementById("test_fieldset"));
+        assert.strictEqual(b,false);
+    });
     
     
 });
