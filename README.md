@@ -1,17 +1,11 @@
 # apoco
 ## spa javascript web framework
-
+(SPA - Single Page Application. )
+[Definition of a SPA](https://en.wikipedia.org/wiki/Single-page_application)
 
 [Online manual](https://snorkelferret.github.io)
 
 Apoco is a data-driven enterprise level SPA library/Frontend real time framework. The components can be used together or individually. Apoco is arranged hierarchically.
-
-
-(SPA - Single Page Application. )
-
-
-[Definition of a SPA](https://en.wikipedia.org/wiki/Single-page_application)
-
 
 
 ##### Windows
