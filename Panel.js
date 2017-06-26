@@ -415,12 +415,11 @@ require("./Window");
             //   console.log("after add adding child length is " + this.components.length);
             return display_object;
 	},
-        deleteChildren: function(){
+        deleteChildren: function(child_array){
             if(!this.components){
                 throw new Error("Panel: has no children " + this.name);
             }
             for(var i=0;i<this.components.length;i++){
-        
                 this.components[i].delete("message from parent");
             }
             this.components.length=0;
@@ -430,12 +429,17 @@ require("./Window");
             if(!obj){
                 throw new Error("Apoco.Panel: deleteChild obj is null");
             }
-            if(Apoco.type['string'].check(obj)){
+           // console.log("Panel delete child is here");           
+            if(!Apoco.type['object'].check(obj)){ // type check string does not work if id is an int e.g 209
                 obj=this.getChild(obj);
+               // console.log("obj is string- object is  " + obj);
             }
+          
 	    for(var i=0;i<this.components.length;i++){
+             //   console.log("does " + obj + "match " + this.components[i]);
 		if(obj === this.components[i]){
                     index=i;
+               //     console.log("got index "+ index);
                     break;
 		}
 	    }
@@ -444,7 +448,7 @@ require("./Window");
 	        this.components.splice(index,1);
             }
             else{
-                throw new Error("Panel: deleteChild could not find child " + obj.id);
+                throw new Error("Panel: deleteChild could not find child " + obj);
             }
 
 	},
