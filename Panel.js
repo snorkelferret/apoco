@@ -419,6 +419,16 @@ require("./Window");
             if(!this.components){
                 throw new Error("Panel: has no children " + this.name);
             }
+         //   console.log("Panel deleteChildren is here parms " + child_array);
+      //      console.log("child array check type is " + Apoco.type["array"].check(child_array) );
+            if(child_array && Apoco.type["array"].check(child_array)){
+           //     console.log("child array is here and its an array");
+                for(var i=0;i<child_array.length;i++){
+              //      console.log("deleting child " + child_array[i]);
+                    this.deleteChild(child_array[i]);
+                }
+                return;
+            }
             for(var i=0;i<this.components.length;i++){
                 this.components[i].delete("message from parent");
             }

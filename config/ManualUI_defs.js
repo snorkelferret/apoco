@@ -1013,7 +1013,8 @@ var UI={};
                     items:[{label:"nodeType",description:"any valid html element"}]
                 },
                 options:{
-                    items:[{label:"text",description: "text to add to element if applicable"}]
+                    items:[{label:"text",description: "text to add to element if applicable"},
+                           {label:"attr",descriptions:["optional key value array of attributes"]}]
                 }
             }
         };
@@ -1849,8 +1850,8 @@ var UI={};
             show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>","puts all the display pbjects into the DOM - unless the display has hidden=true e.g my_display.hidden=true"]}],
             showAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.showAll([ ,win])</code>","params: none or string window name, or window Object"]}],
             addChild:[{label:"Usage",descriptions:["<code>var d=Apoco.Panel.get(string).addChild(object);</code>","<br> return: object","parms: object","a Apoco display Object of key value pairs"]}],
-            deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(panel_name).deleteChild(c);</code>","params: object or string","where object is the child object returned by getChild or string the id of the child node "]}],
-            deleteChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).deleteChildren();</code>"]}],
+            deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(panel_name).deleteChild(c);</code>","params: object or string","where object is the child object returned by getChild or string the id of the child node - if deleting more than one child use deleteChildren"]}],
+            deleteChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).deleteChildren([child_array]);</code>","if no params - deletes all the children otherwise deletes children in array"]}],
             findChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).findChild(object);</code>"]}],
             getChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).getChild(string);</code>"]}],
             getChildren:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(string).getChildren();</code>"]}]
