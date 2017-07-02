@@ -28,6 +28,11 @@ Apoco is a data-driven enterprise level SPA library/Frontend real time framework
 
 You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) 
 
+All Apoco components which provide user input have methods to get set and reset the values.
+Thereby the integrity of the data can be guaranteed, since the journalled value can only be set
+by a call to setValue.
+
+
 Apoco panels are generally defined in a UI_defs.js file.,
 for example,
 

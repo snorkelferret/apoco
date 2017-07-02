@@ -189,7 +189,8 @@ var UI={};
                 common: {required:{type:"boolean",default: false,descriptions:["Is the cell allowed to be blank"]},
                          editable:{type:"boolean",default:true,descriptions:["If false user input is disabled"]},
                          label:{type: "string",default: undefined,descriptions:["added next to the input field"]},
-                         title:{type: "string",default: undefined,descriptions:["add a tooltip"]}
+                         title:{type: "string",default: undefined,descriptions:["add a tooltip"]},
+                         hidden:{type:"boolean",default: false,descriptions:["set the element display to none or unset"]}
                         },
                 IO:{
                     action:{type:"function",default: undefined,descriptions:["Function run after field has beenn created <br>","e.g <code>action:function(that){ alert('hullo');}</code>"]},
@@ -600,6 +601,16 @@ var UI={};
                 deleteOptions:{ descriptions:[
                     "<code> field.removeOptions(); </code>"
                 ]},
+                show:{
+                    descriptions:[
+                        "<code> field.show(); </code>"
+                        ]
+                },
+                hide:{
+                       descriptions:[
+                        "<code> field.hide(); </code>"
+                       ]
+                },
                 contains:{descriptions:[
                     "<code> var array=field.contains(options_array,value);<code>"
                 ]},
@@ -1042,7 +1053,11 @@ var UI={};
                 opts[HNodes[i]].options={};
                 opts[HNodes[i]].options.items=[];
             }
-            var common_options=[{label:"id",descriptions:["type: string ", "Add an id"]},{label:"class",descriptions:["type: string","add a class to the node"]},{label:"name",descriptions:["type: string","add a name attribute to the node"]}];
+            var common_options=[{label:"id",descriptions:["type: string ", "Add an id"]},
+                                {label:"class",descriptions:["type: string","add a class to the node"]},
+                                {label:"name",descriptions:["type: string","add a name attribute to the node"]},
+                                {lanel:"hidden",descriptions:["type: boolean","set the element display to none or unset"]}
+                               ];
             opts[HNodes[i]].required.items.push({label:'node',description:"type: string - " + HNodes[i]});
             for(var j=0;j<common_options.length;j++){
                 opts[HNodes[i]].options.items.push(common_options[j]);

@@ -40,7 +40,9 @@ require("./Types.js");
                 }
             }
         }
-
+        if(this.hidden){
+            this.hide();
+        }
 	if(this.id){
 	    this.element.id=this.id;
 	}
@@ -71,7 +73,15 @@ require("./Types.js");
             default:
                 throw new Error("Cannot set text of " + this.node);
             }
-	}
+	},
+        show:function(){
+            this.hidden=false;
+            this.element.style.display="unset";
+        },
+        hide:function(){
+            this.hidden=true;
+            this.element.style.display="none";
+        }
     };
 
     var _getNode={

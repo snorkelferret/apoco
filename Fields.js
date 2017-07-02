@@ -18,7 +18,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             required:false,
             editable: true,
             type: "any",
-            value: null
+            value: null,
+            hidden:false
         };
         if(!d){
             throw new Error("Field: must have some options");
@@ -79,7 +80,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             l.appendChild(document.createTextNode(this.label));
  	    this.element.appendChild(l);
 	}
-        
+        if(this.hidden){
+            this.hide();
+        }
 	if(this.publish !== undefined){
 	    Apoco.IO.publish(this);
 	}
@@ -112,6 +115,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    }
 	    return null;
 	},
+        hide:function(){
+            this.hidden=true;
+           // if(this.DOM.contains(this.element)){
+            this.element.style.display="none";
+           // }
+        },
+        show:function(){
+            this.hidden=false;
+            //  if(this.DOM.contains(this.element)){
+            this.element.style.display="unset"; // hmmm maybe a problem here
+           // }
+        },
 	getValue:function(){
             if(this.input.pending){
                 return null;
