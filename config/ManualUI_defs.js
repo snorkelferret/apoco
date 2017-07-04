@@ -1395,7 +1395,7 @@ var UI={};
         var HPopups=HThings["Popups"];
 
         var command={
-            alert:  function(c){ return c.concat('("Hi, An alert");');},
+            alert:  function(c){ return c.concat('("title","Hi, An alert");');},
             dialog:function(c){return c.concat('("title","my message");');},
             error:function(c){return c.concat('("title","my message");');},
          /*   paginate:function(c){return c.concat('({DOM:"right",values:[{text:"1",action:function(that){alert("got a click");}},{text:"2",action:function(that){alert("got a click");}}]});');},
@@ -1430,9 +1430,12 @@ var UI={};
                         usage: "<code>Apoco.popup['statusCode'][ERROR_CODE](text); </code>",
                         ret: "none"
                        },
-            alert:{items:[{label:"text",description:"type: string, required: false "}],
-                   cmd:  function(c){ return c.concat('("Hi, An alert");');},
-                   usage:" <code>Apoco.popup['alert'](title);</code>",
+            alert:{items:[{label:"title",description:"type: string, required: false "},
+                          {label:"text",description:"type: string, required: false "},
+                          {label:"time",description:"type: integer, required: false, time in milliseconds "}
+                         ],
+                   cmd:  function(c){ return c.concat('("title","Hi, An alert");');},
+                   usage:" <code>Apoco.popup['alert'](title,text,[time]);</code>",
                    ret: "HTML Element Object"
                   },
             dialog:{items:[{label:"title",description:"type: string, required: true"},

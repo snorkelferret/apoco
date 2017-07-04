@@ -148,7 +148,7 @@ var Apoco=require('./declare').Apoco;
 	    }
             return spinner;
 	},
-	alert: function(text,time){
+	alert: function(title,text,time){
 	    var nd,ns,np,s;
           //  console.log("creating alert");
             nd=document.createElement("div");
@@ -158,9 +158,7 @@ var Apoco=require('./declare').Apoco;
             ns.classList.add("alert");
             np=document.createElement("p");
             s=document.createElement("span");
-            np.appendChild(s);
-            s=document.createElement("strong");
-            s.textContent="Alert";
+            s.textContent=title;
             np.appendChild(s);
             s=document.createElement("p");
             s.textContent=text;

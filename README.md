@@ -5,8 +5,8 @@
 
 [Online manual](https://snorkelferret.github.io)
 
-Apoco is a data-driven enterprise level SPA library/Frontend real time framework. The components can be used together or individually. Apoco is arranged hierarchically.
-
+Apoco is a data-driven enterprise level SPA library/Frontend real time framework, with automatic two way synchronisation between browser and server content.
+The components can be used together or individually. Apoco is arranged hierarchically.
 
 ##### Windows
 
