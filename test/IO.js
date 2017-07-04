@@ -36,7 +36,7 @@ describe("IO.getFiles",function() {
         var promises=Apoco.IO.getFiles(files,t);
      //   console.log("promises in test is %j" ,promises);
         assert.deepEqual(promises,[]);
-        assert.equal(files[0].error,"File incorrect type data/images/alchemist1.jpg cannot be uploaded");
+        assert.equal(t._errors[0],"File incorrect type data/images/alchemist1.jpg cannot be uploaded");
     });
   
 
