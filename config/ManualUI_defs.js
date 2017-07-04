@@ -1568,7 +1568,7 @@ var UI={};
                        items:[{label:"file_array",
                                description:"an array of files - typically returned by event.dataTransfer.files or event.target.files etc "},
                               {label:"object",
-                               descriptions:["<b>object</b><br> <code> var object={opts:{maxSize:integer_bytes,<br> mimeType:'/application/json', // any type of valid mimeType<br> action:function(promises){// passes the array of promises} },<br> progressBar: html_div_element }<code>}","Creates an array of _promises and _files (if they do not already exist) otherwise pushes to the arrays"]
+                               descriptions:["<b>object</b><br> <code> var object={opts:{maxSize:integer_bytes,<br> mimeType:'/application/json', // any type of valid mimeType<br> action:function(promises){// passes the array of promises} },<br> progressBar: html_div_element }<code>}","Creates an array of _promises and _files (if they do not already exist) otherwise pushes to the arrays","if there are errors - error messages are put in that._errors   (an array of strings)"]
                               }
                                
                               

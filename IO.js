@@ -165,29 +165,35 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(!that._promises){
                 that._promises=[];
             }
+            if(!that._errors){
+                that._errors=[];
+            }
             if(!that._files){
                 that._files=[];
             }
+          //  console.log("getFiles that is %j",that);
             for (var i = 0; i<f.length; i++) {
-                //console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
+              //  console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
                 if(that.opts){
-                 //   console.log("dropZone setting options");
+                //    console.log("dropZone setting options");
                     if(that.opts["maxSize"]){
                         if(f[i].size > that.opts.maxSize ){
-                            Apoco.popup.dialog("File too large","File " + f[i].name + "exceeds the maximum allowable file size");
+                            that._errors.push("File too large" + f[i].name + "exceeds the maximum allowable file size");
                             continue;
                         }
                     }
                     found=true;
                     if(that.opts["mimeType"]){
+                       // console.log("got a mimetype");
                         found=false;
                         for(var j=0;j<that.opts["mimeType"].length;j++){ //e.g application/pdf
+                       //     console.log("is " + f[i].type + " of type " + that.opts["mimeType"][j] );
                             if(f[i].type === that.opts["mimeType"][j]){
                                   found=true;
                             }
                         }
                         if(!found){
-                            Apoco.popup.dialog("File incorrect","File " + f[i].name + " cannot be uploaded");
+                            that._errors.push("File incorrect type " + f[i].name + " cannot be uploaded");
                         }
                     }
                     if(!found){
@@ -218,6 +224,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                             that._files.push(file);//(evt.target.result);
                             resolve(file); //evt.target.result);
                             if(pb){
+                                pb.style.width =  100 + '%';
                                 pb.textContent=("Staged for upload " + file.name);
                             }
                         };
@@ -447,6 +454,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         reset:function(){
             this.clearFileList();
             this.clearPromises();
+            this._errors=[];
             if(this.opts && this.opts.progressBar){
                 this.opts.progressBar.innerHTML="";
             }

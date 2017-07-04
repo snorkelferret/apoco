@@ -1410,6 +1410,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(!this.height){
             this.height=400;
         }
+      //  console.log("FileReader is here %j ", that );
+      //  console.log("FileReader got opts %j" , that.opts);
         if(this.editable !== false){
 	    if(!window.FileReader){
 	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
