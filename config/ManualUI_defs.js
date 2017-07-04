@@ -265,6 +265,8 @@ var UI={};
                           descriptions:[""]
                         },
                 fileReader:{ options:{ type:{type:"string",default: "file"},
+                                       opts:{type: "key value object",default: undefined,
+                                             descriptions:["maxSize type: integer, max filesize in bytes","mimeTypes: an array of strings of valid mimetypes","see the IO getFiles","e.g <code> var my_display=Apoco.field['fileReader']({name:'someName',opts:{maxSize:1024,mimeTypes:['application/pdf','image/png']}});</code> "]},
                                        hideFiles:{type:"boolean",default: false},
                                        resizable:{type: "boolean",default: false},
                                        width:{type:"integer",default: 400,description:"width of the file object"},

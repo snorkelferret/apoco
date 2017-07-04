@@ -183,18 +183,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                         found=false;
                         for(var j=0;j<that.opts["mimeType"].length;j++){ //e.g application/pdf
                             if(f[i].type === that.opts["mimeType"][j]){
-                           
-                                found=true;
+                                  found=true;
                             }
+                        }
+                        if(!found){
+                            Apoco.popup.dialog("File incorrect","File " + f[i].name + " cannot be uploaded");
                         }
                     }
                     if(!found){
                         continue;
                     }
                 }
-                if(!found){
-                    Apoco.popup.dialog("File incorrect","File " + f[i].name + " cannot be uploaded");
-                }
+             
                 //f[i].lastModifiedDate.toLocaleDateString(
   
                 promise=new Promise(function(resolve,reject){
