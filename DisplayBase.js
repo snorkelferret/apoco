@@ -70,6 +70,21 @@ require("./Fields");
 	 	context.action(context);
 	    }
         };
+        this.element=document.createElement("div");
+        this.element.id=this.id;
+        
+        this.element.classList.add("apoco_"+this.display);  
+        if(this.class){
+            if(Apoco.type["string"].check(this.class)){
+                this.element.classList.add(this.class);
+            }
+            else{
+                for(var i=0;i< this.class.length;i++){
+                    this.element.classList.add(this.class[i]);
+                }
+            }
+        }
+        
         // if the execution depends on another node
         if(this.action){
             if( !this.dependsOn){
@@ -88,21 +103,7 @@ require("./Fields");
             }
             // else the action is added to the show function below
         }
-
-        this.element=document.createElement("div");
-        this.element.id=this.id;
-        
-        this.element.classList.add("apoco_"+this.display);  
-        if(this.class){
-            if(Apoco.type["string"].check(this.class)){
-                this.element.classList.add(this.class);
-            }
-            else{
-                for(var i=0;i< this.class.length;i++){
-                    this.element.classList.add(this.class[i]);
-                }
-            }
-        }
+  
         
 	if(this.listen !== undefined){
 	    Apoco.IO.listen(this);  
