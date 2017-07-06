@@ -22,7 +22,7 @@ var Apoco=require('./declare').Apoco;
             var mkDialog=function(title,message,modal){
 	        var Hdialog,message_text,title_text,Modal,draggable;
                 if(modal && Apoco.modal === undefined){
-                    console.log("creating a modal ");
+                    console.log("creating a modal " + message);
                     Apoco.modal=document.createElement("div");
                     Apoco.modal.id="Apoco_modal";
                 }

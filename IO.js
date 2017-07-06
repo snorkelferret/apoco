@@ -2,6 +2,7 @@ var Apoco=require('./declare').Apoco;
 var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 ;(function(){
+
     'use strict';
     Apoco.IO={
         _subscribers:{},
@@ -31,6 +32,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             //  for(var k in that){
             //      console.log("listen has that " + k);
             //   }
+           // console.log("listener is " + that.id);
             if(that === undefined || that.listen === undefined){
                 throw new Error("IO.listen needs an object");
             }
@@ -82,7 +84,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    }
         },
  
-  
+    
         REST:function(type,options,data){
             var defaults={dataType: 'json',
                           mimeType: 'application/json'};
@@ -255,13 +257,24 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         that.init();
         
         this.socket.onerror=function(e){
-            Apoco.popup.error("webSocket","Received an error msg");
+            if(that.settings.errorCallback){
+                that.settings.errorCallback(e);
+            }
+            else{
+                Apoco.popup.error("webSocket","Received an error msg");
+            }
         };
         this.socket.onclose=function(e){
-            if(e.code !== 1000){ // normal termination
-                Apoco.popup.error("webSocket abnormal termination", "Exiting with code" + e.code);
-            }
             this.socket=null;
+            if(e.code !== 1000){ // normal termination
+                if(that.settings.errorCallback){
+                    that.settings.errorCallback(e);
+                }
+                else{
+                    throw new Error("webSocket abnormal termination Exiting with code" + e.code);
+                }
+            }
+           
         };
         this.socket.onmessage=function(e){
             if(!e.data){
@@ -269,13 +282,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             var d=JSON.parse(e.data);
         //    console.log("Websocket: got: %j %j",d[0],d[1]);
-            
+            if(d[0] === "error"){
+                throw new Error("socker on messagr got error " + JSON.stringify(d[0]));
+            }
             if(that.corking){
                // console.log("corking data %j",d);
                 that.buffer.push(d);
-            }
-            else if(d[0] === "error"){
-                Apoco.popup.dialog("Error",JSON.stringify(d[1]));
             }
             else{
                 Apoco.IO.dispatch(d[0],d[1]);
@@ -288,24 +300,19 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var that=this;
             //console.log("webSocket -init: settings %j",that.settings);
             if(!that.socket){
-            //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
+                //  console.log("creating websocket +++++++++++++++++++++++++++++++++++++++++++= ");
                 var a={'http:':'ws:','https:':'wss:','file:':'wstest:'}[window.location.protocol];
                 //  console.log("a is " + a + " protocol " + window.location.protocol);
                 if(!a){
                     throw new Error("IO: Cannot get protocol for window " + window.location);
                 }
-            
+                
                 try{
                     that.socket=new WebSocket(a + "//" + window.location.host + that.settings.url);
-                    that.socket.onopen = function (e) {
-                    //     console.log("created websocket + + + + + + + + + + + + + + ++");
-                   /* if(data !== undefined){ // in case of timing issue
-                        that.send(data);
-                    }*/
-                    };
+                        /*  that.socket.onopen = function (e) {}; */
                 }
                 catch(err){
-                    throw new Error(("webSocket: failed to open" + err));
+                    throw new Error("webSocket: failed to open" + err);
                 }
 	    }
         },
@@ -316,16 +323,23 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var that=this;
             //  console.log("Trying to send message ___________________________________");
             var msg=JSON.stringify(data);
-            //  console.log("got some data " + msg);
-            if(!that.socket){
-                that.init();
+             //console.log("websocket ready state is " + that.socket.readyState);
+            if(that.socket.readyState !== 1){
+                var wait=function (event) {
+                    that.socket.send(msg+'\n');
+                    that.socket.removeEventListener('open',wait);
+                };
+                that.socket.addEventListener('open', wait,false);
             }
-            try{
-                that.socket.send(msg+'\n');
+            else{
+                try{
+                    that.socket.send(msg+'\n');
+                }
+                catch(err){
+                    Apoco.popup.error("websocket send", ("Could not send websocket message %j ",err));
+                }
             }
-            catch(err){
-                Apoco.popup.error("websocket send", ("Could not send websocket message %j ",err));
-            } 
+            
         },
         cork:function(on){
           //  console.log("tippppppppppppppppppppppppppppppppp");
@@ -334,7 +348,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(on){
                 that.corking=true;
             }
-            else{
+            else{ 
                while ((msg=that.buffer.shift())!==undefined){
                //    console.log("uncorking %j",msg);
                    Apoco.IO.dispatch(msg[0],msg[1]);
@@ -357,7 +371,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     Apoco.IO.webSocket=function(options,data){
         return new _webSocket(options,data);  // need to call new so prototype methods are instantiated 
     };
-
+    
     var _dropZone=function(element,opts){
         var that=this,p;
         this.opts=opts;
@@ -465,4 +479,5 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         return new _dropZone(element,options);  // need to call new so prototype methods are instantiated 
     };
     
-})();
+    }
+)();

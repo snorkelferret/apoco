@@ -1090,6 +1090,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	},
         setValue: function(value,index){
             var t=0;
+            if(!value){
+                throw new Error("ButtonSet:setValue needs a value - got " + value );
+            }
             if(!Apoco.type["array"].check(value)){
                 if( index !== undefined && index<=this.input.length){
                     if(this.checkbox !== true){
@@ -1401,15 +1404,27 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         d.field="FileField";
         d.type="file";
 	_Field.call(this,d,element);
+
         if(!this.value){
             this.value=[];
         }
-        if(!this.width){
-            this.width=400;
+        if(this.width){
+            if(!isNaN(this.width)){
+                this.width=this.width+"px";
+            }
         }
-        if(!this.height){
-            this.height=400;
+        else{
+            this.width="400px";
         }
+        if(this.height){
+            if(!isNaN(this.height)){
+                this.height=this.height+"px";
+            }
+        }
+        else{
+            this.height="400px";
+        }
+        
       //  console.log("FileReader is here %j ", that );
       //  console.log("FileReader got opts %j" , that.opts);
         if(this.editable !== false){
