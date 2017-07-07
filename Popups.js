@@ -155,17 +155,22 @@ var Apoco=require('./declare').Apoco;
             nd.id="apoco_alert";
             Apoco.Utils.draggable(nd);
             ns=document.createElement("div");
+            
             ns.classList.add("alert");
             np=document.createElement("p");
             s=document.createElement("span");
             s.textContent=title;
             np.appendChild(s);
-            s=document.createElement("p");
-            s.textContent=text;
-            np.appendChild(s);
-            
-	    ns.appendChild(np);
-	    nd.appendChild(ns);
+            ns.appendChild(np);
+            nd.appendChild(ns);
+
+            ns=document.createElement("div");
+            ns.classList.add("alert_msg");
+            np=document.createElement("p");
+            np.textContent=text;
+            ns.appendChild(np);
+            nd.appendChild(ns);
+	   
 	    document.body.appendChild(nd);
 
             var t;

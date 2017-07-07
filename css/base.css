@@ -382,10 +382,13 @@ code{font-size: 10pt}
 
 
 #apoco_alert{background-color: #bb0000; color: #ffffff; border: 2px solid orange; padding: 1em;
-             width: 20em; height: 4em;margin: auto; z-index: 100; position: absolute; top: 50%;left: 50%}
+             width: 20em;min-height: 4em;margin: auto; z-index: 100; position: absolute; top: 50%;left: 50%}
 #apoco_alert span{width: inherit; margin-top: 1em;
                   font-weight: bolder;
                   padding-left: 1em;}
+#apoco_alert .alert{height: 2em; position: relative}
+#apoco_alert .alert_msg{position: relative}
+
 #apoco_trouble{position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.5;  background-color: #800; padding: 30px; z-index: 100}
 #apoco_trouble h1{font-size: 70pt; position: fixed; top: 20%; left: 30%;  margin: auto; color: #fff ; background-color: inherit; opacity:1.0}
 #apoco_trouble h2{position:fixed;font-size: 50pt; color: #fff; top: 33%; left:30%; margin:auto; opacity: 1.0}
