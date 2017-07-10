@@ -32,8 +32,8 @@ describe("Manual",function(){
             .build();
 
     //});
-   // driver.get("file://"+process.cwd()+"/index.html");
-    driver.get("https://snorkelferret.github.io/index.html");
+    driver.get("file://"+process.cwd()+"/index.html");
+   // driver.get("https://snorkelferret.github.io/index.html");
 
     test.after(function() {
         driver.quit();

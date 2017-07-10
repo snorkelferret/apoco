@@ -113,7 +113,7 @@ require("./DisplayFieldset");
 	},
         addSubmitter:function(index,el,parent_element){
             var n={},p,d;
-            console.log("DisplayForm: addSubmitter is here");
+         //   console.log("DisplayForm: addSubmitter is here");
             if(Number.isInteger(index)){
                 d=this.components[index]; 
             }
@@ -152,7 +152,7 @@ require("./DisplayFieldset");
             n.element.appendChild(n.submit);
             parent_element.appendChild(n.element);
             this.components[index]=n;
-            console.log("DisplayForm: added submitter");
+       //     console.log("DisplayForm: added submitter");
             return n;
             
         },
