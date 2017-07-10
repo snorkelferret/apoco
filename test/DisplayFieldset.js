@@ -168,3 +168,51 @@ describe("DisplayFieldset-(start with data)",function(){
     
     
 });
+
+describe("DisplayFieldset-adding pre-existing fields and nodes",function(){
+  var t;
+    require("../DisplayFieldset.js"); 
+    it("creates a fieldset object",function(){
+        var b=document.createElement("div");
+        b.id="test";
+        document.body.appendChild(b);
+        assert.strictEqual(document.body.contains(b),true);
+        t=Apoco.display.fieldset({id:"test_fieldset",
+                                   DOM:"test",
+                                   components:[{node:"paragraph",name:"stuff",text:"hullo people"}
+                                              ]});
+        assert.isObject(t);
+    });
+    it("can add a pre-existing node",function(){
+        var d=Apoco.node({node:"button",name:"SomeButton", label: 'A Label'});
+        t.addChild(d);
+        var b=t.getChildren();
+//        for(var i=0;i<b.length;i++){
+//            console.log("field is " + b[i].name);
+//        }
+        assert.strictEqual(b.length,2);
+        
+    });
+
+    it("can add a pre-existing field",function(){
+        var d=Apoco.field['checkBox']({name:"Something", label: 'A Label'});
+        t.addChild(d);
+        var b=t.getChildren();
+//        for(var i=0;i<b.length;i++){
+//            console.log("field is " + b[i].name);
+//        }
+        assert.strictEqual(b.length,3);
+        
+    });
+    it("can add a delete a pre-existing field",function(){
+       
+        t.deleteChild("Something");
+        var b=t.getChildren();
+//        for(var i=0;i<b.length;i++){
+//            console.log("field is " + b[i].name);
+//        }
+        assert.strictEqual(b.length,2);
+        
+    });
+    
+});

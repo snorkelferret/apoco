@@ -147,3 +147,25 @@ describe("DisplayForm",function(){
     });
     
 });
+describe("DisplayForm",function(){
+    var t;
+    require("../DisplayForm.js"); 
+    it("creates a form display object with input submits",function(){
+        var b=document.createElement("div");
+        b.id="test";
+        document.getElementsByTagName("body")[0].appendChild(b);
+        assert.strictEqual(document.contains(b),true);
+        t=Apoco.display.form({id:"test_form",DOM:"test",
+                              onSubmit:function(t){},
+                               components:[{node:"heading",size:"h2",text:"Start"},
+                                           {node:"paragraph",text:"hullo people"},
+                                           {type: "integer",value: 10,name:"ID"},
+                                           {submit:true,name:"submitter"}
+                                          ]
+                              });
+        assert.isObject(t);
+        var c=t.getChildren();
+        assert.strictEqual(c.length,4);
+        
+    });
+});

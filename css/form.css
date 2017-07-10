@@ -1,16 +1,26 @@
 /* css for Apoco.display.form */
 
 
-.apoco_form{position: fixed; top: 25%; left: 25%; 
-                font-weight: normal;
-                z-index:600;
-                min-width: 12em;
-                min-height:18em;
-                background-color: #ffffff;
-                max-height: 80em;
-                 overflow: hidden;
-                 display: inline-block}
-.form_header{cursor: move; height: 2em ; background-color:#ddd; color: #000;  min-width:inherit; width: inherit}
+.apoco_form{ font-weight: normal;
+          
+             background-color: #ffffff;
+           
+             overflow: hidden;
+             display: inline-block}
+
+.apoco_form.isdraggable{
+    position: fixed; top: 25%; left: 25%;
+    z-index:600;
+    max-width: 40em;
+    max-height: 80em;
+    min-width: 12em;
+    min-height:18em;
+}
+
+.isdraggable .form_header{
+    cursor: move;
+}
+.form_header{height: 2em ; background-color:#ddd; color: #000;  min-width:inherit; width: inherit}
 
 .apoco_form .form_header h5{display:inline; margin: 0;position: absolute; top:0.4em; left:0.4em  }
 
