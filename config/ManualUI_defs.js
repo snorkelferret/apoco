@@ -1135,6 +1135,8 @@ var UI={};
                                                                "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
                   options:[{label:"buttons",descriptions:["an array of button objects","example","<code> buttons: [{name: 'string',text:'string',action: function(that){ //some code }}]</code>"]},{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                            {label:"draggable",descriptions:["type: boolean","default: false","if true the form is detached and can be dragged around the browser window - adds a close button top right"]},
+                           {label:"attr",descriptions:["object array of attributes to add to the form"]},
+                           {label:"onSubmit",descriptions:["function to call"]},
                            {label: "label",description: "type: string"}]},
             grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type or the field may be specified directly","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1},{field:'select',title; 'Pick one',name:'choose',options:['one','two','three']}]<code>","options are the same as for the fields with the addition of the title option - which is the text displayed in the head - defaults to name"]},
                             {label:"rows",descriptions:["type:objectArray","if the cols were defined as above then the rows would be","<code> rows:[{colname1:'some_string',colname2:23.53,choose:'one'},{colname1:'another_string',colname2:34.66,choose:'three'}]"]}],

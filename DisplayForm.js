@@ -23,13 +23,8 @@ require("./DisplayFieldset");
     ApocoMakeForm.prototype={
 	_execute: function(){
 	    var that=this,fp,lp,header,container,fc,h;
-            /*console.log("make foem is here");
-            this.element=document.createElement("div");
-            this.element.id=this.id;   
-             if(this.class !== undefined){
-                this.element.classList.add(this.class);
-            }
-             */
+            //console.log("make foem is here");
+   
             this.element.classList.add("apoco_form"); //,"resizable"); 
       
             if(this.height){
@@ -59,6 +54,13 @@ require("./DisplayFieldset");
 	    header.appendChild(h);
             if(this.onSubmit){
                 container.setAttribute("onSubmit",'return function(){that.onSubmit(this); return false;}');
+            }
+            if(this.attr && Apoco.type["objectArray"].check(this.attr)){
+                for(var i=0;i<this.attr.length;i++){
+                    for(var k in that.attr[i]){
+                        container.setAttribute(k,that.attr[i][k]);
+                    }
+                }
             }
 
             if(this.draggable === true){ //only add the close button if draggable
