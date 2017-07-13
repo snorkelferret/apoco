@@ -274,7 +274,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     throw new Error("webSocket abnormal termination Exiting with code" + e.code);
                 }
             }
-           
+            if(that.settings.closeCallback){
+                that.settings.closeCallback(e);
+            }
         };
         this.socket.onmessage=function(e){
             if(!e.data){

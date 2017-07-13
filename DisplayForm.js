@@ -52,8 +52,16 @@ require("./DisplayFieldset");
                 h.textContent=this.label;
 	    }
 	    header.appendChild(h);
+            console.log("parent is " + that.parent.name);
             if(this.onSubmit){
-                container.setAttribute("onSubmit",'return function(){that.onSubmit(this); return false;}');
+                //  container.setAttribute("onSubmit",'return function(){that.onSubmit(this); return false;}'
+               
+                container.addEventListener("submit",function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    that.onSubmit(e);
+                });
+               // container.setAttribute("onSubmit",`return false`);
             }
             if(this.attr && Apoco.type["objectArray"].check(this.attr)){
                 for(var i=0;i<this.attr.length;i++){
