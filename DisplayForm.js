@@ -52,7 +52,7 @@ require("./DisplayFieldset");
                 h.textContent=this.label;
 	    }
 	    header.appendChild(h);
-            console.log("parent is " + that.parent.name);
+          //  console.log("parent is " + that.parent.name);
             if(this.onSubmit){
                 //  container.setAttribute("onSubmit",'return function(){that.onSubmit(this); return false;}'
                

@@ -28,6 +28,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    }
         },
         listen:function(that){ //pubsub
+            var t,found=false;
 	    //var b=that.getKey();
             //  for(var k in that){
             //      console.log("listen has that " + k);
@@ -42,21 +43,36 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	        if(!this._subscribers[n]){
 		    this._subscribers[n]=[];
 	        }
-	        this._subscribers[n].push({context:that,action:that.listen[i].action});
-	    }
+                // check that we are not adding it multiple times
+                found=false;
+                if(this._subscribers[n]){
+                    for(var j=0;j<this._subscribers[n].length;j++){
+                        t=this._subscribers[n][j];
+                        // we already have this entry
+                        if(t.context==that && t.action== that.listen[i].action){
+                            found=true;
+                        }
+                    }
+                }
+	        if(!found){
+                    this._subscribers[n].push({context:that,action:that.listen[i].action});
+                }
+            }
         },
-        unsubscribe:function(that){ //pubsub
+        unsubscribe:function(that,name){ //pubsub
 	   // var names=[];
 
 	    for(var i=0; i< that.listen.length; i++){
-	     //   console.log("finding name " + that.listen[i].name);
-	        if(this._subscribers[that.listen[i].name]){
-		    for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
-		        if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){
-			    this._subscribers[that.listen[i].name].splice(j,1);
+	        //   console.log("finding name " + that.listen[i].name);
+                if(name && that.listen[i].name === name){
+	            if(this._subscribers[that.listen[i].name]){
+		        for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
+		            if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){
+			        this._subscribers[that.listen[i].name].splice(j,1);
+		            }
 		        }
-		    }
-	        }
+	            }
+                }
 	    }
             for(var k in this._subscribers){
                 if(this._subscribers[k].length === 0){ //nobody listening
