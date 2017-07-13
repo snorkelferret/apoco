@@ -1555,7 +1555,7 @@ var UI={};
                          des: "unsubscibe from all messages defined in object.listen"
                         },
             webSocket:{code: "<code>var s=Apoco.IO.webSocket(settings);</code>",
-                       items:[{label:"settings",descriptions:["key value object","settings={url:'.',errorCallback:function(event){console.log('got error')}}; ","url defaults to UI.url if it exists","if no errorCallback function- defaults to throwing an Error","any other settings in options will be passed to the webSocket","optionally add am error callback function"]},
+                       items:[{label:"settings",descriptions:["key value object","<code>var settings={url:'.',<br>" + mk_spaces(7) + "errorCallback:function(event){console.log('got error')},<br>" + mk_spaces(7) + "closeCallback:function(event){console.log('got close');}};<br><code> ","url defaults to UI.url if it exists","if no errorCallback function- defaults to throwing an Error","any other settings in options will be passed to the webSocket"]},
                              ],
                        ret: "object",
                        des: "sends and receives messages, received messages are sent with IO.dispatch",
