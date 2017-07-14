@@ -367,7 +367,9 @@ var Apoco=require('./declare').Apoco;
             html_type:"password",
             field: "input",
             check:function(s){
-               // s=String(s);
+                // s=String(s);
+                s=String(s);
+	        s=s.trim(); // trim leading and trailing whitespace
 	        if(Apoco.type.blank.check(s)){
 		    return false;
 	        }

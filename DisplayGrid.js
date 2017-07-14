@@ -969,7 +969,7 @@ jsonishData={
             if(!state){state="toggle";}
             
             b=this.getColIndex(name);
-            if(!b){
+            if(b === null){
                 throw new Error("grid: hideCol cannot find column called " + name);
             }
             if(this.cols[b].element.classList.contains("hidden")){

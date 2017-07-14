@@ -128,9 +128,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
            // }
         },
 	getValue:function(){
-            if(this.input.pending){
-                return null;
-            }
 	    var v=this.input.value;
 	    if( v && v.length > 0){
 		return this.input.value;
