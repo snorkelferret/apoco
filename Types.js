@@ -368,8 +368,8 @@ var Apoco=require('./declare').Apoco;
             field: "input",
             check:function(s){
                 // s=String(s);
-                s=String(s);
-	        s=s.trim(); // trim leading and trailing whitespace
+               // s=String(s);
+	      //  s=s.trim(); // trim leading and trailing whitespace
 	        if(Apoco.type.blank.check(s)){
 		    return false;
 	        }
