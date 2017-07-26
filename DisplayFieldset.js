@@ -118,6 +118,15 @@ require("./Nodes.js");
 	    }
             return js;
         },
+        reset:function(){
+            var c=this.components;
+            for(var i=0;i<this.components.length;i++){
+                if(this.components[i].field){
+                    this.components[i].resetValue();    
+                    
+                }
+            }
+        },
 	check: function(){
             var valid=true;
 	    for(var i=0;i<this.components.length;i++){

@@ -124,9 +124,7 @@ describe("InputField",function(){
         var f=t.resetValue();
         assert.notStrictEqual(b.value,f);
     });
-   
-    
-    
+ 
 });
 
 describe("StaticField",function(){
@@ -269,6 +267,7 @@ describe("FloatField",function(){
     it("knows the value has been changed in the browser",function(){
         f.valueChanged(f.getValue(),true);
     });
+ 
     it("can delete itself",function(){
         f.delete();
     });
@@ -421,6 +420,7 @@ describe("CheckBoxField",function(){
         var p=Apoco.field["date"]({name: "statich",value:"2017-09-23",type: "date"});
         assert.strictEqual(p.getValue(),"2017-09-23");
     });
+
     it("can set a date specified in milliseconds",function(){
         var p=Apoco.field["date"]({name: "statich",value:1486998999898,type: "date"});
         assert.strictEqual(p.getValue(),"2017-02-13");
@@ -467,6 +467,7 @@ describe("NumberArrayField-Integer",function(){
         b.value="6798";
         assert.strictEqual(f.valueChanged(),true);
     });
+
 });
 
 describe("TextAreaField",function(){
@@ -511,7 +512,7 @@ describe("TextAreaField",function(){
         b.value="whatever";
         assert.strictEqual(f.valueChanged(),true);
     });
-    
+
 });
                                        
 describe("SelectField",function(){
@@ -579,6 +580,7 @@ describe("SelectField",function(){
         f.addValue({label:"sixty",value:77});
         var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
         assert.strictEqual(e.length,5);
+       // f.getValue();
     });
     
     it("gets a value from browser with key value options ",function(){
@@ -594,11 +596,15 @@ describe("SelectField",function(){
         var b=f.getValue();
         assert.strictEqual(b,"77");
     });
-    
+ /*   it("has a clearValue method which sets the value to null",function(){
+        f.clearValue();
+        assert.strictEqual(f.getValue(),"three");
+    });*/
     it("knows the value has been changed by setValue",function(){
         f.setValue("two");
         assert.strictEqual(f.valueChanged(),false);
     });
+ 
     
 });
 
@@ -731,7 +737,7 @@ describe("ButtonSetField",function(){
             assert.strictEqual(b[0].two,true);
         }
         
-    });
+    });           
     it("can remove itself",function(){
         f.delete();
     });
@@ -782,7 +788,7 @@ describe("ButtonSetField - as checkboxes",function(){
         }
         
     });
-    
+ 
     
 });
 

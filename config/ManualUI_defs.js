@@ -237,7 +237,7 @@ var UI={};
                               },
                      options:{blank_option:{type:"boolean",
                                             default: false,
-                                            descriptions:[""]},
+                                            descriptions:["adds an input fielg for the user to add an option","if you want a blank select add empty string to the options array"]},
                               value:{type: "string",default: undefined,descriptions:[ "An element from the options string Array or object array"]}
                              },
                      descriptions:[""]
@@ -1284,7 +1284,7 @@ var UI={};
 
         }
         var display_methods_list={
-            reset:["<code> my_display.reset();</code>","deselect all child elements"],
+            reset:["<code> my_display.reset();</code>","deselect all child elements-for tabs OR reset fields to last setValue call or default value if no setValue has been called"],
             show:["<code> var v=my_display.show();</code>","params: none","return: boolean","add the root display element to the DOM"],
             getElement:["<code> var v=my_display.getElement();</code>","params: none","return: htmlobject"," the root element of the display"],
             getChild:["<code>var c=my_display.getChild(name);</code>","params: type: string - name as defined in the components array ","return: object","returns null on fail"],
@@ -1306,6 +1306,7 @@ var UI={};
             deleteTab:["<code>my_display.deleteTab(name);</code>","params: name(string)","return: none"],
             select: ["<code> my_display.select(name)</code>","params: name(string)","return: none"],
             getJSON: ["<code> var js=my_display.getJSON();</code>"],
+           
             resetInvalid:["<code>my_display.resetInvalid();</code>","params: none","return: none","reset all fields to last known good value"],
             play:["<code>my_display.play();</code>","start playback"],
             step:["<code>my_display.step(dir);</code>","params: dir (string) either 'next' or 'prev'","step forward one frame"],

@@ -57,6 +57,7 @@ describe("DisplayFieldset-(no initial data)",function(){
         var b=t.getChild("title").getValue();
         assert.strictEqual(b,"Robert");
     });
+  
     it("has a show method which puts the root element into the dom",function(){
         var b=document.contains(document.getElementById("test_fieldset"));
         assert.strictEqual(b,false);
@@ -70,6 +71,14 @@ describe("DisplayFieldset-(no initial data)",function(){
         var c=b.value;
         assert.strictEqual(c,"Robert");
     });
+    it("can reset all the field values",function(){
+        var b=document.querySelector("#test_fieldset div[name='title'] input");
+        b.value="Fog";
+        t.reset();
+        var b=t.getChild("title").getValue();
+        assert.strictEqual(b,"Robert");
+    });
+ 
     it("has put the nodes into the dom",function(){
         //var b=$("#test_fieldset").find("div[name='blurb'] p").text();
         var b=document.querySelector("#test_fieldset p[name='blurb']");

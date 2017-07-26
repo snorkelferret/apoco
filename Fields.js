@@ -135,20 +135,17 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    return null;
 	},
 	setValue:function(v){
-            if(!Apoco.type[this.type].check(v)){
-                throw new Error("Field: setValue " + v  + " is the wrong type, expects " + this.type);
-            }
-	    this.value=v;
-            if(this.value === null){
+            if(v === null || v === undefined){
                 this.input.value="";
+            }
+            else if(!Apoco.type[this.type].check(v)){
+                throw new Error("Field: setValue " + v  + " is the wrong type, expects " + this.type);
             }
 	    else {
                 this.input.value=v;
             }
-            if(this.input.pending){
-                this.input.classList.remove("pending");
-                this.input.pending=false;
-            }
+            this.value=v;
+          
 	},
         delete:function(){
             // remove all the nodes
