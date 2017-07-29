@@ -1526,8 +1526,8 @@ var UI={};
                       ret: "none",
                       des:""
                      },
-            listen:{code: "<code>Apoco.IO.listen(object);</code>",
-                    items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
+            listen:{code: "<code>Apoco.IO.listen(object,[name]);</code>",
+                    items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","If name is given only listens for that channel","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
                     cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addChild({field:'input',editable: false,type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addChild({node:'paragraph',text: data});  }}]});  // press go to initialise",
                     ret:"none",
                     des: "Listens for messages sent by publish,websocket or dispatch methods"
@@ -1847,6 +1847,10 @@ var UI={};
                 }
             }
         }
+        if(that.parent.element.parentNode.style.display==="block"){
+            that.parent.element.parentNode.style.display="none";
+        }
+        
        // }
     };
 
@@ -1965,25 +1969,48 @@ var UI={};
     UI.Panels={
         Tabs:{ name: "Tabs",
                components:[ {display: "tabs",
-                             DOM: "Main",
+                             DOM: "mainNavbar",
                              id: "Tabs",
                              selected: "About",
                              action: function(that){
-                                 for(var i=0; i<that.components.length;i++){
-                                     that.components[i].action=select_tabs;
-                                 }
+                               
+                                 var burgerBar=function(that){
+                                         var p=document.getElementById("tabBar");
+                                         if(!p){
+                                             throw new Error("Cannot find tabBar");
+                                         }
+                                         p.addEventListener("click",function(e){
+                                             e.stopPropagation();
+                                             e.preventDefault();
+                                   //          console.log("got click");
+                                             var t=that.DOM; //document.getElementById("mainNavbar");
+                                             if(!t){
+                                                 throw new Error("Cannot find main navNar");
+                                             }
+                                     //        console.log("t display is " + t.style.display);
+                                             if(t.style.display==="none" || t.style.display === ""){ // not set inline the first time round
+                                                 t.classList.add("tab_dropdown");
+                                                 t.style.display="block";
+                                             }
+                                             else{
+                                                 t.classList.remove("tab_dropdown");
+                                                 t.style.display="none";
+                                             }
+                                         },false);
+                                     };
+                                  burgerBar(that); // initialise the mobile collapse menu
                              },
                              components: [
-                                 {name: "About",label: "About"},
-                                 {name: "Types",label: "Types"},
-                                 {name: "Fields",label: "Fields"},
-                                 {name: "Nodes",label: "Nodes"},
-                                 {name: "Displays",label: "Displays"},
-                                 {name: "Panels",label: "Panels"},
-                                 {name: "Windows",label: "Windows"},
-                                 {name: "IO",label: "IO"},
-                                 {name: "Popups",label: "Popups"},
-                                 {name: "Utils",label: "Utils"}
+                                 {name: "About",label: "About",action:select_tabs},
+                                 {name: "Types",label: "Types",action:select_tabs},
+                                 {name: "Fields",label: "Fields",action:select_tabs},
+                                 {name: "Nodes",label: "Nodes",action:select_tabs},
+                                 {name: "Displays",label: "Displays",action:select_tabs},
+                                 {name: "Panels",label: "Panels",action:select_tabs},
+                                 {name: "Windows",label: "Windows",action:select_tabs},
+                                 {name: "IO",label: "IO",action:select_tabs},
+                                 {name: "Popups",label: "Popups",action:select_tabs},
+                                 {name: "Utils",label: "Utils",action:select_tabs}
                              ]
                             }
                           ]

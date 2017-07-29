@@ -27,7 +27,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	       }
 	    }
         },
-        listen:function(that){ //pubsub
+        listen:function(that,name){ //pubsub
             var t,found=false;
 	    //var b=that.getKey();
             //  for(var k in that){
@@ -55,24 +55,30 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     }
                 }
 	        if(!found){
-                    this._subscribers[n].push({context:that,action:that.listen[i].action});
+                    if(name === undefined || name===n){
+                        this._subscribers[n].push({context:that,action:that.listen[i].action});
+                    }
                 }
             }
         },
         unsubscribe:function(that,name){ //pubsub
-	   // var names=[];
+	    // var names=[];
+            var n;
 
 	    for(var i=0; i< that.listen.length; i++){
+                n=that.listen[i].name;
 	        //   console.log("finding name " + that.listen[i].name);
-                if(name && that.listen[i].name === name){
-	            if(this._subscribers[that.listen[i].name]){
-		        for(var j=0;j<this._subscribers[that.listen[i].name].length;j++){
-		            if(this._subscribers[that.listen[i].name][j]["context"].action === that.action){
-			        this._subscribers[that.listen[i].name].splice(j,1);
+               // if(name && that.listen[i].name === name){
+	        if(this._subscribers[n]){
+		    for(var j=0;j<this._subscribers[n].length;j++){
+		        if(this._subscribers[n][j]["context"].action === that.action){
+                            if(name === undefined || name === n){
+			        this._subscribers[n].splice(j,1);
 		            }
 		        }
 	            }
                 }
+                
 	    }
             for(var k in this._subscribers){
                 if(this._subscribers[k].length === 0){ //nobody listening

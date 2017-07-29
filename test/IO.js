@@ -42,3 +42,36 @@ describe("IO.getFiles",function() {
 
 });
  
+describe("IO.pubsub",function() {
+    var thing={name:"thing",
+               listen:[{name:"channel",action:function(){}}]};
+    
+    it("can subscribe to a channel",function(){
+        Apoco.IO.listen(thing);
+        
+        assert.strictEqual(Apoco.IO._subscribers.channel[0].context,thing);
+    });
+    it("can subscribe to another channel",function(){
+        thing.listen.push({name:"another",action:function(){}});
+        //Apoco.IO.unsubscribe(thing,"channel");
+        Apoco.IO.listen(thing,"another");
+        assert.strictEqual(Apoco.IO._subscribers.channel.length,1);
+        assert.strictEqual(Apoco.IO._subscribers.another.length,1);
+        
+    });
+    it("can unsubscribe to a channel",function(){
+        Apoco.IO.unsubscribe(thing,"channel");
+        assert.strictEqual(Apoco.IO._subscribers.channel,undefined);
+    });
+    it("can add a channel again",function(){
+        Apoco.IO.listen(thing,"channel");
+        assert.strictEqual(Apoco.IO._subscribers.channel.length,1);
+    });
+    it("can unsubscribe from all channels",function(){
+        Apoco.IO.unsubscribe(thing);
+        assert.strictEqual(Apoco.IO._subscribers.channel,undefined);
+        assert.strictEqual(Apoco.IO._subscribers.another,undefined);
+    });
+    
+    
+});

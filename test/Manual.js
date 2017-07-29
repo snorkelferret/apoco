@@ -22,7 +22,7 @@ var promise=require("selenium-webdriver/lib/promise");
 //global.jQuery = require('jquery');
 
 
-describe("Manual",function(){
+test.describe("Manual",function(){
 //    var $= global.jQuery;
     var driver;
     var tabs;
