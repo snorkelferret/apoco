@@ -629,6 +629,19 @@ describe("SelectField with start value",function(){
         assert.strictEqual(f.value,"four");
         assert.strictEqual("four",b);
     });
+    
+    it("can add objects array",function(){
+        var labels=[{label:"ten",value:10},{label:"eleven",value:11},{label:"twelve",value:12}];
+        for(var i=0;i<labels.length;i++){
+            f.addValue(labels[i]);
+            if(labels[i].value===10){
+                f.setValue(labels[i]);
+            }
+        }
+        var b=f.getValue();
+        assert.strictEqual(b,"10");
+    });
+    
 });
 
 

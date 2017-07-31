@@ -886,7 +886,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             
             // if selection option is "Other" add a new input field
             this.select.addEventListener("change",function(){
-	        console.log("select option has changed");
+	      //  console.log("select option has changed");
                 if(that.select.value === ""){      
 		    if(!that.input){ 
                         mk_input();
@@ -899,7 +899,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    });
         },
         setValue: function(v){
-            var value,name;
+            var value,name,b;
             if(Apoco.type["string"].check(v)){
                 name=v;
                 value=v;
@@ -910,15 +910,27 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 if(!name || !value){
                     throw new Error("select: setValue must have object with keys value and label");
                 }
+                
             }
             else{
                 throw new Error("select: setValue must be of type string or object");
             }
             for(var i=0;i<this.options.length;i++){
-                if(this.options[i] == name){
+              //  console.log("option is %j ", this.options[i]);
+             //   console.log( "name is " + name);
+                if(Apoco.type["object"].check(this.options[i])){
+                    b=this.options[i].value;
+                }
+                else{
+                    b=this.options[i];
+                }
+             //   console.log( "value is " + b );
+                if(b === value){
+                //    console.log("found value " + name);
                     this.select.value=value;
                     this.value=value;
                     return;
+                    
                 }
             }
             if(this.input){
@@ -926,7 +938,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.value=value;
                 return;
             }
-            throw new Error("SelectField: Cannot set value to " + v + " not it options list");
+            throw new Error("SelectField: Cannot set value to " + v + " not in options list");
            
         },
         addValue:function(v){
