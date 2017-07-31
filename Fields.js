@@ -837,8 +837,27 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             select_el.appendChild(o);
 	}
         this.select=select_el;
-     
-	var cd=function(that){
+        if(this.blank_option){   
+            this._mkBlankOption();
+        }
+
+	if(this.value){
+            //this.select.value=this.value;
+            this.setValue(this.value);
+	}
+        this.element.appendChild(this.select);
+        if(this.action){
+            this.action(this);
+        }
+	return this;
+    };
+
+
+    SelectField.prototype={
+        
+        _mkBlankOption:function(){
+            var that=this,o;
+            var cd=function(that){
 		return function(e){
 		    e.stopPropagation();
                     if(e.keyCode === 13){
@@ -855,50 +874,30 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		        }
                     }
 		};
-	}(this);
+	    }(this);
 
 
-        var mk_input=function(){
-            that.input=document.createElement("input");
-            that.input.setAttribute("type",that.html_type);
-            that.element.appendChild(that.input);
-            that.input.addEventListener("keypress",cd);
-        };
-
-        // if selection option is "Other" add a new input field
-        this.select.addEventListener("change",function(){
-	    console.log("select option has changed");
-            if(that.select.value === ""){      
-		if(!that.input){ 
-                    mk_input();
-                }
-                that.select.style.visibility="hidden";
-	        that.input.style.visibility="visible";
-	        that.input.focus();
-	    }
-	    else if(that.edit_func){ //set for editor callback
-		var v=that.getValue();
-		that.value=v;
-		if(that.edit_func.context){
-		    that.edit_func.cmd.call(that.edit_func.context,v);
-		}
-		else that.edit_func(v);
-	    }
-
-	});
-
-	if(this.value){
-            this.select.value=this.value;
-	}
-        this.element.appendChild(this.select);
-        if(this.action){
-            this.action(this);
-        }
-	return this;
-    };
-
-
-    SelectField.prototype={
+            var mk_input=function(){
+                that.input=document.createElement("input");
+                that.input.setAttribute("type",that.html_type);
+                that.element.appendChild(that.input);
+                that.input.addEventListener("keypress",cd);
+            };
+            
+            // if selection option is "Other" add a new input field
+            this.select.addEventListener("change",function(){
+	        console.log("select option has changed");
+                if(that.select.value === ""){      
+		    if(!that.input){ 
+                        mk_input();
+                    }
+                    that.select.style.visibility="hidden";
+	            that.input.style.visibility="visible";
+	            that.input.focus();
+	        }
+                
+	    });
+        },
         setValue: function(v){
             var value,name;
             if(Apoco.type["string"].check(v)){
@@ -927,7 +926,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.value=value;
                 return;
             }
-            throw new Error("SelectField: Cannot set value to " + v );
+            throw new Error("SelectField: Cannot set value to " + v + " not it options list");
            
         },
         addValue:function(v){
@@ -1068,6 +1067,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                         for(var i=0;i<b.length;i++){
                             if(b[i] !== e.target){
                                 b[i].checked=false;
+                                b[i].parentNode.classList.remove("checked");
+                            }
+                            else{
+                                b[i].parentNode.classList.add("checked");
                             }
                         }
                         //(e.target.checked==false)?e.target.checked=true: e.target.checked=false;
@@ -1123,6 +1126,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             for(var i=0;i<value.length;i++){
                 this.value[i]=value[i];
                 this.input[i].input.checked =value[i];
+               (value[i]===true)?this.input[i].input.parentNode.classList.add("checked"):this.input[i].input.parentNode.classList.remove("checked");
             }
         },
 	deleteValue:function(label){

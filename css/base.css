@@ -297,7 +297,7 @@ text-align: left;  padding: 0em 0em .5em 0em}
 
 h5{color: #202020; font-size: 12pt}
 
-dd{word-wrap: break-word}
+dd{word-wrap: break-word; padding-left: 1em;}
 
 button{margin: 0.5em}
 

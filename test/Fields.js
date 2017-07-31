@@ -596,17 +596,41 @@ describe("SelectField",function(){
         var b=f.getValue();
         assert.strictEqual(b,"77");
     });
- /*   it("has a clearValue method which sets the value to null",function(){
-        f.clearValue();
-        assert.strictEqual(f.getValue(),"three");
-    });*/
+
     it("knows the value has been changed by setValue",function(){
         f.setValue("two");
         assert.strictEqual(f.valueChanged(),false);
     });
- 
+  
     
 });
+
+describe("SelectField with start value",function(){
+  
+    require("../Fields.js");
+
+    var f=Apoco.field["select"]({name:"selectAgain",type: "string",value:"four",options:["","four"]});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+
+    it("can add some values to a degenerate array",function(){
+        var labels=["one","two","three"];
+        for(var i=0;i<labels.length;i++){
+            f.addValue({label:labels[i],value:labels[i]});
+        }
+        var e=document.getElementsByName("selectAgain")[0].getElementsByTagName("option");
+        assert.strictEqual(e.length,5);
+    });
+    it("the value is still set after adding values",function(){
+        var b=f.getValue();
+        assert.strictEqual(f.value,"four");
+        assert.strictEqual("four",b);
+    });
+});
+
 
 describe("ButtonSetField",function(){
   

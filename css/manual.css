@@ -6,7 +6,9 @@ header .navbar-default{background-color: #223344;}
 .apoco_slideshow div.pic_area div{bottom: -4em}
 button{padding: 0 1em}
 /*#Head{background: url("images/apoco01.png") no-repeat; width: 300px; height: 140px}*/
-#logo{background: url("images/apoco01.png") no-repeat; width: 300px; height: 140px}
+#logo{background: url("images/apoco01.png") no-repeat;
+      width: 300px; height: 140px;padding: 0;
+      border:none;}
 #Tabs ul{background-color:#fff; z-index: 100; }
 
 
