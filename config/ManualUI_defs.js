@@ -1556,18 +1556,32 @@ var UI={};
                          des: "unsubscibe from all messages defined in object.listen, or if name is given stop listening for name"
                         },
             webSocket:{code: "<code>var s=Apoco.IO.webSocket(settings);</code>",
-                       items:[{label:"settings",descriptions:["key value object","<code>var settings={url:'.',<br>" + mk_spaces(7) + "errorCallback:function(event){console.log('got error')},<br>" + mk_spaces(7) + "closeCallback:function(event){console.log('got close');}};<br><code> ","url defaults to UI.url if it exists","if no errorCallback function- defaults to throwing an Error","any other settings in options will be passed to the webSocket"]},
+                       items:[{label:"settings",descriptions:["key value object","<code>var settings={url:'.',<br>" + mk_spaces(7) + "errorCallback:function(event){console.log('got error')},<br>" + mk_spaces(7) + "closeCallback:function(event){console.log('got close');},<br> " + mk_spaces(7) + "reconectMax: integer//(default- 6) };<br><code> ","url defaults to UI.url if it exists","if no errorCallback function- defaults to throwing an Error","any other settings in options will be passed to the webSocket"]},
                              ],
                        ret: "object",
                        des: "sends and receives messages, received messages are sent with IO.dispatch",
                     /*   cmd: " var s=Apoco.IO.webSocket({url:'/data/websocket'}); <br> s.send(['logon',{user: 'fred',password: 'flinstone'}]); ", */
                        methods:[{label: "send",descriptions:["<code>s.send(data); </code>","where data is a key value object that can ne converted to json"]},
-                                {label: "init",descriptions:["<code> s.init(data); </code>","called automatically when object is created"]},
-                                {label: "setToNull",descriptions:["<code> s.setToNull();","set the websocket to null"]},
+                                {label: "init",descriptions:["<code> s.init(); </code>","called automatically when object is created"]},
+                                {label:"reconnect",description:["<code> s.reconnect(successFunc,failFunc)"]},
+                                {label:"setToNull",descriptions:["<code> s.setToNull();","set the websocket to null"]},
                                 {label:"getSocket",descriptions:["<code>var p=s.getSocket();</code>","return the websoxket"]},
                                 {label: "cork",descriptions:["<code> s.cork(true);</code>","true: buffer incoming the messages ","<code>s.cork(false);</code>","dispatch the messages in the buffer (if any)"]},
                                 {label: "close",descriptions:["<code>s.close();<code>","close the websocket"]}
-                               ]},
+                               ],
+                       example: `<code>var opts={<br>
+                                    &nbsp  &nbsp errorCallback:function(error){ // try to restart<br>
+                                    &nbsp  &nbsp  console.log("Got error from websocket" + error);<br>
+                                    &nbsp &nbsp  if(error.code === 1006){ //abnormal termination<br>
+                                    &nbsp  &nbsp console.log("error code is 1006");<br>
+                                    &nbsp  &nbsp  UI.socket.reconnect(function(){UI.socket.send(["reconnect",{token:UI.session.authToken}]);},logOut);<br>
+                                 }<br>
+                                },<br>
+                                   closeCallback:function(e){<br>
+                                  &nbsp   &nbsp  Apoco.IO.dispatch("websocketClose");<br>
+                                }<br>
+                              };<br>`
+                      },
             getFiles:{ code:"<code> Apoco.IO.getFiles(file_array,object);<code>",
                        items:[{label:"file_array",
                                description:"an array of files - typically returned by event.dataTransfer.files or event.target.files etc "},
@@ -1626,6 +1640,10 @@ var UI={};
                     globalEval(f.getValue());
                 }});
 
+            }
+            if(items[HIO[i]].example){
+                k.components.push({node:"heading",size:"h5",text:"Example"});
+                k.components.push({node: "paragraph",text: items[HIO[i]].example});
             }
             UI.Panels.IO.components.push(k);
         }

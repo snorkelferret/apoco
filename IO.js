@@ -265,6 +265,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
     var _webSocket=function(options,data){
         var that=this,defaults={url: "."};
+        this.retry_attempts=0;
         this.buffer=[];
         this.socket=null;
         
@@ -276,51 +277,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         for(var k in options){
             this.settings[k]=options[k];
         }
+        if(!this.settings["reconnectMax"]){
+            this.settings.reconnectMax=6;
+        }
         that.init();
         
-        this.socket.onerror=function(e){
-            if(that.settings.errorCallback){
-                that.settings.errorCallback(e);
-            }
-            else{
-                Apoco.popup.error("webSocket","Received an error msg");
-            }
-        };
-        this.socket.onclose=function(e){
-            this.socket=null;
-            if(e.code !== 1000){ // normal termination
-                if(that.settings.errorCallback){
-                    that.settings.errorCallback(e);
-                }
-                else{
-                    throw new Error("webSocket abnormal termination Exiting with code" + e.code);
-                }
-            }
-            if(that.settings.closeCallback){
-                that.settings.closeCallback(e);
-            }
-        };
-        this.socket.onmessage=function(e){
-            if(!e.data){
-                throw new Error("webSocket: no data or name from server");
-            }
-            var d=JSON.parse(e.data);
-        //    console.log("Websocket: got: %j %j",d[0],d[1]);
-            if(d[0] === "error"){
-                throw new Error("socker on messagr got error " + JSON.stringify(d[0]));
-            }
-            if(that.corking){
-               // console.log("corking data %j",d);
-                that.buffer.push(d);
-            }
-            else{
-                Apoco.IO.dispatch(d[0],d[1]);
-            }
-        };
+      
     };
     
     _webSocket.prototype={
-        init:function(data){
+        init:function(){
             var that=this;
             //console.log("webSocket -init: settings %j",that.settings);
             if(!that.socket){
@@ -332,7 +298,53 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
                 
                 try{
+                  //  console.log("that .settings is %j",that.settings);
                     that.socket=new WebSocket(a + "//" + window.location.host + that.settings.url);
+                    this.socket.onopen=function(e){
+                      //  console.log("onopen event");
+                    };
+                    this.socket.onerror=function(e){
+                      //  console.log("onerror event");
+                        if(that.settings.errorCallback){
+                            that.settings.errorCallback(e);
+                        }
+                        else{
+                            Apoco.popup.error("webSocket","Received an error msg");
+                        }
+                    };
+                    this.socket.onclose=function(e){
+                     //   console.log("onclose event");
+                        this.socket=null;
+                        if(e.code !== 1000){ // normal termination
+                            if(that.settings.errorCallback){
+                                that.settings.errorCallback(e);
+                            }
+                            else{
+                                throw new Error("webSocket abnormal termination Exiting with code" + e.code);
+                            }
+                        }
+                        if(that.settings.closeCallback){
+                            that.settings.closeCallback(e);
+                        }
+                    };
+                    this.socket.onmessage=function(e){
+                       // console.log("onmessage event");
+                        if(!e.data){
+                            throw new Error("webSocket: no data or name from server");
+                        }
+                        var d=JSON.parse(e.data);
+                        //    console.log("Websocket: got: %j %j",d[0],d[1]);
+                        if(d[0] === "error"){
+                            throw new Error("socket on message got error " + JSON.stringify(d[0]));
+                        }
+                        if(that.corking){
+                            // console.log("corking data %j",d);
+                            that.buffer.push(d);
+                        }
+                        else{
+                            Apoco.IO.dispatch(d[0],d[1]);
+                        }
+                    };
                         /*  that.socket.onopen = function (e) {}; */
                 }
                 catch(err){
@@ -340,8 +352,47 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
 	    }
         },
+        reconnect:function(succ_func,fail_func){
+            var that=this;
+
+            //console.log("*********************8 start recoonnect socket is  " + that.socket + " retry attempt " + that.retry_attempts);
+          
+            if(that.socket && that.socket.readyState !== 1){
+                that.socket.close();
+                that.socket=null;
+              //  console.log("socket was set to closed and set to null");
+              
+            }
+            else{
+                that.retry_attempts=0;
+                if(succ_func){
+                    succ_func();
+                }
+                return;
+            }
+           // var t=Apoco.Panel.get("TabPanel").getChild("Tabs").getChild("LogOut");   
+            if(that.retry_attempts > that.settings.reconnectMax){
+              //  console.log("Can't reconnect");
+                that.socket=null;
+                // logOut(t,"error");
+                if(fail_func){
+                    fail_func();
+                }
+                return;
+            }
+        
+            that.retry_attempts++;
+            window.setTimeout(function(){
+               // console.log("before init: reconnect count is " + that.retry_attempts + " that.settings is %j " ,that.settings);
+                that.init();
+               // console.log(" iN timeout trying to open socket ready state is " + that.socket.readyState);
+            },that.retry_attempts*1000);
+                                
+        },
         close:function(){
-            this.socket.close();
+            if(this.socket){
+                this.socket.close();
+            }
         },
         send:function(data){
             var that=this;
