@@ -307,7 +307,12 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         var b=document.getElementById("rowEditPopup");
         assert.strictEqual(document.contains(b),true);
     });
-
+   it("can delete itself",function(){
+        var b=document.getElementById("test_grid");
+        t.delete();
+        assert.strictEqual(document.body.contains(b),false);
+        
+    });
     
     
 });

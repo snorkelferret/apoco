@@ -190,6 +190,7 @@ var UI={};
                          editable:{type:"boolean",default:true,descriptions:["If false user input is disabled"]},
                          label:{type: "string",default: undefined,descriptions:["added next to the input field"]},
                          title:{type: "string",default: undefined,descriptions:["add a tooltip"]},
+                         class:{type:"string or stringArray",default:undefined,descriptions:["add a class or classes to the field"] },
                          hidden:{type:"boolean",default: false,descriptions:["set the element display to none or unset"]}
                         },
                 IO:{
@@ -1056,7 +1057,7 @@ var UI={};
                 opts[HNodes[i]].options.items=[];
             }
             var common_options=[{label:"id",descriptions:["type: string ", "Add an id"]},
-                                {label:"class",descriptions:["type: string","add a class to the node"]},
+                                {label:"class",descriptions:["type: string or stringArray","add a class or classes to the node"]},
                                 {label:"name",descriptions:["type: string","add a name attribute to the node"]},
                                 {lanel:"hidden",descriptions:["type: boolean","set the element display to none or unset"]}
                                ];
@@ -1132,12 +1133,14 @@ var UI={};
                       options:[{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}]
                      },
             form:{required:[{label:"components",descriptions:[ "An array of nodes and/or field objects","example",
-                                                               "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>"]}],
+                                                               "<code>components: [{node:'heading',size:'h4',text:'heading'},{field:'float',name:'some_name',value:10.0}}]</code>","If the component has 'submit:true', creates an imput of type submit to use with onSubmit (see below) "]}],
                   options:[{label:"buttons",descriptions:["an array of button objects","example","<code> buttons: [{name: 'string',text:'string',action: function(that){ //some code }}]</code>"]},{label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
                            {label:"draggable",descriptions:["type: boolean","default: false","if true the form is detached and can be dragged around the browser window - adds a close button top right"]},
                            {label:"attr",descriptions:["object array of attributes to add to the form"]},
-                           {label:"onSubmit",descriptions:["function to call"]},
-                           {label: "label",description: "type: string"}]},
+                        
+                           {label:"onSubmit",descriptions:["function to call","used with component which has 'submit:true'","<code> {submit:true,name:'loginButton',value:'Login',class:'login'}</code>"]},
+                           {label: "label",description: "type: string"}]
+                 },
             grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type or the field may be specified directly","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1},{field:'select',title; 'Pick one',name:'choose',options:['one','two','three']}]<code>","options are the same as for the fields with the addition of the title option - which is the text displayed in the head - defaults to name"]},
                             {label:"rows",descriptions:["type:objectArray","if the cols were defined as above then the rows would be","<code> rows:[{colname1:'some_string',colname2:23.53,choose:'one'},{colname1:'another_string',colname2:34.66,choose:'three'}]"]}],
                   options:[
@@ -1228,6 +1231,7 @@ var UI={};
                                                           {label:"dependsOn",descriptions:["type: string","id of the node that needs to be created before the action function is run","example","<code> dependsOn:'nodeId'"]},
                                                           {label:"publish",descriptions:["type: objectArray","example","<code>publish:[{name:'some_name',action:function(that,name){ var data=that.myGetData(); <br> Apoco.dispatch(name,data)}}]</code>"]},
                                                           {label:"listen",descriptions:["type: objectArray","example","<code>listen:[{name:'some_name',action:function(that,data){//do something}}]<code>"]},
+                                                          {label:"class",descriptions:["type: string or string array<br> Add a class(es) to root element"]},
                                                           {label:"after",descriptions:["type: string","where the string is the id of an element that the new elemnent will be displayed after"]}]},
                           {node:"descriptionList",items:stuff[HDisplays[i]].options},
                           {node: "heading",size:'h4',text:"live Demo"},
@@ -1522,16 +1526,23 @@ var UI={};
             dispatch:{code: "<code>Apoco.IO.dispatch(name,data);</code>",
                       items:[{label:"name",descriptions:["string","event identifier (matches listen)"]},
                              {label:"data",descriptions:["any data type","data to be sent to listeners"]}],
-                      cmd:"Apoco.IO.dispatch('mySignal','hullo'); // go to listen page to see results",
+                      cmd:"var v=Apoco.IO.dispatch('mySignal','hullo'); // go to listen page to see results",
                       ret: "none",
                       des:""
                      },
             listen:{code: "<code>Apoco.IO.listen(object,[name]);</code>",
                     items:[{label:"object",descriptions:["object contains and Array of key value Objects called listen","If name is given only listens for that channel","e.g <br> <code>var object={listen:[{name:'some_name',<br>" + mk_spaces(11)+ "action:my_func(that,data){ <br> " + mk_spaces(14) + "alert('got data' + data);<br> "+ mk_spaces(14)+ "}<br>"+ mk_spaces(13) + "}<br> " + mk_spaces(11) + "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object"]}],
-                    cmd: "Apoco.Panel.get('IO').getChild('listenMethods').addChild({field:'input',editable: false,type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addChild({node:'paragraph',text: data});  }}]});  // press go to initialise",
+                    cmd: "var v=Apoco.Panel.get('IO').getChild('listenMethods').addChild({field:'input',editable: false,type: 'string',name:'test_listen',value: 'listener initialised',listen:[{name:'mySignal',action:function(that,data){ that.parent.addChild({node:'paragraph',text: data});  }}]});  // press go to initialise",
                     ret:"none",
                     des: "Listens for messages sent by publish,websocket or dispatch methods"
                    },
+            getSubscribers:{ code:"<code>Apoco.IO.getSubscribers(name); </code>",
+                             items:[{label:"name",descriptions:["type:string","where name is has been subscribed to be adding a listener "]}],
+                             cmd:"var v=Apoco.IO.getSubscribers('mySignal')",
+                             ret:"objectArray",
+                             des:"Array of the context objects of the subscribers "
+                
+            },
             publish:{code: "<code>Apoco.IO.publish(object);</code>",
                      items:[{label:"object",descriptions:["object contains and Array of key value Objects called publish",
                                                           "e.g <br> <code>var object={publish:[{name:'some_name',<br>" + mk_spaces(11) +
@@ -1545,13 +1556,13 @@ var UI={};
                                                           "data:'Hello from another_name' <br>" + mk_spaces(11) +  "}" + mk_spaces(8) +
                                                           "<br>" + mk_spaces(11) + 
                                                           "// add another here <br> "+ mk_spaces(11)+ "] <br> "+ mk_spaces(6) + "};</code>","Note: 'that' in my_func is a reference to the calling object","Typically the action function is used when an eventListener needs to be added to the calling element, see example below","Otherwise calling publish with name and data is just polyfill for Apoco.IO.dispatch(name,some_data)"]}],
-                     cmd: "Apoco.IO.publish({publish:[{name:'mySignal',action:function(that,name){ var t=Apoco.Panel.get('IO').getChild('publishMethods'); t.element.addEventListener('click',function(e){ Apoco.IO.dispatch(name,'hullo from publish');},false); }}]}); // press Go to initialise, and then click anywhere in the panel to send data- the data will be caught on the listen page",
+                     cmd: "var v=Apoco.IO.publish({publish:[{name:'mySignal',action:function(that,name){ var t=Apoco.Panel.get('IO').getChild('publishMethods'); t.element.addEventListener('click',function(e){ Apoco.IO.dispatch(name,'hullo from publish');},false); }}]}); // press Go to initialise, and then click anywhere in the panel to send data- the data will be caught on the listen page",
                      ret: "none",
                      des:""
                     },
             unsubscribe:{code: "<code>Apoco.IO.unsubscribe(object,[name]);</code>",
                          items:[{label:"object",descriptions:[""]}],
-                         cmd:"var t=Apoco.Panel.get('IO').getChild('listenMethods').getField('test_listen'); Apoco.IO.unsubscribe(t);",
+                         cmd:"var v=Apoco.Panel.get('IO').getChild('listenMethods').getChild('test_listen'); Apoco.IO.unsubscribe(v);",
                          ret: "null on error, or undefined on success",
                          des: "unsubscibe from all messages defined in object.listen, or if name is given stop listening for name"
                         },
@@ -1591,7 +1602,7 @@ var UI={};
                                
                               
                        ]
-            },
+                     },
             dropZone:{code:"<code>Apoco.IO.dropZone(element,[opts]) </code>",
                    
                       items:[{label:"element",description:"any html element"},
@@ -1610,7 +1621,7 @@ var UI={};
                      }
         };
         for(var i=0;i<HIO.length;i++){
-           // console.log("making io panel",HIO[i]);
+            //console.log("making io panel",HIO[i]);
             var k={};
             k.display="fieldset";
             k.DOM="right";
@@ -1638,8 +1649,20 @@ var UI={};
                         throw new Error("can't get input params");
                     }
                     globalEval(f.getValue());
+                    var p=that.parent.getChild("Result");
+                   
+                    if(p){
+                        try{
+                            p.setText(JSON.stringify(v));
+                        }
+                        catch(e){
+                            p.setText(v);
+                      
+                        }
+                    }
                 }});
-
+                k.components.push({node: "paragraph",text:"Result"});
+                k.components.push({node:"paragraph",text:"",name:"Result"});
             }
             if(items[HIO[i]].example){
                 k.components.push({node:"heading",size:"h5",text:"Example"});
@@ -1652,18 +1675,18 @@ var UI={};
     var mkWindows=function(){
         var W=HThings["Windows"];
         var items={
-            close: {cmd:"Apoco.Window.close('TestWindow');",
+            close: {cmd:"var v=Apoco.Window.close('TestWindow');",
                     params:[{label:"win",descriptions:["string - window name","or","object- windowObject"
                                                       ]}],
                     description:"close the window- don't delete the panels it may contain",
                     ret:[{label:"none",description:""}]
                    },
-            deleteAll:{cmd:"Apoco.Window.closeAll();",
+            deleteAll:{cmd:"var v=Apoco.Window.closeAll();",
                        params:[{label:"none",description:"return none"}],
                        description:"",
                        ret:[{label:"none",description:""}]
                      },
-            delete:{cmd: "Apoco.Window.delete('TestWindow');",
+            delete:{cmd: "var v=Apoco.Window.delete('TestWindow');",
                     params:[{label:"win",descriptions:["string - window name","or","object - windowObject"
                                                      ]}],
                     description:"close the window and delete all the contents",
@@ -1706,14 +1729,15 @@ var UI={};
                               }
                               globalEval(f.getValue());
                               var p=that.parent.getChild("Result");
-                              try{
-                                   p.setText(JSON.stringify(v));
-                               }
-                               catch(e){
-                                   console.log("methods doit got %j", v);
-                                   p.setText(v);
-                               }
-
+                              if(p){
+                                  try{
+                                      p.setText(JSON.stringify(v));
+                                  }
+                                  catch(e){
+                                    //  console.log("methods doit got %j", v);
+                                      p.setText(v);
+                                  }
+                              }
                           }},
                           {node: "paragraph",text:"Result"},
                           {node:"paragraph",text:"",name:"Result"}

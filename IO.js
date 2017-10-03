@@ -61,6 +61,17 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
             }
         },
+        getSubscribers:function(name){
+            var p=[];
+            if(name && this._subscribers[name]){
+                for(var i=0; i<this._subscribers[name].length; i++){
+                  //  console.log("name is " + name + " i is " + i);
+                   // console.log("subscriber is %j ",this._subscribers[name][i]);
+                    p.push(this._subscribers[name][i].context);
+                }
+            }
+            return p;
+        },
         unsubscribe:function(that,name){ //pubsub
 	    // var names=[];
             var n;
@@ -309,7 +320,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                             that.settings.errorCallback(e);
                         }
                         else{
-                            Apoco.popup.error("webSocket","Received an error msg");
+                            Apoco.popup.error("webSocket","Received an error msg %j" ,e);
                         }
                     };
                     this.socket.onclose=function(e){

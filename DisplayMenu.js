@@ -56,7 +56,7 @@ require("./DisplayBase");
                 this.select(this.selected);
             }
             else{
-	        this.selected=undefined;
+	        this.selected=null;
             }
            // this.components.length=0; // for garbage collection
 	},
@@ -123,6 +123,7 @@ require("./DisplayBase");
                // this.components[index]=d;
                 if(d.action === "default"){
                     d.action=select_menu;
+                   
                 }
                 if(d.action !==undefined){
                     //console.log("menu has action " + this.components[index].action);

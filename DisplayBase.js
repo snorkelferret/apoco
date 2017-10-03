@@ -9,7 +9,7 @@ require("./Fields");
   
     Apoco.display={};  //setup container for display Objects
     
-    var dp;
+   
     Apoco._DisplayBase=function(options,win){
 	var defaults={
 	    parent: null,
@@ -38,40 +38,29 @@ require("./Fields");
             throw new Error(this.display + ": Must supply a unique id string");
         }
     
-        if(win){
+        if(!win){
+            win=window; // set to default window
+        }
           //  console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
           //  console.log("adding to DOM " + this.DOM);
-	    this.DOM=win.document.getElementById(this.DOM);
-            t=win.document.getElementById(this.id);
-            if(this.dependsOn){
-                dp=win.document.getElementById(this.dependsOn);
-            }
+	this.DOM=win.document.getElementById(this.DOM);
+        t=win.document.getElementById(this.id);
+        if(this.dependsOn){
+            dp=win.document.getElementById(this.dependsOn);
         }
-        else{
-            t=document.getElementById(this.id); 
-	    this.DOM=document.getElementById(this.DOM);
-            if(this.dependsOn){
-                dp=document.getElementById(this.dependsOn);
-            }
-            // console.log("hpy  %j" , this.DOM);
-            //console.log("length is " + this.DOM.length);
-        }
-	if(!this.DOM){
+        
+        if(!this.DOM){
 	    throw new Error("_ApocoDisplayBase DOM element does not exist " + this.DOM);
 	}
 
 	if(t){
-	   t.parentNode.removeChild(t);
+	    t.parentNode.removeChild(t); //remove from DOM but can be reinserted
+            this.element=t;
 	}
-
-        var doit=function(context){
-           // console.log("DOIT IS HERE");
-            if(context.action){
-	 	context.action(context);
-	    }
-        };
-        this.element=document.createElement("div");
-        this.element.id=this.id;
+        else{
+            this.element=document.createElement("div");
+            this.element.id=this.id;
+        }
         
         this.element.classList.add("apoco_"+this.display);  
         if(this.class){
@@ -85,9 +74,15 @@ require("./Fields");
             }
         }
         
-        // if the execution depends on another node
+        var doit=function(context){
+           // console.log("DOIT IS HERE");
+            if(context.action){
+	 	context.action(context);
+	    }
+        };
+         // if the execution depends on another node
         if(this.action){
-            if( !this.dependsOn){
+            if( !this.dependsOn || dp){
                 this.action(this);
             }
             else if(!dp){ //element not already in DOM
@@ -101,7 +96,6 @@ require("./Fields");
                 Apoco.Observer.observe(b,{childList:true,subtree:true,attributes:true,attributeFilter:["id"]});
                 Apoco.Utils.observer.add(this.dependsOn, doit,this);
             }
-            // else the action is added to the show function below
         }
   
         

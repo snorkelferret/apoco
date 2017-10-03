@@ -70,7 +70,11 @@ describe("DisplayForm-(start without fields)",function(){
         var b=t.getElement().querySelector("p[name='Blah']");
         assert.strictEqual(document.contains(b),false);
     });
-    
+    it("can delete itself",function(){
+        var b=document.getElementById("test_form");
+        t.delete();
+        assert.strictEqual(document.contains(b),false);
+    });
     
 });
 
@@ -82,7 +86,7 @@ describe("DisplayForm",function(){
         b.id="test";
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.contains(b),true);
-        t=Apoco.display.form({id:"test_form",DOM:"test",
+        t=Apoco.display.form({id:"test_form2",DOM:"test",
                                components:[{node:"heading",size:"h2",text:"Start"},
                                            {node:"paragraph",text:"hullo people"},
                                            {type: "integer",value: 10,name:"ID"}
@@ -104,15 +108,15 @@ describe("DisplayForm",function(){
         assert.strictEqual(t.getChildren().length,5);
     });
     it("has a show method which adds the root element to the DOM",function(){
-        var b=document.getElementById("test_form");
+        var b=document.getElementById("test_form2");
         assert.strictEqual(document.contains(b),false);
         t.show();
-        b=document.getElementById("test_form");
+        b=document.getElementById("test_form2");
         assert.strictEqual(document.contains(b),true);
     });
     it("has put the fields in the dom ",function(){
         //console.log("form added " + $("#test_form").html() );
-        var b=document.getElementById("test_form").getElementsByTagName("li");
+        var b=document.getElementById("test_form2").getElementsByTagName("li");
         assert.strictEqual(b.length,5);
     });
     it("can add another node",function(){
@@ -121,14 +125,14 @@ describe("DisplayForm",function(){
         assert.strictEqual(t.getChildren().length,6);
     });
     it("has added the paragraph node to the dom",function(){
-        var b=document.getElementById("test_form").querySelector("p[name='Blah']");
+        var b=document.getElementById("test_form2").querySelector("p[name='Blah']");
         assert.strictEqual(document.body.contains(b),true);
     });
     it("can delete a node",function(){
         assert.strictEqual(t.getChildren().length,6);
         t.deleteChild("Blah");
         assert.strictEqual(t.getChildren().length,5);
-        var b=document.getElementById("test_form").querySelector("p[name='Blah']");
+        var b=document.getElementById("test_form2").querySelector("p[name='Blah']");
         assert.strictEqual(document.body.contains(b),false);
     
     });
@@ -136,12 +140,12 @@ describe("DisplayForm",function(){
         assert.strictEqual(t.getButton().length,1);
     });
     it("has added the buttons to the DOM",function(){
-        var b=document.getElementById("test_form").getElementsByTagName("button");
+        var b=document.getElementById("test_form2").getElementsByTagName("button");
         assert.strictEqual(b.length,1);
     });
     it("has added a callback to the button",function(){
         assert.strictEqual(t.getChild("ID").getValue(),"10");
-        var b=document.getElementById("test_form").querySelector("button[name='OK']");
+        var b=document.getElementById("test_form2").querySelector("button[name='OK']");
         b.click();
         assert.strictEqual(t.getChild("ID").getValue(),"342");
     });
