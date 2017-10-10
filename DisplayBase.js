@@ -54,13 +54,14 @@ require("./Fields");
 	}
 
 	if(t){
-	    t.parentNode.removeChild(t); //remove from DOM but can be reinserted
-            this.element=t;
+         //   console.log();
+	    t.parentNode.removeChild(t); //remove from DOM 
+           // this.element=t;
 	}
-        else{
-            this.element=document.createElement("div");
-            this.element.id=this.id;
-        }
+        //else{
+        this.element=document.createElement("div");
+        this.element.id=this.id;
+       // }
         
         this.element.classList.add("apoco_"+this.display);  
         if(this.class){
@@ -296,7 +297,8 @@ require("./Fields");
                     //    console.log("DisplayBase.delete: deleting this.element");
                         this.element.parentNode.removeChild(this.element);  //removes events and data as well
                     }
-                    this.element=null;  
+                    this.element=null;
+                    
                 }
 	        else{
                     console.log("this element should not be null " + this.id);

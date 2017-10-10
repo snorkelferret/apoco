@@ -60,6 +60,9 @@ require("./Types.js");
 	getElement: function(){
 	    return this.element;
 	},
+        getParent:function(){
+            return this.parent;  
+        },
 	setText: function(text){
             switch(this.node){
             case "heading":
@@ -172,7 +175,12 @@ require("./Types.js");
             }
 	},
         list: function(that){
-	    that.element=document.createElement("ul");
+            if(that.ordered === true){
+                that.element=document.createElement("ol");
+            }
+            else{
+	        that.element=document.createElement("ul");
+            }
             that.element.classList.add("list");
 	    for(var i=0;i<that.list.length;i++){
                 var l=that.list[i];

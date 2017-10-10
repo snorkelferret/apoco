@@ -26,9 +26,9 @@ require("./Nodes.js");
 	    var el,p,that=this;
             //            console.log("length of components is " + this.components.length);
             for(var i=0;i<this.components.length;i++){
-              //  console.log("++++ adding child +++++ " + i);
+                //  console.log("++++ adding child +++++ " + i);
                 el=document.createElement("div");
-               // el.classList.add("fieldset_child");
+                // el.classList.add("fieldset_child");
   	        this.addChild(i,el);
             }
            // console.log("length of components is NOW " + this.components.length);
@@ -67,7 +67,7 @@ require("./Nodes.js");
             if(!parent_element){
                 parent_element=this.element;
             }
-            
+            d.parent=this; // add here to avoid timing issues
             if(d.node){
                  n=Apoco.node(d,el);
             }
@@ -86,7 +86,7 @@ require("./Nodes.js");
                 throw new Error("Apoco.displayFieldset: meed to specify node type or field");
             }
             if(n){
-                n.parent=this;
+//                n.parent=this;
                 p=n.element.parentNode; //this is for node entries which use the el parm as a parent not the root this.element like fields
                 if(p){
                     parent_element.appendChild(p);
@@ -108,7 +108,8 @@ require("./Nodes.js");
              //   console.log("this field required is " + this.components[i].required);
                 if(this.components[i].field){
                     if(this.components[i].required){
-                       // console.log("return from checkValue is " + this.components[i].checkValue() );
+                      //  console.log("name getJSON is " + this.components[i].name);
+                     //   console.log("return from checkValue is " + this.components[i].checkValue() );
                         if(this.components[i].checkValue() !== true){
                             return null;
                         }

@@ -393,5 +393,14 @@ describe("DisplayGrid-(start with data but no subgrids and no unique key)",funct
         assert.isObject(b);
         assert.strictEqual(b["one"].value,22);
     });
+    it("can delete itsef",function(){
+        var b=document.getElementById("test_grid");
+        var c=document.getElementsByClassName("head");
+        t.delete();
+        assert.strictEqual(document.body.contains(b),false);
+        assert.strictEqual(c.length,0);
+        //assert.strictEqual(document.body.contains(b),false);
+        
+    });
     
 });

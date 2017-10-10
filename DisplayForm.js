@@ -55,12 +55,14 @@ require("./DisplayFieldset");
           //  console.log("parent is " + that.parent.name);
             if(this.onSubmit){
                 //  container.setAttribute("onSubmit",'return function(){that.onSubmit(this); return false;}'
-               
-                container.addEventListener("submit",function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    that.onSubmit(e);
-                });
+                container.addEventListener("submit",(function(self){
+                    return  function(e){
+                       // console.log("self is ", self);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        that.onSubmit(e,self);
+                    };
+                })(this),false);
                // container.setAttribute("onSubmit",`return false`);
             }
             if(this.attr && Apoco.type["objectArray"].check(this.attr)){

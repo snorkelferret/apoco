@@ -961,7 +961,40 @@ jsonishData={
             this.hideGrid(grid);
         },
         deleteChildren:function(){
-            this.deleteAll();
+            var el,row;
+            if(this.grids){
+                for(var i=0;i<this.grids.length;i++){
+                    for(var j=0;j<this.grids[i].rows.length;j++){
+                        row=this.grids[i].rows[j];
+                        for(var k=0;k<this.cols.length;k++){
+                            el=row[this.cols[k].name].element;
+                        //    console.log("el is " + el);
+                        //    console.log("cell is " + j + " " + k);
+                            if(el && el.parentNode){
+                                el.parentNode.removeChild(el);
+                            }
+                        }
+                    }
+                    this.grids[i].rows.length=0;
+                    this.grids[i].element.parentNode.removeChild(this.grids[i].element);
+                }
+ 
+            }
+            if(this.colElement){
+                for(var i=0;i<this.cols.length;i++){
+                    if(this.cols[i].element){ // some elements are hidden so not in DOM
+                        this.colElement.removeChild(this.cols[i].element);
+                    }
+                 //   else{
+                 //       console.log("no column at " + i);
+                 //   }
+                }
+                if(this.colElement.parentNode){
+                    this.colElement.parentNode.removeChild(this.colElement);
+                }
+            }
+            this.cols.length=0;
+            this.grids.length=0;
         },
         hideCol:function(name,state){
             var b,current_state=false;
@@ -1000,26 +1033,8 @@ jsonishData={
             }
         },
 	deleteAll:function(){
-            var el,row;
-            if(this.grids){
-                for(var i=0;i<this.grids.length;i++){
-                    for(var j=0;j<this.grids[i].rows.length;j++){
-                        row=this.grids[i].rows[j];
-                        for(var k=0;k<this.cols.length;k++){
-                            el=row[this.cols[k].name].element;
-                        //    console.log("el is " + el);
-                        //    console.log("cell is " + j + " " + k);
-                            if(el && el.parentNode){
-                                el.parentNode.removeChild(el);
-                            }
-                        }
-                    }
-                    this.grids[i].rows.length=0;
-                    this.grids[i].element.parentNode.removeChild(this.grids[i].element);
-                }
-                this.cols.length=0;
-                this.grids.length=0;
-            }
+            this.deleteChildren();
+           
         },
 	showGrid: function(name){
             var g;

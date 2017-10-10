@@ -108,6 +108,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             return null;
         },
+        getParent:function(){
+            return this.parent;
+        },
 	getKey:function(){
             var k=(this.name)?this.name: this.label;
 	    if(k){
@@ -840,6 +843,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(this.blank_option){   
             this._mkBlankOption();
         }
+        else if(this.onChange){ // add the changEvent anyway
+            this.select.addEventListener("change",function(e){
+                e.stopPropagation();
+                that.onChange(that);
+            });
+        }
 
 	if(this.value){
             //this.select.value=this.value;
@@ -885,8 +894,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             };
             
             // if selection option is "Other" add a new input field
-            this.select.addEventListener("change",function(){
-	      //  console.log("select option has changed");
+            this.select.addEventListener("change",function(e){
+	        //  console.log("select option has changed");
+                e.stopPropagation();
                 if(that.select.value === ""){      
 		    if(!that.input){ 
                         mk_input();
@@ -895,7 +905,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	            that.input.style.visibility="visible";
 	            that.input.focus();
 	        }
-                
+                if(that.onChange){
+                    that.onChange(that);
+                }
 	    });
         },
         setValue: function(v){
@@ -1798,10 +1810,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         box=document.createElement("div");
         box.classList.add(this.type,"apoco_autocomplete");
         this.element.appendChild(box);
-        var p=document.createElement("span");
-        p.classList.add("search");
-        p.innerHTML="&#x26B2;";
-        box.appendChild(p);
         this.input=document.createElement("input");
         this.input.setAttribute("placeholder","Search");
         if(this.required===true){
@@ -1819,9 +1827,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             switch(e.type){
             case "input":
                 var r;
-                //  console.log("INPUT event on %j ",e.target);
+             //  console.log("INPUT event on %j ",e.target);
                 var v=that.input.value;
-              
+              //  console.log("got value "+ v);
                 e.stopPropagation();
                 that.select.style.visibility="hidden";
                 r=that.contains(that.options,v);
@@ -1835,7 +1843,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 that.select.style.visibility="hidden";
                 break;
             case "keypress":
+                console.log("select got keypress");
                 pubsub=(that.name + "_value_selected");
+                break;
             default: return;
             }
         };
@@ -1893,10 +1903,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var count=0,a,n=[];
             // make it case insensitive
             item=item.toLowerCase();
+          //  console.log("contains: got input " + item);
             for(var i=0;i<arr.length;i++){
                 a=arr[i].toLowerCase();
-                if(arr[i].startsWith(item)){
-                  //  console.log("item " + item + " starts with " + arr[i]);
+             //   console.log("testing arr " + i + " value " + a);
+                if(a.startsWith(item)){
+                 //  console.log("item " + item + " starts with " + a);
                     n[count]=arr[i];
                     count++;
                 }

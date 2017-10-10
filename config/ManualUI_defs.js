@@ -239,7 +239,12 @@ var UI={};
                      options:{blank_option:{type:"boolean",
                                             default: false,
                                             descriptions:["adds an input fielg for the user to add an option","if you want a blank select add empty string to the options array"]},
-                              value:{type: "string",default: undefined,descriptions:[ "An element from the options string Array or object array"]}
+                              value:{type: "string",default: undefined,descriptions:[ "An element from the options string Array or object array"]},
+                              onChange:{type:"function",
+                                        default: "none",
+                                        descriptions:["adds EventListener on change and runs function ",
+                                                     "<code> options=[{onChange:function(that){//run some code}}];</code>"]
+                                       }
                              },
                      descriptions:[""]
                    },
@@ -583,11 +588,17 @@ var UI={};
                     "return: boolean",
                     "If the type has been specified checks the value is of the specified type "
                 ]},
+                getParent:{ descriptions:[
+                    "<code>var r=field.getParent();</code>",
+                    "return: Apoco object or undefined",
+                    "If the field is part of a hierarchy, e.g part of a fieldset or form returns the parent object "
+                ]},
                 getElement: {descriptions:[
                     "<code>var r=field.getElement();<code>",
                     "return: HTMLObject",
                     "The original html node supplied in the call to Apoco.Field"
                 ] },
+               
                 getKey: {descriptions:[
                     "<code>var r=field.getKey();</code>",
                     "return: string",
@@ -602,7 +613,7 @@ var UI={};
                     "<code> field.addOptions(['adc','ddfg','dddgf']); </code>"
                 ]},
                 deleteOptions:{ descriptions:[
-                    "<code> field.removeOptions(); </code>"
+                    "<code> field.deleteOptions(); </code>"
                 ]},
                 show:{
                     descriptions:[
@@ -946,7 +957,7 @@ var UI={};
                            {label: "text",descriptions: ["type: string",'the clickable text that appears in the DOM']},
                            {label: "target",descriptions: ["type:string","where to open the link "]}]
                 },
-                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                methods:[{label:"myNode.setText(string);",description:"params: string - text to insert"}]
             },
             descriptionList:{
                 parms:{items:[ "objectArray"]},
@@ -961,7 +972,7 @@ var UI={};
                 required:{
                     items:[{label:"size",descriptions: ["type: string","size param: one of the following sizes","'h1'","'h2'","'h3'","'h4'","'h5'" ]}]
                 },
-                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                methods:[{label:"myNode.setText(string);",description:"params: string - text to insert"}]
 
             },
             image:{
@@ -976,15 +987,20 @@ var UI={};
             label:{
                 parms:{text:"string",for:"string"},
                 options:{
-                    items:[{label: 'for',description:"optional, id of the html element the label belongs to " }]
+                    items:[{label: 'for',description:"optional, id of the html element the label belongs to " },
+                           {label: 'text',descriptions:["type:string" ,"text to add to node"]}]
                 },
-                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                methods:[{label:"myNode.setText(string);",description:"params: string - text to insert"}]
 
             },
             list:{
                 parms:{list:"stringArray"},
                 required:{
                     items:[{label: "stringArray",description:"example: ['one','two'.'three']"}]
+                },
+                options:{
+                    items:[{label:"ordered",descriptions:["type: boolean","default: false","create an ordered rather than an unordered list"]}
+                    ]
                 }
 
             },
@@ -1000,7 +1016,7 @@ var UI={};
                 options:{
                     items:[{label: "text",description:"the text can contain unicode and things like ' &#60br&#62'"}]
                 },
-                methods:[{label:"f.setText(string);",description:"params: string - text to insert"}]
+                methods:[{label:"myNode.setText(string);",description:"params: string - text to insert"}]
 
             },
             paginate:{
@@ -1059,7 +1075,7 @@ var UI={};
             var common_options=[{label:"id",descriptions:["type: string ", "Add an id"]},
                                 {label:"class",descriptions:["type: string or stringArray","add a class or classes to the node"]},
                                 {label:"name",descriptions:["type: string","add a name attribute to the node"]},
-                                {lanel:"hidden",descriptions:["type: boolean","set the element display to none or unset"]}
+                                {label:"hidden",descriptions:["type: boolean","set the element display to none or unset"]}
                                ];
             opts[HNodes[i]].required.items.push({label:'node',description:"type: string - " + HNodes[i]});
             for(var j=0;j<common_options.length;j++){
@@ -1113,7 +1129,10 @@ var UI={};
                            }
                           },
                           {node:'heading',size:'h4',text:'Methods'},
-                          {node:'descriptionList',items:[{label:'node.getElement();',descriptions:['params: none','return: HTML element Object']}]}
+                          {node:'descriptionList',items:[{label:'node.getParent();',descriptions:['params: none','return: Apoco parent object or undefined']}]},
+                          {node:'descriptionList',items:[{label:'node.getElement();',descriptions:['params: none','return: HTML element Object']}]},
+                          {node:'descriptionList',items:[{label:'node.show();',descriptions:['params: none','show the node element']}]},
+                          {node:'descriptionList',items:[{label:'node.hide();',descriptions:['params: none','hide the node element']}]}
 
             ];
             if(opts[HNodes[i]].methods){
@@ -1138,7 +1157,7 @@ var UI={};
                            {label:"draggable",descriptions:["type: boolean","default: false","if true the form is detached and can be dragged around the browser window - adds a close button top right"]},
                            {label:"attr",descriptions:["object array of attributes to add to the form"]},
                         
-                           {label:"onSubmit",descriptions:["function to call","used with component which has 'submit:true'","<code> {submit:true,name:'loginButton',value:'Login',class:'login'}</code>"]},
+                           {label:"onSubmit",descriptions:["function to call","used with component which has 'submit:true'","<code> components=[{submit:true,name:'loginButton',value:'Login',class:'login'}]</code>","onSubmit: receives the click event, <code>var mySubmit=function(event){ //must return false;  }; </code>"]},
                            {label: "label",description: "type: string"}]
                  },
             grid:{required:[{label: "cols",descriptions:["type: objectArray","array of fields based on type or the field may be specified directly","example","<code>cols:[{name:'colname1',type:'string',editable:false},{name:'colname2',type:'float',required:true,resizable:true,precision:2,step:0.1},{field:'select',title; 'Pick one',name:'choose',options:['one','two','three']}]<code>","options are the same as for the fields with the addition of the title option - which is the text displayed in the head - defaults to name"]},
@@ -1149,7 +1168,7 @@ var UI={};
                       {label:"groupBy",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a title it will be used as a the subgrid seperator"]},
                       {label:"uniqueKey",descriptions:["type: stringArray","the set of column names that  uniquely determine a row (f it exists)","If no uniqueKey is given an id is added called '_aid'","You can access the uniqeKey with <code> var key=mygrid.uniqueKey;<code> which returns a string array "]},
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]},
-                       {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
+                      {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
                   ]},
             menu:{  required:[{label: "components",descriptions:["type: objectArray","which must contain a name, key value pair and optionally an action and/or label ","<code>{name:'menu1',action:some_function,label:'some_string'}</code>", "action: A function that receives one arg which is 'this'","the action can also be 'default' in which case the following code is substituted",
                                                            "<br><code> var select_menu=function(that,index){<br>" +
@@ -1770,9 +1789,9 @@ var UI={};
                           description:"",
                           cmd:"var v=Apoco.Utils.detectMobile();",
                           ret: "boolean"},
-            draggable:{p:"<code> var d=Apoco.Utils.draggable(htmlObject);</code>",
-                       params:"a htmlObject",
-                       description:"",
+            draggable:{p:"<code> var d=Apoco.Utils.draggable(source[,destination,handle]);</code>",
+                       params:"htmlObjects",
+                       description:"source - htmlObject - object to drag<br> optional: destination - dropzone for draggable object<br> optional: handle - html object to use as a handle instead of the whole source object",
                        ret:"false - on fail"},
             extend:{p:"<code> Apoco.Utils.extend(subclass,superclass); </code>",
                     params: "subclass-constructor function, superclass: base constructor function",
@@ -2254,7 +2273,7 @@ var UI={};
 
                           {node: "heading",size:"h4",text:"Live Example"},
                           {name: "Input_params",field: "textArea",
-                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'MyPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',components:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
+                           value: "if(Apoco.Window.get('TestWindow') === null){var promise=Apoco.Window.open({url:'child_window.html',name: 'TestWindow',opts:{width:600}});}else{ var promise=Apoco.Window.get('TestWindow').promise;} promise.then(function(){Apoco.Panel.add({name:'TestPanel',window:'TestWindow',components:[{display:'tabs',DOM:'Content',id:'Tabs',components:[{name:'tab1',label:'my tab'},{name:'tab2',label:'another tab'}]}]})}).catch(function(message){Apoco.popup.error('cannot open window',message)});"},
                           {name: "doit", node: "button", text: "Go",
                            action: function(that){
                                var f=that.parent.getChild("Input_params");
@@ -2262,8 +2281,8 @@ var UI={};
                                    throw new Error("can't get input params");
                                }
 
-                               if(Apoco.Panel.get('MyPanel')){
-                                   Apoco.Panel.delete('MyPanel');
+                               if(Apoco.Panel.get('TestPanel')){
+                                   Apoco.Panel.delete('TestPanel');
                                }
                                // $.globalEval(f.getValue());
                                globalEval(f.getValue());
