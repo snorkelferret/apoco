@@ -65,14 +65,7 @@ require("./Fields");
         
         this.element.classList.add("apoco_"+this.display);  
         if(this.class){
-            if(Apoco.type["string"].check(this.class)){
-                this.element.classList.add(this.class);
-            }
-            else{
-                for(var i=0;i< this.class.length;i++){
-                    this.element.classList.add(this.class[i]);
-                }
-            }
+            Apoco.Utils.addClass(this.element,this.class);
         }
         
         var doit=function(context){

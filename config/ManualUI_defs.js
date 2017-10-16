@@ -191,6 +191,7 @@ var UI={};
                          label:{type: "string",default: undefined,descriptions:["added next to the input field"]},
                          title:{type: "string",default: undefined,descriptions:["add a tooltip"]},
                          class:{type:"string or stringArray",default:undefined,descriptions:["add a class or classes to the field"] },
+                         childClass:{type:"string or stringArray",default:undefined,descriptions:["add a class or classes to the element contained by the div(default)"] },
                          hidden:{type:"boolean",default: false,descriptions:["set the element display to none or unset"]}
                         },
                 IO:{
@@ -1074,6 +1075,7 @@ var UI={};
             }
             var common_options=[{label:"id",descriptions:["type: string ", "Add an id"]},
                                 {label:"class",descriptions:["type: string or stringArray","add a class or classes to the node"]},
+                                {label:"childClass",descriptions:["type:string or stringArray","default:undefined","add a class or classes to the element contained by the div(default)" ]},
                                 {label:"name",descriptions:["type: string","add a name attribute to the node"]},
                                 {label:"hidden",descriptions:["type: boolean","set the element display to none or unset"]}
                                ];
@@ -1774,6 +1776,11 @@ var UI={};
                           ret: "index - of the found array item or null",
                           cmd:" var v={}; var b=Apoco.Utils.binarySearch([1,2,13,24,45],null,15,v);"
                          },
+            addClass:{p:"<code> Apoco.Utils.addClass(element,class);<code>",
+                      params: "html element<br> class: string or stringArray",
+                      description:"add a class or array of classes to an html element",
+                      ret: "none",
+                      cmd:"Apoco.Uitls.addClass(element,['some_class','another_class']);"},
             dateNow:{p:"<code>var today=Apoco.Utils.dateNow();<code>",
                      params: "none",
                      description:"",

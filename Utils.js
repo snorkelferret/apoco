@@ -87,6 +87,24 @@ String.prototype.trim = String.prototype.trim || function trim() {
             }
             return (value.toString() + units);
         },
+        addClass:function(element,cl){
+            if(!element){
+                throw new Error("addClass: requires an html element");
+            }
+            if(!cl=== undefined){
+                throw new Error("addClass: requires a class or an array of classes");
+            }
+            if(cl){
+                if(Apoco.type["string"].check(cl)){
+                    element.classList.add(cl);
+                }
+                else{
+                    for(var i=0;i< cl.length;i++){
+                        element.classList.add(cl[i]);
+                    }
+                }
+            } 
+        },
         fontSizeToPixels:function(font_size){
             var p,pp="";
             var lu={"6":8,"7":9,"7.5":10,"8":11,"9":12,"10":13,"11":15,"12":16,"13":17,"13.5":18,"14":19,"14.5":20,"15":21,"16":22,"17":23,"18":24,"20":26,"22":29,"24":32,"26":35,"27":36,"28":37,"29":38,"30":40,"32":42,"34":45,"36":48};

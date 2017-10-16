@@ -61,14 +61,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.element.classList.add(this.type);
 
         if(this.class){
-            if(Apoco.type["string"].check(this.class)){
-                this.element.classList.add(this.class);
-            }
-            else{
-                for(var i=0;i< this.class.length;i++){
-                    this.element.classList.add(this.class[i]);
-                }
-            }
+            Apoco.Utils.addClass(this.element,this.class);
         }
         
 	this.element.setAttribute("name",this.name);
@@ -231,6 +224,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         d.field="static";
         _Field.call(this,d,element);
         this.span=document.createElement("span");
+        if(this.childClass){
+            Apoco.Utils.addClass(this.span,this.childClass);
+        }
         //s.setAttribute("type",this.html_type);
         this.setValue(this.value);
         this.element.appendChild(this.span);
@@ -280,9 +276,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         var that=this;
         d.field="input";
 	_Field.call(this,d,element);
-        var s=document.createElement("input");
-        s.setAttribute("type",this.html_type);
-        this.input=s;
+        this.input=document.createElement("input");
+        this.input.setAttribute("type",this.html_type);
+       
+       if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
+        
         if( this.min !== undefined){
             this.input.setAttribute("min",this.min);
         }
@@ -329,6 +329,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         }
 	var list=document.createElement("ul"); 
         list.classList.add('aligned_float');
+        if(this.childClass){
+            Apoco.Utils.addClass(list,this.childClass);
+        }
+        
 	var el=document.createElement("li");
 	var dec=document.createElement("div");
         dec.className='values';
@@ -516,6 +520,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(this.required === true){
             this.input.required=true;
         }
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
+        
         this.element.appendChild(this.input);
         if(this.value){
             if(Apoco.type["integer"].check(this.value)){
@@ -561,6 +569,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(this.required === true){
             this.input.required=true;
         }
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
+        
         this.element.appendChild(this.input);
         if(this.editable === false){
             this.input.readOnly=true;
@@ -581,6 +593,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.input=document.createElement("input");
         this.input.setAttribute("type",this.html_type);
         this.input.className="check_box";
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
         
         this.element.appendChild(this.input);
         if(this.required===true){
@@ -755,6 +770,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	_Field.call(this,d,element);
 	this.popup=true;
         this.input=document.createElement("textarea");
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
+        
         if(this.required===true){
             this.input.required=true;
         }
@@ -801,15 +820,17 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     var SelectField=function(d,element){
-	var i,o,that=this,opt_type,select_el;
+	var i,o,that=this,opt_type;
         d.field="select";
         d.type="string";
 	_Field.call(this,d,element);
-        select_el=document.createElement("select");
+        this.select=document.createElement("select");
         if(this.required === true){
-            select_el.required=true;
+            this.select.required=true;
         }
-        
+        if(this.childClass){
+            Apoco.Utils.addClass(this.select,this.childClass);
+        }
         if(this.options){
          //   console.log("select: this options is "+ this.options);    
             if(Apoco.type["stringArray"].check(this.options)){
@@ -832,14 +853,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 o.value=this.options[i].value;
                 o.textContent=this.options.label;
             }
-            select_el.appendChild(o);
+            this.select.appendChild(o);
 	}
 	if(this.blank_option === true){ // add a blank option at the head of the list
             o=document.createElement("option");
             o.value="";
-            select_el.appendChild(o);
+            this.select.appendChild(o);
 	}
-        this.select=select_el;
+        
         if(this.blank_option){   
             this._mkBlankOption();
         }
@@ -1030,6 +1051,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	this.popup=true;
         var u=document.createElement("ul");
         u.className="choice";
+        if(this.childClass){
+            Apoco.Utils.addClass(u,this.childClass);
+        }
 	this.element.appendChild(u);
         
 	for(var i=0;i<this.input.length;i++){
@@ -1216,6 +1240,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	this.input= document.createElement("input");
         this.input.setAttribute("type",this.type);
         this.element.appendChild(this.input);
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
 	var that=this;
 	if(this.min){
             this.input.setAttribute("min",this.min);
@@ -1456,6 +1483,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    }
             this.input=document.createElement("input");
             this.input.type="file";
+            if(this.childClass){
+                Apoco.Utils.addClass(this.input,this.childClass);
+            }
             if(this.required===true){
                 this.input.required=true;
             }
@@ -1628,6 +1658,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	        throw new Error("No FileReader");
 	    }
             this.input=document.createElement("input");
+            if(this.childClass){
+                Apoco.Utils.addClass(this.input,this.childClass);
+            }
             this.input.type="file";
             if(this.required===true){
                 this.input.required=true;
@@ -1814,6 +1847,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.input.setAttribute("placeholder","Search");
         if(this.required===true){
             this.input.required=true;
+        }
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
         }
         this.input.setAttribute("type",this.html_type);
         box.appendChild(this.input);

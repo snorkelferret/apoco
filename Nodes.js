@@ -31,14 +31,10 @@ require("./Types.js");
             p=this.element;
         }
         if(this.class){
-            if(Apoco.type["string"].check(this.class)){
-                p.classList.add(this.class);
-            }
-            else{
-                for(var i=0;i< this.class.length;i++){
-                   p.classList.add(this.class[i]);
-                }
-            }
+            Apoco.Utils.addClass(p,this.class);
+        }
+        if(this.childClass){
+            Apoco.Utils.addClass(this.element,this.childClass);
         }
         if(this.hidden){
             this.hide();
