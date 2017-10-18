@@ -145,23 +145,26 @@ require("./DisplayFieldset");
             }
             n.parent=this;
             n.element=el;
+            
             n.submit=document.createElement("input");
             n.submit.setAttribute("type","submit");
             if(d.value){
                 n.submit.setAttribute("value",d.value);
             }
             if(d.class){
-                if(Apoco.type["array"].check(d.class)){
-                    for(var i=0;i<d.class.length;i++){
-                        n.element.classList.add(d.class[i]);
-                    }
-                }
-                else{
-                    n.element.classList.add(d.class);
-                }
+                Apoco.Utils.addClass(n.element,d.class);
+            }
+            if(d.childClass){
+                Apoco.Utils.addClass(n.submit,d.childClass);
             }
             n.name=d.name;
             n.element.appendChild(n.submit);
+            n.element.addEventListener("click",(function(that,n){
+                return function(e){
+                    e.stopPropagation();
+                    that.submitter=n;//e.target;
+                };
+            })(this,n),false);
             parent_element.appendChild(n.element);
             this.components[index]=n;
        //     console.log("DisplayForm: added submitter");

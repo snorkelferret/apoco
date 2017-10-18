@@ -19,7 +19,7 @@ require("./Fields");
             hidden: false,
             components:[]
 	};
-        var that=this,t,dp;
+        var that=this,t,dp,td;
        
         for(var k in defaults){
             if(options[k] === undefined){
@@ -42,17 +42,20 @@ require("./Fields");
             win=window; // set to default window
         }
           //  console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
-          //  console.log("adding to DOM " + this.DOM);
-	this.DOM=win.document.getElementById(this.DOM);
+      // console.log("adding to DOM " + this.DOM);
+        if(this.DOM && this.DOM.id){
+            console.log("Error not a string id " + this.DOM.id);
+        }
+	td=win.document.getElementById(this.DOM);
         t=win.document.getElementById(this.id);
         if(this.dependsOn){
             dp=win.document.getElementById(this.dependsOn);
         }
         
-        if(!this.DOM){
-	    throw new Error("_ApocoDisplayBase DOM element does not exist " + this.DOM);
+        if(!td){
+	    throw new Error("_ApocoDisplayBase DOM must be the string id  of an existing html element " + this.DOM );
 	}
-
+        this.DOM=td;
 	if(t){
          //   console.log();
 	    t.parentNode.removeChild(t); //remove from DOM 
@@ -221,9 +224,9 @@ require("./Fields");
 	        Apoco.IO.publish(this);
 	    }
             if(!this.DOM.contains(this.element)){
-              //  console.log("Showing element that is not in DOM" + this.element);
+              // console.log("Showing element that is not in DOM" + this.element);
 	        if(this.element){
-		  //  console.log("show found non null element");
+	//	   console.log("show found non null element");
                     if(this.after){
                         var a=document.getElementById(this.after);
                         if(a && a.nextSibling){    // && $.contains(this.DOM[0],a[0])){ //insert after
@@ -239,7 +242,7 @@ require("./Fields");
                         this.DOM.appendChild(this.element);
                     }
                     if(this._afterShow !== undefined){
-                     //   console.log("DisplayBase: calling afterShow ");
+                //       console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
                     }
                  

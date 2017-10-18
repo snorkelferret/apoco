@@ -1,7 +1,7 @@
 var Apoco=require('./declare').Apoco;
 require("./DisplayBase.js");
 require("./Nodes.js");
-
+require("./Fields.js");
 
 // requires ApocoDisplayBase.js
 

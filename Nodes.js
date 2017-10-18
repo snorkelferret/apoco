@@ -4,6 +4,11 @@ require("./Types.js");
 // No callbacks or publish or listeners for these elements
 // if you need callbacks use Apoco.fields
 
+//TODO
+//need to sort out parent element from this.element to make it match fields
+// for example the hide/show method is ugly
+
+
 ;(function(){
 
     var _Node=function(d,element){
@@ -26,6 +31,7 @@ require("./Types.js");
         }
         if(element !== undefined){
             p=element;
+            this.root=p;
         }
         else{
             p=this.element;
@@ -75,11 +81,21 @@ require("./Types.js");
 	},
         show:function(){
             this.hidden=false;
-            this.element.style.display="unset";
+            if(this.root){
+                this.root.style.display="";
+            }
+            else{
+                this.element.style.display="";
+            }
         },
         hide:function(){
             this.hidden=true;
-            this.element.style.display="none";
+            if(this.root){
+                this.root.style.display="none";
+            }
+            else{
+                this.element.style.display="none";
+            }
         }
     };
 
