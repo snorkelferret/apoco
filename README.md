@@ -61,7 +61,7 @@ UI.Panels={
 };
 
 ```
-Although Apoco is primarily a desktop window replacememt, (because of realtime updating
+Although Apoco is primarily a desktop window replacement, (because of realtime updating
 and dynamic elements), however,there are some "shop front" Website's using apoco
 
 [Perluceo](http://www.perluceo.com)

@@ -149,8 +149,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 var stateChange=function(){
                     if(request.readyState === XMLHttpRequest.DONE){
                         if(request.status === 200){ //success
-                           // console.log("return from server is %j ", request.response);
-                            if(settings.mimeType === 'application/json'){
+                            // request.response
+                         //   for(var k in request){
+                          //      console.log("return from server is k " + k + " with value " +  request[k]);
+                           // }
+                            if(request.responseType === 'application/json'){
                                 resolve(JSON.parse(request.responseText));
                             }
                             else{
