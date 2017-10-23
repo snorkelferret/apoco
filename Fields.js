@@ -189,7 +189,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
                 return this.value;
             }
-            this.input.value=this.value;
+            if(this.input){
+                this.input.value=this.value;
+            }
             return this.value;
         },
         valueChanged:function(){

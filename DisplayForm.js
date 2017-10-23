@@ -93,9 +93,7 @@ require("./DisplayFieldset");
                 for(var i=0;i<this.components.length;i++){
                     
                     lp=document.createElement("li");
-                    if(this.components[i].editable === false){
-                        this.components[i].field="static";
-                    } 
+    
                     if(this.components[i].submit){ //add an input of type submit
                         this.addSubmitter(i,lp,fp);
                     }
