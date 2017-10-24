@@ -2035,7 +2035,7 @@ var UI={};
     };
 
     UI.Panels={
-        Tabs:{ name: "Tabs",
+        Tabs:{ //name: "Tabs",
                components:[ {display: "tabs",
                              DOM: "mainNavbar",
                              id: "Tabs",
@@ -2083,7 +2083,7 @@ var UI={};
                             }
                           ]
              },
-        Fields: { name: "Fields",
+        Fields: {// name: "Fields",
                   components:[ {display:"menu",
                                 DOM: "left",
                                 id: "FieldsMenu",
@@ -2109,7 +2109,7 @@ var UI={};
                                },
                              ]
                 },
-        About:{ name: "About",
+        About:{ //name: "About",
                 components:[
                     {display:"menu",
                      DOM: "left",
@@ -2167,7 +2167,7 @@ var UI={};
                      ]
                     }
                 ]},
-        Nodes:{ name: "Nodes",
+        Nodes:{ //name: "Nodes",
                 components:[
                     {display:"menu",
                      DOM: "left",
@@ -2200,7 +2200,7 @@ var UI={};
                     }
                 ]
               },
-        Displays:{ name: "Displays",
+        Displays:{ //name: "Displays",
                    components:[
                        {display:"menu",
                         DOM: "left",
@@ -2230,7 +2230,7 @@ var UI={};
                             ]
                        }
                    ]},
-        Windows:{ name: "Windows",
+        Windows:{ //name: "Windows",
                   components:[
                       {display:"menu",
                        DOM: "left",
@@ -2255,7 +2255,7 @@ var UI={};
                             ]
                       }
                 ]},
-        Panels:{ name: "Panels",
+        Panels:{ //name: "Panels",
                   components:[
                     { display: "fieldset",
                       id:"Blurb",
@@ -2264,7 +2264,7 @@ var UI={};
                           {node: "heading",size:"h2",text: "Apoco Panels"},
                           {node: "paragraph",text:"Panel.js"},
                           {node: "paragraph",text: "Only display templates can be added to the Panel components array."},
-                          {node: "paragraph",text: ("Apoco panels are generally defined in a UI_defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{name: 'MyPanel',<br>" + mk_spaces(7) + "components:[ {display: 'tabs',<br>" + mk_spaces(14) + "DOM: 'Main',<br> " + mk_spaces(14) + "id: 'Tabs',<br> " + mk_spaces(14) + "components:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(17) + "{name:'another', label:'Another'}<br>" + mk_spaces(17) + "]<br> " + mk_spaces(14) + "}  <br> " + mk_spaces(14) + " // add another display template here <br> " + mk_spaces(13) + "] <br> " + mk_spaces(7) + "} <br> " + mk_spaces(7) + " // add another panel here <br> }; " )},
+                          {node: "paragraph",text: ("Apoco panels are generally defined in a defs.js file., <br> for example,<br><br> <code>   UI.Panels={<br> " + mk_spaces(2) + " MyPanel:{ components:[ {display: 'tabs',<br>" + mk_spaces(8) + "DOM: 'Main',<br> " + mk_spaces(8) + "id: 'Tabs',<br> " + mk_spaces(8) + "components:[{name: 'someName',label: 'Some Name'},<br> " + mk_spaces(12) + "{name:'another', label:'Another'}<br>" + mk_spaces(12) + "]<br> " + mk_spaces(8) + "}  <br> " + mk_spaces(8) + " // add another display template here <br> " + mk_spaces(4) + "] <br> " + mk_spaces(2) + "} <br> " + mk_spaces(2) + " // add another panel here <br> }; " )},
                           {node:"paragraph",text: ("This would create a new panel with the name 'MyPanel' with one component, Tabs<br> To add another display component you add it to the components array.")},
 
                           {node: "heading", size: "h3", text: "Usage" },
@@ -2306,7 +2306,7 @@ var UI={};
                       },
                   ]
                 },
-        Types:{name: "Types",
+        Types:{//name: "Types",
                components:[
                    {display:"menu",
                     DOM: "left",
@@ -2339,7 +2339,7 @@ var UI={};
                    }
                ]
               },
-        IO:{name: "IO",
+        IO:{//name: "IO",
                   components:[
                     { display: "fieldset",
                       id:"Blurb",
@@ -2362,7 +2362,7 @@ var UI={};
                   ]
 
            },
-        Popups:{name: "Popups",
+        Popups:{//name: "Popups",
                 components:[
                     {display:"menu",
                     DOM: "left",
@@ -2384,7 +2384,7 @@ var UI={};
                     }
                   ]
               },
-        Utils:{name: "Utils",
+        Utils:{//name: "Utils",
                   components:[
                     { display: "fieldset",
                       id:"Blurb",

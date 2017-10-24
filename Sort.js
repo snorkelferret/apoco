@@ -25,6 +25,12 @@ require("./Types")
     function generic_compare(a,b,fn){
 	var s=fn(a);
 	var t=fn(b);
+        if( s === null){
+            return -1;
+        }
+        if(t === null){
+            return 1;
+        }
 	if(s<t) return -1;
 	if(s>t) return 1;
 	return 0;
@@ -43,6 +49,31 @@ require("./Types")
 	case "positiveInteger":
             return generic_compare;
 	case "date":  // date is in format 2018-04-22
+            return (function (a,b,fn){
+                var s,t,p,q;
+	        s=fn(a);
+	        t=fn(b);
+                if( s === null){
+                    return -1;
+                }
+                if(t === null){
+                    return 1;
+                }
+                p=Date.parse(s);
+                q=Date.parse(t);
+                
+              //  console.log("s was " + s + " now is " + p + " t was " + t + " now is " + q);
+	        if(p<q){
+              //     console.log(" s " + s + " less than " + t);
+                    return -1;
+                }     
+	        if(p>q){
+                //    console.log(" s " + s + " greater than " + t);
+                    return 1;
+                }
+                //console.log(" s " + s + " equals " + t);
+	        return 0;
+            });
 	case "token":	
 	case "alphaNum":
 	    return (function(s,t,fn){

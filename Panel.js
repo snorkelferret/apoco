@@ -101,6 +101,7 @@ require("./Window");
                 if(k == name){
                 //    console.log("found " + name);
                     var cd=Apoco.cloneDeep(UI.Panels[k]);
+                    cd.name=name; // so we don't have to repeat the name in the UI declaration
                //     console.log("clone deep is " + cd);
                     return cd;
                 }
