@@ -39,8 +39,7 @@ for example,
 ```javascript
 
 UI.Panels={
-    MyPanel:{name: 'MyPanel',
-              components:[ {display: 'tabs',
+    MyPanel:{ components:[{ display: 'tabs',
                             DOM: 'Main',
                             id: 'Tabs',
                             tabs:[{name: 'someName',label: 'Some Name'},
@@ -56,8 +55,22 @@ UI.Panels={
                             }
                             // add another display template here
                           ]
+            },
+  AnotherPanel:{ components:[ {display:"form",
+                               DOM:"Main",
+                               id:"MyForm",
+                               onSubmit:function(submit_event,that){ // do something},
+                               components:[{name:"email",type:"email"},
+                                           {name:"name",type:"string"},
+                                           {submit:true,name:"submit",value:"Submit"}
+                                           
+                                        ]
+                               }
+                               // add other display components
+                         ]
+
               }
-              // add another panel here
+ // add another panel here
 };
 
 ```

@@ -122,37 +122,104 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 /* default for tables */
 
 /* grid table */
-.apoco_grid {min-width: 4em; overflow:hidden; font-size: 10pt; box-sizing: border-box} 
-.apoco_grid .label{margin: 1em 0 1em 1em;   display: table-row}
-.grid_content { min-width: 8em; min-height: 6em}
-.grid_footer {height: 3em; margin-top: 2em; } /* position: absolute;  bottom: 12em; */
-.grid_footer div{ background-color: #888}
-.apoco_grid button{ height: 2em}  
-.apoco_grid table{ min-width: 8em }
 
-.apoco_grid table {table-layout: fixed; border-collapse: collapse}
-/*.grid table.head {z-index: 100; position: fixed;  top: 3em;  height: 2em }
-.grid table.head th{ color: #fff; background-color: #000; background-image:none; border: 1px solid #555} */
-.apoco_grid div.head{z-index: 100; background-color:#000;  top: 3em;  height: 2em;  overflow: hidden}
-.apoco_grid div.head div{display: inline-table; color: #fff; height: inherit; text-align: center; background-color: #000; border: 1px solid #555; box-sizing: border-box; border-collapse: collapse; overflow:hidden;}
-.apoco_grid table td {  height: 1.5em;
-                  margin: 0;
-                  box-sizing: border-box;
-                  font-weight:normal;
-                  text-align: right; 
-                  min-width: 3em !important;
-                  /*padding: 0em 0.4em 0em 0.4em; */
-                  border: 1px solid #bbb} /* border-bottom-width: 0em !important; padding: 0em 10em} */
-.apoco_grid table th span{ display: inline-block; float: right; margin-left: 1em; }
-.apoco_grid .hover { background: #aabbcc }
-.apoco_grid table tbody tr.last-child th,
-.apoco_grid table tbody tr.last-child td { border-bottom-width: 1px !important; }
-.apoco_grid table label{ }
 
-/* .grid table button {background-color: #202020; color: #bbbbbb; border: 1px solid dimgrey;}  */
-.apoco_grid table tr td textarea{}
-.apoco_grid table textarea,select{}
-.apoco_grid table td span{ display: inline} /*float: right } */
+
+.apoco_grid {
+    min-width: 4em;
+    font-size: 10pt;
+    box-sizing: border-box;
+    margin: 0 2em 4em 2em;
+} 
+.apoco_grid .label{
+    margin: 1em 0 1em 1em;
+    display: table-row;
+}
+.grid_content {
+    min-width: 8em;
+    min-height: 6em;
+}
+.grid_footer {
+    height: 3em;
+    margin-top: 2em;
+} 
+.grid_footer div{
+    background-color: #888;
+}
+.apoco_grid button{
+    height: 2em;
+}  
+.apoco_grid table{
+    min-width: 8em;
+}
+
+.apoco_grid table {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+
+.apoco_grid div.head{
+    z-index: 100;
+    background-color:#ddd;
+    top: 3em;
+    height: 3em;
+    overflow: hidden;
+
+}
+.apoco_grid div.head > div{
+    display: inline-table;
+    height: inherit;
+    text-align: center;
+}
+
+.apoco_grid div.head > div,
+.apoco_grid table td{
+    overflow:hidden;
+    min-width: 3em !important;
+    margin: 0;
+    padding: 8px;
+}
+.apoco_grid div.head div.arrows{
+    display: inline;
+    height: 32px;
+    float:right;
+    width: 16px;
+    padding: 0;
+    margin-top:-8px;
+}
+
+.apoco_grid div.head div.arrows span{
+    height: 16px;
+    width: 16px;
+    display:block;
+}
+
+.up:before{ content:"\25B2";}
+.down:before{content:"\25BC";}
+
+.apoco_grid table tr{
+    height: 3em !important;
+    overflow: hidden;
+}
+.apoco_grid table td {
+    height: inherit;
+    overflow: hidden;
+    font-weight:normal;
+    text-align: right;
+}
+.apoco_grid table td label{
+    display: none;
+}
+
+.apoco_grid table th span{
+    display: inline-block;
+    float: right;
+    margin-left: 1em;
+}
+
+
+
 /* table with only col names */
 .apoco_grid .inner_table h4{ padding-left: 1em; height: 1.5em; color: #0000ff}
 .apoco_grid .inner_table table{ height: 100% }

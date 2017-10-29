@@ -45,6 +45,9 @@ require("./Types.js");
         if(this.hidden){
             this.hide();
         }
+        if(this.title){
+            this.element.setAttribute("title",this.title);
+        }
 	if(this.id){
 	    this.element.id=this.id;
 	}

@@ -1077,7 +1077,8 @@ var UI={};
                                 {label:"class",descriptions:["type: string or stringArray","add a class or classes to the node"]},
                                 {label:"childClass",descriptions:["type:string or stringArray","default:undefined","add a class or classes to the element contained by the div(default)" ]},
                                 {label:"name",descriptions:["type: string","add a name attribute to the node"]},
-                                {label:"hidden",descriptions:["type: boolean","set the element display to none or unset"]}
+                                {label:"hidden",descriptions:["type: boolean","set the element display to none or unset"]},
+                                {label:"title",descriptions:["type:string","set the title attribute for tooltips"]}
                                ];
             opts[HNodes[i]].required.items.push({label:'node',description:"type: string - " + HNodes[i]});
             for(var j=0;j<common_options.length;j++){

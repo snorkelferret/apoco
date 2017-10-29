@@ -17,9 +17,9 @@ describe("Sort",function() {
         expect(b).to.eql(["apple","dog","fog","zebra"]);
     });
     it("sorts an array of dates",function(){
-        var b=[20200521,20160624,20300113,20200814];
+        var b=["2020-05-21","2016-06-24","2030-01-13","2020-08-14"];
         Apoco.sort(b,"date");
-        expect(b).to.eql([20160624,20200521,20200814,20300113]);
+        expect(b).to.eql(["2016-06-24","2020-05-21","2020-08-14","2030-01-13"]);
     });
     it("sorts an array of alphanumerics",function(){
         var b=["x43","dsa4","X43","rew42","3","rwd","s56","f"];
@@ -44,21 +44,21 @@ describe("Sort",function() {
         expect(b).to.eql(["2010-10-01","2013-04-22","2018-05-12","2020-03-21"]);
     });
     it("can sort a complex object",function(){
-        var b=[{stock: "AAB" ,maturity: 20171105 ,subclass: 12 },
-               {stock: "AAE" ,maturity: 20201129 ,subclass: 11 },
-               {stock: "AAF" ,maturity: 20210523 ,subclass: 0 },
-               {stock: "AAC" ,maturity: 20180214 ,subclass: 8 },
-               {stock: "AAD" ,maturity: 20191022 ,subclass: 7 },
-               {stock: "AAG" ,maturity: 20221010 ,subclass: 10 }];
+        var b=[{stock: "AAB" ,maturity: '2017-11-05' ,subclass: 12 },
+               {stock: "AAE" ,maturity: '2020-11-29' ,subclass: 11 },
+               {stock: "AAF" ,maturity: '2021-05-23' ,subclass: 0 },
+               {stock: "AAC" ,maturity: '2018-02-14' ,subclass: 8 },
+               {stock: "AAD" ,maturity: '2019-10-22' ,subclass: 7 },
+               {stock: "AAG" ,maturity: '2022-10-10' ,subclass: 10 }];
         Apoco.sort(b,[{type:"string",fn:function(a){return a["stock"];}},
-                       {type: "integer",fn: function(a){return a["maturity"];}}]);
+                       {type: "date",fn: function(a){return a["maturity"];}}]);
         
-        expect(b).to.eql([{"maturity": 20171105,"stock": "AAB","subclass": 12},
-                          {"maturity": 20180214,"stock": "AAC","subclass": 8},
-                          {"maturity": 20191022,"stock": "AAD","subclass": 7},
-                          {"maturity": 20201129,"stock": "AAE","subclass": 11},
-                          {"maturity": 20210523,"stock": "AAF","subclass": 0},
-                          {"maturity": 20221010,"stock": "AAG","subclass": 10}]);
+        expect(b).to.eql([{"maturity": '2017-11-05',"stock": "AAB","subclass": 12},
+                          {"maturity": '2018-02-14',"stock": "AAC","subclass": 8},
+                          {"maturity": '2019-10-22',"stock": "AAD","subclass": 7},
+                          {"maturity": '2020-11-29',"stock": "AAE","subclass": 11},
+                          {"maturity": '2021-05-23',"stock": "AAF","subclass": 0},
+                          {"maturity": '2022-10-10',"stock": "AAG","subclass": 10}]);
     });
     
 });
