@@ -309,6 +309,7 @@ jsonishData={
 	    for(var j=0;j<this.grids.length;j++){
 		Apoco.sort(this.grids[j].rows,ar);
                 this.grids[j].sorted=true;
+                this.grids[j].reverse=false;
                /* for(var n=0;n<this.grids[j].rows.length;n++){
                     for(var m=0;m<this.sortOrder.length; m++){
                         var mn=this.sortOrder[m];
@@ -317,6 +318,7 @@ jsonishData={
                 } */
                 if(dir && dir === "down"){
                     this.grids[j].rows.reverse();
+                    this.grids[j].reverse=true;
                 }
 	    }
 	    
@@ -684,7 +686,12 @@ jsonishData={
                                 if(this.cols[k].name === this.sortOrder[i]){
                                     if(this.cols[k].editable === false ){  // value is in static span tex
                                         ci=c[j].getElementsByTagName("span");
-                                        key[this.sortOrder[i]]=ci[0].textContent;
+                                        if(ci[0].textContent === ""){
+                                            key[this.sortOrder[i]]=null; // because value is null
+                                        }
+                                        else{
+                                            key[this.sortOrder[i]]=ci[0].textContent;
+                                        }
                                         break;
                                     }
                                     // is there an input node ....?
@@ -845,7 +852,7 @@ jsonishData={
                 }
             }
          //   console.log("getRow this.sortOrder length is " + this.sortOrder.length);
-        //    console.log("key is %j",key);
+         //   console.log("key is %j",key);
             for(var i=0;i<grid.length;i++){
                 if(grid[i].name === undefined){
                     throw new Error("grid " + i + "name is " + grid[i].name);
@@ -859,13 +866,27 @@ jsonishData={
                     }
                     else{
                         sortOrder=this.sortOrder;
-                        for(var j=0;j<sortOrder.length; j++){
-                            if(key[sortOrder[j]] === undefined || key[sortOrder[j]]===null){
-                                throw new Error("getRow: key is not unique needs " + this.sortOrder[j] );
+                        if(this.uniqueKey){
+                            for(var j=0;j<this.uniqueKey.length; j++){
+                                if(key[this.uniqueKey[j]] === undefined || key[this.uniqueKey[j]]===null){
+                                    throw new Error("getRow: key is not unique needs " + this.uniqueKey[j] );
+                                }
                             }
                         }
+                        else{
+                             for(var j=0;j<sortOrder.length; j++){
+                                if(key[sortOrder[j]] === undefined || key[sortOrder[j]]===null){
+                                    throw new Error("getRow: key is not unique needs " + sortOrder[j] );
+                                }
+                            }  
+                        }
+                    }
+                    if(grid[i].reverse){
+                        grid[i].rows.reverse();
+                        grid[i].reverse=false;
                     }
 		    row=Apoco.Utils.binarySearch(grid[i].rows,sortOrder,key,closest);
+                  //  console.log("binary search returns row " + row);
                     if(row !== null){
                         return row;
                     }

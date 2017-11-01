@@ -129,9 +129,9 @@ String.prototype.trim = String.prototype.trim || function trim() {
 	    // sort_order array -  1st then 2nd etc
 	    var mid,r,compare;
             var len=arr.length;
-          //  console.log("array len is " + len);
-         
-            if(sort_order === null){
+            //console.log("array len is " + len);
+         //  console.log("data to match is %j",data);
+            if(sort_order === null){ //should be sorting on uniquekey
                 compare=function(aa){
                    // console.log("testing " + aa + " with " + data);
                     if(aa == data){
@@ -146,30 +146,42 @@ String.prototype.trim = String.prototype.trim || function trim() {
 		       // console.log(aa + " is less than " + data);
 			return -1;
 		    }
-	            else{
-                        throw new Error("binarySearch: should never get here");
+	            else{  // sorting on uniqueKey if value is null throw an error
+                        throw new Error("binarySearch: sorting on UniqueKey found a null value");
                     }
                 };
             }
             else{
 	        compare=function(aa){
-		    var field,item;
-                  //  console.log("Compare: sort_order is %j", sort_order);
+		    var field,item,curr;
+                //    console.log("START Compare:");
 		    for(var i=0;i<sort_order.length;i++){
+                        
 		        field=sort_order[i];
-		        item=data[field];
-		    //     console.log("field is " + field + " value is " + item);
-                        if(aa[field].value == item){ // && i === sort_order.length -1){
-		        //    console.log(aa[field].value + " equals " + item);
+                        item=data[field];
+                        curr=aa[field].value;
+                     //   console.log("sort field is " + field + " item is " + item + " compare " + aa[field].value);
+                        if(curr == item){ // && i === sort_order.length -1){
+		      //      console.log(curr + " equals " + item);
 		            //found[i]=true;
                             continue;
 		        }
-		        else if(aa[field].value > item){
-		         //   console.log(aa[field].value + " is greater than " + item);
+                        if(item === "" || item === null){
+                         //   console.log("continue");
+                            return 1;
+                        }
+                        if(curr === "" || curr === null){
+                         //   console.log("continue");
+                            return -1;
+                        }
+		      //  console.log("field is " + field + " value is " + item);
+  
+		        if(curr > item){
+		         // console.log(curr + " is greater than " + item);
 			    return 1;
 		        }
-		        else if(aa[field].value < item){
-		           // console.log(aa[field].value + " is less than " + item);
+		        else if(curr < item){
+		         //  console.log(curr + " is less than " + item);
 			    return -1;
 		        }
 	                else{
@@ -193,16 +205,19 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 }
             }
   	    r=compare(arr[mid]);
+  
 	    if (r < 0  && arr.length > 1) {
                 if(closest){
                     closest.dir="after";
                 }
+              //  console.log("going up");
             	return Apoco.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
 	    }
 	    else if (r > 0 && arr.length > 1) {
                 if(closest){
                     closest.dir="before";
                 }
+              //  console.log("going down");
 		return Apoco.Utils.binarySearch(arr.slice(0, mid),sort_order,data,closest);
 	    }
 	    else if (r  === 0) {
