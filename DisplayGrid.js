@@ -242,28 +242,28 @@ jsonishData={
                 this.redrawRows();
             }
    	},
-        _afterShow:function(){
-            var v,c,width=0,d,t;
-            var that=this;
-            //console.log("After show is here");
-            if(!this.grids){
-                return;
-            }
+        _calcWidth:function(){
+            var that=this,v,c,width=0,d,t;
+          //  console.log("_calcWidth is here");
             v=that.element.getElementsByClassName("head")[0];
             if(v){
-                c=v.getElementsByTagName("div");
+                c=v.children;//getElementsByTagName("div");
                 // adding up child widths because window may be smaller than grid width
                 if(c){
                     for(var i=0; i<c.length;i++){
-              //          console.log("found child " + i);
+                     //   console.log("found child " + i);
+                        if(c[i].classList.contains("hidden")){
+                            continue;
+                        }
                         d=window.getComputedStyle(c[i],null).getPropertyValue("width");
-                //        console.log("width of child is " + d);
+                      //  console.log("width of child is " + d);
                         if(d.indexOf("px")>=0){
                             t=d.split("px");
                         }
                         else{
                             return;
                         }
+                        
                         width+=parseFloat(t[0]);
                     }
                    // var width=window.getComputedStyle(v,null).getPropertyValue("width");
@@ -275,12 +275,18 @@ jsonishData={
                     }
                     v.style.width=width;
                 }
-                // now add all the grids                
+            }
+        },
+        _afterShow:function(){
+            var that=this;
+         //   console.log("After show is here");
+            if(!this.grids){
+                return;
+            }
+            this._calcWidth();
+            if(!this.element.contains(this.grid_container)){
                 this.element.appendChild(this.grid_container);
-            }
-            else{
-                console.log("cannot find head element ");
-            }
+            }           
         },
     	sort: function(dir){
 	    var isSortable=false;
@@ -815,7 +821,7 @@ jsonishData={
             }
             // remove from dom
             for(var i=0;i<this.cols.length;i++){
-              //  console.log("deleting col " + this.cols[i].name);
+             //   console.log("deleting col " + this.cols[i].name);
                 if(!row[this.cols[i].name]){
                     throw new Error("row is undefined");
                 }
@@ -851,8 +857,8 @@ jsonishData={
                     grid=this.grids.slice(0);
                 }
             }
-         //   console.log("getRow this.sortOrder length is " + this.sortOrder.length);
-         //   console.log("key is %j",key);
+            //console.log("getRow this.sortOrder length is " + this.sortOrder.length);
+           // console.log("key is %j",key);
             for(var i=0;i<grid.length;i++){
                 if(grid[i].name === undefined){
                     throw new Error("grid " + i + "name is " + grid[i].name);
@@ -1052,6 +1058,8 @@ jsonishData={
                     }
                 }
             }
+            this._calcWidth();
+         
         },
 	deleteAll:function(){
             this.deleteChildren();

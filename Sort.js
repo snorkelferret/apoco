@@ -48,11 +48,14 @@ require("./Types")
 	case "float":
 	case "positiveInteger":
             return generic_compare;
-	case "date":  // date is in format 2018-04-22
+        case "date":  // date is in format 2018-04-22
             return (function (a,b,fn){
                 var s,t,p,q;
 	        s=fn(a);
 	        t=fn(b);
+                if(s === t){
+                    return 0;
+                }
                 if( s === null){
                     return -1;
                 }
@@ -144,7 +147,11 @@ require("./Types")
 	    }
 	    r.sort(function(a,b){ 
 		for(var i=0;i<type_data.length;i++){
+                  //  console.log("compare " + type_data[i].type );
+               //     console.log("values a %j",type_data[i].fn(a));
+                //    console.log("values b %j",type_data[i].fn(b));
 		    t=type_data[i].compare(a,b,type_data[i].fn);
+                //    console.log("return is " + t);
 		    if(t !== 0){
 			return t;
 		    }

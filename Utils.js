@@ -154,34 +154,33 @@ String.prototype.trim = String.prototype.trim || function trim() {
             else{
 	        compare=function(aa){
 		    var field,item,curr;
-                //    console.log("START Compare:");
+                   // console.log("START Compare:");
 		    for(var i=0;i<sort_order.length;i++){
-                        
 		        field=sort_order[i];
                         item=data[field];
                         curr=aa[field].value;
-                     //   console.log("sort field is " + field + " item is " + item + " compare " + aa[field].value);
+                      //  console.log("sort field is " + field + " item is " + item + " compare " + aa[field].value);
                         if(curr == item){ // && i === sort_order.length -1){
-		      //      console.log(curr + " equals " + item);
+		        //    console.log(curr + " equals " + item);
 		            //found[i]=true;
                             continue;
 		        }
                         if(item === "" || item === null){
-                         //   console.log("continue");
+                          //  console.log("continue");
                             return 1;
                         }
                         if(curr === "" || curr === null){
-                         //   console.log("continue");
+                           // console.log("continue");
                             return -1;
                         }
 		      //  console.log("field is " + field + " value is " + item);
   
 		        if(curr > item){
-		         // console.log(curr + " is greater than " + item);
+		           // console.log(curr + " is greater than " + item);
 			    return 1;
 		        }
 		        else if(curr < item){
-		         //  console.log(curr + " is less than " + item);
+		       //    console.log(curr + " is less than " + item);
 			    return -1;
 		        }
 	                else{
@@ -205,12 +204,14 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 }
             }
   	    r=compare(arr[mid]);
-  
+         //   for(var i=0;i<arr.length;i++){
+          //      console.log("array is here id  " + arr[i]["id"].value + " date " + arr[i]["submissionDate"].value);
+          //  }
 	    if (r < 0  && arr.length > 1) {
                 if(closest){
                     closest.dir="after";
                 }
-              //  console.log("going up");
+                //console.log("going up");
             	return Apoco.Utils.binarySearch(arr.slice(mid, Number.MAX_VALUE),sort_order,data,closest);
 	    }
 	    else if (r > 0 && arr.length > 1) {

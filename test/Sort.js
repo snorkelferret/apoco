@@ -60,6 +60,23 @@ describe("Sort",function() {
                           {"maturity": '2021-05-23',"stock": "AAF","subclass": 0},
                           {"maturity": '2022-10-10',"stock": "AAG","subclass": 10}]);
     });
+    it("can sort a complex object with nulls",function(){
+         var b=[{stock: "AAB" ,maturity: '' ,subclass: 12 },
+               {stock: "AAE" ,maturity: '2020-11-29' ,subclass: 11 },
+               {stock: "AAF" ,maturity: '' ,subclass: 0 },
+               {stock: "AAC" ,maturity: '2018-02-14' ,subclass: 8 },
+               {stock: "AAD" ,maturity: '2019-10-22' ,subclass: 7 },
+               {stock: "AAG" ,maturity: '2022-10-10' ,subclass: 10 }];
+        Apoco.sort(b,[{type:"string",fn:function(a){return a["stock"];}},
+                       {type: "date",fn: function(a){return a["maturity"];}}]);
+        
+        expect(b).to.eql([{"maturity": '',"stock": "AAB","subclass": 12},
+                          {"maturity": '2018-02-14',"stock": "AAC","subclass": 8},
+                          {"maturity": '2019-10-22',"stock": "AAD","subclass": 7},
+                          {"maturity": '2020-11-29',"stock": "AAE","subclass": 11},
+                          {"maturity": '',"stock": "AAF","subclass": 0},
+                          {"maturity": '2022-10-10',"stock": "AAG","subclass": 10}]);
+    });
     
 });
  

@@ -63,6 +63,7 @@ require("./Fields.js");
             }
             if(el === undefined && this.display == "form"){
                 el=document.createElement("li");
+                parent_element=this.element.getElementsByTagName("ul")[0];
             }
             if(!parent_element){
                 parent_element=this.element;
