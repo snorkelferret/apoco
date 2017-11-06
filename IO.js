@@ -147,13 +147,23 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var promise=new Promise(function(resolve,reject){
                 var request=new XMLHttpRequest();
                 var stateChange=function(){
+                    var ct,js=false;
                     if(request.readyState === XMLHttpRequest.DONE){
+                      //  for(var k in request){
+                       //     console.log("return from server is k " + k + " with value " +  request[k]);
+                      //  }
+                      //  console.log("response header " + request.getResponseHeader("Content-Type"));
+                        
                         if(request.status === 200){ //success
                             // request.response
-                         //   for(var k in request){
-                          //      console.log("return from server is k " + k + " with value " +  request[k]);
-                           // }
-                            if(request.responseType === 'application/json'){
+                            ct=request.getResponseHeader("Content-Type").split(";");
+                            for(var i=0;i<ct.length;i++){
+                                if(ct[i] === "application/json"){
+                                    js=true;
+                                    break;
+                                }
+                            }
+                            if(request.responseType === 'application/json' || js){
                                 resolve(JSON.parse(request.responseText));
                             }
                             else{
