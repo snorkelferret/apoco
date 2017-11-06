@@ -149,11 +149,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 var stateChange=function(){
                     var ct,js=false;
                     if(request.readyState === XMLHttpRequest.DONE){
-                      //  for(var k in request){
-                       //     console.log("return from server is k " + k + " with value " +  request[k]);
-                      //  }
-                      //  console.log("response header " + request.getResponseHeader("Content-Type"));
-                        
+                        //console.log("response header " + request.getResponseHeader("Content-Type"));
+                     /*   for(var k in request){
+                            console.log("return from server is k " + k + " with value " +  request[k]);
+                        }*/
                         if(request.status === 200){ //success
                             // request.response
                             ct=request.getResponseHeader("Content-Type").split(";");
@@ -164,9 +163,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                                 }
                             }
                             if(request.responseType === 'application/json' || js){
-                                resolve(JSON.parse(request.responseText));
+                                //console.log("got responseType of application/js");
+                                resolve(request.response);//JSON.parse(request.responseText));
                             }
                             else{
+                                //console.log("Not json");
                                 resolve(request.responseText);
                             }
                         }
