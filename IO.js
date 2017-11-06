@@ -120,7 +120,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     
         REST:function(type,options,data){
             var defaults={dataType: 'json',
-                          mimeType: 'application/json'};
+                          mimeType: 'json'};
             if(UI && UI.URL){
                 defaults.url=UI.URL;
             }
