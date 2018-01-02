@@ -72,7 +72,7 @@ var UI={};
         PhoneNumber: "02073522023",
         floatArray: [1.456,1.59900,7.89,1044.55],
         boolean: true,
-        text: "Some text",
+        enum:["one","two","three"],
         stringArray: ["some","string","array"],
         imageArray: [{src:"css/images/alchemist1.jpg",url:"",
                       content:[{node:"paragraph",text:"alchemist"}]},
@@ -758,7 +758,6 @@ var UI={};
         return f;
     };
 
-
     var mkTypes=function(){
         var HTypes=HThings.Types;
         var tests={
@@ -804,10 +803,15 @@ var UI={};
             decimal:{
                 test:'[34,"sdds","fs",104.4]',
                 items:[{label:"description",description:""}]
-            },            
+            },
             email:{
                 test:'["junk@nowhere.com","uiui@op"]',
                 items:[{label:"description",description:"e.g me@thisplace.com"}]
+            },
+            enum:{
+                test:'[["6767",7878,"re"],["sss","uiui","dog"]]',
+                
+                items:[{label:"description",description:"Not doing proper checks yet"}]
             },
             file:{
                 test:'[34,"sdds","fs",104.4]',
