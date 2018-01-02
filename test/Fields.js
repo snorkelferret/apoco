@@ -576,16 +576,68 @@ describe("SelectField",function(){
         assert.strictEqual(e.length,4);
         
     });
-    it("can add a value with key value object",function(){
-        f.addValue({label:"sixty",value:77});
-        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
-        assert.strictEqual(e.length,5);
+    it("cannot  add a value of different type to options array",function(){
+        var fn=function(){
+            f.addValue({label:"sixty",value:77});
+           
+        };
+        assert.throws(fn,"select field - addValue must be the same type as options array");
+        //var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
+        //assert.strictEqual(e.length,5);
        // f.getValue();
+    });
+ 
+    it("knows the value has been changed by setValue",function(){
+        f.setValue("two");
+        assert.strictEqual(f.valueChanged(),false);
+    });
+     
+});
+
+describe("SelectField with objectArray as options",function(){
+
+    var f=Apoco.field["select"]({name:"objectselectField",type: "integer",
+                                 options:[{label:"four",value:4},
+                                          {label:"two",value:2},
+                                          {label:"three",value:3}
+                                         ]});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+    it("creates a select node",function(){
+        var e=document.getElementsByName("objectselectField")[0].getElementsByTagName("select")[0];
+        //var e=$("body").find("div[name='selectField']").find("select");
+        assert.isObject(e);
+    });
+    it("creates option nodes",function(){
+        //var e=$("body").find("div[name='selectField']").find("option");
+        var e=document.getElementsByName("objectselectField")[0].getElementsByTagName("option");
+        assert.strictEqual(e.length,3);
+       
+    });
+    it("gets a value from browser",function(){
+        //var e=$("body").find("div[name='selectField']").find("option:contains('two')");
+        var e=document.getElementsByName("objectselectField")[0].getElementsByTagName("option");
+        for(var i=0;i<e.length;i++){
+            //console.log("option is %j" + e[i]);
+            if(e[i].textContent === "two"){
+                break;
+            }
+        }
+      
+        e[i].selected=true;
+      
+        e[i].click();
+        var b=f.getValue();
+        assert.deepEqual(b,{value:'2',label:"two"});
     });
     
     it("gets a value from browser with key value options ",function(){
+        f.addValue({label:"sixty",value:60});
         //var e=$("body").find("div[name='selectField']").find("option:contains('two')");
-        var e=document.getElementsByName("selectField")[0].getElementsByTagName("option");
+        var e=document.getElementsByName("objectselectField")[0].getElementsByTagName("option");
         for(var i=0;i<e.length;i++){
             if(e[i].textContent === "sixty"){
                 break;
@@ -594,19 +646,23 @@ describe("SelectField",function(){
         e[i].selected=true;
         e[i].click();
         var b=f.getValue();
-        assert.strictEqual(b,"77");
+        assert.deepEqual(b,{value:"60",label:"sixty"});
+    });    
+    it("can add objects array",function(){
+        var labels=[{label:"ten",value:10},{label:"eleven",value:11},{label:"twelve",value:12}];
+        for(var i=0;i<labels.length;i++){
+            f.addValue(labels[i]);
+            if(labels[i].value===10){
+                f.setValue(labels[i]);
+            }
+        }
+        var b=f.getValue();
+        assert.deepEqual(b,{value:"10",label:"ten"});
     });
-
-    it("knows the value has been changed by setValue",function(){
-        f.setValue("two");
-        assert.strictEqual(f.valueChanged(),false);
-    });
-  
     
 });
 
 describe("SelectField with start value",function(){
-  
     require("../Fields.js");
 
     var f=Apoco.field["select"]({name:"selectAgain",type: "string",value:"four",options:["","four"]});
@@ -619,7 +675,7 @@ describe("SelectField with start value",function(){
     it("can add some values to a degenerate array",function(){
         var labels=["one","two","three"];
         for(var i=0;i<labels.length;i++){
-            f.addValue({label:labels[i],value:labels[i]});
+            f.addValue(labels[i]);
         }
         var e=document.getElementsByName("selectAgain")[0].getElementsByTagName("option");
         assert.strictEqual(e.length,5);
@@ -629,20 +685,39 @@ describe("SelectField with start value",function(){
         assert.strictEqual(f.value,"four");
         assert.strictEqual("four",b);
     });
-    
-    it("can add objects array",function(){
-        var labels=[{label:"ten",value:10},{label:"eleven",value:11},{label:"twelve",value:12}];
+
+});
+
+
+
+describe("SelectField with number array",function(){
+    require("../Fields.js");
+
+    var f=Apoco.field["select"]({name:"selectNumbers",value:4,options:[1,2,3,4]});
+    it("creates a div",function(){
+        var b=f.getElement();
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+    });
+
+    it("can add some values to a the options",function(){
+        var labels=[5,6,7];
         for(var i=0;i<labels.length;i++){
             f.addValue(labels[i]);
-            if(labels[i].value===10){
-                f.setValue(labels[i]);
-            }
         }
-        var b=f.getValue();
-        assert.strictEqual(b,"10");
+        var e=document.getElementsByName("selectNumbers")[0].getElementsByTagName("option");
+        assert.strictEqual(e.length,7);
     });
-    
+    it("the value is still set after adding values",function(){
+        var b=f.getValue();
+        assert.strictEqual(f.value,4);
+        assert.strictEqual(4,b);
+    });
+
 });
+
+
+
 
 
 describe("ButtonSetField",function(){

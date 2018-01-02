@@ -40,9 +40,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         for(var k in d){
             this[k]=d[k];
         }
-        if(this.editable===false){
-            this.popup=false; // no popup editor if not editable
-        }
+        (this.editable===false)?this.popup=false:this.popup=true; // no popup editor if not editable
+           
         if(Apoco.type[this.type]){
 	    this.html_type=Apoco.type[this.type].html_type;
         }
@@ -822,7 +821,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     var SelectField=function(d,element){
-	var i,o,that=this,opt_type;
+	var i,o,that=this;
+        this.opt_type=null;
         d.field="select";
         d.type="string";
 	_Field.call(this,d,element);
@@ -834,26 +834,41 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             Apoco.Utils.addClass(this.select,this.childClass);
         }
         if(this.options){
-         //   console.log("select: this options is "+ this.options);    
-            if(Apoco.type["stringArray"].check(this.options)){
-                opt_type="stringArray";
+           //if(Apoco.type["array"].check(this.options)){
+           // console.log("select: this options is %j ", this.options);    
+            if(Apoco.type["objectArray"].check(this.options)){
+                this.opt_type="object";
             }
-            else if(Apoco.type["objectArray"].check(this.options)){
-                opt_type="objectArray";
+            else if(Apoco.type["floatArray"].check(this.options)){
+                this.opt_type="float";
+            }
+            else if(Apoco.type["integerArray"].check(this.options)){
+                this.opt_type="integer";
+            }
+            else if(Apoco.type["enum"].check(this.options)){
+                this.opt_type="string";
+               // }
+            }
+            else if(Apoco.type["stringArray"].check(this.options)){
+                this.opt_type="string";
             }
             else{
-                throw new Error("select field- options must be string array or object array with two keys: value and label");
+                throw new Error("select field- options must be an array or object array with two keys: value and label");
             }
         }
+        else{
+            throw new Error("select field needs options set");
+        }
+     //   console.log("opt type is " + this.opt_type);
 	for(i=0; i<this.options.length; i++){
             o=document.createElement("option");
-            if(opt_type === "stringArray"){
+            if(this.opt_type !== "object"){
                 o.value=this.options[i];
                 o.textContent=this.options[i];
             }
             else{
                 o.value=this.options[i].value;
-                o.textContent=this.options.label;
+                o.textContent=this.options[i].label;
             }
             this.select.appendChild(o);
 	}
@@ -896,7 +911,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		        if(that.input.style.visibility === "visible"){ //}("visible")){
 			    that.input.style.visibility= "hidden"; //hide();
                             that.select.style.visibility="visible";
-                            console.log("target value" + e.target.value);
+                         //   console.log("target value" + e.target.value);
                             o=document.createElement("option");
                             o.value=e.target.value;
                             o.textContent=e.target.value;
@@ -935,25 +950,25 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         },
         setValue: function(v){
             var value,name,b;
-            if(Apoco.type["string"].check(v)){
-                name=v;
-                value=v;
+            if(!Apoco.type[this.opt_type].check(v)){
+                throw new Error("select: setValue value " + v + "does not match specified type " + this.opt_type);   
             }
-            else if(Apoco.type["object"].check(v)){
+            if(this.opt_type === "object"){
                 name=v.label;
                 value=v.value;
                 if(!name || !value){
                     throw new Error("select: setValue must have object with keys value and label");
-                }
-                
+                } 
             }
             else{
-                throw new Error("select: setValue must be of type string or object");
+                name=v;
+                value=v;
             }
+   
             for(var i=0;i<this.options.length;i++){
               //  console.log("option is %j ", this.options[i]);
              //   console.log( "name is " + name);
-                if(Apoco.type["object"].check(this.options[i])){
+                if(this.opt_type === "object"){
                     b=this.options[i].value;
                 }
                 else{
@@ -963,14 +978,15 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 if(b === value){
                 //    console.log("found value " + name);
                     this.select.value=value;
-                    this.value=value;
+                    this.select.label=name;
+                    this.value=v;
                     return;
-                    
                 }
             }
             if(this.input){
                 this.input.value=value;
-                this.value=value;
+                this.input.label=name;
+                this.value=v;
                 return;
             }
             throw new Error("SelectField: Cannot set value to " + v + " not in options list");
@@ -981,14 +997,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(!v){
                 return;
             }
-            if(Apoco.type["string"].check(v) || Apoco.type["object"].check(v)){
+          //  console.log("selectField trying to add value %j ",v);
+         //  console.log("selectField: addValue optype is " + this.opt_type);
+            if(Apoco.type[this.opt_type].check(v)){
                 a.push(v);
             }
             else if(Apoco.type["array"].check(v)){
                 a=v;
             }
             else{
-                throw new Error("select field - addValue needs a string, object,stringArray or objectArray");
+                throw new Error("select field - addValue must be the same type as options array " + this.opt_type);
             }
             for(var i=0;i<a.length;i++){
                 this.options.push(a[i]);
@@ -999,17 +1017,39 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
         },
 	getValue:function(){
-	   
+	    var v,n=null;
 	    if(this.input && this.input.value){
-		var v=this.input.value;
+		v=this.input.value; // added option
+                // so no label
 	    }
 	    else{
-		var v=this.select.value;
+		v=this.select.value;
 	    }
-	    if(v && v.length > 0){
-		return v;
-	    }
-	    return null;
+           
+	    if(!v || v.length <= 0){
+                return null;
+            }
+            // return value of correct type
+            if(this.opt_type === "float"){
+                v=parseFloat(v);
+            }
+            else if(this.opt_type === "integer"){
+                v=parseInt(v);
+            }
+            else if(this.opt_type === "object"){
+                // need to find the label
+                if(n===null){
+                    for(var i=0;i<this.options.length;i++){
+                     //   console.log("getValue: this is option " + this.options[i].value + " with label " + this.options[i].label);
+                        if(this.options[i].value == v){
+                            n=this.options[i].label;
+                            break;
+                        }
+                    }
+                }
+                v={value:v,label:n};
+            }
+	    return v;
 
 	},
 	popupEditor:function(func){

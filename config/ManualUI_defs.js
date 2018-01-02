@@ -232,10 +232,10 @@ var UI={};
                                  },
                          descriptions:[""]
                    },
-                select:{ required:{ options:{type:"stringArray",
+                select:{ required:{ options:{type:"array",
                                              params:that.get_types("stringArray"),
                                              default: undefined,
-                                             descriptions: ["where the options can be a stringArray or an objectArray"," the objectArray has two key value pairs","<code> options=[{label:'my label',value:10},{label:'another label',value:'pig'}]</code>","where label is of type string and value is of type any"]}
+                                             descriptions: ["where the options can be a stringArray,floatArray,integerArray  enum or objectArray"," the objectArray has two key value pairs","<code> options=[{label:'my label',value:10},{label:'another label',value:'pig'}]</code>","where label is of type string and value is of any type"]}
                               },
                      options:{blank_option:{type:"boolean",
                                             default: false,

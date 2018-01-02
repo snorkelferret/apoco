@@ -187,6 +187,24 @@ var Apoco=require('./declare').Apoco;
 	        }
 	        return false;
 	    }},
+        enum:{
+            html_type:"",
+            field:"select",
+            check:function(s){
+                if(Apoco.type.blank.check(s)){
+		    return false;
+	        }
+                if(!Apoco.type.array.check(s)){
+                    return false;
+                }
+                // do we need to check the consistency of the elements?
+                //for(var i=0;i<s.length;i++){}
+               // if(isNaN(s)){
+                    
+               // }
+                return true;
+            }
+        },
         file:{
             html_type:"file",
             field: "input",
