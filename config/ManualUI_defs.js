@@ -158,12 +158,12 @@ var UI={};
                            HThings[k].push(n);
                        }
                    }
-                   else{
-                       HThings[k].push(n);
-                   }
-               }
+                    else{
+                        HThings[k].push(n);
+                    }
+                }
             }
-           
+            
             Apoco.sort(HThings[k],"string");
         }
 
@@ -210,67 +210,71 @@ var UI={};
                         descriptions:["For fields that are not editable but need to have field methods"]
                        },
                 input: { options:{type:{type:"string",
-                                    default:"string",
-                                    params:that.get_types("input"),
-                                    dependsOn:{float:{min:"default: undefined",
-                                                      max:"default: undefined",
-                                                      step:"default: 0.01",
-                                                      precision:"default: 2,descriptions:Number of places after the decimal point"
-                                                     },
-                                               integer:{min:"default: undefined",
-                                                        max:"default: undefined",
-                                                        step:"default: 1"
-                                                       },
-                                               currency:{ISOCurrencyCode:"3 letter string - default: 'GBP'"
-                                                        }
-                                              }
-                                   },
+                                        default:"string",
+                                        params:that.get_types("input"),
+                                        dependsOn:{float:{min:"default: undefined",
+                                                          max:"default: undefined",
+                                                          step:"default: 0.01",
+                                                          precision:"default: 2,descriptions:Number of places after the decimal point"
+                                                         },
+                                                   integer:{min:"default: undefined",
+                                                            max:"default: undefined",
+                                                            step:"default: 1"
+                                                           },
+                                                   currency:{ISOCurrencyCode:"3 letter string - default: 'GBP'"
+                                                            }
+                                                  }
+                                       },
                                   value:{type: "any",default: undefined,
-                                     params:that.get_types("input"),
-                                     descriptions:[""]},
+                                         params:that.get_types("input"),
+                                         descriptions:[""]},
                                   placeholder:{type: "string",default:"none",params: "string",descriptions:["placeholder text for field"]}
                                  },
                          descriptions:[""]
-                   },
+                       },
                 select:{ required:{ options:{type:"array",
                                              params:that.get_types("stringArray"),
                                              default: undefined,
-                                             descriptions: ["where the options can be a stringArray,floatArray,integerArray  enum or objectArray"," the objectArray has two key value pairs","<code> options=[{label:'my label',value:10},{label:'another label',value:'pig'}]</code>","where label is of type string and value is of any type"]}
-                              },
-                     options:{blank_option:{type:"boolean",
-                                            default: false,
-                                            descriptions:["adds an input fielg for the user to add an option","if you want a blank select add empty string to the options array"]},
-                              value:{type: "string",default: undefined,descriptions:[ "An element from the options string Array or object array"]},
-                              onChange:{type:"function",
-                                        default: "none",
-                                        descriptions:["adds EventListener on change and runs function ",
-                                                     "<code> options=[{onChange:function(that){//run some code}}];</code>"]
-                                       }
-                             },
-                     descriptions:[""]
-                   },
+                                             descriptions: ["where the options can be a stringArray,floatArray,integerArray  enum or objectArray"," the objectArray has two key value pairs","<code> options=[{label:'my label',value:10},{label:'another label',value:'pig'}]</code>","where label is of type string and value is of any allowed type (see above)"]}
+                                  },
+                         options:{ type:{type:"string",
+                                         default:"string",
+                                         descriptions:["type is one of enum, float, integer,object or string","The type must match the type of the options array - so if the options array is a stringArray the type must be string","If the type is enum the return value will be a string"]},
+                                   
+                                   blank_option:{type:"boolean",
+                                                 default: false,
+                                                 descriptions:["adds an input fielg for the user to add an option","if you want a blank select add empty string to the options array"]},
+                                   value:{type: "string",default: undefined,descriptions:[ "An element from the options array"]},
+                                   onChange:{type:"function",
+                                             default: "none",
+                                             descriptions:["adds EventListener on change and runs function ",
+                                                           "<code> options=[{onChange:function(that){//run some code}}];</code>"]
+                                            }
+                                 },
+                         descriptions:[""]
+                       },
                 buttonSet:{required:{labels:{type:"stringArray"}},
-                       options:{checkbox:{type:"boolean",
-                                          default: false},
-                                value:{type:"booleanArray"}},
-                       descriptions:[""]
-                      },
-            slider:{ options:{ min:{type:"integer",default: 1},
-                               max:{type:"integer",default: 10},
-                               value:{type: "integer",default: undefined}
-                             },
-                     descriptions:["This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Apoco setValue and getValue methods "]
-                   },
+                           options:{checkbox:{type:"boolean",
+                                              default: false},
+                                    value:{type:"booleanArray"}},
+                           descriptions:[""]
+                          },
+                slider:{ options:{ min:{type:"integer",default: 1},
+                                   max:{type:"integer",default: 10},
+                                   value:{type: "integer",default: undefined}
+                                 },
+                         descriptions:["This is a wrapper for the html5 slider, to access the htmlobject use var slider=my_slider_field.getFlement(); Please use the Apoco setValue and getValue methods "]
+                       },
                 numberArray:{ options:{type:{type:"string",
                                              default: "integerArray",
                                              params:that.get_types("numberArray")
-                                        },
-                                   value:{type:"any",
-                                          params:that.get_types("numberArray"),
-                                          default:undefined}
-                                  },
-                          descriptions:[""]
-                        },
+                                            },
+                                       value:{type:"any",
+                                              params:that.get_types("numberArray"),
+                                              default:undefined}
+                                      },
+                              descriptions:[""]
+                            },
                 fileReader:{ options:{ type:{type:"string",default: "file"},
                                        opts:{type: "key value object",default: undefined,
                                              descriptions:["maxSize type: integer, max filesize in bytes","mimeTypes: an array of strings of valid mimetypes","see the IO getFiles","e.g <code> var my_display=Apoco.field['fileReader']({name:'someName',opts:{maxSize:1024,mimeTypes:['application/pdf','image/png']}});</code> "]},
@@ -279,51 +283,51 @@ var UI={};
                                        width:{type:"integer",default: 400,description:"width of the file object"},
                                        height:{type:"integer",default: 400,description:"height of the file object"},
                                        multiple:{type:"boolean",default: true,description:"allow multiple file selects"}
-                    
+                                       
                                      },
                              descriptions:[""]
-                
-                },
-            imageArray:{options:{value:{type:"imageArray",
-                                        default: undefined,
-                                        description: "key value javascript object"},
-                                 thumbnails:{type:"boolean",default:false,description:"Display the images as thumbnails" },
-                                 width:{type:"integer",default: 120,description:"width of the thumbnails"},
-                                 height:{type:"integer",default: 90,description:"height of the thumbnails"}
-                                },
-                        descriptions:[""]
-                       },
-            float:{options:{precision:{type:"integer",default: 2,description:"Number of places after the decimal point" },
-                            step:{type:"float",default: 0.1},
-                            value:{type: "float",default: undefined}},
-                   descriptions:["Float field that aligns the decimal point"]
-                  },
-            autoComplete:{options:{options:{type:"stringArray"},
-                                   value:{type: "string",default: undefined}},
-                          descriptions: ["This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> ","  Please use the Apoco getValue and setValue methods "]
-                         },
-            checkBox:{ options:{ value:{type: "boolean",default: false}},
-                       descriptions: [""]},
-            date:{options:{value:{type:"date",default:undefined,params:["Date","string"] }},
-                  descriptions:["An ISO string- e.g '2018-04-23'","or an integer milliseconds past 1970","This uses the browser datepicker(where available) or Apoco.datepicker"]
-                 },
-            time:{options:{value:{type:"time",default:undefined,
-                                  description:"A valid partial-time as defined in [RFC 3339]."}},
-                  descriptions:[""]
-                 },
-          /*  static:{options:{value:{type:"any",params:["string","float","integer"]}},
-                    descriptions:[""]
-                   }, */
-            textArea:{options:{value:{type:"text",default: undefined}},
+                             
+                           },
+                imageArray:{options:{value:{type:"imageArray",
+                                            default: undefined,
+                                            description: "key value javascript object"},
+                                     thumbnails:{type:"boolean",default:false,description:"Display the images as thumbnails" },
+                                     width:{type:"integer",default: 120,description:"width of the thumbnails"},
+                                     height:{type:"integer",default: 90,description:"height of the thumbnails"}
+                                    },
+                            descriptions:[""]
+                           },
+                float:{options:{precision:{type:"integer",default: 2,description:"Number of places after the decimal point" },
+                                step:{type:"float",default: 0.1},
+                                value:{type: "float",default: undefined}},
+                       descriptions:["Float field that aligns the decimal point"]
+                      },
+                autoComplete:{options:{options:{type:"stringArray"},
+                                       value:{type: "string",default: undefined}},
+                              descriptions: ["This is a simple  autoComplete field. To access the htmlObject, use <br> <code> var auto_comp=ac.getInputElement();</code> ","  Please use the Apoco getValue and setValue methods "]
+                             },
+                checkBox:{ options:{ value:{type: "boolean",default: false}},
+                           descriptions: [""]},
+                date:{options:{value:{type:"date",default:undefined,params:["Date","string"] }},
+                      descriptions:["An ISO string- e.g '2018-04-23'","or an integer milliseconds past 1970","This uses the browser datepicker(where available) or Apoco.datepicker"]
+                     },
+                time:{options:{value:{type:"time",default:undefined,
+                                      description:"A valid partial-time as defined in [RFC 3339]."}},
                       descriptions:[""]
                      },
-            stringArray:{options:{ length:{type:"integer",
-                                           default: 4,
-                                           description:" Max of value array and length"},
-                                   value:{type:"stringArray",default: undefined}
-                                 },
-                         descriptions:[""]
-                        }
+                /*  static:{options:{value:{type:"any",params:["string","float","integer"]}},
+                 descriptions:[""]
+                 }, */
+                textArea:{options:{value:{type:"text",default: undefined}},
+                          descriptions:[""]
+                         },
+                stringArray:{options:{ length:{type:"integer",
+                                               default: 4,
+                                               description:" Max of value array and length"},
+                                       value:{type:"stringArray",default: undefined}
+                                     },
+                             descriptions:[""]
+                            }
             };
 
         },
@@ -332,12 +336,12 @@ var UI={};
             this.fields={};
             this.mkOptions(Options);
             this.mkFieldOptionsList();
-           /* for(var k in this.fields){
-                console.log("fields  value %j",this.fields[k]);
-                for(var h in this.fields[k]){
-                    console.log("other fields is %j " ,this.fields[k][h]);
-                }
-            }*/
+            /* for(var k in this.fields){
+             console.log("fields  value %j",this.fields[k]);
+             for(var h in this.fields[k]){
+             console.log("other fields is %j " ,this.fields[k][h]);
+             }
+             }*/
             this.Commands=this.mkFieldCommands();
             this.mkFields();
             this.mkFieldMethods();

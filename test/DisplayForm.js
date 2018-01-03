@@ -160,16 +160,21 @@ describe("DisplayForm",function(){
         document.getElementsByTagName("body")[0].appendChild(b);
         assert.strictEqual(document.contains(b),true);
         t=Apoco.display.form({id:"test_form",DOM:"test",
-                              onSubmit:function(t){},
+                              onSubmit:function(t){
+                                  return false;
+                              },
                                components:[{node:"heading",size:"h2",text:"Start"},
                                            {node:"paragraph",text:"hullo people"},
                                            {type: "integer",value: 10,name:"ID"},
+                                           {type:"enum",name:"select",required:true,options:["one","two"]},
                                            {submit:true,name:"submitter"}
                                           ]
                               });
         assert.isObject(t);
         var c=t.getChildren();
-        assert.strictEqual(c.length,4);
+        assert.strictEqual(c.length,5);
+        var c=t.getChild("submitter");
+        c.element.click();
         
     });
 });

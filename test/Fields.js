@@ -596,7 +596,7 @@ describe("SelectField",function(){
 
 describe("SelectField with objectArray as options",function(){
 
-    var f=Apoco.field["select"]({name:"objectselectField",type: "integer",
+    var f=Apoco.field["select"]({name:"objectselectField",type: "object",
                                  options:[{label:"four",value:4},
                                           {label:"two",value:2},
                                           {label:"three",value:3}
@@ -621,7 +621,7 @@ describe("SelectField with objectArray as options",function(){
         //var e=$("body").find("div[name='selectField']").find("option:contains('two')");
         var e=document.getElementsByName("objectselectField")[0].getElementsByTagName("option");
         for(var i=0;i<e.length;i++){
-            //console.log("option is %j" + e[i]);
+           // console.log("option name is %j " , e[i].textContent);
             if(e[i].textContent === "two"){
                 break;
             }
@@ -693,7 +693,7 @@ describe("SelectField with start value",function(){
 describe("SelectField with number array",function(){
     require("../Fields.js");
 
-    var f=Apoco.field["select"]({name:"selectNumbers",value:4,options:[1,2,3,4]});
+    var f=Apoco.field["select"]({name:"selectNumbers",type:"integer",value:4,options:[1,2,3,4]});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b);

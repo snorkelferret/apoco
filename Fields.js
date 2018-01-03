@@ -821,10 +821,31 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     var SelectField=function(d,element){
-	var i,o,that=this;
+	var i,o,p,that=this;
+        var allowed_types=["enum","float","integer","string","object"];
         this.opt_type=null;
         d.field="select";
-        d.type="string";
+        if(!d.type){
+            d.type="string"; // make a default
+        }
+        if(d.type){
+            for(var i=0;i<allowed_types.length;i++){
+            //    console.log("type is " + d.type + " allowed type is " + allowed_types[i]);
+                if(d.type == allowed_types[i]){
+                    if(d.type === "enum"){
+                        this.opt_type="enum";
+                        d.type = "string";
+                    }
+                    else{
+                        this.opt_type=(d.type + "Array");
+                    }
+                    break;
+                }
+            }
+            if(this.opt_type === null){ // not an allowed type
+                throw new Error("selectField: this type -  " + d.type + " - is not allowed for select field ");
+            }
+        }
 	_Field.call(this,d,element);
         this.select=document.createElement("select");
         if(this.required === true){
@@ -836,24 +857,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         if(this.options){
            //if(Apoco.type["array"].check(this.options)){
            // console.log("select: this options is %j ", this.options);    
-            if(Apoco.type["objectArray"].check(this.options)){
-                this.opt_type="object";
-            }
-            else if(Apoco.type["floatArray"].check(this.options)){
-                this.opt_type="float";
-            }
-            else if(Apoco.type["integerArray"].check(this.options)){
-                this.opt_type="integer";
-            }
-            else if(Apoco.type["enum"].check(this.options)){
-                this.opt_type="string";
-               // }
-            }
-            else if(Apoco.type["stringArray"].check(this.options)){
-                this.opt_type="string";
-            }
-            else{
-                throw new Error("select field- options must be an array or object array with two keys: value and label");
+            if(!Apoco.type[this.opt_type].check(this.options)){
+                throw new Error("select field- options must be an array or object array with two keys: value and label of type " + this.type);
             }
         }
         else{
@@ -862,7 +867,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
      //   console.log("opt type is " + this.opt_type);
 	for(i=0; i<this.options.length; i++){
             o=document.createElement("option");
-            if(this.opt_type !== "object"){
+            if(this.type !== "object"){
                 o.value=this.options[i];
                 o.textContent=this.options[i];
             }
@@ -950,10 +955,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         },
         setValue: function(v){
             var value,name,b;
-            if(!Apoco.type[this.opt_type].check(v)){
-                throw new Error("select: setValue value " + v + "does not match specified type " + this.opt_type);   
+            if(!Apoco.type[this.type].check(v)){
+                throw new Error("select: setValue value " + v + " does not match specified type " + this.type);   
             }
-            if(this.opt_type === "object"){
+            if(this.type === "object"){
                 name=v.label;
                 value=v.value;
                 if(!name || !value){
@@ -968,7 +973,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             for(var i=0;i<this.options.length;i++){
               //  console.log("option is %j ", this.options[i]);
              //   console.log( "name is " + name);
-                if(this.opt_type === "object"){
+                if(this.type === "object"){
                     b=this.options[i].value;
                 }
                 else{
@@ -999,10 +1004,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
           //  console.log("selectField trying to add value %j ",v);
          //  console.log("selectField: addValue optype is " + this.opt_type);
-            if(Apoco.type[this.opt_type].check(v)){
+            if(Apoco.type[this.type].check(v)){
                 a.push(v);
             }
-            else if(Apoco.type["array"].check(v)){
+            else if(Apoco.type[this.opt_type].check(v)){
                 a=v;
             }
             else{
@@ -1030,13 +1035,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 return null;
             }
             // return value of correct type
-            if(this.opt_type === "float"){
+            if(this.type === "float"){
                 v=parseFloat(v);
             }
-            else if(this.opt_type === "integer"){
+            else if(this.type === "integer"){
                 v=parseInt(v);
             }
-            else if(this.opt_type === "object"){
+            else if(this.type === "object"){
                 // need to find the label
                 if(n===null){
                     for(var i=0;i<this.options.length;i++){
