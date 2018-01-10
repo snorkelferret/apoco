@@ -304,9 +304,9 @@ require("./DisplayBase");
                 }
                 else{
                     that.components[this.current].element.style.visibility="visible";
-                    setTimeout(function(){
-                        that.play();
-                    },that.delay);
+                  //  setTimeout(function(){
+                    that.play();
+                  //  },that.delay);
                 }
             }
             else{ // show the first image
@@ -482,7 +482,7 @@ require("./DisplayBase");
                 return;
             }
          
-            that.step("next"); // update immediately for user feedback
+         //   that.step("next"); // update immediately for user feedback
 //            console.log("play is here- current " + that.current);
             that.autoplay=true;
             that.interval=setInterval(function(){that.step("next","play");},this.delay);
@@ -557,7 +557,7 @@ require("./DisplayBase");
             var that=this,num=this.components.length;
             var next,prev=this.current;
             // stop the current fade if one is in progress
-         //   console.log("fade timer is " + this.fade_timer);
+          // console.log("fade timer is " + this.fade_timer);
             if(this.fade_timer !== 0){
                 that.stop();
             //    console.log("step called stop");
