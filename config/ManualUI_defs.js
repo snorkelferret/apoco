@@ -87,6 +87,7 @@ var UI={};
         array: ["One","Two","Three","Four"],
         path: "css/images/rabbit_img1.jpg",
         size: "h3",
+        text: "here is some text",
         href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
         target: "_blank",
         nodeType: "ul",
@@ -1025,7 +1026,7 @@ var UI={};
                 options:{
                     items:[{label: "text",description:"the text can contain unicode and things like ' &#60br&#62'"}]
                 },
-                methods:[{label:"myNode.setText(string);",description:"params: string - text to insert"}]
+                methods:[{label:"node.setText(string);",description:"params: string - text to insert"}]
 
             },
             paginate:{

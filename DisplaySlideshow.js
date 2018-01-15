@@ -529,7 +529,7 @@ require("./DisplayBase");
             that.components[next].element.style.top=0;
             that.components[next].element.style.left=0;
             that.components[next].element.style.opacity = op;
-            that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+            //that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
        //     console.log("cross fade prev is " + prev + " next " + next);
       
             that.fade_timer = setInterval(function() {
@@ -540,13 +540,13 @@ require("./DisplayBase");
                     op=1.0;
                     that.components[prev].element.style.visibility="hidden";
                     that.components[prev].element.style.opacity=1;
-                    that.components[prev].element.style.filter = 'alpha(opacity=' + 100 + ")";
+              //      that.components[prev].element.style.filter = 'alpha(opacity=' + 100 + ")";
                 }
                 else{
                     that.components[prev].element.style.opacity = (1-op);
-                    that.components[prev].element.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
+                //    that.components[prev].element.style.filter = 'alpha(opacity=' + (1-op) * 100 + ")"; // IE 5+ Support
                     that.components[next].element.style.opacity = op;
-                    that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
+                 //   that.components[next].element.style.filter = 'alpha(opacity=' + op * 100 + ")"; // IE 5+ Support
                     op += op * inc;
                 }
             }, step);
@@ -587,7 +587,7 @@ require("./DisplayBase");
                 this.components[prev].element.style.visibility="hidden";
                 this.components[next].element.style.visibility="visible"; 
                 this.components[next].element.style.opacity=1;
-                this.components[next].element.style.filter = "alpha(opacity=100)";
+               // this.components[next].element.style.filter = "alpha(opacity=100)";
                 this.components[next].element.style.top=0;
                 this.components[next].element.style.left=0;
             }
