@@ -120,7 +120,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     
         REST:function(type,options,data){
             var defaults={dataType: 'json',
-                          mimeType: 'json'};
+                          mimeType: 'application/json'};
             if(UI && UI.URL){
                 defaults.url=UI.URL;
             }
@@ -147,36 +147,39 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var promise=new Promise(function(resolve,reject){
                 var request=new XMLHttpRequest();
                 var stateChange=function(){
-                    var ct,js=false;
+                    var ct,mtype;
                     if(request.readyState === XMLHttpRequest.DONE){
                         //console.log("response header " + request.getResponseHeader("Content-Type"));
                      /*   for(var k in request){
                             console.log("return from server is k " + k + " with value " +  request[k]);
                         }*/
-                        if(request.status === 200){ //success
+                        if(request && request.status === 200){ //success
                             // request.response
-                            ct=request.getResponseHeader("Content-Type").split(";");
-                            for(var i=0;i<ct.length;i++){
-                                if(ct[i] === "application/json"){
-                                    js=true;
-                                    break;
+                            if(request.getResponseHeader("Content-Type")){
+                                ct=request.getResponseHeader("Content-Type").split(";");
+                                if(ct && ct.length > 1){
+                                    mtype=ct[1];
                                 }
                             }
-                            if(request.responseType === 'application/json' || js){
+                            if(request.responseType === 'application/json' ||
+                               mtype.indexOf("json") !== -1){
                                 //console.log("got responseType of application/js");
-                                resolve(request.response);//JSON.parse(request.responseText));
+                                resolve(JSON.parse(request.response));
+                            }
+                            else if(request.responseType && request.responseType.indexOf("text") !== -1 ||
+                                    mtype.indexOf("text") !== -1){
+                                (request.responseText)?resolve(request.responseText):resolve(request.response);
                             }
                             else{
                                 //console.log("Not json");
-                                resolve(request.responseText);
+                                (request.response)?resolve(request.response):resolve(request.responseText);
                             }
                         }
                         else{
-                            reject(request.status);
                             if(!request){
                                 throw new Error("REST failed with no return from server");
                             }
-                           // Apoco.popup.statusCode[request.status]((request.statusText + " " + request.responseText));
+                            reject(request.status);
                         }
                     }
                 };
@@ -195,7 +198,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     }
                 }
                 if(type === "POST"  || type === "PUT"){
-                    console.log("PUT request %j",request );
+                   // console.log("PUT request %j",request );
                     request.send(data);
                 }
                 else{

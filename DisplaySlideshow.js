@@ -201,10 +201,11 @@ require("./DisplayBase");
             h=window.getComputedStyle(this.slideshow_container,null).getPropertyValue("height").split("px");
             this.width=parseInt(w);
             this.height=parseInt(h);
-          // console.log("slideshow container width " + this.width + " height " + this.height);
+            //console.log("slideshow container width " + this.width + " height " + this.height);
             if(parseInt(this.height) === 0){ // if height is not set on slideshow_container
                 y=this._getTopOffset();
                 this.height=window.innerHeight-y;
+                //this.slideshow_container.style.height=(h + "px");
             }
             
             if(parseInt(this.height)>0 ){
@@ -282,7 +283,7 @@ require("./DisplayBase");
             for(var i=0;i<this.components.length;i++){
               //  console.log("after show calc " + i + " this loaded is " + this.components[i].loaded);
                 if(this.components[i].loaded){
-                   // console.log("Values loaded = going to calculate cover");
+                //   console.log("Values loaded = going to calculate cover");
                     this._calculateCover(this.components[i]);
                 }
             }
@@ -301,11 +302,12 @@ require("./DisplayBase");
                   //  console.log("stopping");
                     that.stop();
                 }
+                that.components[this.current].element.style.visibility="visible";
                 if(that.controls){
                     that.element.querySelector(".play").click();
                 }
                 else{
-                    that.components[this.current].element.style.visibility="visible";
+                   // that.components[this.current].element.style.visibility="visible";
                   //  setTimeout(function(){
                     that.play();
                   //  },that.delay);
