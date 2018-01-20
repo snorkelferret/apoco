@@ -147,7 +147,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var promise=new Promise(function(resolve,reject){
                 var request=new XMLHttpRequest();
                 var stateChange=function(){
-                    var ct,mtype;
+                    var ct,mtype="";
                     if(request.readyState === XMLHttpRequest.DONE){
                         //console.log("response header " + request.getResponseHeader("Content-Type"));
                      /*   for(var k in request){
