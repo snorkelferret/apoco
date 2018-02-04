@@ -75,7 +75,7 @@ test.describe("Manual",function(){
         });
     });
     test.it("we have some tabs",function(done){
-        assert.strictEqual(tabs.length,10);
+        assert.strictEqual(tabs.length,11);
 //        console.log("we have poxy tabs " + tabs.length);
         done();
     });
@@ -83,7 +83,7 @@ test.describe("Manual",function(){
     test.it("can get the tab list with Apoco",function(){
         driver.executeScript("return Apoco.Panel.get('Tabs').getChild('Tabs').getChildren().length")
             .then(function(p){
-                assert.strictEqual(p,10);
+                assert.strictEqual(p,11);
             });
     });
 
