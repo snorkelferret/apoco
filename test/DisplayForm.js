@@ -174,7 +174,9 @@ describe("DisplayForm",function(){
         var c=t.getChildren();
         assert.strictEqual(c.length,5);
         var c=t.getChild("submitter");
+        assert.isObject(c);
         c.element.click();
         
     });
+ 
 });

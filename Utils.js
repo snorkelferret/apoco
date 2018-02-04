@@ -524,15 +524,17 @@ String.prototype.trim = String.prototype.trim || function trim() {
 		history.replaceState(c_obj,c_obj.title,c_obj.url);
 	    },
 	    push: function(name){   // used by callback functions
-                var c_obj={};
+                var p,c_obj={};
                 c_obj.name=name;
-                var p=("index.html?" + name);
-		history.pushState(c_obj,p,p);
+                //p=("index.html?" + name);
+                p=(window.location.pathname + "?" + name);
+               // console.log("path is " + p);
+		history.pushState(c_obj,name,p);
 	    },
             queryString:function(){
                 var name=null,u=window.location.href;
                 var p=u.split("?");
-                console.log(" got string to start ",p[1]);
+              //  console.log(" got string to start ",p[1]);
                 if(p.length ===2){
                     name=p[1].toString();
                 }

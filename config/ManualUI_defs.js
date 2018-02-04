@@ -578,7 +578,7 @@ var UI={};
                 getValue:{descriptions:[
                     "<code>var r=field.getValue();</code>",
                     "return: type",
-                    'returns the value currently displayed in the DOM <br> Use _reset() to set the values to the last setValue  <br>if no value is set returns "undefined"']
+                    'returns the value currently displayed in the DOM <br> Use _reset() to set the values to the last setValue  <br>if no value is set returns "undefined"<br> To access the value set with setValue use raw field.value ']
                          },
                 setValue:{descriptions:[
                     "<code>var r=field.setValue(value[,index]);</code>",
@@ -623,13 +623,17 @@ var UI={};
                 ]},
                 show:{
                     descriptions:[
-                        "<code> field.show(); </code>"
+                        "<code> field.show([display_type]); </code>",
+                        "where optional display type is a valid css type, excluding 'none'"
                         ]
                 },
                 hide:{
                        descriptions:[
                         "<code> field.hide(); </code>"
                        ]
+                },
+                setRequired:{
+                    descriptions:["set or unset required ","<code> my_field.setRequired(true);<code>","return: none"]
                 },
                 contains:{descriptions:[
                     "<code> var array=field.contains(options_array,value);<code>"
@@ -1848,7 +1852,7 @@ var UI={};
                          ret: "array of sibling htmlObjects"},
             history:{ p:"Make the forward and back buttons on the browser work.<br> <code>var c=Apoco.Utils.history.init(callback_function); </code> ",
                       params:"function",
-                      description:"history.init calls a this function when the forward or back buttons on the browser are pushed <br> Other Methods: <code> <br> Apoco.Utils.history.push('some_name');<code> This is the name that is returned to the callback function ",
+                      description:"history.init calls a this function when the forward or back buttons on the browser are pushed <br> Other Methods: <code> <br> Apoco.Utils.history.push('some_name');</code> This is the name that is returned to the callback function <br>Example:<br><code>    var b=null,<br>name=Apoco.Utils.history.queryString();<br><br> if(name){ // find the panel that contains the name <br> "+ mk_spaces(2) + " b=find_tab_panel(name,true); <br> }<br> if(!b){<br> "+ mk_spaces(2) + " UI.Panels.Tabs.components[0].selected='About';<br>" + mk_spaces(2) + " Apoco.Utils.history.push('About');<br> " + mk_spaces(2) + " UI.start=['Tabs','About'];<br>}<br> else{// unselect the default<br>" + mk_spaces(2) + "UI.Panels.Tabs.components[0].selected=null;<br> " + mk_spaces(2) + "b.selected=name;<br>" + mk_spaces(2) + "UI.start=['Tabs',name];<br>}</code><br>and the select function for the tabs is <br><code>  var select_tabs=function(that,pop){<br> var name=that.name; <br> if(!pop){<br> "+ mk_spaces(2) + "Apoco.Utils.history.push(name);<br> }<br>    if(that.parent.getSelected()){<br> "+ mk_spaces(2) + "Apoco.Panel.hide(that.parent.selected.name);<br>}<br>     Apoco.Panel.show(name);<br> that.parent.select(name); ",
                       ret: "object"}
             
         };
@@ -2061,7 +2065,7 @@ var UI={};
                                              e.stopPropagation();
                                              e.preventDefault();
                                    //          console.log("got click");
-                                             var t=that.DOM; //document.getElementById("mainNavbar");
+                                             var t=that.DOM;
                                              if(!t){
                                                  throw new Error("Cannot find main navNar");
                                              }
@@ -2088,7 +2092,8 @@ var UI={};
                                  {name: "Windows",label: "Windows",action:select_tabs},
                                  {name: "IO",label: "IO",action:select_tabs},
                                  {name: "Popups",label: "Popups",action:select_tabs},
-                                 {name: "Utils",label: "Utils",action:select_tabs}
+                                 {name: "Utils",label: "Utils",action:select_tabs},
+                                 {name: "Examples",label: "Exanples",action:select_tabs}
                              ]
                             }
                           ]
@@ -2143,7 +2148,7 @@ var UI={};
                                                           {label: "types",description: ""}
                                                          ]},
 
-                          {node:"paragraph",text:"You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) "}
+                          {node:"paragraph",text:"You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s) <br> You don't have to use Apoco to make an SPA it will happily make the components for any page."}
                         //  {node: "heading",size: "h4",text:"Required"}
 
                       ]},
@@ -2413,7 +2418,596 @@ var UI={};
                        components: mkMenu(HThings.Utils)
                       }
                   ]
+        },
+        Examples:{
+            components:[
+                {display:"fieldset",
+                 id:"Blurb",
+                 DOM: "right",
+                 components:[
+                     {node:"heading",size:"H2",text:"HTML"},
+                     {editable:false, type:"text",name:"jjjs",value:` <!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" >
+     <script>
+        window.onload=function(){
+             Apoco.start(UI.start);
+        };
+    </script>
+   </head>
+<body>
+    <div class="bg" id="bg">
+    </div>
+    <header>
+      <div id="vfx">          
+             <h2>Visual Effects</h2>
+      </div> 
+     <nav class="bannertop navbar navbar-inverse">
+        <div class="auto_margin container">
+    
+           <div class="navbar-header">
+              <button type="button" id="tabBar" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNavbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+             
+            </div>
+           <div class="collapse navbar-collapse" id="mainNavbar">
+         
+           </div>
+    	   
+        </div>
+     
+     </nav> 
+    </header>
+     <div id="Main">
+
+	<div id="Content" class="ui-corner-bottom">
+	</div>
+  
+	<div class="no_script">
+          
+	  <noscript>
+	     <div style=" background-color: #800; padding: 30px">
+	      <h2 style="margin-left: 100px;" > No Javascript enabled ...</h2>
+	      <h2 style="margin-left: 100px;" > This site won't work without it !!! </h2>
+	       </div>
+	  </noscript>
+      
+        </div>
+      
+        </div>
+       
+     <footer id="Footer">
+           <p class="footer_text">
+	 
+             Copyright &copy;  2012-2018 Perluceo Ltd. All rights reserved
+             <a href="https://www.npmjs.com/package/apoco"> Built with Apoco </a> 
+            </p>
+     </footer>
+
+     <script  src="js/apoco.js" defer  ></script>
+     <script src="js/PerluceoUI_defs.js" defer ></script>
+   
+</body>
+ 
+</html>
+`},
+                     {node:"heading",size:"H2",text:"Javascript UI Panels"},
+                     {editable:false, type:"text",name:"hhh",value:`var UI={};
+;(function(){
+    'use strict';
+    // Business Logic
+ 
+    var history_update=function(name){
+        var a;
+        console.log("history update is here");
+        if(!name){
+            console.log("state name is wrong or null" + name);
         }
+        else{
+            a=find_tab_panel(name);//Apoco.Panel.get("TabPanel").getChild("Tabs").getChild(name);
+
+            if(a){
+                select_tabs(a.getChild(name),true);
+            }
+            else console.log("cannot find tab");
+        }
+    };
+
+    Apoco.Utils.history.init(history_update);
+    
+    var find_tab_panel=function(name,start){ // if start is true - not been built yet
+        var b,c,h;
+        if(!start){
+            b=Apoco.Panel.get("Tabs").getChild("Tabs");
+            if(b === null){
+                throw new Error("Cannot find tab Panel tabs");
+            }
+            c=b.getChildren();
+        }
+        else{
+            h=UI.Panels["Tabs"];
+            for(var k=0;k<h.components.length;k++){
+                if(h.components[k].id === "Tabs"){
+                    c=h.components[k].components;
+                    b=h.components[k];
+                    break;
+                }
+            } 
+        }
+        
+        for(var j=0;j<c.length;j++){
+            if(c[j].name === name){
+                return b;
+            }
+        }
+        
+        return null;
+    };
+ 
+    var select_tabs=function(that,pop){
+        var name=that.name;
+        if(!pop){
+            Apoco.Utils.history.push(name);
+        }
+        if(that.parent.getSelected()){
+            Apoco.Panel.hide(that.parent.selected.name);
+        }
+        Apoco.Panel.show(name);
+        that.parent.select(name);
+   
+        if(name === "Projects"){
+            Apoco.Panel.get("Projects").getChild("Video").hide();
+        }
+        // for the burger bar
+        var p=Apoco.Panel.get("Tabs").getChild("Tabs"); 
+        if(that.parent === p){
+            if(p.element.parentNode.style.display==="block"){
+                p.element.parentNode.style.display="none";
+            }
+        }
+        //Apoco.Panel._dumpHTML(name);
+    };
+    
+    
+    var project_list=[
+        { date: 2017,
+          label:"Showreel 2017",
+          name:"sr2017",
+          video: "css/videos/1K2018.mp4",
+          description:"DMP, FX, Stereo conversions and compositing",
+          src: "css/images/posters/no_image.png" 
+        },
+        { date: 2017,
+          label:"Back (TV Series)",
+          name:"back",
+          description:"DMP, CGI and compositing for 'Back'.",
+          src: "css/images/posters/back.jpg" 
+        },
+        { date: 2017,
+          label:"Amazon Adventure 3D Imax",
+          name:"amazon",
+          description:"DMP and stereo conversions",
+          node:[{node:"anchor",text:"Review imax Victoria",href:"http://imaxvictoria.com/movie/amazon-adventure-3d/",target:"_blank"}
+               ],
+          src: "css/images/posters/Amazon_Adventure-1-1.jpg" 
+        },
+        { date: 2016,
+          label: "Showreel from 2016",
+          name: "showreel",
+          description: "Selection of shots from recent(ish) projects",
+          video: "css/videos/1K2.mp4",
+          src: "css/images/posters/no_image.png"
+        },
+        { date: 2016,
+          label: "EarthFlight 3D Imax (Documentary)",
+          name: "earthflight",
+          description: "Stereography, Photogrammetry and DMP",
+          video:"css/videos/EFImax.mp4",
+          node:[{node: "anchor",text: "review in Giant Screen Films",
+                 href: "http://www.gsfilms.com/news/article.asp?ArticleSource=326",target:"_blank"},
+                {node: "anchor",text: "trailer on vimeo",href:"https://vimeo.com/178526335",
+                 target:"_blank"}
+               ],
+          src:"css/images/posters/earthflight3D.jpg"
+        },
+        { date: 2014,
+          label: "Showreel from 2012",
+          name: "old_showreel",
+          description: "Selection of shots from older projects",
+          video: "css/videos/history.webm",
+          src: "css/images/posters/no_image.png"
+       
+        },
+        { date: 2015,
+          label: "Shaun the Sheep Movie " ,name: "shaun",
+          description: "Compositing and FX Animation",
+          src:"css/images/posters/shaun_the_sheep.jpg"
+        },
+        { date: 2014,label: "Wings 3D (Documentary)" ,name:"wings",
+          description: "Stereographic fixes",
+          node:[{node: "anchor",href:"http://www.mcclatchydc.com/news/nation-world/national/article24769051.html",
+                text: "John Downer Interview",target:"_blank"}],
+          src:"css/images/posters/wings3D.jpg"},
+        { date: 2014,label: "Bears (Documentary) ",name:"bears",
+          description: "visual effects artist - Image processing and Compositing",
+          src:"css/images/posters/bears.jpg"},
+        { date: 2012,label: "Flight of the Butterflies 3D (Documentary)", name:"fob",
+          description: "FX Animation, CG Modelling Texturing and Lighting",
+          src:"css/images/posters/flight_of_the_butterflies.jpg"}
+    ];
+        
+
+    var preload_video=function(){
+        for(var i=0; i<project_list.length;i++){
+            if(project_list[i].video){
+                project_list[i].source=document.createElement("source");
+                project_list[i].source.setAttribute("src",project_list[i].video);
+                project_list[i].source.setAttribute('type', 'video/mp4');
+            }
+        }
+    };
+
+    preload_video();
+    
+   
+    UI.Panels={
+        Tabs:{ components:[
+            {display:"tabs",id:"Tabs",
+             DOM: "mainNavbar",
+             selected: "About",
+             class:["navbar-nav","nav","navbar-right"],
+             //  dependsOn:"Tabs",
+             action: function(that){
+                 for(var i=0; i<that.components.length;i++){
+                     that.components[i].action=select_tabs;
+                 }
+                 var burgerBar=function(that){
+                     var p=document.getElementById("tabBar");
+                     if(!p){
+                         throw new Error("Cannot find tabBar");
+                     }
+                     p.addEventListener("click",function(e){
+                         e.stopPropagation();
+                         e.preventDefault();
+                         //          console.log("got click");
+                         var t=that.DOM; //document.getElementById("mainNavbar");
+                         if(!t){
+                             throw new Error("Cannot find main navNar");
+                         }
+                         //        console.log("t display is " + t.style.display);
+                         if(t.style.display==="none" || t.style.display === ""){ // not set inline the first time round
+                             t.classList.add("tab_dropdown");
+                             t.style.display="block";
+                         }
+                         else{
+                             t.classList.remove("tab_dropdown");
+                             t.style.display="none";
+                         }
+                     },false);
+                 };
+                 burgerBar(that);
+             },
+             components:[{name: 'About'},
+                         {name:'Projects'},
+                         {name: "Who"},
+                         {name: "Contact"},
+                         {name: "Stuff"}
+                        ]}
+        ]},
+        About:{ components:[ 
+            {display: "slideshow",
+             DOM: "Content",
+             id: "Slideshow",
+             dependsOn: "Slideshow",
+             fit_to: "width",
+             action:function(){
+                 Apoco.IO.dispatch("resize");
+             }, 
+             listen:[{name:"resize",action:function(that){
+                 console.log("config got resize event");
+                 that.height=window.innerHeight-that.element.offsetTop;
+                 that.element.style.height=(that.height + "px");
+                 that._afterShow();
+             }}], 
+             controls: false,
+             fade: true,
+             //     autoplay: true,
+             components:[{"src":"css/images/titles/name.0001.png",content:[{node:"paragraph",text:"High-end compositing, including 3D/Imax etc. " }]},
+                         {"src":"css/images/titles/comp01.png",content:[{node:"paragraph",text:"High-end compositing, including 3D/Imax etc. "}]},
+                         {"src":"css/images/titles/name.0002.png",content:[{node:"paragraph",text:"Some problems don't easily fit into the frame-by-frame approach of conventional compositing systems. Time based errors such as fogging,lens flare and other artefacts, are better done with software that can look at many frames to determine the desired values. Our strong programming background means we can program a solution not available in traditional compositing packages."}]},
+                         {"src":"css/images/titles/im01.png",content:[{node:"paragraph",text:"Some problems don't easily fit into the frame-by-frame approach of conventional compositing systems. Time based errors such as fogging,lens flare and other artefacts, are better done with software that can look at many frames to determine the desired values. Our strong programming background means we can program a solution not available in traditional compositing packages."}]},
+                         {"src":"css/images/titles/name.0003.png",content:[{node:"paragraph",text:"From full 3D CG models to matte painting. Extensive experience with complex photogrammetry."}]},
+                         {"src":"css/images/titles/pg1_01.jpg",content:[{node:"paragraph",text:"From full 3D CG models to matte painting. Extensive experience with complex photogrammetry."}]},
+                         {"src":"css/images/titles/pg1_02.jpg",content:[{node:"paragraph",text:"From full 3D CG models to matte painting. Extensive experience with complex photogrammetry."}]},
+                         {"src":"css/images/titles/pg1_03.jpg",content:[{node:"paragraph",text:"From full 3D CG models to matte painting. Extensive experience with complex photogrammetry."}]},
+                         {"src":"css/images/titles/name.0004.png",content:[{node:"paragraph",text:"Full CG models, tracked matte paintings and everything in between "}]},
+                         {"src":"css/images/titles/se1_02.jpg",content:[{node:"paragraph",text:"Full CG models, tracked matte paintings and everything in between "}]},
+                         {"src":"css/images/titles/se1_01.jpg",content:[{node:"paragraph",text:"Full CG models, tracked matte paintings and everything in between "}]},
+                         {"src":"css/images/titles/name.0005.png",content:[{node:"paragraph",text:"Conversions and fixes, VFX and set extensions. HD to Imax. Recent work includes EarthFlight 3D an imax documentary released last year."}]},
+                         {"src":"css/images/titles/stereo01.png",content:[{node:"paragraph",text:"Conversions and fixes, VFX and set extensions. HD to Imax. Recent work includes EarthFlight 3D an imax documentary released last year."}]},
+                         {"src":"css/images/titles/name.0006.png",content:[{node:"paragraph",text: "All types of weather, rain, snow, fog, sky replacement. Dust from the helicopter in 'Black Hawk Down', snow in 'The Girl with Dragon Tattoo' and many more credits."}]},
+                         {"src":"css/images/titles/fx01.png",content:[{node:"paragraph",text: "All types of weather, rain, snow, fog, sky replacement.Dust from the helicopter in 'Black Hawk Down', snow in 'The Girl with Dragon Tattoo' and many more credits."}]},
+                         {"src":"css/images/titles/name.0007.png",content:[{node:"paragraph",text:"Val has painted hundreds of DMP's for high-end film and TV projects, often with wild camera moves"}]},
+                         {"src":"css/images/titles/dmp1_01.jpg",content:[{node:"paragraph",text:"Val has painted hundreds of DMP's for high-end film and TV projects, often with wild camera moves"}]},
+                         {"src":"css/images/titles/dmp1_02.jpg",content:[{node:"paragraph",text:"Val has painted hundreds of DMP's for high-end film and TV projects, often with wild camera moves"}]}
+                        ]
+            }
+        ]
+              },
+        Projects:{ components:[
+            { DOM: "Content",
+              id: "Video",
+              hidden: true,
+              display: "fieldset",
+              components:[
+                  {node:"heading",name:"video_heading",size:"h3",text:""},
+                  {node: "whatever",name:"video_player","class":"video_player",nodeType:"video"},
+                  {node:"paragraph",name:"video_text",text:""},
+                  {node: "button", childClass:["btn","btn-primary"],text:"back",name:"stop_video",action:function(that){
+                      var n=that.parent.getChild("video_player");
+                      // console.log("n is " + n);
+                      if(n){
+                          //   console.log("got video player");
+                          var s=n.element.childNodes[0];
+                          if(s){
+                              //     console.log("got source");
+                              n.element.removeChild(s);
+                          }
+                      }
+                      that.parent.hide();
+                      that.parent.getSibling("Projects").show();
+                  }}
+              ]},
+            { DOM: "Content",
+              id:"Projects",
+              display:"fieldset",
+              components:[
+                  {node: "heading",size: "h2",text: "Val Wardlaw, Filmography"},
+                  {field: "imageArray",name: "posters",editable: false, width: 148,height: 216,
+                   thumbnails: true,
+                   value:project_list,
+                   action:function(that){
+                      // var p,v;
+                       var play_video=function(a,preload){
+                           var n, p=that.parent.getSibling("Video");
+                           //  console.log("index in play is " + a.index);
+                           if(!preload){
+                               p.show();
+                           }
+                           n=p.getChild("video_heading");
+                           n.setText(project_list[a.index].label);
+                           n=p.getChild("video_text");
+                           n.setText(project_list[a.index].description);
+                           n=p.getChild("video_player");
+                           n.element.textContent="Your browser doesn't support HTML5 video tag.";
+                           n.element.controls=true;
+                           //  p.element.poster="css/images/titles/im01.png";
+                           n.element.preload="auto";
+                           n.element.appendChild(project_list[a.index].source);
+                           n.element.load();
+                           window.scrollTo(0,100);
+                           if(!preload){
+                               n.element.play();
+                               that.parent.hide();
+                           }
+                       };
+                       var mk_nodes=function(v,index){
+                           var first=true;
+                           var p=that.element.querySelector("div[name='" + v.name+ "']");
+                           if(p){
+                               var f=document.createElement("h4");
+                               f.textContent=v.date;
+                               p.appendChild(f);
+                               f=document.createElement("p");
+                               f.textContent=v.description;
+                               p.appendChild(f);
+                               if(v.video !== undefined){
+                                   f=Apoco.node({node:"button",action:play_video});
+                                   f.index=index;
+                                   var m=document.createElement("img");
+                                   m.setAttribute("src","css/images/play.png");
+                                   m.classList.add("play_icon");
+                                   f.element.appendChild(m);
+                                   p.appendChild(f.element);
+                                   if(first){   // force preload of first video
+                                       play_video(f,true);
+                                       first=false;
+                                   }
+                               }
+                               if(v.node){
+                                   for(var j=0;j<v.node.length;j++){
+                                       // console.log("got a node");
+                                       p=that.element.querySelector("div[name='" + v.name+ "']");
+                                       // console.log("node parent is " + p);
+                                       Apoco.node(v.node[j],p);
+                                   }
+                               }
+                           }
+                           else{
+                               throw new Error("cannot find div called " + v.name);
+                           }
+                       };
+
+                       for(var i=0;i<that.promises.length;i++){
+                           that.promises[i].then((function(index){
+                               return function(v){
+                                   mk_nodes(v,index);
+                               };
+                           }(i)));
+                       }
+                   }
+                  }
+              ]}
+        ]},
+        Who:{ components:[
+            {display:"fieldset",
+             id: "Who",
+             DOM: "Content",
+            // class:["col-sm-12","col-lg-12","col-md-12"],
+             components:[
+                 {node: "image",src: "css/images/vandj.jpg",class:"pic"},
+                 {node: "heading",size:"h2",text: "Val Wardlaw"},
+                 {node: "heading",size:"h3",text:"VFX Effects Artist/Supervisor, Applications Programmer "},
+                 {node: "paragraph",text:"Experienced VFX Supervisor<br> Digital Matte Painter (Photogrammetry), <br> 3D Generalist, dynamics, modelling, lighting <br> Compositor <br>On-set supervisor<br> Programmer, Python, mel, C++, shell-scripting, javascript. <br> Val has more than 20 year’s experience in visual effects on mainstream and independent productions.  She has designed, set up and supervised VFX pipelines for CFC Framestore, Henson's Creature Shop and Baseblack. She has worked in both Production and R&D for many large VFX houses."},
+                 {node: "anchor",href:"http://www.imdb.com/name/nm0912036/",target:"_blank",text: "Val Wardlaw on imdb"},
+                 {node: "anchor",href:"https://www.linkedin.com/in/val-wardlaw-081312b?trk=hp-identity-name",target:"_blank",text: "Linkedin profile"},
+                 {node: "whatever",nodeType:"div","class": "spacer"},
+                 
+                 {node: "heading",size: "h2", text: "John Kozak"},
+                 {node: "heading",size: "h3",text: "Chief Technologist, Research and Development"},
+		 {node: "paragraph", text: "John is a systems architect and developer with vast programming experience, developing software and hardware solutions to improve the quality and efficiency of film production processes since 2003.  Elsewhere, he designed probably the first browser-based financial trading application, inventing what is now called Ajax in the process - a significant proportion of the UK’s government securities market is now traded across his software."},
+                 {node: "anchor",href: "http://www.imdb.com/name/nm1547681/" ,target:'_blank',text:"John Kozak on imdb"}
+
+             ]
+            }
+        ]},
+        Contact:{ components:[
+            {display: "fieldset",
+             DOM: "Content",
+             id: "Contact",
+             components:[
+                 {node:"whatever", nodeType: "iframe", attr:[{src:"https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1242.3646682782437!2d-0.1730488!3d51.4814823!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x745052a626f34542!2sperluceo!5e0!3m2!1sen!2suk!4v1479305392567"}]}, // width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>      
+                 {node: "heading",size:"h2",text: "Contact"},
+                 {node: "anchor",href:"mailto:val@perluceo.com", target: "top", text:"val@perluceo.com"},
+                 {node: "paragraph",text:"Phone +44 (0)7712671395"},
+                 {node: "paragraph",text:"Houseboat St Lucia,<br> 106 Cheyne Walk,<br>London,SW10 0DG" }
+             ]
+            }
+        ]},
+        Stuff:{components:[
+            {display: "fieldset",
+             DOM: "Content",
+             id: "Blog",
+             components:
+             [  {node:"paragraph",class:"who",text:"Val Wardlaw on 15th January 2018"},
+                {node: "heading",size:"h3",text:"Paintings"},
+                {node: "paragraph",text: "Various Paintings from 2016-7"},
+                {node: "button",id:"PS",name: "PS",childClass:["btn","btn-primary"],text:"click for slideshow",action: function(that){
+                    var p=that.parent.getSibling("PaintingSlideshow");
+                    if(p===null){
+                        throw new Error("cannot find slideshow");
+                    }
+                    if(p.isHidden()){
+                        //console.log("hidden");
+                        p.show();
+                    }
+                    else{
+                        //console.log("not hidden");
+                        p.hide();
+                    }
+                }},
+                {node:"whatever",nodeType:"div",id: "Painting"},
+                {node: "paragraph","class":"who",text:"Val Wardlaw on 10th August 2016"},
+                {node: "heading",size:"h3",text:"Earthflight 3D"},
+                {node: "paragraph",text: "Director-  John Downer"},
+                {node: "paragraph",text: "Narration-  Cate Blanchett"},
+                {node: "paragraph",text: "A 3D Imax film to be released this year.<br> Work included photogrammetry,DMP,fixes and conversions"},
+                {node: "anchor",target: "_blank", href:"http://www.ibtimes.com/wings-3d-director-john-downer-discusses-exciting-time-wildlife-filmmakers-1601708", text: "Wings 3D in ibtimes"},
+                {node: "anchor",target: "_blank",href:"http://www.gsfilms.com/news/article.asp?ArticleSource=326",text:"Review in Giant Screen Films"},
+                {node: "anchor",target: "_blank",href:"http://www.mcclatchydc.com/news/nation-world/national/article24769051.html",text:"Director John Downwer in mcclatchydc"},
+                {node: "paragraph","class":"date",text:""},
+                {node: "paragraph","class":"who",text:"Val Wardlaw on 24th March 2016"},
+                {node: "heading",size:"h3",text:"CG Architectural Sketches"},
+                {node: "paragraph",text: "Various lighting tests on model of D'Arblay Street"},
+                {node: "button",name: "CGA",childClass:["btn","btn-primary"],text:"click for slideshow",action: function(that){
+                    var p=that.parent.getSibling("BlogSlideshow");
+                    if(p===null){
+                        throw new Error("cannot find slideshow");
+                    }
+                    if(p.isHidden()){
+                        //console.log("hidden");
+                        p.show();
+                    }
+                    else{
+                        //console.log("not hidden");
+                        p.hide();
+                    }
+                }},
+                {node: "paragraph","class":"date",text:""}
+             ]},
+            {display: "slideshow",
+             DOM: "Content",
+             id: "BlogSlideshow",
+             hidden: true,
+             fade: true,
+             controls: false,
+             fit_to:"height",
+             /*             action:function(){
+                 Apoco.IO.dispatch("resize");
+             }, 
+             listen:[{name:"resize",action:function(that){
+                 console.log("config got resize event");
+                 that.height=window.innerHeight-that.element.offsetTop;
+                 that.element.style.height=(that.height + "px");
+                 that._afterShow();
+             }}], */
+             components:[{"src":"css/images/architectural/pp.0001.png"},
+                         {"src":"css/images/architectural/pp.0002.png"},
+                         {"src":"css/images/architectural/pp.0003.png"},
+                         {"src":"css/images/architectural/pp.0004.png"},
+                         {"src":"css/images/architectural/pp.0005.png"},
+                         {"src":"css/images/architectural/pp.0006.png"}
+                        ]
+            },
+            {display: "slideshow",
+             DOM: "Painting",
+             id: "PaintingSlideshow",
+             hidden: true,
+             fade: true,
+             controls: false,
+             fit_to:"height",
+             //after: "PS",
+             components:[{"src":"css/images/paintings/ps.0001.jpg"},
+                         {"src":"css/images/paintings/ps.0002.jpg"},
+                         {"src":"css/images/paintings/ps.0003.jpg"},
+                         {"src":"css/images/paintings/ps.0004.jpg"},
+                         {"src":"css/images/paintings/ps.0005.jpg"},
+                         {"src":"css/images/paintings/ps.0006.jpg"},
+                         {"src":"css/images/paintings/ps.0007.jpg"},
+                         {"src":"css/images/paintings/ps.0008.jpg"}
+                         
+                         ]
+            }
+        ]}
+    };
+    
+    var b=null,name=Apoco.Utils.history.queryString();
+    if(name){
+        // find the panel that contains the name
+        b=find_tab_panel(name,true);
+        console.log("name of tab is " + name + " found tab " + b);
+    }
+    if(!b){
+        console.log("starting in default mode");
+        UI.Panels.Tabs.components[0].selected="About";
+        Apoco.Utils.history.push("About");
+        UI.start=["Tabs","About"];
+        //throw new Error("Could not find panel " + name);
+    }
+    else{
+        // unselect the default
+        UI.Panels.Tabs.components[0].selected=null;
+        console.log("found url to load " + name);
+        b.selected=name;
+        UI.start=["Tabs",name];
+    }
+   
+        
+})();
+
+`
+                     },
+                     {node: "heading", size: "h2", text: "see the website working"},
+                     {node:"anchor",text: "click to see website",href:"https://www.perluceo.com",target:"_blank"}
+                     
+                 ]}
+            ]}
     };
 
     fieldManual.execute();

@@ -264,10 +264,13 @@ jsonishData={
                             return;
                         }
                         
-                        width+=parseFloat(t[0]);
+                        width+=Math.ceil(parseFloat(t[0]));
                     }
-                   // var width=window.getComputedStyle(v,null).getPropertyValue("width");
-                    //var width=v.style.width;
+                     
+                   // var b=window.getComputedStyle(v,null).getPropertyValue("border");
+                    // console.log("border is " + b);
+                    // probably because border is not included :(
+                    width+=1; // because it doesn't always work otherwise !!!!
                     width=(Math.ceil(width).toString() + "px");
                     for(var i=0;i<this.grids.length;i++){
                         //console.log("setting grid " + i + " to " + width);

@@ -128,5 +128,10 @@ describe("DisplayMenu",function(){
         var c=t.getChild("two").element;
         assert.strictEqual(b,c);
     });
+
+    it("can find the menu item with css name ",function(){
+        var b=document.getElementsByName("two")[0];
+        assert.isObject(b);
+    });
     
 });

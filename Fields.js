@@ -116,11 +116,25 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.element.style.display="none";
            // }
         },
-        show:function(){
+        show:function(display_type){
             this.hidden=false;
-            //  if(this.DOM.contains(this.element)){
-            this.element.style.display="unset"; // hmmm maybe a problem here
-           // }
+            
+            if(display_type && display_type !== "none"){
+                this.element.style.display=display_type; 
+            }
+            else{
+                this.element.style.display="inherit"; 
+           }
+        },
+        setRequired:function(on){
+            if(on){
+                this.required=true;
+                this.input.required=true;
+            }
+            else{
+                this.required=false;
+                this.input.removeAttribute("required");
+            }
         },
 	getValue:function(){
 	    var v=this.input.value;
@@ -454,6 +468,18 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     FloatField.prototype={
+        setRequired: function(on){
+            var v=(on)?true:false;
+            this.required=v;
+            if(v){
+                this.input[0].required=v;
+                this.input[1].required=v;
+            }
+            else{
+                this.input[0].removeAttribute("required");
+                this.input[0].removeAttribute("required");
+            }
+        },
 	getValue: function(){
             var v;
             var a=this.input[0].value;
@@ -711,6 +737,19 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
  	    this.element.appendChild(this.input[i].input);
             return true;
         },
+        setRequired:function(on){
+            var v=(on)?true : false;
+            this.required=v;
+            for(var i=0;i<this.input.length;i++){
+                if(v){
+                    this.input[i].input.required=v;
+                }
+                else{
+                    this.input[i].removeAttribute("required");
+                }
+            }
+            
+        },
         deleteValue:function(value){
             var index = -1;
             for(var i=0;i<this.input.length;i++){
@@ -906,7 +945,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 
     SelectField.prototype={
-        
+        setRequired:function(on){
+            var v=(on)?true:false;
+            this.required=v;
+            if(v){
+                this.select.required=v;
+            }
+            else{
+                this.select.removeAttribute("required");
+            }
+        },
         _mkBlankOption:function(){
             var that=this,o;
             var cd=function(that){
@@ -1452,6 +1500,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.input[i].input.readOnly=true;
             }
 	},
+        setRequired:function(on){
+            var v=(on)?true:false;
+            this.required=v;
+            for(var i=0;i<this.input.length;i++){
+                this.input[i].input.requied=v;
+            }
+        },
 	checkValue:function(){
 	    var valid;
 	    (this.required)?valid=false: valid=true;

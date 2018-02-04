@@ -38,7 +38,18 @@ test.describe("Manual",function(){
     test.after(function() {
         driver.quit();
     });
-
+    test.it("has defined UI",function(done){
+        this.timeout(15000);
+       // driver.wait(function(){
+        //     return
+        execute("return window.UI;")
+            .then(function(r){
+                assert.isDefined(r,"UI is defined");
+             //   console.log("Apoco is " + r);
+                done();
+            });
+       // },1500);
+    });
     test.it("has loaded a node called Content",function(done){
         this.timeout(15000);
         driver.wait(function(){
@@ -52,6 +63,7 @@ test.describe("Manual",function(){
         done();
        // });
     });
+    
     // before(function(done){
     test.it("can find some tabs ",function(done){
         driver.findElement(By.id("Tabs")).then(function(e){
@@ -66,6 +78,13 @@ test.describe("Manual",function(){
         assert.strictEqual(tabs.length,10);
 //        console.log("we have poxy tabs " + tabs.length);
         done();
+    });
+    
+    test.it("can get the tab list with Apoco",function(){
+        driver.executeScript("return Apoco.Panel.get('Tabs').getChild('Tabs').getChildren().length")
+            .then(function(p){
+                assert.strictEqual(p,10);
+            });
     });
 
     test.it("can find a tab name",function(done){
@@ -94,6 +113,8 @@ test.describe("Manual",function(){
         assert.isObject(tab);
         done();
     });
+
+  
     test.it("click fields tab loads fields page",function(done){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Fields')]"));
 //        console.log("tab is " + tab);
@@ -150,5 +171,8 @@ test.describe("Manual",function(){
         assert.isObject(driver.findElement(By.id("UtilsMenu")));
         done();
     });
-
+    
+    function execute() {
+        return driver.executeScript.apply(driver, arguments);
+    }
 });

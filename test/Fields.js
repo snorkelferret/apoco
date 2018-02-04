@@ -85,6 +85,17 @@ describe("InputField",function(){
      //   console.log("CCCCCCCCCCCCCCCC name is " + b.getAttribute("name"));
         assert.strictEqual(b.getAttribute("name"),"inputNode");
     });
+    it("can set required",function(){
+        t.setRequired(true);
+        var e=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];    
+        assert.strictEqual(e.required,true);
+    });
+    it("can unset required",function(){
+        t.setRequired(false);
+        var e=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];    
+        assert.strictEqual(e.required,false);
+    });
+    
     it("knows the value has not been changed in the browser",function(){
         assert.strictEqual(t.valueChanged(),false);
     });
@@ -230,6 +241,16 @@ describe("FloatField",function(){
         assert.strictEqual(e[0].value,'-23');
         assert.strictEqual(e[1].value,'468');
     });
+    it("can set required",function(){
+        f.setRequired(true);
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
+        assert.strictEqual(e[0].required,true);
+    });
+    it("can unset required",function(){
+        f.setRequired(false);
+        var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
+        assert.strictEqual(e[0].required,false);
+    });
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),"-23.468"); 
     });
@@ -267,6 +288,7 @@ describe("FloatField",function(){
     it("knows the value has been changed in the browser",function(){
         f.valueChanged(f.getValue(),true);
     });
+    
  
     it("can delete itself",function(){
         f.delete();

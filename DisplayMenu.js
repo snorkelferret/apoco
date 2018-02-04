@@ -117,6 +117,7 @@ require("./DisplayBase");
 	       // d.element.classList.add("ui-menu-item");
                 d.element.setAttribute("role","menuitem");
                 d.element.textContent=l;
+                d.element.setAttribute("name",d.name);
               //  console.log("menu text is "+ d.element.textContent);
 	        d.parent=this;
                 parent_element.appendChild(d.element);
