@@ -1,6 +1,6 @@
 {
   "name": "apoco",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Single page real time web framework",
   "keywords": [
     "SPA",
