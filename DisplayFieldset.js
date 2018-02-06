@@ -50,7 +50,7 @@ require("./Fields.js");
         },
         addChild:function(index,el,parent_element){
             var n,d,p;
-            if(Number.isInteger(index)){
+            if(Apoco.type.integer.check(index)){
                 d=this.components[index]; 
             }
             else{

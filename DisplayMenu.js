@@ -87,7 +87,7 @@ require("./DisplayBase");
             if(parent_element === undefined){
                 parent_element=this.element.getElementsByClassName("apoco_menu_list")[0];
             }
-            if(Number.isInteger(index)){
+            if(Apoco.type.integer.check(index)){
                 d=this.components[index];
             }
             else{

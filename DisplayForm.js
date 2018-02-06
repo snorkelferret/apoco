@@ -124,7 +124,7 @@ require("./DisplayFieldset");
         addSubmitter:function(index,el,parent_element){
             var n={},p,d;
          //   console.log("DisplayForm: addSubmitter is here");
-            if(Number.isInteger(index)){
+            if(Apoco.type.integer.cbeck(index)){
                 d=this.components[index]; 
             }
             else{

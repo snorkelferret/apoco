@@ -60,7 +60,7 @@ require("./DisplayBase.js");
             if(tablist === undefined){
                 tablist=this.element.querySelector("ul.tabs");
             }
-            if(Number.isInteger(t)){
+            if(Apoco.type.integer.check(t)){
                 alreadyHaveName(this.components[t].name,t);
                 index=t;
                 t=this.components[index];
