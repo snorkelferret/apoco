@@ -178,6 +178,37 @@ describe("DisplayFieldset-(start with data)",function(){
     
 });
 
+
+describe(" can use a node that is not in the DOM as this.DOM",function(){
+    var t;
+    it("creates the fieldset",function(){
+        var p=document.createElement("div");
+        p.id="test";
+        t=Apoco.display.fieldset({id:"test_fieldset",
+                                   DOM:p,
+                                   components:[{node:"paragraph",name:"DOMstuff",text:"hullo people"}
+                                              ]});
+        assert.isObject(t);
+        
+    });
+    it("can show the fieldset",function(){
+        t.show();
+        assert.isObject(t.DOM);
+        var e=t.DOM.children;
+        assert.isObject(e[0]);
+        assert.equal(e[0].id,"test_fieldset");
+    });
+    it("has not put this.DOM into the document",function(){
+        var p=document.contains(t.DOM);
+        assert.equal(p,false);
+    });
+    it("after append this.DOM is in the document",function(){
+        document.body.appendChild(t.DOM);
+        assert.equal(document.contains(t.DOM),true);
+    });
+    
+});
+
 describe("DisplayFieldset-adding pre-existing fields and nodes",function(){
   var t;
     require("../DisplayFieldset.js"); 
@@ -223,5 +254,55 @@ describe("DisplayFieldset-adding pre-existing fields and nodes",function(){
         assert.strictEqual(b.length,2);
         
     });
+});
+describe("DisplayFieldset-can a child fieldset",function(){
+    var t,p;
+    require("../DisplayFieldset.js"); 
+    it("creates a fieldset object",function(){
+        var b=document.createElement("div");
+        b.id="test";
+        document.body.appendChild(b);
+        assert.strictEqual(document.body.contains(b),true);
+        t=Apoco.display.fieldset({id:"test_fieldset",
+                                  DOM:"test",
+                                  components:[{node:"paragraph",name:"stuff",text:"hullo people"},
+                                              {node:"whatever",nodeType:"div",id:"fieldset_parent"},
+                                              {field:"numberArray",type:"integerArray",value:[1,3,4],name:"ia"},
+                                              {node:"heading",size:"h3",text:"Extra"}
+                                   ]});
+        assert.isObject(t);
+    });
+    it("can get a node by Id",function(){
+        var c=t.getChild("fieldset_parent");
+        assert.isObject(c);
+    });
+    it("can add a child fieldset",function(){
+        var c=t.getChild("fieldset_parent");
+        assert.isObject(c);
+        assert.isObject(c.getElement());
+        p=Apoco.display.fieldset({id:"child",
+                                  DOM:c.element,
+                                  components:[{node:"paragraph"},
+                                              {type:"integer",value: 10,name:"number"},
+                                              {type:"string",value: "some string",name:"string"}
+                                             ]
+                                     });
+        assert.isObject(p);
+    });
+    
+    it("can put the objects into the DOM",function(){
+        t.show();
+        assert.strictEqual(document.body.contains(t.element),true);
+        p.show();
+        assert.strictEqual(document.body.contains(p.element),true);
+    });
+    it("can get the JSON for the child fieldset",function(){
+        var j=p.getJSON();
+        assert.isObject(j);
+        assert.equal(j["number"],10);
+        assert.equal(j["string"],"some string");
+    });
+    
     
 });
+

@@ -54,6 +54,7 @@ describe("Nodes",function(){
         t=Apoco.node({node:"paragraph",text:"test"});
         assert.isObject(t);
     });
+ 
     it("creates a list",function(){
         t=Apoco.node({node:"list",list:["one","two"]});
         assert.isObject(t);

@@ -1257,7 +1257,7 @@ var UI={};
                           {node:"paragraph", text: "As a standalone call <br> <code>var node=Apoco.display['" + HDisplays[i] + "'](dataObject);</code> <br> or as part of UI.Panel<br> <code> {DOM:'myparent',id:'someid',display:" + HDisplays[i] + ",components:[ObjectArray]}"},
                           {node: "heading",size: "h4",text: "dataObject settings"},
                           {node: "heading",size: "h5",text: "required"},
-                          {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string","an existing node with an id (do not include #) which is used as the parent for the display"]},
+                          {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string or html element","an existing node with an id (do not include #) which is used as the parent for the display <br> <b> or </b> <br> an html element with an id, (make sure that this element has been appended to the document as the show() method will not do this)"]},
                                                           {label: "id",descriptions:["type: string","id of the base htmlObject the display creates"]}]
                           },
                           {node:"descriptionList", items:stuff[HDisplays[i]].required},
@@ -2139,7 +2139,7 @@ var UI={};
                       DOM: "right",
                       components:[
                           {node: "heading",size:"h2",text: "About Apoco"},
-                          {node: "paragraph",text: "Apoco is a data-driven enterprise level SPA library/Frontend framework. The components can be used together or individually. <br> This site is made exclusively with Apoco Components, written in vanilla javascript."},
+                          {node: "paragraph",text: "Apoco is a data-driven enterprise level library/Frontend framework. Apoco can be used as a SPA or the components can be used in part or individually. <br> This site is made exclusively with Apoco Components, written in vanilla javascript."},
                           {node: "paragraph",text:"Apoco is arranged hierarchically."},
                           {node: "descriptionList",items:[{label: "Windows",description:"Windows contain"},
                                                           {label: "Panels",description:"Panels contain"},

@@ -19,7 +19,7 @@ require("./Fields");
             hidden: false,
             components:[]
 	};
-        var that=this,t,dp,td;
+        var that=this,t,dp;
        
         for(var k in defaults){
             if(options[k] === undefined){
@@ -32,7 +32,7 @@ require("./Fields");
 
         //console.log("DisplayBase parent is " + this.parent);
         if(this.DOM === null){
-            throw new Error(this.display + ": Must supply a DOM id for an existing node");
+            throw new Error(this.display + ": Must supply a DOM id for an existing node or the html element itself");
         }
         if(this.id === null){
             throw new Error(this.display + ": Must supply a unique id string");
@@ -43,24 +43,28 @@ require("./Fields");
         }
           //  console.log("++++++++++++++++++++++= Adding display to child window " + this.display);
       // console.log("adding to DOM " + this.DOM);
-        if(this.DOM && this.DOM.id){
-            console.log("Error not a string id " + this.DOM.id);
+    
+        if(!Apoco.type["object"].check(this.DOM) ){
+           // console.log("DOM element is bot an existing html object");
+            if(this.DOM && this.DOM.id){ 
+                console.log("Error not a string id " + this.DOM.id); // because it has an id
+            }
+	    this.DOM=win.document.getElementById(this.DOM);
+            if(!this.DOM){
+	        throw new Error("_ApocoDisplayBase DOM must be the string id  of an existing html element or an html element " + this.DOM );
+	    }
         }
-	td=win.document.getElementById(this.DOM);
         t=win.document.getElementById(this.id);
-        if(this.dependsOn){
-            dp=win.document.getElementById(this.dependsOn);
-        }
-        
-        if(!td){
-	    throw new Error("_ApocoDisplayBase DOM must be the string id  of an existing html element " + this.DOM );
-	}
-        this.DOM=td;
+            
 	if(t){
          //   console.log();
 	    t.parentNode.removeChild(t); //remove from DOM 
            // this.element=t;
 	}
+        if(this.dependsOn){
+            dp=win.document.getElementById(this.dependsOn);
+        }
+    
         //else{
         this.element=document.createElement("div");
         this.element.id=this.id;
@@ -115,6 +119,9 @@ require("./Fields");
                 for(var i=0; i< this.components.length;i++){
                   //  console.log("getChild i is " + i + " with name " + this.components[i].name);
                     if(this.components[i].name == name){
+                        return this.components[i];
+                    }
+                    else if(this.components[i].id == name){
                         return this.components[i];
                     }
                 }
@@ -223,6 +230,8 @@ require("./Fields");
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Apoco.IO.publish(this);
 	    }
+            // first check if the this.DOM element is already in the DOM
+            
             if(!this.DOM.contains(this.element)){
               // console.log("Showing element that is not in DOM" + this.element);
 	        if(this.element){
@@ -245,8 +254,7 @@ require("./Fields");
                 //       console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
                     }
-                 
-		}
+ 		}
 	        else {
 		    //console.log(" --- invalid element");
 		    throw new Error("No valid element for " + this.getKey());

@@ -115,6 +115,10 @@ describe("DisplayTabs",function(){
         var b=document.getElementById("test_tabs2").getElementsByTagName("li");
         assert.strictEqual(b.length,4);
     });
+    it("can get the tabs with getChildren",function(){
+        var b=t.getChildren();
+        assert.equal(b.length,4);
+    });
     it("won't allow a tab to be added with a duplicate name",function(){
         var fn = function(){ t.addTab({name:"tabFour"}); };
         assert.throws(fn,"DsiplayTabs: Already has a tab named tabFour" );

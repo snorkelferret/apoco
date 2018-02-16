@@ -1,13 +1,16 @@
 # apoco
-## spa javascript web framework
+##  Javascript web framework
+
+Apoco is a set of modules that can be used to form an SPA or used as a page or part of a page.
+It is a data-driven enterprise level library/Frontend real time framework, with automatic two way synchronisation between browser and server content.
+
+The components can be used together or individually.
+
 (SPA - Single Page Application. )
 [Definition of a SPA](https://en.wikipedia.org/wiki/Single-page_application)
 
 [Online manual](https://snorkelferret.github.io)
 
-Apoco is a self contained set of modules that can be used together.
-It can be used as  a data-driven enterprise level SPA library/Frontend real time framework, with automatic two way synchronisation between browser and server content...  or not.
-The components can be used together or individually.
 Apoco is arranged hierarchically.
 
 ##### Windows

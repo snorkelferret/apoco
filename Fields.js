@@ -2078,7 +2078,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
     Apoco.Utils.extend(AutoCompleteField,_Field);
 
-    
+      
     Apoco.field={
         exists:function(field){
             if(this[field]){
@@ -2086,7 +2086,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             return false;
         },
-        static: function(options,element){return new StaticField(options,element)},
+        static: function(options,element){return new StaticField(options,element);},
         staticMethods:function(){var n=[]; for(var k in StaticField.prototype){  n.push(k);} return n;},
         input:function(options,element){return new InputField(options,element);},
         inputMethods:function(){var n=[]; for(var k in InputField.prototype){  n.push(k);} return n;},
