@@ -72,6 +72,11 @@ require("./Fields.js");
             if(d.node){
                  n=Apoco.node(d,el);
             }
+            else if(d.display){
+                d.DOM=el;
+                d.name=d.id;
+                n=Apoco.display[d.display](d);
+            }
             else if(d.field || d.type){
                 if(!d.field){
                     d.field=Apoco.type[d.type].field;
@@ -91,6 +96,10 @@ require("./Fields.js");
                 p=n.element.parentNode; //this is for node entries which use the el parm as a parent not the root this.element like fields
                 if(p){
                     parent_element.appendChild(p);
+                }
+                else if(n.display){  // where the component is itself a display
+                    parent_element.appendChild(el);
+                    n.show();  // let the parent display control visibility
                 }
                 else{
                     parent_element.appendChild(n.element);
