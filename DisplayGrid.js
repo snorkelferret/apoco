@@ -330,7 +330,7 @@ jsonishData={
                     this.grids[j].reverse=true;
                 }
 	    }
-	    
+	    return this;
 	},
         addGrid:function(grid){
             var div,h;
@@ -353,6 +353,7 @@ jsonishData={
 	    this.grid_container.appendChild(div);
             grid.element=div;
             grid.sorted=false;
+            return this;
         },
         addCol:function(col){
             var that=this,index,r,t,rows;
@@ -469,6 +470,7 @@ jsonishData={
                 Apoco.popup.spinner(false);   
                 this.show();
             }
+            return this.cols[index];
         },
         rowEditPopup: function(row,buttons,override){
             var b,d,that=this,p={},label,
@@ -557,6 +559,7 @@ jsonishData={
             else{
                 throw new Error("cannot find column " + name);
             }
+            return this.cols;
         },
 	getColIndex: function(name){
             if(name === undefined){
@@ -802,7 +805,8 @@ jsonishData={
             else{
                 this._insertRow(row_data,r,grid);
             }
-            return row_data;
+            // return row_data;
+            return r;
         },
         deleteRow:function(key,group){
             var closest={},g,parent,el;
@@ -839,6 +843,7 @@ jsonishData={
             }
             parent.parentNode.removeChild(parent);
             g.rows.splice(closest.index,1);
+            return g.rows;
         },
         getRow:function(key,group,closest){
             var grid=[],row,sortOrder=[];
@@ -961,7 +966,7 @@ jsonishData={
                     }
                 }
                 if(!resort){
-                    return;
+                    return grid.rows;
                 }
                 grid.rows.splice(index,1);
                 this._insertRow(cell_data,row,grid);
@@ -969,6 +974,7 @@ jsonishData={
 	    else{
 		throw new Error("No matching entry found in grid data");
 	    }
+            return grid.rows;
 	},
 	getGrid: function(name){
             if(!this.grids){
@@ -989,6 +995,7 @@ jsonishData={
 	},
         deleteChild:function(grid){
             this.hideGrid(grid);
+            return this;
         },
         deleteChildren:function(){
             var el,row;
@@ -1025,6 +1032,7 @@ jsonishData={
             }
             this.cols.length=0;
             this.grids.length=0;
+            return this;
         },
         hideCol:function(name,state){
             var b,current_state=false;
@@ -1039,7 +1047,7 @@ jsonishData={
                 current_state=true;
             }
             if(state === current_state){
-                return;  // already in the correct state
+                return this.cols[b];  // already in the correct state
             }
             if(state === "toggle"){
                 state=(current_state)?false:true;
@@ -1062,6 +1070,7 @@ jsonishData={
                 }
             }
             this._calcWidth();
+            return this.cols[b];
          
         },
 	deleteAll:function(){
@@ -1086,6 +1095,8 @@ jsonishData={
                     }
 		}
 	    }
+            return this;
+            
 	},
 	hideGrid: function(name){
 	    if(this.grids.length === 1){
@@ -1096,6 +1107,7 @@ jsonishData={
 		    this.grids[i].element.visibility="hidden";
 		}
 	    }
+            return this;
 	},
 	redrawRows: function(grid_name){
             var b,g,p,name,grids=[];
@@ -1127,6 +1139,7 @@ jsonishData={
 		    b.appendChild(p);
 	        }
             }
+            return this;
 	},
         getJSON: function(){
             var c,t,m;

@@ -479,18 +479,19 @@ require("./DisplayBase");
                 }
                 that._afterShow();
 	    }
+            return this;
         },
         play:function(){
             var that=this;
             if(!document.contains(this.element)){
-                return;
+                return null;
             }
          
          //   that.step("next"); // update immediately for user feedback
 //            console.log("play is here- current " + that.current);
             that.autoplay=true;
             that.interval=setInterval(function(){that.step("next","play");},this.delay);
-          
+            return this;
         },
         stop:function(){
           //  console.log("stop is here");
@@ -514,6 +515,7 @@ require("./DisplayBase");
                 }
  
             }
+            return this;
         
         },
         _crossFade: function(prev,next){

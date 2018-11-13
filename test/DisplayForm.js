@@ -70,6 +70,10 @@ describe("DisplayForm-(start without fields)",function(){
         var b=t.getElement().querySelector("p[name='Blah']");
         assert.strictEqual(document.contains(b),false);
     });
+    it("returns a reference to itself with call to deleteChild",function(){
+        assert.strictEqual(t.deleteChild("somethingElse"),t);
+    });
+    
     it("can delete itself",function(){
         var b=document.getElementById("test_form");
         t.delete();

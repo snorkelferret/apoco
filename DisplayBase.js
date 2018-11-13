@@ -1,7 +1,6 @@
 var Apoco=require('./declare').Apoco;
 require("./Utils");
 require("./Popups");
-require("./Fields");
 
 ;(function(){
 
@@ -151,7 +150,7 @@ require("./Fields");
                 this.components.splice(index,1);
             }
  
-            return null;
+            return this;
         },
         deleteChildren:function(){
             for(var i=0;i<this.components.length;i++){
@@ -161,6 +160,7 @@ require("./Fields");
                 this.components[i].element.parentNode.removeChild(this.components[i].element);
             }
             this.components.length=0;
+            return this;
         },
         deleteAll:function(){
             this.deleteChildren();
@@ -258,11 +258,10 @@ require("./Fields");
 	        else {
 		    //console.log(" --- invalid element");
 		    throw new Error("No valid element for " + this.getKey());
-		    return null;
-	        }
+		}
             }
            
-            return true;
+            return this;
  	},
         isHidden:function(){
             if(this.DOM.contains(this.element)){
@@ -278,8 +277,9 @@ require("./Fields");
             if(this.DOM.contains(this.element)){
              //   console.log("Hiding element that is in dom");
                 this.DOM.removeChild(this.element);
-                return;
+                //return;
             }
+            return this;
         },
 	delete: function(msg_from_parent){
 	//    console.log("delete display object is here msg is " + msg_from_parent);
@@ -308,6 +308,7 @@ require("./Fields");
                     console.log("this element should not be null " + this.id);
                 }
             }
+            
 	}
     };
 

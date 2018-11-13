@@ -69,18 +69,14 @@ require("./Types.js");
             return this.parent;  
         },
 	setText: function(text){
-            switch(this.node){
-            case "heading":
-            case "paragraph":
-            case "label":
-            case "anchor":
-            case "button":    
-		this.element.innerHTML=text;
-		this.text=text;
-                return;
-            default:
+            if(this.text !== undefined && text !== undefined ){
+         	this.element.innerHTML=text;
+                this.text=text;
+            }
+            else{
                 throw new Error("Cannot set text of " + this.node);
             }
+            return this;
 	},
         show:function(){
             this.hidden=false;
@@ -90,6 +86,7 @@ require("./Types.js");
             else{
                 this.element.style.display="";
             }
+            return this;
         },
         hide:function(){
             this.hidden=true;
@@ -99,6 +96,13 @@ require("./Types.js");
             else{
                 this.element.style.display="none";
             }
+            return this;
+        },
+        isHidden:function(){
+            if(document.contains(this.element)){
+                return false;
+            }
+            return true;
         }
     };
 
@@ -133,6 +137,9 @@ require("./Types.js");
             }
         },
 	heading: function(that){
+            if(that.text===undefined){
+                that.text="";
+            }
 	    switch(that.size){
 	    case "h1":
 	    case "H1":
@@ -170,24 +177,31 @@ require("./Types.js");
 	},
 	label: function(that){
             that.element=document.createElement("label");
+            if(that.text===undefined){
+                that.text="";
+            }
+           
             that.element.textContent=that.text;
+            
 	    if(that.for){
                 that.element.htmlFor=that.for;
 	    }
 	},
         code: function(that){
             that.element=document.createElement("code");
-            if(that.text!==undefined){
-               // that.element.textNode(that.text);
-               that.element.textContent=that.text;
+            if(that.text===undefined){
+                that.text="";
             }
+               // that.element.textNode(that.text);
+            that.element.textContent=that.text;
         },
 	paragraph: function(that){
 	    that.element=document.createElement("p");
-            if(that.text!==undefined){
-                // that.element.textContent=that.text; // doesn't parse unicode
-                that.element.innerHTML=that.text;
+            if(that.text===undefined){
+                that.text="";
             }
+                // that.element.textContent=that.text; // doesn't parse unicode
+            that.element.innerHTML=that.text;
 	},
         list: function(that){
             if(that.ordered === true){

@@ -137,6 +137,7 @@ require("./Fields.js");
                     
                 }
             }
+            return this;
         },
 	check: function(){
             var valid=true;

@@ -21,10 +21,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     });
  
     Apoco.start=function(options) {
-        // bid listener
-        // little listener
-        // big listener
-        // x which root
+        // possibly add listener to root
         
         if(options){
 	    if(!Apoco.type["array"].check(options) && Apoco.type["object"].check(options)){

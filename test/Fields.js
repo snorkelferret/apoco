@@ -90,6 +90,10 @@ describe("InputField",function(){
         var e=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];    
         assert.strictEqual(e.required,true);
     });
+    it("returns itself from a call to setRquired",function(){
+        var p=t.setRequired(true);
+        assert.strictEqual(p,t);
+    });
     it("can unset required",function(){
         t.setRequired(false);
         var e=(document.getElementsByName("inputNode")[0]).getElementsByTagName("input")[0];    
@@ -120,9 +124,14 @@ describe("InputField",function(){
         assert.throws(fn,"Field: setValue dog is the wrong type, expects integer");
     });
     it("has a getValue method that returns the value",function(){
-        t.setValue(6);
-        assert.strictEqual(t.getValue(),'6'); 
+        t.setValue(4);
+        assert.strictEqual(t.getValue(),'4');
     });
+   it("returns itself from a call to setRquired",function(){
+        var p=t.setValue(6);
+        assert.strictEqual(p,t);
+    });
+    
     it("has a getKey method that returns the name ",function(){
         assert.strictEqual(t.getKey(),"inputNode"); 
         //console.log("InputField is %j",t);
@@ -246,6 +255,12 @@ describe("FloatField",function(){
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
         assert.strictEqual(e[0].required,true);
     });
+
+    it("returns itself from a call to setRquired",function(){
+        var p=f.setRequired(true);
+        assert.strictEqual(p,f);
+    });      
+
     it("can unset required",function(){
         f.setRequired(false);
         var e=document.getElementsByName("floatField")[0].getElementsByTagName("input");
@@ -283,13 +298,18 @@ describe("FloatField",function(){
         b[0].value="29";
         b[1].value="34";
         assert.strictEqual("29.340",f.getValue());
-        assert.notStrictEqual(29.340,f.resetValue());
+      
     });
-    it("knows the value has been changed in the browser",function(){
-        f.valueChanged(f.getValue(),true);
+   it("knows the value has been changed in the browser",function(){
+        assert.strictEqual(f.valueChanged(),true);
+        
+    });
+    it("resets the value to the one previously stored by setValue",function*(){
+        assert.notStrictEqual(29.340,f.resetValue());  
     });
     
  
+    
     it("can delete itself",function(){
         f.delete();
     });
@@ -418,6 +438,12 @@ describe("CheckBoxField",function(){
         //var e=$("body").find("div[name='checkBoxField']").find("input");
         assert.strictEqual(e.getAttribute("checked"),"checked");
     });
+ 
+    it("returns itself from a call to setValue",function(){
+        var p=f.setValue(true);
+        assert.strictEqual(p,f);
+    });      
+
     it("gets a value",function(){
         assert.strictEqual(f.getValue(),true); 
     });
@@ -488,6 +514,10 @@ describe("NumberArrayField-Integer",function(){
         var b=(document.getElementsByName("numberArrayField")[0]).getElementsByTagName("input")[0];
         b.value="6798";
         assert.strictEqual(f.valueChanged(),true);
+    });
+    it("can add a value to the array",function(){
+        f.addValue(4);
+        assert.sameMembers(f.getValue(),["6798","5","7","","4"]);
     });
 
 });
@@ -598,6 +628,13 @@ describe("SelectField",function(){
         assert.strictEqual(e.length,4);
         
     });
+    
+    it("returns itself from a call to addValue",function(){
+        var p=f.addValue("pigs");
+        assert.strictEqual(p,f);
+    });      
+
+    
     it("cannot  add a value of different type to options array",function(){
         var fn=function(){
             f.addValue({label:"sixty",value:77});
@@ -818,6 +855,9 @@ describe("ButtonSetField",function(){
         //var e=$("body").find("div[name='radioButtonSetField']").find("input");
         assert.strictEqual(e.length,4);
     });
+
+
+    
     it("can set the new entry",function(){
         var e=document.getElementsByName("radioButtonSetField")[0].getElementsByTagName("li");
         for(var i=0;i<e.length;i++){
@@ -871,6 +911,11 @@ describe("ButtonSetField",function(){
             assert.strictEqual(b[0].two,true);
         }
         
+    });
+
+    it("returns itself from a call to addValue",function(){
+        var p=f.addValue("five");
+        assert.strictEqual(p,f);
     });           
     it("can remove itself",function(){
         f.delete();
@@ -922,6 +967,10 @@ describe("ButtonSetField - as checkboxes",function(){
         }
         
     });
+    it("returns itself from a call to setValue",function(){
+        var p=f.setValue([false,false,true]);
+        assert.strictEqual(p,f);
+    });      
  
     
 });
@@ -1037,9 +1086,22 @@ describe("StringArrayField",function(){
         f.addValue("nnn");
         assert.strictEqual(f.valueChanged(),true);
     });
-
+    it("returns itself from a call to addValue",function(){
+        var p=f.addValue("ahh");
+        assert.strictEqual(p,f);
+    });      
+    
+    it("returns itself from a call to setValue",function(){
+        var p=f.setValue("ahh",1);
+        assert.strictEqual(p,f);
+    });      
     
 });
+
+
+
+
+
 
 describe("ImageArrayField",function(){
   

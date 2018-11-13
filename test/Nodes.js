@@ -50,6 +50,15 @@ describe("Nodes",function(){
         t=Apoco.node({node:"label",text:"test"});
         assert.isObject(t);
     });
+    it("can set the text of a label node",function(){
+        t.setText("have set text");
+        assert.equal("have set text",t.element.innerHTML);
+    });
+    it("returns a reference to itself with call to setText",function(){
+        var p=t.setText("test return");
+        assert.strictEqual(p,t);
+    });
+    
     it("creates a paragraph",function(){
         t=Apoco.node({node:"paragraph",text:"test"});
         assert.isObject(t);
@@ -77,6 +86,15 @@ describe("Nodes",function(){
         t=Apoco.node({node:"paginate",number:4});
         assert.isObject(t);
     });
+    it("can hide a node",function(){
+        t.hide();
+        assert.strictEqual(t.isHidden(),true);
+    });
+    it("returns a reference to itself after calling show()",function(){
+        var p=t.show();
+        assert.strictEqual(p,t);
+    });
+    
 /*    it("creates a progressBar",function(){
         t=Apoco.node({node:"progressBar",value:10});
         assert.isObject(t);

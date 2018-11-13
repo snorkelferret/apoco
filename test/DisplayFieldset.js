@@ -65,6 +65,11 @@ describe("DisplayFieldset-(no initial data)",function(){
         b=document.contains(document.getElementById("test_fieldset"));
         assert.strictEqual(b,true);
     });
+    
+    it("returns a reference to itself after calling show()",function(){
+        assert.strictEqual(t.show(),t);
+    });
+    
     it("has put the fields into the dom",function(){
         //var b=$("#test_fieldset").find("div[name='title'] input").val();
         var b=document.querySelector("#test_fieldset div[name='title'] input"); 
@@ -78,7 +83,11 @@ describe("DisplayFieldset-(no initial data)",function(){
         var b=t.getChild("title").getValue();
         assert.strictEqual(b,"Robert");
     });
- 
+    
+    it("returns a reference to itself after calling reset()",function(){
+        assert.strictEqual(t.reset(),t);
+    });
+    
     it("has put the nodes into the dom",function(){
         //var b=$("#test_fieldset").find("div[name='blurb'] p").text();
         var b=document.querySelector("#test_fieldset p[name='blurb']");
@@ -153,6 +162,8 @@ describe("DisplayFieldset-(start with data)",function(){
         var b=t.getChild("title");
         assert.notStrictEqual(b,null);
     });
+
+    
     it("returns null if all the required fields do not have the correct type",function(){
         var p=t.getJSON();
         assert.strictEqual(p,null);
@@ -168,6 +179,10 @@ describe("DisplayFieldset-(start with data)",function(){
                    });
         var b=t.getChild("title");
         assert.notStrictEqual(b,null);
+    });
+    it("returns a reference to the created child",function(){
+        var b=t.addChild({type:"integer",name:"ttt",value:6});
+        assert.strictEqual(b,t.getChild("ttt"));
     });
     it("can delete itself",function(){
         t.delete();
@@ -254,8 +269,13 @@ describe("DisplayFieldset-adding pre-existing fields and nodes",function(){
         assert.strictEqual(b.length,2);
         
     });
+    it("returns reference to itself after deleting a child",function(){
+        t.addChild({name:"deleteMe",type:"string",value:"hullo"});
+        assert.strictEqual(t.deleteChild("deleteMe"),t);
+    });
 });
-describe("DisplayFieldset-can a child fieldset",function(){
+
+describe("DisplayFieldset-can have a child fieldset",function(){
     var t,p;
     require("../DisplayFieldset.js"); 
     it("creates a fieldset object",function(){

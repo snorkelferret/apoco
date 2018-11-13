@@ -104,19 +104,21 @@ require("./DisplayBase.js");
                 },false);
              }
  	    tablist.appendChild(t.element);
-            return;
+            return t;
         },
         showTab:function(name){
             var p=this.getChild(name);
             if(p){
                 p.element.style.display="unset";
             }
+            return p;
         },
         hideTab:function(name){
             var p=this.getChild(name);
             if(p){
                 p.element.style.display="none";
             }
+            return p;
         },
 	update:function(name){
             var p=this.getChild(name);
@@ -132,6 +134,7 @@ require("./DisplayBase.js");
 	    else{
 		throw new Error("Apoco.tabs Could not find element " + name);
 	    }
+            return p;
 	},
         getSelected:function(){
             if(this.selected){
@@ -152,12 +155,14 @@ require("./DisplayBase.js");
 		    this.components[i].element.classList.remove("selected");
 		}
 	    }
+            return this.selected;
 	},
         reset:function(){
             for(var i=0;i<this.components.length;i++){
                 this.components[i].element.classList.remove("selected");
             }
             this.selected=null;
+            return this;
         }
         
     };

@@ -95,17 +95,19 @@ var UI={};
         objectArray:[{label:"value",description: "describe value"},{label:"another_value",descriptions:["one","two","three"]}]
     };
 
-    var HThings={Fields:[],
-                 Displays:[],
-                 Nodes:[],
-                 Popups:[],
-                 Types:[],
-                 IO:[],
-                 Panels:[],
-                 PanelComponents:[],
-                 Windows:[],
-                 Utils:[]
-                };
+    var HThings={
+        Fields:[],
+        Displays:[],
+        Nodes:[],
+        Popups:[],
+        Types:[],
+        IO:[],
+        Panels:[],
+        PanelComponents:[],
+        Windows:[],
+        Utils:[]
+    };
+    
     function mkArrays(){
         var thing;
         for(var k in HThings){
@@ -631,6 +633,9 @@ var UI={};
                        descriptions:[
                         "<code> field.hide(); </code>"
                        ]
+                },
+                isHidden:{
+                    descriptions:["<code> field.isHidden(); </code>"]
                 },
                 setRequired:{
                     descriptions:["set or unset required ","<code> my_field.setRequired(true);<code>","return: none"]
@@ -1257,7 +1262,7 @@ var UI={};
                           {node:"paragraph", text: "As a standalone call <br> <code>var node=Apoco.display['" + HDisplays[i] + "'](dataObject);</code> <br> or as part of UI.Panel<br> <code> {DOM:'myparent',id:'someid',display:" + HDisplays[i] + ",components:[ObjectArray]}"},
                           {node: "heading",size: "h4",text: "dataObject settings"},
                           {node: "heading",size: "h5",text: "required"},
-                          {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string or html element","an existing node with an id (do not include #) which is used as the parent for the display <br> <b> or </b> <br> an html element with an id, (make sure that this element has been appended to the document as the show() method will not do this)"]},
+                          {node: "descriptionList",items:[{label: "DOM",descriptions:["type: string or html element","an existing node with an id (do not include #) which is used as the parent for the display <br> <b> or </b> <br> an html element with an id, (make sure that this element has been appended to the document as the show() method)"]},
                                                           {label: "id",descriptions:["type: string","id of the base htmlObject the display creates"]}]
                           },
                           {node:"descriptionList", items:stuff[HDisplays[i]].required},
@@ -1949,7 +1954,7 @@ var UI={};
         var panel_methods={
             UIStart:[{label:"Usage",descriptions:[ "Called by default if", "<code> UI.start=['MyPanel']; </code> is defined"]},
                      {label: "Or",descriptions:[ "<br><code>Apoco.Panel.UIStart(stringArray);</code>","<br> return: nothing","parms: stringArray","string array of panel keys, as defined in the UI,Panels object that will be displayed immediately on load"," e.g if <code> UI.start=['MyPanel']; </code> is defined, Apoco will immediately load this panel by default in the main window","you then don't need to call this method"]}],
-            add:[{label: "Usage",descriptions:[ "<code>Apoco.Panel.add(object|| string);</code>","return: nothing","parms: object or string","e.g from the above definition","<code>Apoco.Panel.add('MyPanel');</code>","or","<code> Apoco.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
+            add:[{label: "Usage",descriptions:[ "<code>Apoco.Panel.add(object|| string);</code>","return: Panel object or null on fail","parms: object or string","e.g from the above definition","<code>Apoco.Panel.add('MyPanel');</code>","or","<code> Apoco.Panel.add({name:'some_name',components:my_display_object_array});</code>","to use the string parm the window must be defined in the UI.Panels object"]}],
             clone:[{label:"Usage",descriptions:["<code>var p=Apoco.Panel.clone(panel_name);</code>","clone a panel object that has been defined in UI.Panels","Add to DOM with <code>Apoco.Panel.add(p);</code>"]}],
             delete:[{label:"Usage",descriptions:["<code>Apoco.Panel.delete(string);</code>","return: nothing","parms: string","the name of the window to be deleted"]}],
             deleteAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.deleteAll();</code>","return: nothing","parms: none","delete all the windows"]}],
@@ -1957,7 +1962,7 @@ var UI={};
             hide:[{label:"Usage",descriptions:["<code>Apoco.Panel.hide(string);</code>","return: none","parms: string",("" + mk_spaces(7) + "name of the window")]}],
             hideAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.hideAll();</code>","return: none","parms: none","Remove all the panels from the DOM"]}],
             getList:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.getList();</code>","return: stingArray","list the names of all the windows in Apoco"]}],
-            show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>","puts all the display pbjects into the DOM - unless the display has hidden=true e.g my_display.hidden=true"]}],
+            show:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.show(string);</code>","puts all the display pbjects into the DOM - unless the display has hidden=true e.g my_display.hidden=true returns the Panel object"]}],
             showAll:[{label:"Usage",descriptions:["<code>Apoco.Panel.showAll([ ,win])</code>","params: none or string window name, or window Object"]}],
             addChild:[{label:"Usage",descriptions:["<code>var d=Apoco.Panel.get(string).addChild(object);</code>","<br> return: object","parms: object","a Apoco display Object of key value pairs"]}],
             deleteChild:[{label:"Usage",descriptions:["<code>var v=Apoco.Panel.get(panel_name).deleteChild(c);</code>","params: object or string","where object is the child object returned by getChild or string the id of the child node - if deleting more than one child use deleteChildren"]}],
@@ -2098,7 +2103,7 @@ var UI={};
                             }
                           ]
              },
-        Fields: {// name: "Fields",
+        Fields: {
                   components:[ {display:"menu",
                                 DOM: "left",
                                 id: "FieldsMenu",
@@ -2124,15 +2129,14 @@ var UI={};
                                },
                              ]
                 },
-        About:{ //name: "About",
+        About:{ 
                 components:[
                     {display:"menu",
                      DOM: "left",
                      id: "AboutMenu",
-              //       selected: "heading",
                      heading:"Core Methods",
                      components: [{label: "start",name: "start",action:select_menu},
-                            {label: "stop",name:"stop",action: select_menu}]
+                                  {label: "stop",name:"stop",action: select_menu}]
                     },
                     { display: "fieldset",
                       id:"Blurb",

@@ -159,8 +159,8 @@ require("./Window");
             if(k===undefined){
                 throw new Error("Panel.show name is undefined");
             }
-            var p=this.get(k);
-            if(!p){
+            var c,p=this.get(k);
+           /* if(!p){   // No it should not load the panel on show();
                 var w=this._UIGet(k);
                 if(!w){
                     throw new Error("Cannot find panel " + k);
@@ -171,10 +171,13 @@ require("./Window");
                          throw new Error("Cannot find panel " + k);
                     }
                 }
+            } */
+            if(!p){
+                return null;
             }
-            var c=p.getChildren();
+            c=p.getChildren();
             if(c === null){
-                return;
+                return null;
             }
             for(var i=0;i<c.length;i++){
               //  console.log("Panel show " + c[i].id + " hidden " + c[i].hidden);
@@ -182,6 +185,7 @@ require("./Window");
                     c[i].show();
                 }
             }
+            return p;
         },
         showAll:function(win){
             var w,tw=null;
@@ -236,11 +240,12 @@ require("./Window");
             }
             var c=p.getChildren();
             if(c === null){
-                return;
+                return null;
             }
             for(var i=0;i<c.length;i++){
                 c[i].hide();
             }
+            return p;
         },
         getList: function(){
             var l=[];

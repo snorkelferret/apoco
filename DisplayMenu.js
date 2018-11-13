@@ -68,6 +68,7 @@ require("./DisplayBase");
 	    else{
 		throw new Error("Apoco.menu Could not find element " + name);
 	    }
+            return this;
 	},
         getSelected: function(){
             if(this.selected){
@@ -81,6 +82,7 @@ require("./DisplayBase");
             for(var i=0;i<p.length;i++){
                 p[i].classList.remove("selected");
             }
+            return this;
         },
         addMenu:function(index,parent_element){
             var d,s,l,that=this;
@@ -144,6 +146,7 @@ require("./DisplayBase");
                 }
 	    }
             this.components[index]=d;
+            return this.components[index];
         },
  
 	select: function(val){
@@ -157,9 +160,10 @@ require("./DisplayBase");
                         c[j].classList.remove("selected");
                     }
                     this.selected.element.classList.add("selected");
-                    return;
+                    return this.selected;
                 }
             }
+            return null; 
 	}
     };
 

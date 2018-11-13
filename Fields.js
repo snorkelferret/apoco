@@ -48,6 +48,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         else{ 
             throw new Error("Apoco field does not support type " + this.type);
         }
+        
         if(element === undefined){
             this.element=document.createElement("div");
         }
@@ -114,6 +115,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             this.hidden=true;
            // if(this.DOM.contains(this.element)){
             this.element.style.display="none";
+            return this;
            // }
         },
         show:function(display_type){
@@ -124,7 +126,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             else{
                 this.element.style.display="inherit"; 
-           }
+            }
+            return this;
+        },
+        isHidden:function(){
+            if(this.DOM.contains(this.element)){
+                return false;
+            }
+            return true;
         },
         setRequired:function(on){
             if(on){
@@ -135,6 +144,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.required=false;
                 this.input.removeAttribute("required");
             }
+            return this;
         },
 	getValue:function(){
 	    var v=this.input.value;
@@ -154,7 +164,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.input.value=v;
             }
             this.value=v;
-          
+            return this;
 	},
         delete:function(){
             // remove all the nodes
@@ -297,18 +307,19 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
        if(this.childClass){
             Apoco.Utils.addClass(this.input,this.childClass);
         }
-        
-        if( this.min !== undefined){
-            this.input.setAttribute("min",this.min);
-        }
-        if(this.max !== undefined){
-            this.input.setAttribute("max",this.max);
-        }
-        if(this.step){
-            this.input.setAttribute("step",this.step);
-        }
-        if(this.precision){
-            this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
+        if(this.type === "float" || this.type === "integer"){
+            if( this.min !== undefined){
+                this.input.setAttribute("min",this.min);
+            }
+            if(this.max !== undefined){
+                this.input.setAttribute("max",this.max);
+            }
+            if(this.step){ 
+                this.input.setAttribute("step",this.step);
+            }
+            if(this.precision){
+                this.input.setAttribute("pattern", "^[-+]?\d*\.?\/" + this.precision + "*$");
+            }
         }
         if(this.placeholder){
             this.input.setAttribute("placeholder",this.placeholder);
@@ -319,7 +330,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.element.appendChild(this.input);
    
 	if(this.value !== null && this.value !== undefined){
-            this.input.value=this.value;
+            // check that the value is valid
+            if(Apoco.type[this.type].check(this.value)){
+                this.input.value=this.value;
+            }
+            else {
+                throw new Error("Field with type " + this.type + "doesn't accept a value of " + this.value);
+            }
 	}
         if(this.editable === false){
             this.input.readOnly=true;
@@ -479,6 +496,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.input[0].removeAttribute("required");
                 this.input[0].removeAttribute("required");
             }
+            return this;
         },
 	getValue: function(){
             var v;
@@ -511,6 +529,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	},
         resetValue:function(){
             this.setValue(this.value);
+            return this;
         },
 	setValue: function(v){
  	    if(Apoco.type.blank.check(v)){
@@ -651,6 +670,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     this.input.removeAttribute("checked");
                 }
 	    }
+            return this;
         },
 	popupEditor:function(func){
             if(this.editable === true){
@@ -735,7 +755,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
             }
  	    this.element.appendChild(this.input[i].input);
-            return true;
+            return this;
         },
         setRequired:function(on){
             var v=(on)?true : false;
@@ -748,7 +768,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     this.input[i].removeAttribute("required");
                 }
             }
-            
+            return this;
         },
         deleteValue:function(value){
             var index = -1;
@@ -763,6 +783,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(index !== -1){
                 this.input.splice(index,1);
             }
+            return this;
         },
 	setValue: function(v){
             if(v.length >this.input.length){
@@ -777,6 +798,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
 	    }
             this.value=v;
+            return this;
 	},
 	getValue:function(index){
             if(index !== undefined && index< this.input.length){
@@ -954,6 +976,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             else{
                 this.select.removeAttribute("required");
             }
+            return this;
         },
         _mkBlankOption:function(){
             var that=this,o;
@@ -1033,14 +1056,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     this.select.value=value;
                     this.select.label=name;
                     this.value=v;
-                    return;
+                    return this;
                 }
             }
             if(this.input){
                 this.input.value=value;
                 this.input.label=name;
                 this.value=v;
-                return;
+                return this;
             }
             throw new Error("SelectField: Cannot set value to " + v + " not in options list");
            
@@ -1048,7 +1071,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         addValue:function(v){
             var o,a=[];
             if(!v){
-                return;
+                throw new Error("selectField: addValue must have a parameter");
             }
           //  console.log("selectField trying to add value %j ",v);
          //  console.log("selectField: addValue optype is " + this.opt_type);
@@ -1068,6 +1091,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 (a[i].label)?o.textContent=a[i].label:o.textContent=a[i];
                 this.select.appendChild(o);
             }
+            return this;
         },
 	getValue:function(){
 	    var v,n=null;
@@ -1221,12 +1245,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     }
                 },false);
             }
-            return true;
+            return this;
 	},
 	resetValue:function(){
             for(var i=0;i<this.input.length;i++){
                 this.input[i].input.checked=this.value[i];
             }
+            return this;
 	},
         setValue: function(value,index){
             var t=0;
@@ -1250,7 +1275,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 else{
                     throw new Error("ButtonSetField: value must be a boolean array");
                 }
-                return;
+                
+                return this;
             }
             
             if(value.length!== this.input.length){
@@ -1271,6 +1297,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.input[i].input.checked =value[i];
                (value[i]===true)?this.input[i].input.parentNode.classList.add("checked"):this.input[i].input.parentNode.classList.remove("checked");
             }
+            return this;
         },
 	deleteValue:function(label){
 	    var that=this;
@@ -1290,7 +1317,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	    else{
 		throw new Error("could not remove value " + value);
 	    }
-
+            return this;
 	},
 	getValue:function(){
             var ar=[],p={};
@@ -1458,6 +1485,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     throw new Error("StringArrayField: setValue array is too long");
                 } 
             }
+            return this;
         },
 	getValue:function(){
 	    var vals=[],t;
@@ -1479,6 +1507,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
                 t.parentNode.removeChild(t);
             }
+            return this;
         },
 	addValue:function(value,i){
             if(i===undefined){
@@ -1499,6 +1528,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(this.editable === false){
                 this.input[i].input.readOnly=true;
             }
+            return this;
 	},
         setRequired:function(on){
             var v=(on)?true:false;
@@ -1506,6 +1536,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             for(var i=0;i<this.input.length;i++){
                 this.input[i].input.requied=v;
             }
+            return this;
         },
 	checkValue:function(){
 	    var valid;
@@ -1544,6 +1575,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     this.deleteValue(i);
                 }
             }
+            return this;
         }
     };
 
@@ -1674,7 +1706,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             f=that.findFile(name);
             if(f && f.element){
                 f.element.style.display="none";
-            } 
+            }
+            return this;
         },
         showFile:function(name){
             var that=this,f;
@@ -1682,8 +1715,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(f && f.element){
                 f.element.style.display="unset";
             }
+            return this;
         },
-        setValue:function(v){ // add to the input node
+        setValue:function(v){ 
             
         },
         addValue:function(v){
@@ -1691,12 +1725,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
           // . if(v.object){return v;} // already done
             if(!that.checkValue(v)){
            //     console.log("add value failed check %j",v);
-                return null;
+                // return null;
+                throw new Error(("addValue failed checkValue() with value %j",v));
             }
             v.element=document.createElement("div");
             if(that.resizable === true || v.resizable === true){
                 v.element.classList.add("resizable");
-                console.log("adding resizable");
+                //console.log("adding resizable");
             }
             v.object=document.createElement("embed");
             v.object.setAttribute("name",v.name);
@@ -1926,6 +1961,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(this.thumbnails){
                 this.mk_thumbnails();
             }
+            return this;
         }
     };
 
@@ -2013,6 +2049,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     AutoCompleteField.prototype={
         deleteOptions:function(){
             this.options.length=0;
+            return this;
         },
         addOptions:function(n){
             for(var i=0;i<n.length;i++){
@@ -2021,6 +2058,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(this.options.length>1){
                 Apoco.sort(this.options,"string");
             }
+            return this;
          },
         _make_list:function(ar){
             var p;
@@ -2056,23 +2094,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             return n;
         },
-    /*    offset:function(){
-            var that=this;
-            var  offset={x:0,y:0};
-            var rect=that.input.getBoundingClientRect();
-            that._getOffset(that.select,offset);
-            that.select.style.top=((rect.bottom+window.scrollY - offset.y).toString() + "px"); //pos[0];
-            that.select.style.left=((rect.left+window.scrollX - offset.x).toString() + "px"); //pos[1];
-
-        },
-        _getOffset: function(object, offset) {
-            if (!object){
-                return;
-            }
-            offset.x += object.offsetLeft;
-            offset.y += object.offsetTop;
-            this._getOffset(object.offsetParent, offset);
-        }, */
         popupEditor: null
     };
 

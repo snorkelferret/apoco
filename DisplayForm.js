@@ -194,6 +194,7 @@ require("./DisplayFieldset");
                 throw new Error("DisplayForm: addButton cannot find button container");
             }
             r.appendChild(this.buttons[index].element);
+            return this.buttons[index];
         },
         getButton:function(name){
             if(name !== undefined){
@@ -215,6 +216,7 @@ require("./DisplayFieldset");
             }
             //console.log("this element is " + this.element + " parebt " + this.element.parentNode);
             this.buttons.length=0;
+            return this;
         },
         deleteButton:function(name){
             var n,index=-1;
@@ -233,6 +235,7 @@ require("./DisplayFieldset");
             this.buttons[index].element.parentNode.removeChild(this.buttons[index].element);
             this.buttons[index].element=null;
             this.buttons.splice(index,1);
+            return this.buttons;
         },
 	resetInvalid: function(){
 	    for(var i=0;i< this.fields.length;i++){
@@ -240,6 +243,7 @@ require("./DisplayFieldset");
 		    this.fields[i]._resetValue();
 		}
 	    }
+            this;
 	},
 
 	print: function(){
@@ -258,6 +262,7 @@ require("./DisplayFieldset");
 	    win.document.write('</body></html>');
 	    win.print();
 	    win.close();
+            return this;
 	},
 	check: function(){
 	    var valid=true;
