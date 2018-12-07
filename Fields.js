@@ -256,7 +256,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             Apoco.Utils.addClass(this.span,this.childClass);
         }
         //s.setAttribute("type",this.html_type);
-        
+                
         this.setValue(this.value);
         this.element.appendChild(this.span);
     };
@@ -278,6 +278,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     }
                     this.value=t[0];
                 }
+            }
+            if(this.type === "object"){
+               this.span.textContent=this.userSetValue(v);
             }
             if(Apoco.type["array"].check(v)){
                 for(var i=0;i<v.length;i++){
@@ -646,18 +649,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         }
        //console.log("userSetValue is " + d.userSetValue);       
         if(!Apoco.type["object"].check(d.value)){
-            Apoco.popup.error(("Fields: Object- object param %j ",d.value),"Not an object");
-            return null;
+            throw new Error("Fields: Object  value  is incorrect type %j ",d.value);
         }
         if(!d.userSetValue || !Apoco.type["function"].check(d.userSetValue)){
-            Apoco.popup.error("Object Field: - missing function","missing param setValue function");
-            console.log("Object field: userSetValue function incorrect");
-            return null;
+            throw new Error("Object field: userSetValue function incorrect");
         }
         if(!d.userGetValue || !Apoco.type["function"].check(d.userGetValue)){
-            Apoco.popup.error("Object Field: - missing function","missing param getValue function");
-            console.log("Object field: userSetValue function incorrect");
-            return null;
+            throw new Error("Object field: userGetValue function incorrect");
         }
       
         _Field.call(this,d,element);
@@ -709,8 +707,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
             }
             else{
-                Apoco.popup.error("Object field setValue ",("input is not an object %j",val));
-                return null;
+                throw new Error("Object field setValue value incorrect type %j",val);
             }
             return this;
         },

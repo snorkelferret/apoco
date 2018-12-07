@@ -201,16 +201,22 @@ describe("StaticField",function(){
         assert.strictEqual(p.getValue(),"2017-02-13");
     });
     
-   /* w=Apoco.field["static"]({name:"staticObject",inputType:"string",type:"object",
-                             setValue:function(t){
-                                 return null;
-                             },
-                             getValue:function(t){
-                                 return t.value;
-                             },
-                             object:{n:{type:"integer",value:10},
-                                     b:{type:"string",value:"hello"}}});
-  */
+    it("can make a static object field",function(){
+       var  p=Apoco.field["static"]({name:"staticObject",inputType:"string",type:"object",
+                                     userSetValue:function(t){
+                                         return t.b;
+                                     },
+                                     userGetValue:function(self){
+                                         return self.value;
+                                     },
+                                     value:{n:10,
+                                            b:"hello"}
+                                    });
+        
+        assert.isObject(p.getElement(),"element is here");
+        assert.deepEqual(p.getValue(),{n:10,b:"hello"});
+    });
+  
 
 });
 
@@ -273,16 +279,18 @@ describe("ObjectField",function(){
     });
 
     it("returns an empty object on option error",function(){
-        f=Apoco.field["object"]({name:"nnn",type:"object",inputType:"string",
-                                 object:{a:10, b:"abc",c:"don't touch me"},
-                                 userSetValue:undefined,
-                                 userGetValue:undefined
-                                 
-                            });
-      //  console.log("bad return is %j",f);
-        assert.isObject(f,"asserted f is an object");
-        var p=Apoco.field.object;
-        assert.notInstanceOf(f,p);
+        var fn=function(){
+            f=Apoco.field["object"]({name:"nnn",type:"object",inputType:"string",
+                                     value:{a:10, b:"abc",c:"don't touch me"},
+                                     userSetValue:undefined,
+                                     userGetValue:undefined
+                                     
+                                    });
+            console.log("bad return is %j",f);
+        };
+          
+        assert.throws(fn, "Object field: userSetValue function incorrect");
+              
     });
 });
 
