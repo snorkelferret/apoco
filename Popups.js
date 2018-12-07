@@ -74,7 +74,7 @@ require("./Utils");
                     s=document.createElement("div");
                     s.classList.add("message");
                     message_text=document.createElement("p");
-                    message_text.style.float="right";
+                    //message_text.style.float="right";
                     message_text.textContent=message;
                     b=document.createElement("span");
                     s.appendChild(b);

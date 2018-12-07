@@ -26,13 +26,25 @@ test.describe("Manual",function(){
 //    var $= global.jQuery;
     var driver;
     var tabs;
-    //test.before(function(){
+    test.before(function(done){
+        this.timeout(20000);
         driver = new webdriver.Builder()
-            .forBrowser('firefox')
+            .forBrowser('chrome')
             .build();
-
-    //});
-    driver.get("file://"+process.cwd()+"/index.html");
+        driver.getCapabilities().then(function(cap){
+            const knownGoodVersions = { // add to this!
+                firefox:['52.9.0','60.3.0'],
+                chrome:['70.0.3538.67','70.0.3538.110']
+            };
+            const kgv = knownGoodVersions[cap.get('browserName')];
+            assert.notStrictEqual(undefined,kgv);
+            const browserVersion = cap.get('version') || cap.get('browserVersion'); // this is nice
+            assert.isTrue(kgv.includes(browserVersion));
+        });
+        driver.manage().timeouts().implicitlyWait(10000);
+    
+        driver.get("file://"+process.cwd()+"/index.html").then(done);
+    });
    // driver.get("https://snorkelferret.github.io/index.html");
 
     test.after(function() {
@@ -52,11 +64,11 @@ test.describe("Manual",function(){
     });
     test.it("has loaded a node called Content",function(done){
         this.timeout(15000);
-        driver.wait(function(){
-           return driver.isElementPresent(By.id("Content"));
-       },15000);
+       // driver.wait(function(){
+      //     return driver.isElementPresent(By.id("Content"));
+      // },15000);
        var b=driver.findElement(By.id("Content"));
-        //driver.findElement(By.id("Content")).then(function(b){
+       
     //    console.log("Got content node " + b);
         assert.notStrictEqual(b,undefined);
         assert.notStrictEqual(b,null);

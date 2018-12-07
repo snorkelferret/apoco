@@ -4,6 +4,7 @@ require("./Sort");
 require('./Types');
 require("./datepicker");
 require("./IO");
+require("./Popups");
 
 var Promise=require('es6-promise').Promise; //polyfill for ie11
 
@@ -247,12 +248,15 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     var StaticField=function(d,element){
         var that=this;
         d.field="static";
+        
         _Field.call(this,d,element);
+       
         this.span=document.createElement("span");
         if(this.childClass){
             Apoco.Utils.addClass(this.span,this.childClass);
         }
         //s.setAttribute("type",this.html_type);
+        
         this.setValue(this.value);
         this.element.appendChild(this.span);
     };
@@ -631,6 +635,94 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
     Apoco.Utils.extend(TimeField,_Field);
 
+    var ObjectField=function(d,element){
+        d.field="object";
+        d.type="object";
+       
+        if(!d.inputType){
+       //     Apoco.popup.error("Object Field needs objectType","inputType parameter missing");
+            //   return null;
+            d.inputType="string";
+        }
+       //console.log("userSetValue is " + d.userSetValue);       
+        if(!Apoco.type["object"].check(d.value)){
+            Apoco.popup.error(("Fields: Object- object param %j ",d.value),"Not an object");
+            return null;
+        }
+        if(!d.userSetValue || !Apoco.type["function"].check(d.userSetValue)){
+            Apoco.popup.error("Object Field: - missing function","missing param setValue function");
+            console.log("Object field: userSetValue function incorrect");
+            return null;
+        }
+        if(!d.userGetValue || !Apoco.type["function"].check(d.userGetValue)){
+            Apoco.popup.error("Object Field: - missing function","missing param getValue function");
+            console.log("Object field: userSetValue function incorrect");
+            return null;
+        }
+      
+        _Field.call(this,d,element);
+       
+        this.html_type=Apoco.type[this.inputType].html_type;
+
+        this.input=document.createElement("input");
+        this.input.setAttribute("type",this.html_type);
+        if(this.childClass){
+            Apoco.Utils.addClass(this.input,this.childClass);
+        }
+        if(this.placeholder){
+            this.input.setAttribute("placeholder",this.placeholder);
+        }
+        if(this.required){
+            this.input.required=true;
+        }
+        this.element.appendChild(this.input);
+        if(!this.editable){
+            this.input.readOnly=true;
+        }
+        if(this.value){
+         //   console.log("Object field setting value");
+            this.setValue(this.value);
+        }
+        else{
+            this.value={}; // default for this.value is null - so make it an object
+        }
+        if(this.action){
+            this.action(this);
+        }
+        return this;
+    };
+
+    ObjectField.prototype={
+        setValue:function(val){
+            var c;
+            if(Apoco.type[this.type].check(val)){
+                for(var k in val){ // doing this so can have missing or extra key values
+                    this.value[k]=val[k];
+                }
+                c=this.userSetValue(val);
+             //   console.log("return from userSetValue is %j ",c);
+                if (this.input){
+                    this.input.value=c;
+                }
+                else if(this.field === "static"){  
+                    this.span.textContent=c;
+                }
+            }
+            else{
+                Apoco.popup.error("Object field setValue ",("input is not an object %j",val));
+                return null;
+            }
+            return this;
+        },
+        getValue:function(){
+            if(this.field === "static"){
+                return this.value;
+            }
+            return this.userGetValue(this);
+        }
+    };
+    Apoco.Utils.extend(ObjectField,_Field);
+    
     var CheckBoxField=function(d,element){
         d.field="checkBox";
         d.type="boolean";
@@ -2111,6 +2203,8 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         staticMethods:function(){var n=[]; for(var k in StaticField.prototype){  n.push(k);} return n;},
         input:function(options,element){return new InputField(options,element);},
         inputMethods:function(){var n=[]; for(var k in InputField.prototype){  n.push(k);} return n;},
+        object:function(options,element){return new ObjectField(options,element);},
+        objectMethods:function(){var n=[]; for(var k in ObjectField.prototype){  n.push(k);} return n;},
         float:function(options,element){return new FloatField(options,element);},
         floatMethods:function(){var n=[]; for(var k in FloatField.prototype){ n.push(k);} return n;},
         fileReader:function(options,element){ return new FileField(options,element);},

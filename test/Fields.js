@@ -201,8 +201,89 @@ describe("StaticField",function(){
         assert.strictEqual(p.getValue(),"2017-02-13");
     });
     
-    
+   /* w=Apoco.field["static"]({name:"staticObject",inputType:"string",type:"object",
+                             setValue:function(t){
+                                 return null;
+                             },
+                             getValue:function(t){
+                                 return t.value;
+                             },
+                             object:{n:{type:"integer",value:10},
+                                     b:{type:"string",value:"hello"}}});
+  */
 
+});
+
+
+
+describe("ObjectField",function(){
+    require("../Fields.js");
+    var f=Apoco.field["object"]({name:"nnn",type:"object",inputType:"string",
+                                 value:{a:10, b:"abc",c:"don't touch me"},
+                                 userSetValue: function(t){
+                                     return t.b.concat((t.a));
+                                 },
+                                 userGetValue:function(that){
+                                     var v=that.input.value;
+                                     var t={};
+                                     var b=v.split(/[0-9]/)[0];
+                                   //  console.log("usergetvalue input is " + v);
+                                   //  console.log("split is %j ",b);
+                                     t.a=parseInt(v.substring(b.length));
+                                     t.b=b;
+                                     t.c=that.value.c;
+                                     return(t);
+                                 }
+                                });
+    it("has created an object ",function(){
+        //console.log("f is %j " , f);
+        assert.isObject(f);
+    });
+  
+    it("creates a div element",function(){
+        var b=f.getElement();
+        assert.isObject(b);
+        document.getElementsByTagName("body")[0].appendChild(b);
+        
+    });
+    
+    it("creates an input node",function(){
+        //var c=document.getElementsByTagName("div";
+        var b=(document.getElementsByName("nnn")[0]).getElementsByTagName("input")[0];    
+      //   console.log("iiiiiiiiiiiiiiiiiinput node is %j " , b);
+        assert.isObject(b);
+    });
+    
+    it("it has set the value",function(){
+        var b=(document.getElementsByName("nnn")[0]).getElementsByTagName("input")[0];
+        assert.strictEqual(b.value,'abc10');
+    });
+    it("knows the value has been changes in the browser",function(){
+        var b=(document.getElementsByName("nnn")[0]).getElementsByTagName("input")[0];
+        b.value="gggg577";
+        assert.strictEqual(f.valueChanged(),true);
+    });
+    it("can get a value that has been changed in the input node",function(){
+        assert.deepEqual(f.getValue(),{a:577,b:"gggg",c:"don't touch me"});
+    });
+    
+    it("can set a value",function(){
+        f.setValue({a:20,b:"tyiop"});
+        assert.deepEqual(f.getValue(),{a:20,b:"tyiop",c:"don't touch me"});
+    });
+
+    it("returns an empty object on option error",function(){
+        f=Apoco.field["object"]({name:"nnn",type:"object",inputType:"string",
+                                 object:{a:10, b:"abc",c:"don't touch me"},
+                                 userSetValue:undefined,
+                                 userGetValue:undefined
+                                 
+                            });
+      //  console.log("bad return is %j",f);
+        assert.isObject(f,"asserted f is an object");
+        var p=Apoco.field.object;
+        assert.notInstanceOf(f,p);
+    });
 });
 
 describe("FloatField",function(){

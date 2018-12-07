@@ -91,9 +91,11 @@ require("./Fields.js");
             else{
                 throw new Error("Apoco.displayFieldset: meed to specify node type or field");
             }
-            if(n){
-//                n.parent=this;
-                p=n.element.parentNode; //this is for node entries which use the el parm as a parent not the root this.element like fields
+            if(n && n.element){
+               // console.log("n is " + n + "and name is " +  n.name);
+                if(n.element){
+                    p=n.element.parentNode; //this is for node entries which use the el parm as a parent not the root this.element like fields
+                }
                 if(p){
                     parent_element.appendChild(p);
                 }
@@ -107,9 +109,10 @@ require("./Fields.js");
 	        this.components[index]=n;
                 return n;
             }
-            else{
-                throw new Error("Apoco,fieldset, doesn't know how to make " + d.node);
-            }
+           // console.log("error, Apoco fieldset cannot make %j " ,d);
+            p=(d.field)?d.field:d.node;
+            Apoco.popup.error("Apoco,fieldset"," doesn't know how to make " + p ) ;
+            
             return null;
         },
         getJSON: function(){

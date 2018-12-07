@@ -92,6 +92,7 @@ var UI={};
         target: "_blank",
         nodeType: "ul",
         thumbnails: "true",
+        object:{a:1,b:"bbbbb",c:3,d:"abcd"},
         objectArray:[{label:"value",description: "describe value"},{label:"another_value",descriptions:["one","two","three"]}]
     };
 
@@ -115,6 +116,7 @@ var UI={};
             switch(k){
             case "Fields":
                 thing=Apoco.field;
+              //  console.log("field is %j ", Apoco.field);
                 break;
             case "Displays":
                 thing=Apoco.display;
@@ -151,6 +153,7 @@ var UI={};
             for(var n in thing){
                 if(!n.startsWith("_")){
                     if(k === "Fields"){
+                    //    console.log("field is " + n);
                         if(n !== "exists" &&  n.indexOf("Methods")<= -1){  // method  not a field
                             HThings[k].push(n);
                         }
@@ -256,6 +259,33 @@ var UI={};
                                  },
                          descriptions:[""]
                        },
+                object:{ required:{userGetValue:{type:"function",
+                                                 params:"function(that){ return that.value;}",
+                                                 default:undefined,
+                                                 descriptions:["function to get the values in the object",
+                                                      "passed in the field context, should return the value object"         
+                                                 ]
+                                                },
+                                   userSetValue:{type:"function",
+                                                 params:"function(val){ return (val[key1] + val[key2]);}",
+                                                 default: undefined,
+                                                 descriptions: ["function to set the input node to a value"]
+                                   
+                                                }
+                                  },
+                         options:{ type:{type:"string",
+                                         default:"object"},
+                                   value:{type:"object",
+                                          default: null,
+                                          descriptions:["object with key value pairs","e.g value={a: 1,b:2,c:3,d:'anything'}"]
+                                         },
+                                   inputType:{type:"string",
+                                              params:that.get_types("input"),
+                                              default: undefined,
+                                              descriptions:["set the input node to a particular type"                         
+                                                           ]
+                                             }}
+                       },
                 buttonSet:{required:{labels:{type:"stringArray"}},
                            options:{checkbox:{type:"boolean",
                                               default: false},
@@ -339,12 +369,12 @@ var UI={};
             this.fields={};
             this.mkOptions(Options);
             this.mkFieldOptionsList();
-            /* for(var k in this.fields){
+           /* for(var k in this.fields){
              console.log("fields  value %j",this.fields[k]);
-             for(var h in this.fields[k]){
-             console.log("other fields is %j " ,this.fields[k][h]);
-             }
-             }*/
+                for(var h in this.fields[k]){
+                    console.log("other fields is %j " ,this.fields[k][h]);
+                }
+            } */
             this.Commands=this.mkFieldCommands();
             this.mkFields();
             this.mkFieldMethods();
@@ -358,7 +388,7 @@ var UI={};
                 this.fields[f].required={};
                 this.fields[f].options={};
                 this.fields[f].IO={};
-                //console.log("mkOptions: field is " + f);
+              //  console.log("mkOptions: field is " + f);
                 if(Options.required){
                     for(var n in Options.required){
                         this.fields[f].required[n]=Options.required[n];
@@ -448,7 +478,7 @@ var UI={};
         mkFieldCommands:function(no_var_equals){
             var that=this;
             var Commands=[];
-            var f,k,v;
+            var f,k,v,p;
             var HFields=HThings.Fields;
 
             var field_desirable={
@@ -459,12 +489,13 @@ var UI={};
                 float:["value"],
                 numberArray:["value","type"],
                 input:["value","type"],
-                imageArray:["thumbnails"]
+                imageArray:["thumbnails"],
+                object:["value"]
             };
             for(var i=0;i<HFields.length;i++){
                 f=HFields[i];
                 var c="";
-              //  console.log("Creating command for " + HFields[i]);
+               // console.log("Creating command for " + HFields[i]);
                 if(no_var_equals){
                     c="{field:'" + HFields[i] + "'";
                 }
@@ -475,8 +506,33 @@ var UI={};
                 // get the globally required opts
                 v=this.fields[f].required;
                 for(k in v){
-                  //  console.log("GETTING REQUIRED");
-                    c=c.concat("," + k + ":" + JSON.stringify(getAType[v[k].type]));
+                  //  console.log("k is " + k + " and v is " + v[k]);
+                    if(k === "userSetValue"){
+                        p=function(t){
+                             return t.b.concat((t.a));
+                        };
+                     //   console.log("p is " + p);
+                    }
+                    else if(k === "userGetValue"){
+                        p=function(that){
+                            var v=that.input.value;
+                            var t={};
+                            var b=v.split(/[0-9]/)[0];
+                            t.a=parseInt(v.substring(b.length));
+                            t.b=b;
+                            for(var k in that.value){
+                                if(!t[k]){
+                                    t[k]=that.value[k];
+                                }
+                            }
+                            return(t);
+                        };
+                       // console.log("p is " + p);
+                    }
+                    else{
+                        p= JSON.stringify(getAType[v[k].type]);
+                    }
+                    c=c.concat("," + k + ":" + p);
                 }
                 c=c.concat(", label: 'A Label'");
 
@@ -484,11 +540,11 @@ var UI={};
                     var fd=field_desirable[HFields[i]];
                     for(var j=0;j<fd.length;j++){
                         var n=this.fields[f].options[fd[j]];
-                        //console.log("desirable field for " + fd[j] + " type " + n.type );
+                     //   console.log("desirable field for " + fd[j] + " type " + n.type );
                         if(n){
                             c=c.concat(","+ fd[j] + ":");
                           //  console.log("adding desirable field " + fd[j] + " with type " + n.type);
-                            if(n.default !== undefined){
+                            if(n.default !== undefined && n.default !== null){
                             //    console.log("adding default " + n.default);
                                 c=c.concat(JSON.stringify(n.default));
                             }
@@ -584,13 +640,14 @@ var UI={};
                          },
                 setValue:{descriptions:[
                     "<code>var r=field.setValue(value[,index]);</code>",
-                    "return: void",
-                    "If the field is an array, value is an array, or a single value and index into the array<br> Set Value is the way to update values in memory"
+                    "return: this (field Object)",
+                    "If the field is an array, value is an array, or a single value and index into the array<br> Set Value is the way to update values in memory",
+                    "If a value is given it must be a valid type or else an error is thrown - see Apoco.type[this.type].check(value)"
                 ]},
                 valueChanged: {descriptions: [  "<code>var r=field.valueChanged();</code>",
                                                 "return: boolean",
                                                 "If the value has been changes in the browser return true"
-                ]},
+                                             ]},
                 checkValue:{descriptions:[
                     "<code>var r=field.checkValue();</code>",
                     "return: boolean",
@@ -1908,6 +1965,10 @@ var UI={};
         if(that.parent.selected){
             Apoco.Panel.hide(that.parent.selected.name);
         }
+        
+        if(!Apoco.Panel.get(name)){
+            Apoco.Panel.add(name);
+        }
         Apoco.Panel.show(name);
         if(!pop){
            // console.log("pushing " + name);
@@ -3024,6 +3085,8 @@ var UI={};
     mkIO();
     mkUtils();
     mkWindows();
+
+    
    // see if the query string exists on url
     var name=Apoco.Utils.history.queryString();
     if(name){

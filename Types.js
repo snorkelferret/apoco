@@ -357,6 +357,8 @@ var Apoco=require('./declare').Apoco;
                 return true;
             }},
         object:{
+            html_type:"",
+            field:"object",
             check: function(a){  // a string is an object if called with var s= new String();
 	        //var t=("testing  " + a + " is an object");
                 if(a === undefined){
