@@ -279,10 +279,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     this.value=t[0];
                 }
             }
-            if(this.type === "object"){
+            if(this.type === "object" && this.userSetValue){
                this.span.textContent=this.userSetValue(v);
             }
-            if(Apoco.type["array"].check(v)){
+            else if(Apoco.type["array"].check(v)){
                 for(var i=0;i<v.length;i++){
                     p=v[i];
                     t=t.concat(p.toString());
