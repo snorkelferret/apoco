@@ -254,6 +254,7 @@ require("./Popups");
                 //       console.log("DisplayBase: calling afterShow ");
                         this._afterShow();
                     }
+                    this.hidden=false;
  		}
 	        else {
 		    //console.log(" --- invalid element");
@@ -272,11 +273,12 @@ require("./Popups");
         displayType: function(){
             return this.displayType;
         },
-        hide:function(){
+        hide:function(){// should it set this.hidden=true?
           //  console.log("trying to hide " + this.id);
             if(this.DOM.contains(this.element)){
              //   console.log("Hiding element that is in dom");
                 this.DOM.removeChild(this.element);
+                this.hidden=true;
                 //return;
             }
             return this;
