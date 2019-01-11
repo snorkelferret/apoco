@@ -1246,7 +1246,8 @@ var UI={};
                       {label:"groupBy",descriptions:["type: stting","split the row data into separate grids based on the value of the column in the row data","example","<code>groupBy: 'colname1',<code>","if the column has a title it will be used as a the subgrid seperator"]},
                       {label:"uniqueKey",descriptions:["type: stringArray","the set of column names that  uniquely determine a row (f it exists)","If no uniqueKey is given an id is added called '_aid'","You can access the uniqeKey with <code> var key=mygrid.uniqueKey;<code> which returns a string array "]},
                       {label: "resizable",descriptions:["type: boolean","Add the resize widget to the bottom rhs"]},
-                      {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]}
+                      {label:"hidden",descriptions:["type:boolean","default: false","add the node to the DOM"]},
+                      {label:"heatMap",descriptions:["type:boolean","default:false","use colours in the cell background to indicate how quickly the cell is being updated ","adds css classes cell_updated and cell_updated_fast which must exist "]}
                   ]},
             menu:{  required:[{label: "components",descriptions:["type: objectArray","which must contain a name, key value pair and optionally an action and/or label ","<code>{name:'menu1',action:some_function,label:'some_string'}</code>", "action: A function that receives one arg which is 'this'","the action can also be 'default' in which case the following code is substituted",
                                                            "<br><code> var select_menu=function(that,index){<br>" +
