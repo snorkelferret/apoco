@@ -83,7 +83,7 @@ jsonishData={
 	var that=this,t;
         
        	Apoco._DisplayBase.call(this,options,win);  //use class inheritance - base Class
-
+        this.heatMap=false;
 	this.cellEdit=null; // cell currently being edited- this is of type Apoco.field
 	this.allowEdit=true;  // are edits allowed?
         this.grids=[];
@@ -917,6 +917,26 @@ jsonishData={
         getChildren:function(){
             return this.getGrid();
         },
+        setCellHeatMap:function(cell){ // heatmap
+            var cell_el, cl,to;
+            if (cell.hidden !== true) {
+                cl = "cell_updated";
+                cell_el = cell.getElement();
+                if (cell_el.classList.contains(cl)) {
+                    cell_el.classList.remove(cl);
+                    cell_el.classList.add("cell_updated_fast");
+                    cl = "cell_updated_fast";
+                } else {
+                    cell.getElement().classList.add(cl);
+                }
+            }
+            if (to) {
+                clearTimeout(to);
+            }
+            to = setTimeout(function () {
+                cell.getElement().classList.remove(cl);
+            }, 15000);
+        },
 	updateRow: function(cell_data,override_editable){
 	    var row,index,g,n,closest={val:-1},resort;
 	    if(this.groupBy){
@@ -942,22 +962,10 @@ jsonishData={
 		for(var k in cell_data){
                     // if this cell is in current sort order grid may now be unsorted
                     if(row[k].editable !== false || override_editable === true){  // need to force update --- see rowEdit override !!!!
- 		        row[k].setValue(cell_data[k]);  
-		        if(row[k].hidden !== true){
-                            cl="cell_updated";
-                            cell=row[k].getElement();
-			    if(cell.classList.contains(cl)){  // add colours to the cells to show update frequency
-			        cell.classList.remove(cl);
-                                cell.classList.add("cell_updated_fast");
-			        cl="cell_updated_fast";
-			    }
-			    else{
-			        row[k].getElement().classList.add(cl);
-			    }
-			    if(to){ clearTimeout(to);}
-			    to=setTimeout(function(){
-			        row[k].getElement().classList.remove(cl);},15000);
-		        }
+ 		        row[k].setValue(cell_data[k]);
+                        if(this.heatMap){
+                            this.setCellHeatMap(row[k]);
+                        }
 		    }
                 }
                 for(var i=0;i<this.sortOrder.length;i++){  // do we need to resort the grid
