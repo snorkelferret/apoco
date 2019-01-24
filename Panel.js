@@ -140,11 +140,11 @@ require("./Window");
                     }
                     t=t.concat(" -->");
                     nodes=nodes.concat(t);
-                    t=c.element.innerHTML;
+                    t=c.element.outerHTML;
                     nodes=nodes.concat(t);
                 } 
             }
-            console.log(nodes);
+            //console.log("DUMP HTML  " + nodes);
             return nodes;
         },
         get: function(k){
