@@ -224,14 +224,16 @@ require("./Popups");
 	_execute: function( data ) {
 	    return null;  // if function has not been overwritten - bad return null
 	},
-	show: function(){
+	show: function(fromParent){
           // console.log("ApocoDisplayBase: showing " + this.id);
 	    if(this.publish !== undefined){
 	        //console.log("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj Publish 99999999999999999999999999999");
 	        Apoco.IO.publish(this);
 	    }
             // first check if the this.DOM element is already in the DOM
-            
+            if(fromParent && this.hidden){
+                return this;
+            }
             if(!this.DOM.contains(this.element)){
               // console.log("Showing element that is not in DOM" + this.element);
 	        if(this.element){
@@ -273,12 +275,15 @@ require("./Popups");
         displayType: function(){
             return this.displayType;
         },
-        hide:function(){// should it set this.hidden=true?
-          //  console.log("trying to hide " + this.id);
+        hide:function(fromParent){// should it set this.hidden=true?
+            //  console.log("trying to hide " + this.id);
+            
             if(this.DOM.contains(this.element)){
              //   console.log("Hiding element that is in dom");
                 this.DOM.removeChild(this.element);
-                this.hidden=true;
+                if(!fromParent){
+                    this.hidden=true;
+                }
                 //return;
             }
             return this;

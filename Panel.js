@@ -3,6 +3,7 @@ require("./Utils");
 require("./Popups");
 require("./Window");
 
+// Panel is a container
 // change show to show hidden children if param is show_children
 ;(function() {
     'use strict';
@@ -61,8 +62,6 @@ require("./Window");
 	}
 	return true;
     }
-
-  
 
     Apoco.Panel={
 	_list: [],  // list of all the Panels. Panel is a group of elements comprising a logical UI object.
@@ -168,10 +167,8 @@ require("./Window");
                 return null;
             }
             for(var i=0;i<c.length;i++){
-              //  console.log("Panel show " + c[i].id + " hidden " + c[i].hidden);
-                if(c[i].hidden !== true){
-                    c[i].show(); 
-                }
+                console.log("Panel show " + c[i].id + " hidden " + c[i].hidden);
+                c[i].show(true);  // set fromParent  
             }
             return p;
         },
@@ -222,7 +219,7 @@ require("./Window");
         },
         hide:function(k){
             var p=this.get(k);
-           // console.log("hiding panel " + k);
+            console.log("hiding panel " + k);
             if(!p){
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
@@ -232,7 +229,7 @@ require("./Window");
             }
             for(var i=0;i<c.length;i++){
                 if(document.contains(c[i].element)){ 
-                    c[i].hide();
+                    c[i].hide(true);  // setting hide from parent to true
                 }
             }
             return p;

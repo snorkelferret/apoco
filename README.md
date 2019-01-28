@@ -116,10 +116,11 @@ Apoco.Panel.add(some_panel_object);
 
 
 
-Although Apoco is primarily a desktop window replacement, (because of realtime updating
-and dynamic elements), however,there are some "shop front" Website's using apoco
+Apoco is primarily a backend workhorse where there is a lot of realtime updating required,
+however,there are some "shop front" Websites using apoco.
 
 [Perluceo](http://www.perluceo.com)
+[MyCleverIdea](https://www.mycleveridea.com)
 
-
+(eating out own dogfood)
 [Online manual](https://snorkelferret.github.io)
