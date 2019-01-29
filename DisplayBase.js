@@ -277,7 +277,6 @@ require("./Popups");
         },
         hide:function(fromParent){// should it set this.hidden=true?
             //  console.log("trying to hide " + this.id);
-            
             if(this.DOM.contains(this.element)){
              //   console.log("Hiding element that is in dom");
                 this.DOM.removeChild(this.element);

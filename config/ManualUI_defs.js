@@ -310,7 +310,9 @@ var UI={};
                             },
                 fileReader:{ options:{ type:{type:"string",default: "file"},
                                        opts:{type: "key value object",default: undefined,
-                                             descriptions:["maxSize type: integer, max filesize in bytes","mimeTypes: an array of strings of valid mimetypes","see the IO getFiles","e.g <code> var my_display=Apoco.field['fileReader']({name:'someName',opts:{maxSize:1024,mimeTypes:['application/pdf','image/png']}});</code> "]},
+                                             descriptions:["maxSize type: integer, max filesize in bytes",
+                                                           "accept: an array of strings of valid mimetypes","see the IO getFiles","e.g <code> var my_display=Apoco.field['fileReader']({name:'someName',opts:{maxSize:1024,accept:['application/pdf','image/png']}});</code> ",
+                                                          "multiple: boolean - allow multiple files"]},
                                        hideFiles:{type:"boolean",default: false},
                                        resizable:{type: "boolean",default: false},
                                        width:{type:"integer",default: 400,description:"width of the file object"},
@@ -702,7 +704,10 @@ var UI={};
                 ]},
                 getFileNames:{descriptions:["<code> var array=field.getFileNames();<code>",
                                             "returns an array of filenames"]},
-                findFile:{descriptions:["<code> var object=field.findFile(name);<code>"
+                findFile:{descriptions:["<code> var o=field.findFile([name]);<code>",
+                                        "if no name parameter is given returns all the files",
+                                        "as an array of objects, or one if name is defined ",
+                                        "object ={name:'filename',data:filedate}"
                                        ]},
                 showFile:{descriptions:["<code> field.showFile(name);<code>"
                                        ]},

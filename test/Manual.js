@@ -183,6 +183,14 @@ test.describe("Manual",function(){
         assert.isObject(driver.findElement(By.id("UtilsMenu")));
         done();
     });
+    /*
+    test.it("can hide a Panel",function(){
+         driver.executeScript("return Apoco.Panel.get('Tabs');")
+            .then(function(p){
+                var tab=driver.findElement(By.Id("Tabs"));
+                assert.isEqual(tab,);
+            });
+    }); */
     
     function execute() {
         return driver.executeScript.apply(driver, arguments);

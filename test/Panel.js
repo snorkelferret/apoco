@@ -84,6 +84,7 @@ describe("Panel",function(){
                    });
         assert.strictEqual(t.getChildren().length,1);
     });
+   
     it("can delete itself",function(){
         Apoco.Panel.delete(t.name);
 //        console.log("t is %j", t);

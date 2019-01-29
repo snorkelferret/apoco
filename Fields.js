@@ -1713,8 +1713,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.input.required=true;
             }
             this.input.setAttribute("name","files");
-            if(this.opts && this.opts.multiple !== false){
-                this.input.setAttribute("multiple","multiple");
+            if(this.opts){
+                for(var k in this.opts){
+                    this.input.setAttribute(k,this.opts[k]);
+                }
+                
             }
 	    this.element.appendChild(this.input);
 	    this.input.addEventListener("change",function(e){
@@ -1728,7 +1731,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
              });
         }
-        if(this.values > 0){
+        if(this.value > 0){
             if(!that.checkValue()){
                 throw new Error("file must have a name");
             }
@@ -1781,14 +1784,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         },
         findFile:function(name){
             var that=this;
-            for(var i=0;i<that.value.length;i++){
-                if (that.value[i].name === name){
-                    if(that.value[i].object){ //maybe should be promise
-                        return that.value[i];
+            if(name){
+                for(var i=0;i<that.value.length;i++){
+                    if (that.value[i].name === name){
+                        if(that.value[i].object){ //maybe should be promise
+                            return that.value[i];
+                        }
                     }
                 }
             }
-            return null;
+            return that.value;
         },
         hideFile:function(name){
             var that=this,f;
@@ -1807,7 +1812,19 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             return this;
         },
         setValue:function(v){ 
-            
+            return null;
+        },
+        resetValue:function(){
+            if(this.value !== undefined){
+                this.value = [];
+            }
+            // remove the embed onject for the file(s)
+            var x=this.element.getElementsByTagName("div");
+            for(var i=0;i<x.length;i++){
+                console.log("FireReader removing embedded stuff");
+                this.element.removeChild(x[i]);
+            }
+            return this.value;
         },
         addValue:function(v){
             var that=this;
@@ -1839,24 +1856,42 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(v.height){
                 v.object.height=v.height; 
             }
-            
+            that.value.push(v); 
             if(that.hideFiles === true || v.hidden === true){
                 v.object.style.display="none";
             }
             v.element.appendChild(v.object);
-           // console.log("appending child");
-            // that.element.appenChild(v.object);
-            that.value.push(v);
             that.element.appendChild(v.element);
+            
+// console.log("appending child");
+                    
             return v;
         },
         _getFileSelect: function(evt){
             var that=this,rc=0;
+            var files=[];
             that._promises=[];
            // console.log("reading file");
             //new_values.length=0; // reset array
 	    evt.stopPropagation();
-	    var files = evt.target.files;
+            if(that.MIMEType){
+                for(var i=0;i<evt.target.files.length; i++){
+                 //   console.log("filereader getting file of type " + that.MIMEType);
+                 //   console.log("evt target MIMEType is " + evt.target.files[i].type);
+                    if (evt.target.files[i].type.match(that.MIMEType)) {
+                    //    console.log("Got matching file types");
+                        files.push(evt.target.files[i]);
+                    }
+                }
+            }
+            else{
+                files=evt.target.files;
+            }
+            if(files.length === 0){
+                that.input.value="";
+                return 0;
+            }
+          //  console.log("_getFileSelect has files %j ",files);
             rc=Apoco.IO.getFiles(files,that);
             return rc; // the number of valid files
         }
