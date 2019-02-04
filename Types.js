@@ -214,6 +214,20 @@ var Apoco=require('./declare').Apoco;
 	        }
                 return true;
             }},
+        fileArray:{
+            html_type:"file",
+            field:["file","dropBox"],
+            check:function(f){
+                if(Apoco.type.array.check(f)){
+                    for(var i=0;i<f.length;i++){
+                        if(!Apoco.type.file.check(f[i])){
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        },
         float:{
             html_type:"number",
             field: "float",

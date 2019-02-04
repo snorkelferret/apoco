@@ -1218,7 +1218,9 @@ describe("ImageArrayField",function(){
 
 describe("FileReaderField",function(){
     require("../Fields.js");
-    var f=Apoco.field["fileReader"]({type:"file",name:"fileReader"});
+    var f=Apoco.field["fileReader"]({type:"file",progressBar:true,
+                                     text:"Let's do it",
+                                     name:"fileReader"});
     it("creates a div",function(){
         var b=f.getElement();
         assert.isObject(b); 
@@ -1230,24 +1232,17 @@ describe("FileReaderField",function(){
          var r=document.getElementsByName("fileReader")[0].getElementsByTagName("input")[0];
          assert.isObject(r);
      });
-   /* it("can read a file",function(){
-        var r=document.getElementsByName("fileReader")[0].getElementsByTagName("input")[0];
-       // r.value="../css/images/alchemist1.jpg";
-        // var p=f.getValue();
-     //   r.trigger("../css/images/alchemist1.jpg");
-       // var event = new window.Event('change');
-        // Dispatch it.
-       // r.dispatchEvent(event);
-        var p=f.getPromises();
-        // assert.strictEqual(p.length,1);
-        assert(p.length,1);
-        p.then(function(){
-            var pp=document.getElementsByName("fileReader")[0].getElementsByTagName("embed")[0];
-            assert.isObject(pp);
-        });
-
-    
-    });*/
+    it("has created a progressBar div",function(){
+        var b=f.getElement();
+        var pb=b.getElementsByClassName("progress_bar")[0];
+        assert.isObject(pb); 
+    });
+    it("has created a p text node",function(){
+        var b=f.getElement();
+        var p=b.getElementsByClassName("text")[0];
+        assert.isObject(p); 
+    });
+ 
     it("can read a file from value array",function(){
         var o={},file;
         // calling getFiles to get the data
@@ -1269,10 +1264,11 @@ describe("FileReaderField",function(){
         });
         
     });
-    
-    
+     
     
 });
+
+
 
 describe("AutoCompleteField",function(){
   

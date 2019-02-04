@@ -91,7 +91,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
             if(!element){
                 throw new Error("addClass: requires an html element");
             }
-            if(!cl=== undefined){
+            if(!cl){
                 throw new Error("addClass: requires a class or an array of classes");
             }
             if(cl){
@@ -100,7 +100,9 @@ String.prototype.trim = String.prototype.trim || function trim() {
                 }
                 else{
                     for(var i=0;i< cl.length;i++){
-                        element.classList.add(cl[i]);
+                       if(Apoco.type["string"].check(cl[i]) && !Apoco.type["blank"].check(cl[i]) ){ 
+                           element.classList.add(cl[i]);
+                       }
                     }
                 }
             } 

@@ -209,7 +209,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
             return promise;
         },
-        getFiles:function(f,that,event){
+        getFiles:function(f,that){
             var promise,found=false;
             if(!that){
                 throw new Error("getFiles: meeds options object");
@@ -223,14 +223,15 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(!that._files){
                 that._files=[];
             }
-          //  console.log("getFiles that is %j",that);
+         
+            console.log("getFiles that is %j",that);
             for (var i = 0; i<f.length; i++) {
               //  console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
                 if(that.opts){
                 //    console.log("dropZone setting options");
                     if(that.opts["maxSize"]){
                         if(f[i].size > that.opts.maxSize ){
-                            that._errors.push("File too large" + f[i].name + "exceeds the maximum allowable file size");
+                            that._errors.push("File too large " + f[i].name + " exceeds the maximum allowable file size");
                             continue;
                         }
                     }
@@ -252,35 +253,37 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                         continue;
                     }
                 }
-             
                 //f[i].lastModifiedDate.toLocaleDateString(
-  
                 promise=new Promise(function(resolve,reject){
-                    var pb=null,pc,reader = new FileReader();
+                    var pc,reader = new FileReader();
                     reader.onerror=function(evt){
                         reject("DropZone Error " + evt.target.error.code);
                     };
-                    if(that.opts && that.opts.progressBar){
+                    if(that.opts && that.opts.progressCallback){
                         reader.onprogress=function(evt){
-                            that._doProgress(evt);
+                           // console.log("evt onporgess is %j",evt);
+                            that.opts.progressCallback(evt,that);
                         };
-                        pb=that.opts.progressBar; 
                     }
                     // Closure to capture the file information.
-                    reader.onload = (function(file) {
+                    reader.onload = (function(file,self) {
                         return function(evt) {
                             evt.stopPropagation();
                             file.data=evt.target.result;
-                           // console.log("reader file  is "+ file.name);
-                            //console.log("evt.target.result " + evt.target.result);
-                            that._files.push(file);//(evt.target.result);
-                            resolve(file); //evt.target.result);
-                            if(pb){
-                                pb.style.width =  100 + '%';
-                                pb.textContent=("Staged for upload " + file.name);
+                            for(var i=0;i<that._files.length;i++){
+                                if(that._files[i].name === file.name){
+                                    //console.log("Found that file already exists");
+                                    reject("IO.getFiles: File already exists");
+                                    return;
+                                }
                             }
+                            that._files.push(file);//(evt.target.result);
+                            if(self.opts.progressCallback){
+                                self.opts.progressCallback(evt,that);
+                            }
+                            resolve(file); 
                         };
-                    })(f[i]);
+                    })(f[i],that);
                     // Read in the image file as a data URL.
                     reader.readAsDataURL(f[i]);
                 });
@@ -474,113 +477,5 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     Apoco.IO.webSocket=function(options,data){
         return new _webSocket(options,data);  // need to call new so prototype methods are instantiated 
     };
-    
-    var _dropZone=function(element,opts){
-        var that=this,p;
-        this.opts=opts;
-        if (!window.File && !window.FileReader && !window.FileList && !window.Blob) {
-            return false;
-        }
-        if(!element){
-            throw new Error("Utils:dropZone - element does not exist");
-        }
-        if(this.opts && this.opts.progressBar){
-            if(this.opts.progressBar.tagName !== "DIV"){
-                throw new Error("Apoco.IO.dropZone - progressBar needs to be a div");
-            }
-        }
-        element.addEventListener("dragover",function(e){
-           // console.log("in drop zone");
-            // var p=document.getElementById("CreateIdeaDrop");
-            if(!element.classList.contains("drop_zone")){
-                element.classList.add("drop_zone");
-            }
-            e.preventDefault();
-            e.stopPropagation();
-        },false);
-        element.addEventListener("dragenter",function(e){
-         //   console.log("enter drop zone");
-            // var p=document.getElementById("CreateIdeaDrop");
-            element.classList.add("drop_zone");
-            e.stopPropagation();
-        },false);
-        element.addEventListener("dragleave",function(e){
-           // console.log("leave drop zone");
-            //var p=document.getElementById("CreateIdeaDrop");
-            element.classList.remove("drop_zone");
-            e.stopPropagation();
-        },false);
-        element.addEventListener("drop",function(e){
-           // console.log("drop is here");
-            //       var p=document.getElementById("CreateIdeaDrop");
-            element.classList.remove("drop_zone");
-            e.preventDefault();
-            e.stopPropagation();
-            //       Apoco.Utils.dropZone.getFiles(e);
-            that._getFiles(e);
-        },false);
-        return true;
-    };
-    _dropZone.prototype={
-        _promises: [],
-        _files:[],
-        _getFiles:function(e) {
-            var f,that=this;
-            e.stopPropagation();
-            e.preventDefault();
-            f=e.dataTransfer.files; // FileList object.
-          //  console.log("got files %j",f);
-            // f is a FileList of File objects. List some properties.
-            Apoco.IO.getFiles(f,that,e);
-            if(this.opts["action"]){
-                this.opts.action(this._promises);
-            }
-        },
-        _doProgress:function(evt){
-            var pl,pb,that=this;
-         //   console.log("do progress options %j", that.opts);
-            if(that.opts && that.opts["progressBar"]){
-                pb=that.opts.progressBar;
-            }
-            else{
-                throw new Error("Cannot find progressBar");
-            }
-          //  console.log("do progress is here");
-            if(!pb){ return;}
-            if (evt.lengthComputable) {
-                pl = Math.round((evt.loaded / evt.total) * 100);
-                // Increase the progress bar length.
-                if (pl< 100) {
-                    pb.style.width = pl + '%';
-                    pb.textContent = pl + '%';
-                }
-            }
-        },
-        getPromises:function(){
-            return this._promises; //Promise.all(this._promises);
-        },
-        getFileList:function(){
-            return this._files; 
-        },
-        clearPromises: function(){
-            this._promises.length=0; 
-        },
-        clearFileList:function(){
-            this._files.length=0;
-        },
-        reset:function(){
-            this.clearFileList();
-            this.clearPromises();
-            this._errors=[];
-            if(this.opts && this.opts.progressBar){
-                this.opts.progressBar.innerHTML="";
-            }
-        }
-        
-    };
-    Apoco.IO.dropZone=function(element,options){
-        return new _dropZone(element,options);  // need to call new so prototype methods are instantiated 
-    };
-    
-    }
-)();
+
+})();

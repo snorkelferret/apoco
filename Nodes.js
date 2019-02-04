@@ -389,20 +389,7 @@ require("./Types.js");
                     t.click();
                 },false);
             }
-        }/*,
-        progressBar:function(that){
-            var max=100;
-            if(!document.contains(document.getElementById("Apoco_progressBar"))){
-                if(!that.element){
-                    that.element=document.createElement("div");//$("<div id='Apoco_progressBar'></div>");
-                    that.element.id="Apoco.progressBar";
-                    $(that.element).progressbar({ value: that.value, max: max,min:0});
-                    //element.append(pb);
-                    //return pb;
-                }
-            }
-
-        }*/
+        }
     };
 
     Apoco.node=function(options,el){

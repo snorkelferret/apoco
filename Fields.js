@@ -131,7 +131,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             return this;
         },
         isHidden:function(){
-            if(this.DOM.contains(this.element)){
+            if(this.DOM && this.DOM.contains(this.element)){
                 return false;
             }
             return true;
@@ -643,8 +643,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         d.type="object";
        
         if(!d.inputType){
-       //     Apoco.popup.error("Object Field needs objectType","inputType parameter missing");
-            //   return null;
             d.inputType="string";
         }
        //console.log("userSetValue is " + d.userSetValue);       
@@ -1329,7 +1327,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                                 b[i].parentNode.classList.add("checked");
                             }
                         }
-                        //(e.target.checked==false)?e.target.checked=true: e.target.checked=false;
                         e.stopPropagation();
                     }
                 },false);
@@ -1359,7 +1356,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     }
                     this.input[index].input.checked=value;
                     this.value[index]=value;
-                    
                 }
                 else{
                     throw new Error("ButtonSetField: value must be a boolean array");
@@ -1617,6 +1613,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(this.editable === false){
                 this.input[i].input.readOnly=true;
             }
+          
             return this;
 	},
         setRequired:function(on){
@@ -1672,82 +1669,205 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
     // base class for Image file reads and other input type "file"
     var FileField=function(d,element){
-        var that=this,rc=true;
+        var that=this,container,q,p;
         d.field="FileField";
-        d.type="file";
+        d.type="fileArray";
 	_Field.call(this,d,element);
 
         if(!this.value){
             this.value=[];
         }
-        if(this.width){
-            if(!isNaN(this.width)){
-                this.width=this.width+"px";
-            }
-        }
-        else{
-            this.width="400px";
-        }
-        if(this.height){
-            if(!isNaN(this.height)){
-                this.height=this.height+"px";
-            }
-        }
-        else{
-            this.height="400px";
-        }
-        
-      //  console.log("FileReader is here %j ", that );
-      //  console.log("FileReader got opts %j" , that.opts);
+
+        this.element.classList.add(d.field);
         if(this.editable !== false){
 	    if(!window.FileReader){
 	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
 	        throw new Error("No FileReader");
 	    }
-            this.input=document.createElement("input");
-            this.input.type="file";
-            if(this.childClass){
-                Apoco.Utils.addClass(this.input,this.childClass);
+            console.log("making a container");
+            this.container=document.createElement("div");
+            this.container.classList.add("file_container");
+            this.element.appendChild(this.container);
+            // add the upload icon
+            p=document.createElement("div");
+            p.classList.add("upload_icon");
+            this.container.appendChild(p);
+          
+            // make a wrapper for the input so we can add styling
+            that._mkInputNode();
+          
+            if(this.text){
+                p=document.createElement("p");
+                p.classList.add("text");
+                p.innerHTML=this.text;
+                this.container.appendChild(p);
             }
-            if(this.required===true){
-                this.input.required=true;
-            }
-            this.input.setAttribute("name","files");
-            if(this.opts){
-                for(var k in this.opts){
-                    this.input.setAttribute(k,this.opts[k]);
+            if(this.progressBar){
+                // make a container for all the nodes
+                this.progressBar=document.createElement("div");
+                this.progressBar.classList.add("progress_bar");
+                this.container.appendChild(this.progressBar);
+                if(that.opts){
+                    that.opts.progressBar=that.progressBar;
+                    that.opts.progressCallback=that._doProgress;
                 }
-                
             }
-	    this.element.appendChild(this.input);
-	    this.input.addEventListener("change",function(e){
-                rc=that._getFileSelect(e,that);
-                for(var i=0;i<that._promises.length; i++){
-                    that._promises[i].then(function(file){
-                        that.addValue(file);
-                    }).catch(function(msg){
-                        console.log("Apoco.field.fileReader Error " + msg);
-                    });
+            if(this.resetButton){
+                this.resetButton=document.createElement("button");
+                this.resetButton.textContent="Remove files";
+                this.resetButton.style="display: none";
+                if(this.resetClass){
+                    Apoco.Utils.addClass(this.resetButton,this.resetClass);
                 }
-             });
-        }
-        if(this.value > 0){
-            if(!that.checkValue()){
-                throw new Error("file must have a name");
+                this.resetButton.onclick=function(){that.reset(that);
+                                                    return false;}; // because probably in a form
+                this.container.append(this.resetButton);
             }
-            for(var i=0;i<this.value.length;i++){
-                this.addValue(this.value[i]);
+            if(this.dragDrop){
+                that._addListeners();
             }
         }
-        if(!rc){
-            Apoco.popup["dialog"]("File Load Error","One or more of the selected files is not a readable file");
+        // display the files
+        if(!this.filesHidden){
+            if(this.value.length > 0){
+                if(!that.checkValue()){
+                    throw new Error("file must have a name");
+                }
+                for(var i=0;i<this.value.length;i++){
+                    // this.addValue(this.value[i]);
+                    this.mkFileDisplay(this.value[i]);
+                }
+            }
         }
+
         if(this.action){
             this.action(this);
         }
         return this;
     };
     FileField.prototype={
+        _promises:[],
+        _errors:[],
+        _mkInputNode:function(){
+            var q,p,that=this;
+            q=document.createElement("div"); // this is so we can style the file input
+            if(that.childClass){
+                 Apoco.Utils.addClass(q,this.childClass);
+            }
+            p=document.createElement("span");
+            p.textContent="Choose a file";
+            q.appendChild(p);
+            that.input=document.createElement("input");
+            that.input.type="file";
+            that.input.classList.add("invisible_input");
+            if(that.required===true){
+                that.input.required=true;
+            }
+            that.input.setAttribute("name","files");
+            if(that.opts){
+                for(var k in that.opts){
+                    that.input.setAttribute(k,this.opts[k]);
+                }
+            }
+            q.appendChild(this.input);
+            that.container.appendChild(q);
+            if(this.dragDrop === true){
+                p=document.createElement("p");
+                p.classList.add("dragdrop_text");
+                p.innerHTML="<b>OR</b> drag and drop a file here.";
+                that.container.appendChild(p);
+            }
+            that._addInputListener();
+            if(that.maxNum < 1){
+                throw new Error("fileReader: maxNum cannot be less than one" + that.maxNum);
+            }
+        },
+        showError:function(){
+            var that=this,str="";
+            for(var i=0;i< that._errors.length;i++){
+                str=str.concat(that._errors[i]);
+                if(that.progressBar){
+                    that.progressBar.innerHTML=str;
+                    that.progressBar.style="background-color: red; width:auto";
+                }
+            }
+            that._errors=[];
+        },
+        _addInputListener:function(){
+            var that=this,rc;
+            that.input.addEventListener("change",function(e){
+                console.log("FileReader got change event ");
+                rc=that._getFiles(e,that);
+                // for(var i=0;i<that._promises.length; i++){
+                that._processFileIn();
+            });
+        },
+        _processFileIn:function(){
+            var that=this;
+            Promise.all(that._promises).then(function(files){
+                var pb=that.progressBar;
+                console.log("errors are %j ", that._errors );
+                that.showError();
+                
+                for(var i=0;i<files.length;i++){
+                    console.log("adding value " + files[i].name);
+                    that.addValue(files[i]);
+   
+                    if(pb){
+                        if(that.value.length > 1){
+                            pb.textContent=("Staged for upload: " + that.value.length + " files ");
+                        }
+                        else{
+                            pb.textContent=("Staged for upload: " + files[0].name ); 
+                        }
+                    }
+                }
+            }).catch(function(msg){
+                console.log("Apoco.field.fileReader Error " + msg);
+            });
+        },
+        _handleEvent:function(that){
+           // console.log("that is %j " , that);
+            return function(e){
+               // console.log("inside event function is that is %j " , that);
+              //  console.log("event type " + e.type);
+                switch(e.type){
+                case "dragover":
+                  //  console.log("dragover");
+                    if(!that.container.classList.contains("drop_zone")){
+                        that.container.classList.add("drop_zone");
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    break;
+                case "dragenter":
+                    that.container.classList.add("drop_zone");
+                    e.stopPropagation();
+                    break;
+                case "dragleave":
+                    that.container.classList.remove("drop_zone");
+                    e.stopPropagation();
+                    break;
+                case "drop":
+                 //   console.log("drop is here");
+                    that.container.classList.remove("drop_zone");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    that._getFiles(e,that);
+                    that._processFileIn();
+                    break;
+                default: return;
+                }
+            };
+        },
+        _addListeners:function(){
+            var that=this;
+            // add the event listeners   
+            that.container.addEventListener("dragover",that._handleEvent(that),false);
+            that.container.addEventListener("dragenter",that._handleEvent(that),false);
+            that.container.addEventListener("dragleave",that._handleEvent(that),false);
+            that.container.addEventListener("drop",that._handleEvent(that),false);
+        },
         checkValue:function(v){
             var that=this,ar=[];
             if(v){
@@ -1767,6 +1887,12 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     return false;
                 }
             }
+            for(var i=0;i<this.value.length;i++){
+                if(this.value[i].name === v.name ){
+                    console.log("already have this value");
+                    return false;
+                }
+            }
             return true;
         },
         getValue:function(){
@@ -1781,6 +1907,16 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         },
         getPromises:function(){
             return this._promises;
+        },
+        clearPromises:function(){
+            this._promises=[];
+            console.log("clearPromises length is " + this._promises.length);
+        },
+        clearFileNames:function(){
+            if(this._files){
+                this._files.length=0;
+            }
+            console.log("clearFilenames file s");
         },
         findFile:function(name){
             var that=this;
@@ -1819,22 +1955,107 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 this.value = [];
             }
             // remove the embed onject for the file(s)
-            var x=this.element.getElementsByTagName("div");
-            for(var i=0;i<x.length;i++){
+           
+            for(var i=0;i<this.value.length;i++){
                 console.log("FireReader removing embedded stuff");
-                this.element.removeChild(x[i]);
+                this.element.removeChild(this.value[i].element);
             }
+            this.reset();
             return this.value;
+        },
+        deleteValue:function(name){
+            var that=this,found=null;
+            for(var i=0;i< that._promises.length; i++){
+                console.log("looking at promise " + i);
+                that._promises[i].then(function(file){
+                    if(file.name === name ){
+                        found=i;
+                    }
+                });
+            }
+            console.log("FileReader: got promise to delete " + found);
+           
+            for(var i=0;i< that.value.length;i++){
+                if(that.value[i].name === name){
+                    break;
+                }
+            }
+            if(i<that.value.length){
+                console.log(Object.keys(that.value[i]));
+                for(var k in that.value[i]){
+                    console.log("k is " + k);
+                    if(k === "element"){
+                        if(that.value[i].element.parentNode){
+                            that.value[i].element.parentNode.removeChild(that.value[i].element);
+                        }  
+                    }
+                    else{
+                        delete that.value[i][k];
+                    }
+                }
+                that.value.splice(i,1);
+                if(found){
+                    that._prpmises.splice(found,1);
+                }
+            }
+            else{
+                return null;
+            }
+            
+            return that.value;
         },
         addValue:function(v){
             var that=this;
-          // . if(v.object){return v;} // already done
+            that.replaced=null;
             if(!that.checkValue(v)){
-           //     console.log("add value failed check %j",v);
-                // return null;
                 throw new Error(("addValue failed checkValue() with value %j",v));
             }
+ 
+            if(that.maxNum && that.value.length === that.maxNum){
+                // overwrite the last value
+                that.replaced=that.value[(that.maxNum -1)].name;
+                that.value[(that.maxNum-1)]=v;
+            }
+            else{
+                that.value.push(v);
+            }
+            if(!that.filesHidden ){
+                that.mkFileDisplay(v);
+            }
+            if(that.resetButton){
+                if(that.value.length){
+                    that.resetButton.style="display: inherit";
+                }
+                else{
+                    that.resetButton.style="display: none";   
+                }
+            }
+            return that.value;
+        },
+        mkFileDisplay:function(v){
+            var that=this;
+
+            if(v && v.object ){
+                return null; // already build this
+            }
+            if(that.width){
+                if(!isNaN(that.width)){
+                    that.width=that.width+"px";
+                }
+            }
+            else{
+                that.width="400px";
+            }
+            if(that.height){
+                if(!isNaN(that.height)){
+                    that.height=that.height+"px";
+                }
+            }
+            else{
+                that.height="400px";
+            }
             v.element=document.createElement("div");
+            v.element.classList.add("embed_file");
             if(that.resizable === true || v.resizable === true){
                 v.element.classList.add("resizable");
                 //console.log("adding resizable");
@@ -1856,48 +2077,113 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(v.height){
                 v.object.height=v.height; 
             }
-            that.value.push(v); 
-            if(that.hideFiles === true || v.hidden === true){
+        
+            if(that.hideFiles === true ){
                 v.object.style.display="none";
             }
             v.element.appendChild(v.object);
             that.element.appendChild(v.element);
-            
-// console.log("appending child");
-                    
+            // console.log("appending child");
+            console.log("FileReader: promises length is " + that._promises.length);
+            console.log("Filereader has " + that.value.length);        
             return v;
         },
-        _getFileSelect: function(evt){
+        reset:function(){
+            var that=this;
+            console.log("FileReader: reset is here");
+            for(var i=0;i< that.value.length; i++){
+                console.log("deleting file " + that.value[i].name);
+                that.deleteValue(that.value[i].name);
+            }
+            that.clearFileNames();
+            that.clearPromises();
+            that._errors=[];
+            that.value=[];
+            that.input.value="";
+            if(that.progressBar){
+                that.progressBar.innerHTML="";
+                that.progressBar.style.width="0px";
+            }
+            if(that.resetButton ){
+                that.resetButton.style="display: none";
+            }
+        },
+        _doProgress:function(evt){
+            var pl,pb,that=this;
+           // console.log("do progress options %j", that.opts);
+            console.log("_doProgress got event %j ", evt);
+            if(!that["progressBar"]){
+                throw new Error("Cannot find progressBar");
+            }
+            else{
+                pb=that.progressBar;
+            }
+            pb.style="";
+          //  console.log("do progress is here");
+           // console.log("evt type is  " + evt.type);
+            if (evt.lengthComputable && evt.type === "progress") {
+                pl = Math.round((evt.loaded / evt.total) * 100);
+                // Increase the progress bar length.
+                if (pl< 100) {
+                    pb.style.width = pl + '%';
+                    pb.textContent = pl + '%';
+                }
+            }
+            else{  // finished loading into memory
+                pb.style.width = "auto";
+                pb.textContent = "100%";
+            }
+        },
+        _getFiles: function(evt){
             var that=this,rc=0;
-            var files=[];
+            var files=[],f;
             that._promises=[];
            // console.log("reading file");
             //new_values.length=0; // reset array
 	    evt.stopPropagation();
-            if(that.MIMEType){
-                for(var i=0;i<evt.target.files.length; i++){
+            if(that.opts.accept){
+                that.opts.mimeType=that.opts.accept;
+            }
+            if(evt.target && evt.target.files){
+                f=evt.target.files;
+            }
+            else if(evt.dataTransfer && evt.dataTransfer.files){
+                f=evt.dataTransfer.files;
+            }
+            else{
+                throw new Error("FileReader: cannot find files");
+            }
+            
+            if(that.opts.mimeType){
+                console.log("checking mimetype");
+                for(var i=0;i<f.length; i++){
                  //   console.log("filereader getting file of type " + that.MIMEType);
-                 //   console.log("evt target MIMEType is " + evt.target.files[i].type);
-                    if (evt.target.files[i].type.match(that.MIMEType)) {
-                    //    console.log("Got matching file types");
-                        files.push(evt.target.files[i]);
+                    console.log("evt target MIMEType is " + f[i].type);
+                    for(var j=0;j<that.opts.mimeType.length;j++){
+                        if (f[i].type.match(that.opts.mimeType[j])) {
+                            console.log("Got matching file types");
+                            files.push(f[i]);
+                            break;
+                        }
                     }
                 }
             }
             else{
-                files=evt.target.files;
+                files=f;
             }
             if(files.length === 0){
                 that.input.value="";
                 return 0;
             }
-          //  console.log("_getFileSelect has files %j ",files);
+          
+            console.log("_getFileSelect has files %j ",files);
             rc=Apoco.IO.getFiles(files,that);
-            return rc; // the number of valid files
+            return rc; // an array of promises
         }
     };
 
     Apoco.Utils.extend(FileField,_Field);
+  
     
     var ImageArrayField =function(d,element){
         var that=this,rc=true;
@@ -1949,6 +2235,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         return this;
     };
 
+    
     ImageArrayField.prototype={
         _getImage: function(o){
             var that=this;

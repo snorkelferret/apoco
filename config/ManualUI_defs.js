@@ -312,9 +312,22 @@ var UI={};
                                        opts:{type: "key value object",default: undefined,
                                              descriptions:["maxSize type: integer, max filesize in bytes",
                                                            "accept: an array of strings of valid mimetypes","see the IO getFiles","e.g <code> var my_display=Apoco.field['fileReader']({name:'someName',opts:{maxSize:1024,accept:['application/pdf','image/png']}});</code> ",
-                                                          "multiple: boolean - allow multiple files"]},
-                                       hideFiles:{type:"boolean",default: false},
+                                                           "multiple: boolean - allow multiple files"]},
+                                       progressBar:{type:"boolean",default:false,
+                                                    descriptions:["make a progressBar for info and errors "]},
+                                       progressCallback:{type:"function",default:"fileReader._doProgress",
+                                                         descriptions:["Callback function for the progress event",
+                                                                       "receives  event as param - onprogress and  onload events"]},
+                                       resetButton:{type:"boolean",default:false,
+                                                    descriptions:["Create a button which removes all files values etc when clicked"]},
+                                       resetClass:{type:"stribgArray",default: false,
+                                                   descriptions:["add classes to the resetButton"]},
+                                       dragDrop:{type:"boolean",default: false,
+                                                 descriptions:["make the containing div do drag and drop "]},
+                                       accept:{type:"string",default: undefined,description: "MiME type e.g 'image.*' , 'image/png' or 'application/pdf etc'"},
+                                       filesHidden:{type:"boolean",default: false},
                                        resizable:{type: "boolean",default: false},
+                                       maxNum:{type:"integer",default: undefined,descriptions:["set the maxinum number of files to be read"]},
                                        width:{type:"integer",default: 400,description:"width of the file object"},
                                        height:{type:"integer",default: 400,description:"height of the file object"},
                                        multiple:{type:"boolean",default: true,description:"allow multiple file selects"}
@@ -635,52 +648,93 @@ var UI={};
             var HFields=HThings.Fields;
             var fields=[];
             var field_methods_list={
-                getValue:{descriptions:[
-                    "<code>var r=field.getValue();</code>",
-                    "return: type",
-                    'returns the value currently displayed in the DOM <br> Use _reset() to set the values to the last setValue  <br>if no value is set returns "undefined"<br> To access the value set with setValue use raw field.value ']
-                         },
-                setValue:{descriptions:[
-                    "<code>var r=field.setValue(value[,index]);</code>",
-                    "return: this (field Object)",
-                    "If the field is an array, value is an array, or a single value and index into the array<br> Set Value is the way to update values in memory",
-                    "If a value is given it must be a valid type or else an error is thrown - see Apoco.type[this.type].check(value)"
+                addOptions:{ descriptions:[
+                    "<code> field.addOptions(['adc','ddfg','dddgf']); </code>"
                 ]},
-                valueChanged: {descriptions: [  "<code>var r=field.valueChanged();</code>",
-                                                "return: boolean",
-                                                "If the value has been changes in the browser return true"
-                                             ]},
+                addValue:{ descriptions:["<code> var r=field.addValue(new_value);</code>"]},
                 checkValue:{descriptions:[
                     "<code>var r=field.checkValue();</code>",
                     "return: boolean",
                     "If the type has been specified checks the value is of the specified type "
                 ]},
-                getParent:{ descriptions:[
-                    "<code>var r=field.getParent();</code>",
-                    "return: Apoco object or undefined",
-                    "If the field is part of a hierarchy, e.g part of a fieldset or form returns the parent object "
+                clearFileNames:{descriptions:["delete the filename array"]},
+                clearPromises:{descriptions:["delete the promise array"]},
+                contains:{descriptions:[
+                    "<code> var array=field.contains(options_array,value);<code>"
                 ]},
+                delete:{descriptions:["<code> field.delete();</code>",
+                                      "return void","delete the field"]},
+                deleteOptions:{ descriptions:[
+                    "<code> field.deleteOptions(); </code>"
+                ]},
+                deleteValue:{ descriptions:["<code> field.deleteValue(value);</code>","return: void"]},
+                findFile:{descriptions:["<code> var o=field.findFile([name]);<code>",
+                                        "if no name parameter is given returns all the files",
+                                        "as an array of objects, or one if name is defined ",
+                                        "object ={name:'filename',data:filedate}"
+                                       ]},
+                finishedLoading:{descriptions:["<code> var promise=field.finishedLoading();</code>","returns a promise"]},
                 getElement: {descriptions:[
                     "<code>var r=field.getElement();<code>",
                     "return: HTMLObject",
                     "The original html node supplied in the call to Apoco.Field"
                 ] },
-               
-                getKey: {descriptions:[
-                    "<code>var r=field.getKey();</code>",
-                    "return: string",
-                    "The name if it exists,or label if that has been supplied or null"
-                ]},
+                getFileNames:{descriptions:["<code> var array=field.getFileNames();<code>",
+                                            "returns an array of filenames"]},
                 getInputElement:{descriptions:[
                     "<code>var r=field.getInputElement()</code>",
                     "return:HTMLObject",
                     "The input node"
                 ]},
-                addOptions:{ descriptions:[
-                    "<code> field.addOptions(['adc','ddfg','dddgf']); </code>"
+                getKey: {descriptions:[
+                    "<code>var r=field.getKey();</code>",
+                    "return: string",
+                    "The name if it exists,or label if that has been supplied or null"
                 ]},
-                deleteOptions:{ descriptions:[
-                    "<code> field.deleteOptions(); </code>"
+                getLabel:{descriptions:["<code>var r=field.getLabel();</code>","return string",
+                                        "get the htmllabel element"]},
+                getParent:{ descriptions:[
+                    "<code>var r=field.getParent();</code>",
+                    "return: Apoco object or undefined",
+                    "If the field is part of a hierarchy, e.g part of a fieldset or form returns the parent object "
+                ]},
+                getPromises:{descriptions:["<code>var promises=field.getPromises();<code>",
+                                           "returns an array of promises of file loads"]},
+                getValue:{descriptions:[
+                    "<code>var r=field.getValue();</code>",
+                    "return: type",
+                    'returns the value currently displayed in the DOM <br> Use _reset() to set the values to the last setValue  <br>if no value is set returns "undefined"<br> To access the value set with setValue use raw field.value ']
+                         },
+                hide:{
+                       descriptions:[
+                        "<code> field.hide(); </code>"
+                       ]
+                },
+                hideFile:{descriptions:["<code> field.hideFile(name);<code>"
+                                       ]},
+                isHidden:{
+                    descriptions:["<code> field.isHidden(); </code>"]
+                },
+                loadImages:{descriptions:["<code>var promisee=field.loadImages(valueArray);</code>","returns an array of javascript promises","valueArray: Object array e.g","<code>valueArray=[{src:'pathToImage',url:'',title:'my_title',width:'100px',height: '100px'}];</code>",
+                                          "load images from the values array"]},
+                methods:{descriptions:["return a list od all the protoype methods"]},
+                mkFileDisplay:{descriptions:["<code>field.mkFileDisplay(value_object); </code>","show the uploaded file"]},
+                mkThumbnails:{descriptions:["<code>field.mkThumbnails();</code>","make thumbnails from values array"]},
+                popupEditor:{descriptions:["<code>field.popupEditor(function); </code>","return void",
+                                           "supply the function to be called "]},
+                reset:{descriptions:["<code>field.reset();</code>","set all the values to false"]},
+                resetValue:{descriptions:[
+                    "<code>var r=field.resetValue()</code>",
+                    "set the values of the DOM to the last good setValue() call or initial values"
+                ]},
+                setRequired:{
+                    descriptions:["set or unset required ","<code> my_field.setRequired(true);<code>","return: none"]
+                },
+                setValue:{descriptions:[
+                    "<code>var r=field.setValue(value[,index]);</code>",
+                    "return: this (field Object)",
+                    "If the field is an array, value is an array, or a single value and index into the array<br> Set Value is the way to update values in memory",
+                    "If a value is given it must be a valid type or else an error is thrown - see Apoco.type[this.type].check(value)"
                 ]},
                 show:{
                     descriptions:[
@@ -688,62 +742,26 @@ var UI={};
                         "where optional display type is a valid css type, excluding 'none'"
                         ]
                 },
-                hide:{
-                       descriptions:[
-                        "<code> field.hide(); </code>"
-                       ]
-                },
-                isHidden:{
-                    descriptions:["<code> field.isHidden(); </code>"]
-                },
-                setRequired:{
-                    descriptions:["set or unset required ","<code> my_field.setRequired(true);<code>","return: none"]
-                },
-                contains:{descriptions:[
-                    "<code> var array=field.contains(options_array,value);<code>"
-                ]},
-                getFileNames:{descriptions:["<code> var array=field.getFileNames();<code>",
-                                            "returns an array of filenames"]},
-                findFile:{descriptions:["<code> var o=field.findFile([name]);<code>",
-                                        "if no name parameter is given returns all the files",
-                                        "as an array of objects, or one if name is defined ",
-                                        "object ={name:'filename',data:filedate}"
-                                       ]},
+                showError:{descriptions:["<code> field.showError() </cod>","puts the error msg in the progreeBar (if it exists)"]},
                 showFile:{descriptions:["<code> field.showFile(name);<code>"
                                        ]},
-                hideFile:{descriptions:["<code> field.hideFile(name);<code>"
-                                       ]},
-                getPromises:{descriptions:["<code>var promises=field.getPromises();<code>",
-                                          "returns an array of promises of file loads"]},
-                resetValue:{descriptions:[
-                    "<code>var r=field.resetValue()</code>",
-                    "set the values of the DOM to the last good setValue() call or initial values"
-                ]},
-                delete:{descriptions:["<code> field.delete();</code>",
-                                      "return void","delete the field"]},
-                deleteValue:{ descriptions:["<code> field.deleteValue(value);</code>","return: void"]},
-                addValue:{ descriptions:["<code> var r=field.addValue(new_value);</code>"]},
-                popupEditor:{descriptions:["<code>field.popupEditor(function); </code>","return void",
-                                           "supply the function to be called "]},
-                getLabel:{descriptions:["<code>var r=field.getLabel();</code>","return string",
-                                        "get the htmllabel element"]},
-                mkThumbnails:{descriptions:["<code>field.mkThumbnails();</code>","make thumbnails from values array"]},
-                loadImages:{descriptions:["<code>var promisee=field.loadImages(valueArray);</code>","returns an array of javascript promises","valueArray: Object array e.g","<code>valueArray=[{src:'pathToImage',url:'',title:'my_title',width:'100px',height: '100px'}];</code>",
-                                          "load images from the values array"]},
-                finishedLoading:{descriptions:["<code> var promise=field.finishedLoading();</code>","returns a promise"]},
-                reset:{descriptions:["<code>field.reset();</code>","set all the values to false"]}
+                valueChanged: {descriptions: [  "<code>var r=field.valueChanged();</code>",
+                                                "return: boolean",
+                                                "If the value has been changes in the browser return true"
+                                             ]}
             };
             var items=[],fm;
               
   
             for(var i=0;i<HFields.length;i++){
-                //console.log("mkFieldMethods making " + HFields[i]);
+                console.log("mkFieldMethods making " + HFields[i]);
                 var k={};
                 items=[];
-                fm=Apoco.field[HFields[i]+"Methods"]();
+                var fm=Apoco.field[HFields[i]+"Methods"]();
+              
                 Apoco.sort(fm,"string");
                 for(var j=0;j<fm.length;j++){
-                 //   console.log("method is "+fm[j]);
+                    console.log("method is "+fm[j]);
                     if(!fm[j].startsWith("_") && fm[j] !== "constructor"){
                         var m=fm[j];
                         items.push({label:m,
@@ -892,6 +910,10 @@ var UI={};
             file:{
                 test:'[34,"sdds","fs",104.4]',
                 items:[{label:"description",description:""}]
+            },
+            fileArray:{
+                test:[[1,2,3],["abc","cdx"]],
+                items:[{label:"descriptions",description:"array of files"}]
             },
             float:{
                 test:'[89.90,90,"89d", .90]',
@@ -1705,22 +1727,6 @@ var UI={};
                                
                               
                        ]
-                     },
-            dropZone:{code:"<code>Apoco.IO.dropZone(element,[opts]) </code>",
-                   
-                      items:[{label:"element",description:"any html element"},
-                             {label:"opts",description:"An object array of options <br> <code> opts={action:function(promise_array){// input is  an array of promises},<br> maxSize:integer_bytes <br> mimeType:'/application/json' //is the default <br> progressBar: html_div_element}"
-                             }],
-                      ret: "object",
-                      des:"Create a dropZone, for browser drag and drop<br>e.g<br> <code>var v=Apoco.IO.dropZone(elememt,<br>{action:function(promises){ <br>for(var i=0;i<promises.length;i++){<br> promises[i].then(function(file){<br> e.textContent=file.name; //puts the data in file.data})}}});<code>",
-                      methods:[{label:"getFilelist",description:"return an array of files"},
-                               {label:"getPromises",description:"return an array of promises"},
-                               {label:"clearFilelist",description:"destroy the file array"},
-                               {label:"clearPromises",description:"destroy the promises array"},
-                               {label:"reset",description:"clear the promises and filelist"}
-                               ]
-                                           
-                    //  cmd:"var e=document.createElement('div'); e.id='test_dropZone'; document.getElementById('dropZoneMethods').appendChild(e); 
                      }
         };
         for(var i=0;i<HIO.length;i++){
