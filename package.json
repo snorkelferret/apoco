@@ -10,7 +10,9 @@
     "Single Page",
     "javascript",
     "DOM library",
-    "client side"
+      "client side",
+      "severless",
+      "real time"
   ],
   "main": "index.js",
   "scripts": {

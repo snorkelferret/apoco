@@ -14,21 +14,13 @@ The components can be used together or individually.
 Apoco is arranged hierarchically.
 
 ##### Windows
-
     Windows contain
-
 ##### Panels
-
     Panels contain
-
 ##### displays
-
     displays contain
-
 ##### fields or nodes
-
     which contain
-
 ##### types
 
 You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s)

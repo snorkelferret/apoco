@@ -125,8 +125,19 @@ require("./Utils");
                 };
                 
             };
-          
-            var d=new mkDialog(title,message,modal);
+            var str="";
+            if(message instanceof Error){
+                for(var k in message){
+                    if(Apoco.types["string"].check(message[k])){
+                        str=str.concat(message[k]);
+                        str=str.concat(" ");
+                    }
+                }
+            }
+            else{
+                str=message;
+            }
+            var d=new mkDialog(title,str,modal);
             d.create();
             return d;
             

@@ -558,18 +558,6 @@ var Apoco=require('./declare').Apoco;
             }}
     };
 
-/*
-        inheritsFrom=function(a,c){
-	    var t=("testing Inherits from ");
-	    while (a != null) {
-		if(a.superClass && a.superClass == c.prototype)
-		{
-		    return true;
-		}
-	    }
-	    return false;
-	};
-   */ 
 
 })();
 
