@@ -653,6 +653,36 @@ jsonishData={
                // console.log("ADD addRowElementData got data %j" , c);
             }
         },
+        findRow:function(e,self){ // params: event and grid callback for Event
+            var el,n,r={};
+            //     console.log("current target is " + e.currentTarget.tagName);
+            el=e.target;
+            while(el && el.parentNode){
+                if(el.parentNode === e.currentTarget){
+                    break; // the body of the table is el.parentNode
+                }
+                el=el.parentNode;
+            }
+            e.stopPropagation();
+            if(el.tagName === "TR"){
+                // console.log("got dblclick on row");
+                n=self.getRowFromElement(el);
+                if(!n){
+                    throw new Error("cannot find row");
+                }
+                // copy all the fields and values
+                for(var k in n){
+                    //  console.log("key in row is " + k);
+                    if(n[k] && n[k].getValue){
+                        r[k]=n[k].getValue();
+                    }
+                    else{
+                        console.log("key " + k + "does not have a getValue method");
+                    }
+                }
+            }
+            return r;
+        },
         getRowFromElement: function(element){  
             var s,c,ci,key={},g,need_more_data=false;
             if(!this.uniqueKey){

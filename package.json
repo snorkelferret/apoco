@@ -19,7 +19,7 @@
     "eslint": "eslint -f compact --env browser commonjs *.js",
     "eslint:test": "eslint -f compact --config test/eslint.conf --env mocha test/*.js",
     "pretest": "npm run eslint && npm run eslint:test",
-    "test": "cross-env NODE_ENV=test mocha -R mocha-tldr-reporter -C test",
+    "test": "cross-env NODE_ENV=test mocha --exit -R mocha-tldr-reporter -C test",
     "posttest": "rimraf .__browserify_string_empty.js",
     "prepublish": "npm run apoco",
     "apoco": "browserify  ./index.js -o apoco.js"

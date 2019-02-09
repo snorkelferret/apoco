@@ -1470,6 +1470,8 @@ var UI={};
             showGrid: ["<code> var v=my_display.showGrid(grid_name); </code>"],
             hideGrid: ["<code> var v=my_display.hideGrid(grid_name); </code>"],
             hideCol:["<code> my_display.hideCol(col_name,[state]<code>","return: none","params: col_name (string)","state: boolean (optional)","if state is not given toggles the display","Adds a class 'hidden' to cols"],
+            findRow:["callback function for Event ","<code> grid.element.addEventListener('click'),function(thisGrid){ return function(e){row_data=this.grid.findRow(e,thisGrid)}; //do something with row data}",
+"thisGrid is the Object returned from creating the grid"],
             insertRow: ["<code> var v=my_display.insertRow(row); </code>"],
             redrawRows: ["<code> var v=my_display.redrawRows(grid_name); </code>"],
             updateRow: ["<code> var v=my_display.updateRow(row); </code>"],

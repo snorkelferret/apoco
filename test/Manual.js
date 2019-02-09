@@ -34,7 +34,10 @@ test.describe("Manual",function(){
         driver.getCapabilities().then(function(cap){
             const knownGoodVersions = { // add to this!
                 firefox:['52.9.0','60.3.0'],
-                chrome:['70.0.3538.67','70.0.3538.110']
+                chrome:['70.0.3538.67','70.0.3538.110',
+                        '71.0.3578.80',
+                        '72.0.3626.7','72.0.3626.53'
+                       ]
             };
             const kgv = knownGoodVersions[cap.get('browserName')];
             assert.notStrictEqual(undefined,kgv);
@@ -49,6 +52,7 @@ test.describe("Manual",function(){
 
     test.after(function() {
         driver.quit();
+        
     });
     test.it("has defined UI",function(done){
         this.timeout(15000);
