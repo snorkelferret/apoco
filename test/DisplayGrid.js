@@ -298,6 +298,21 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         assert.strictEqual(document.contains(b),true);
         
     });
+    it("can get row data from an event callback",function(){
+        var b=t.getGrid();
+        b.element.addEventListener("click",function(self){
+            return function(e){
+                var row;
+                row=self.findRow(e,self);
+                assert.isObject(row);
+                assert.strictEqual(row,{one:"one",two:"hat"});
+            };
+        }(b),false);
+        var h=document.getElementsByTagName("TR");
+        assert.isObject(h);
+        h[0].click();
+        
+    });
     it("rowEditpopup recreates itself it already in DOM",function(){
         var b=t.getRow({one:22});
         assert.notStrictEqual(b,null);
