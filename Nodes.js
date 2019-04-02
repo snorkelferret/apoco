@@ -78,6 +78,22 @@ require("./Types.js");
             }
             return this;
 	},
+        delete:function(msg_from_parent){
+            while (this.element.lastChild) {
+                this.element.removeChild(this.element.lastChild);
+            }
+            if(this.parent && msg_from_parent === undefined){
+		this.parent.deleteChild(this);
+                return;
+	    }
+            else if(this.element.parentNode) {
+                this.element.parentNode.removeChild(this.element);
+            }
+            if(this.listen){
+                Apoco.IO.unsubscribe(this);
+            }
+            this.element=null;
+        },
         show:function(){
             this.hidden=false;
             if(this.root){
@@ -189,11 +205,13 @@ require("./Types.js");
 	},
         code: function(that){
             that.element=document.createElement("code");
+                       
             if(that.text===undefined){
                 that.text="";
             }
-               // that.element.textNode(that.text);
-            that.element.textContent=that.text;
+            
+            // that.element.textContent=that.text;
+            that.element.innerHTML=that.text;
         },
 	paragraph: function(that){
 	    that.element=document.createElement("p");
@@ -391,7 +409,15 @@ require("./Types.js");
             }
         }
     };
+/*
+    Apoco.node={};
 
+    for(var k in _getNode){
+        Apoco.node[k]=function(options,el){
+          return  new _Node(options,el);
+        };
+    }
+  */  
     Apoco.node=function(options,el){
         if(options === "node_list"){ // return the list of nodes- internal use only
             var nl={};
@@ -405,5 +431,6 @@ require("./Types.js");
             //console.log("Apoco.node calling _Node");
             return new _Node(options,el);
         }
-    };
+     }; 
+    
 })();

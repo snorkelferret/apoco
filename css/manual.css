@@ -1,43 +1,119 @@
+h1{font-size:26px;}
+h2{font-size:22px;}
+h3{font-size:20px;}
+h4{font-size:18px;
+  font-family:"monospace"}
+embed{display:block; clear: both}
+
+h1{color:#49638f;
+   font-weight: bold;
+   margin: 0 0 10px 0;}
+
+
+a {padding-right: 2em}
+
+dt{float: left; margin-right: 1em;}
+dd{ word-wrap: break-word; padding-left: 1em;}
+
+
+
+p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 0.5em}
+p a{text-decoration: none; outline: none}
+p a:hover{outline: none; text-decoration: none}
+
+code{font-size: 12pt;
+     color:#4499ee;
+     background-color: #eee;
+     font-weight: bold;
+     text-align: unset;
+     display: block;
+    }
 
 header .navbar-default{background-color: #223344;}
 
 .apoco_slideshow div.pic_area {height: 100%; min-height: 440px}
 .apoco_slideshow div.pic_area img{}
 .apoco_slideshow div.pic_area div{bottom: -4em}
-button{padding: 0 1em}
+button{padding: 0 1em;
+      /* min-width: 10em */
+      }
+.btn-primary{
+    min-width: 10em;
+}
+
+.buttonAsAnchor button{
+    display: inline-flex;
+    border: none;
+    background-color: unset;
+    text-align: unset;
+    color: blue;
+    padding: 0;
+    width: unset;
+}
+
+.inline{
+    display: inline-flex;
+}
+
+textarea{
+    font-family: monospace;
+}
+
 /*#Head{background: url("images/apoco01.png") no-repeat; width: 300px; height: 140px}*/
-#logo{background: url("images/apoco01.png") no-repeat;
+#logo{background: url("images/apoco02.png") no-repeat;
       width: 300px; height: 140px;padding: 0;
       border:none;}
-#Tabs ul{background-color:#fff; z-index: 100; }
 
+#Result{
+    margin:20px;
+    background-color: #e1efff;
+    padding: 20px;
 
-.apoco_menu{border: 1px solid; padding: 1em;}
+}
 
+#Tabs ul,
+#Result .apoco_tabs ul
+{background-color:#eee; z-index: 100; }
+
+#Result .apoco_tabs ul,
+#Tabs.apoco_tabs ul {
+    margin: 1em 0;
+    display: inline-flex;
+}
+
+#Result .apoco_tabs ul li,
+#Tabs.apoco_tabs ul li{
+    border: 1px solid #ccc;
+}
+
+dl.well{padding: 4px;
+       }
+.apoco_menu{padding: 1em;}
 
 @media (min-width: 1190px) {
-    #Tabs.apoco_tabs ul {
-        margin-top: 4em;
-        margin-left: 2em;
-        display: inline-flex;
-    }
+ 
 }
 @media (min-width: 768px){
-    #Tabs.apoco_tabs ul {
-        display: inline-flex;
-    }
+    
+}
+right h3{
+    margin-left: 40px;
 }
 
-.footer_text{color: #888; font-size: 8pt; font-weight: lighter;
-             margin-left:auto; margin-right:auto; width: 40em}
-#Footer{border-top: 1px solid #888;position: relative}
+.indent{
+    margin-left: 40px;
+}
+.indentBig{
+    margin-left: 80px;
+}
+
 
 .field_container textarea {font-family: monospace}
 #Main .field_container{padding: 2em 3em}
 
 div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
 
-.selected{background-color: #bbddff}
+.selected{background-color:#e1efff} /* #bbddff} */
 
 #test_dropZone{
     width: 100%;
@@ -51,4 +127,32 @@ div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
 #Examples textarea{
     width: 100%;
     height: 30em;
+}
+
+
+#Footer {
+
+    border-top: 1px solid #888;
+    width: 100%;
+    padding-top: 4em;
+    margin-top: 2em;
+    height: 4em;
+    position: relative;
+    bottom: 0em;
+    left: 0em;
+
+}
+
+
+.footer_text {
+
+    color: #888;
+    font-size: 8pt;
+    font-weight: lighter;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40em;
+    position: relative;
+    padding: 0em;
+    text-align: center;
 }

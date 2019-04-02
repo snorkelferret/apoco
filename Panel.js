@@ -8,9 +8,11 @@ require("./Window");
 ;(function() {
     'use strict';
     function check(ar){
+      
 	if(!Apoco.type["object"].check(ar)){
-	    throw new Error("This is not a window display object " + ar);
+	    throw new Error("This is not a window display object " + ar,"Panel.js");
 	}
+        
 	for(var i in ar){
 	    var OK=0;
 	    var msg=new String;
@@ -167,7 +169,7 @@ require("./Window");
                 return null;
             }
             for(var i=0;i<c.length;i++){
-                console.log("Panel show " + c[i].id + " hidden " + c[i].hidden);
+               // console.log("Panel show " + c[i].id + " hidden " + c[i].hidden);
                 c[i].show(true);  // set fromParent  
             }
             return p;
@@ -191,6 +193,7 @@ require("./Window");
                     this.show(this._list[i].name);
                 }
             }
+           
         },
         hideAll: function(win){
             var w,tw=null;
@@ -219,7 +222,7 @@ require("./Window");
         },
         hide:function(k){
             var p=this.get(k);
-            console.log("hiding panel " + k);
+           // console.log("hiding panel " + k);
             if(!p){
                 throw new Error("Panel.hide Cannot find panel " + k);
             }
@@ -239,6 +242,9 @@ require("./Window");
             for(var i=0;i< this._list.length;i++){
               //  console.log("panel has " + this._list[i].name + " at " + i);
                 l[i]=this._list[i].name;
+            }
+            if(l.length === 0){
+                return null;
             }
             return l;
         },
@@ -268,26 +274,31 @@ require("./Window");
             }
         },
 	add: function(panel){
+            var w,p;
 	  //  console.log("Panel.add is here");
 	   //console.log("+++++++++++=adding panel object ++++++++++ " + panel.name);
             if(!panel){
-                throw new Error("Panel.add must have a name or object");
+                throw new Error("Panel.add must have a name or object","Panel.js");
             }
             if(Apoco.type['string'].check(panel)){
-                var w=this._UIGet(panel);
-                panel=w;
+                w=this._UIGet(panel);
+                if(w){
+                    panel=w;
+                }
+                else{
+                    throw new Error("Panel is not an object and not defined in UI.Panels","Panel.js");
+                }
             }
-
+            if(Apoco.type["object"].check(panel) && !panel.name){
+                throw new Error("panel must have a name");
+            }
 	    if(this._inList(panel.name) === null){
 		check(panel.components);
-		var p=Apoco._panelComponents(panel);
-		// for(var k in p){
-		//     console.log("panel base has keys " + k);
-		// }
+		p=Apoco._panelComponents(panel);
 		this._list.push(p);
 	    }
 	    else{
-		throw new Error("Panel.add " + panel.name + " is already in the display list");
+		throw new Error("Panel.add " + panel.name + " is already in the display list","Panel.js");
 	    }
             return p;
 	},
@@ -322,9 +333,10 @@ require("./Window");
                     
                 }
                 obj=null;
+                return this._list.length;
             }
             else {
-                throw new Error("Apoco.Panel delete -" + name + "is not in the list of Panels");
+                throw new Error("Apoco.Panel delete -" + name + " is not in the list of Panels");
             }
 	}
     };
@@ -357,6 +369,7 @@ require("./Window");
         else{
             that._addComponents();
         }
+      
     };
 
     _Components.prototype={
@@ -386,6 +399,9 @@ require("./Window");
 	},
 	addChild: function(display_object){ // to existing panel
             var d;
+            if(!display_object){
+                throw new Error("addChild: missing parameter - display object","Panel.js");
+            }
             if(this.getChild(display_object.id)){
                 throw new Error("Apoco.Panel: already have a child with id " + display_object.id);
             }
@@ -410,7 +426,7 @@ require("./Window");
 	},
         deleteChildren: function(child_array){
             if(!this.components){
-                throw new Error("Panel: has no children " + this.name);
+                return null;
             }
          //   console.log("Panel deleteChildren is here parms " + child_array);
       //      console.log("child array check type is " + Apoco.type["array"].check(child_array) );
@@ -420,12 +436,13 @@ require("./Window");
               //      console.log("deleting child " + child_array[i]);
                     this.deleteChild(child_array[i]);
                 }
-                return;
+                return this.components.length;
             }
             for(var i=0;i<this.components.length;i++){
                 this.components[i].delete("message from parent");
             }
             this.components.length=0;
+            return 0;
         },
         deleteChild: function(obj){
             var index=-1;
@@ -465,6 +482,17 @@ require("./Window");
             if(!this.components){
                 return null;
             }
+            if(!id){
+                throw new Error("getChild: needs a parameter, either the display object or it's id");
+            }
+            if(Apoco.type.object.check(id)){
+                if(id.id){
+                    id=id.id;
+                }
+                else{
+                    return null;
+                }
+            }
            // console.log("Panel.getChild Trying to find " + id);
             for(var i=0;i< this.components.length;i++){
              //   console.log("this is child " + this.components[i].id);
@@ -475,10 +503,14 @@ require("./Window");
             return null;
         },
 	findChild: function(child){
+	    var found=null;
+            
             if(!this.components){
                 return null;
             }
-	    var found=null;
+            if(!child){
+                throw new Error("findChild: parameter needs to be an object with at least one key value pair - key:id or element:HTMLElement or name:someName ");
+            }
 	    for(var i=0;i<this.components.length; i++){
 	//	console.log("this is child " + i);
 		found=null;

@@ -1,5 +1,4 @@
 global.Apoco=require('./declare').Apoco;
-require("./index.js");
 require("./Utils.js");
 require("./Panel.js");
 require("./Popups.js");
@@ -9,7 +8,6 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 
 (function(){
     'use strict';
-
     var that=this;
     window.onerror=function(msg,url,lineno,col_no,error){
    	Apoco.popup.error(url, ("line number " + lineno + " " + msg));

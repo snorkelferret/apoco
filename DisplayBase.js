@@ -128,18 +128,34 @@ require("./Popups");
             return null;
         },
         deleteChild:function(name,no_splice){
-            var n,index=-1;
+            var n,index=-1,check=null;
             if(name === undefined){
-                throw new Error("DisplayMenu: deleteMenu needs a name");
+                throw new Error("deleteChild: needs a name");
+            }
+            if(Apoco.type.string.check(name)){
+                check="name";
+            }
+            else if(Apoco.type.object.check(name)){
+                check="object";
+            }
+            if(check === null){
+                throw new Error("deleteChild: parameter is name string or object");
             }
             for(var i=0;i<this.components.length;i++){
-               // console.log("++++++ before delete component " + i + " name " + this.components[i].name);
-                if(this.components[i].name == name){
-                    index=i;
-                 //   console.log("Found component to delete " + name + " with index " + index);
-                    break;
+                if(check === "name"){
+                    if(this.components[i].name == name){
+                        index=i;
+                        break;
+                    }
+                }
+                else{
+                    if(this.components[i] === name){
+                        index=i;
+                        break;
+                    }
                 }
             }
+            
             if(index === -1){
                 throw new Error("Display:deleteChild  Cannot find component " + name);
             }

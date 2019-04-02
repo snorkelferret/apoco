@@ -1,37 +1,20 @@
-/* Copyright (c) Pooka Ltd 2012-17
+/* Copyright (c) Perluceo Ltd 2013-19
 
 Author: Val Wardlaw
 Type: css stylesheet
-History: 1st Feb 2012 creation
+History: 1st Feb 2018 creation
 
 */
 html{width: 100%; height: 100%}
 
-body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-serif; font-size: 14px;}  /*font: 15px/22.5px "Helvetica Neue",HelveticaNeue,Helvetica,Arial,sans-serif } */
+body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-serif; font-size: 14px;} 
 * {
     box-sizing: border-box;
 }
-#wrapper{font-size: 10pt}
-.hide{ display: none }
-
-.bannertop {width: 100%; height: 3em; position: fixed; top: 0}
-
-#Tail{position: fixed; bottom: 0; z-index: 100 }
-#Main { /*margin-left: 4em; margin-right: 4em;  */ height: auto}
-
-/* code{font-size: 10pt}  */
-
-
 
 .draggable{ opacity:0.5}
 .isdraggable{position: fixed; z-index: 100}
 .resizable{resize:both;overflow:auto}
-/* selectable */
-.highlight{border: 1px solid yellow}
-
-.selectable .ui-selecting{ background: #444 }
-.selectable .ui-selected{ background: #555  }
-
 
 /*icons   */
 .play:before{content:"\25B6";}
@@ -53,23 +36,13 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 .down:before{content:"\25BC";}
 
 /* fieldSet */
-.apoco_fieldset{padding: 1em; } /*width: inherit}*/
-.apoco_fieldset div label{ margin-right: 1em; line-height: 1.4; width:5em}
-.apoco_fieldset div.label label{margin-right: 1em; width: 3em}
-/* .apoco_fieldset div input, .apoco_fieldset div textarea, */
 
-.apoco_fieldset {margin: 0.5em 0}
-
+.apoco_fieldset div label{ margin-right: 1em; line-height: 1.4;} 
+.apoco_fieldset div.label label{margin-right: 1em;} 
 
 .apoco_paginate{}
 .apoco_paginate button{ width: 2em; text-align: center; padding:0; margin: 0;}
-.slideshow_cover{position: fixed;
-                 z-index: 9;
-                 left: 0;
-                 top: 0;
-                 width: 100%;
-                 height: 100%; 
-                 background-color: #000 } 
+
 /* slideshow */
 
 .apoco_slideshow div.pic_area{position: relative;height: 100% }
@@ -78,8 +51,16 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 .apoco_slideshow ul.carousel{padding: 0; margin: 0;position:relative;}
 .apoco_slideshow ul.carousel li{position: absolute; top: 0; left:0;
                                 height:inherit; overflow:hidden;visibility:"hidden"}
-.apoco_slideshow ul.carousel li div{display: table-row;width: 100%; display: block;position:absolute;}
-.apoco_slideshow ul.carousel li div p{text-align: center; width: inherit; margin: auto; min-width: 200px; max-width: 800px; position: relative}
+.apoco_slideshow ul.carousel li div{
+    width: 100%;
+    height: 60px;
+}
+.apoco_slideshow ul.carousel li div p{
+    text-align: center;
+    width: inherit;
+    margin: auto;
+    position: absolute;
+    bottom:0px; }
 .apoco_slideshow ul.carousel li.slide > h1{width:inherit; height: inherit; text-align:center;}
 .apoco_slideshow span.carousel_left {position: absolute; z-index: 10; background: url("images/carousel_left.png") no-repeat #aaa; width: 48px; height: 48px; margin-left: 1em; top: 50%;left:0px; opacity:0 }
 .apoco_slideshow span.carousel_right{position: absolute; z-index: 10; background: url("images/carousel_right.png") no-repeat #aaa; width: 48px; height: 48px;margin-right: 1em; top: 50%; right: 0px; opacity:0}
@@ -88,7 +69,7 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 .apoco_slideshow span.hover{background-color:#555; opacity: 0.5 }
 .apoco_slideshow div.slideshow_controls{position: relative; width: 140px; margin: 0 auto;z-index:11;display: block }
 .apoco_slideshow div.slideshow_controls ul{display:table-cell; list-style-type: none;
-                                           padding:0; background-color:#fff}
+                                           padding:0;}
 .apoco_slideshow div.slideshow_controls li{width: 24px;
                                             cursor: pointer;
                                             float: left;
@@ -100,7 +81,7 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 
 /* tabs */
 .apoco_tabs ul {margin: 0; padding:0}
-.apoco_tabs li{ height: 2em ; cursor: pointer;cursor:hand; border: 1px solid grey;  }
+.apoco_tabs li{ height: 2em ; cursor: pointer;cursor:hand;  }
 .apoco_tabs li span{ height: 2em; padding: 0em 1em; text-align: center; }
 .apoco_tabs li:hover{color: #4466ff;}
 .apoco_tabs li.selected{font-weight:bolder;}
@@ -230,7 +211,9 @@ body{ body: 100%; height: 100%; margin: 0; padding: 0;  font-family: Arial,sans-
 .apoco_grid .inner_table table td input{ background: inherit; text-align: inherit; margin: 0;padding:0}
 .apoco_grid .inner_table table td th { word-wrap: break-word}
 /* set the row colours */
-.apoco_grid .inner_table table tr:nth-child(even){ background: #ffffd3} /* ddeeff */
+.apoco_grid .inner_table table tr:nth-child(even){ background: #ffffd3}
+.apoco_grid .inner_table table tr:nth-child(odd){ background: #ffffff}
+/* ddeeff */
 .apoco_grid .arrows span{height: 50%; width: 16px}
 
 
@@ -243,14 +226,6 @@ input:valid {
   border: 1px solid green;
 }
 
-input.pending{
-    animation: flash 1s infinite;
-}
-
-@keyframes flash{
-    100% { background-color : #cc3325; color: #eee}
-    0% { background-color : inherit; color: inherit}
-}
 
 .first{width: 2em }
 .slider{width: 15em; margin:  0.5em 0 0.5em 0} 
@@ -284,29 +259,20 @@ input.pending{
 .integerArray span.integerArray{width: 3.5em}
 .floatArray {width: 12em}
 .boolean {width: 4em;}
-.text { width: 12em}
+.boolean label{ margin-left: 1em;}
+
 .imageArray{display:block;margin-top:1em; margin-bottom: 1em}
 .thumbnails{margin-top: 1em}
 .thumbnails div{display:inline}
 .thumbnails img{width: inherit; height:inherit; border: 2px solid #999}
 
 .check_box{width: 16px; height: 16px}
-.field_container textarea {font-family: monospace; width: 50em; height: 10em}
 
 .stringArray li.plus{float: right; margin-left: .4em; border: 1px solid #000 }
 .stringArray li.minus{float: right; margin-left: .4em; border: 1px solid #000 }
-/* remove the spinners on number inputs */
-/*input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield;
-}
-*/
+
 div.apoco_autocomplete{position:relative;width:20em}
-div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0em; position:absolute;top:1.5em}
+div.apoco_autocomplete ul{z-index:10; padding: 0; margin: 0em; position:absolute;top:1.5em; background-color: #fff}
 div.apoco_autocomplete ul li{display: block; 
                              z-index:10; width: inherit}
 div.apoco_autocomplete ul li:hover{font-weight:bold}
@@ -317,20 +283,17 @@ div.apoco_autocomplete span{width: 20px; height: 17px; float:right;
 ul.choice {list-style-type: none; width: 10em }
 ul.choice li{display: block}
 ul.choice li input{float: left}
-/* floats not using the input default */
-/* .form_style_div ul.aligned_float, */
+
 .float ul.aligned_float{display: flex; 
                         list-style-type: none;
-                      /*  height:32px; */
                         border: 1px solid #333333;
                         box-sizing: border-box;
                         border-collapse: collapse;
                         width: 8em; height: 100%; 
                         margin: 0em; padding: 0em; flex-flow: row}
-/* .form_style_div ul.aligned_float, */
+
 .float ul.aligned_float li{ display: flex; flex-flow: row}
-/* .grid table td.float div{display: inline  } */
-/* .form_style_div ul.aligned_float, */
+
 .float ul.aligned_float li input{ border: 0 none}
 
 .float ul.aligned_float li div.values .float_right,
@@ -347,27 +310,12 @@ float ul.aligned_float div.arrows span{height: 50%}
 .float ul.aligned_float div.values{ display:flex; 
                                    flex-flow: row; } 
 
-textarea{min-width: 30em; margin: 0.5em 0 0.5em 0}
+textarea{min-width: 30em;
+         width: 80%;
+         min-height:8em;
+         margin: 1em 0 1em 0}
+
 ul{list-style-type: none;}
-h1 {margin-top: 3em; font-size: 24pt; color: #bbb; text-align: left} 
-
-h2 { font-size: 18pt;  color: #444444 ,text-align: left; margin-top: 0em; margin-bottom: 0em; height: 2em}
-
-h2 a {  color: #333333; text-decoration: none}
-h2 a:hover { color: #444444; text-decoration: none}
-
-h3 { font-size: 16pt ; font-weight: bold; color: #666666; text-align: left; text-decoration: none}
-
-a {padding-right: 2em}
-
-h4 {margin: 0em;  color: #404040; text-decoration: none; font-size: 14pt;
-text-align: left;  padding: 0em 0em .5em 0em}
-
-h5{color: #202020; font-size: 12pt}
-
-dd{word-wrap: break-word; padding-left: 1em;}
-
-button{margin: 0.5em}
 
 .disabled{ 
     pointer-events:none; 
@@ -386,14 +334,6 @@ button{margin: 0.5em}
     background-color: rgba(255,255,255,0.25);
    
 }
-embed{display:block; clear: both}
-
-p {margin-left: 0em; text-align: justify; margin-top: 0em; margin-right: 2em}
-p a{text-decoration: none; outline: none}
-p a:hover{outline: none; text-decoration: none}
-/*dl{text-align:justify} */
-code{font-size: 10pt}
-
 
 
 /* for error messages etc */
@@ -511,9 +451,7 @@ code{font-size: 10pt}
   height: 32px;
 }
 
-.apoco_clock{border: 1px solid ;border-color: inherit; padding: 0.5em; width: 5em; margin-top:1em}
-
-#login_name { margin-right: 1em} 
+.apoco_clock{border: 1px solid ;border-color: inherit; padding: 0.5em; width: 7em; margin-top:1em}
 
 
 .doing_things{cursor: wait;}
@@ -526,7 +464,7 @@ code{font-size: 10pt}
 .tooltip{ } 
 
 .bold{font-weight: bold; color: #cccccc}
-.red{background: #aa0000 }
+.red{background: #aa0000; color: #fff}
 .yellow{background: #fbec88}
 .orange{background: #fb8866}
 .smallgap {position: relative; margin-top: 2em;}
@@ -535,20 +473,3 @@ code{font-size: 10pt}
 .hugegap{position: relative; margin-top: 12em;}
 
 .required{border: 1px solid #dd2222}
-
-
-
-#Footer {
-    width: 100%;
-    padding-top: 4em;
-    margin-top: 2em;
-    height: 4em; position: absolute; bottom: 0em; left: 0em}
-
-.footer_text{position: relative; margin: 0em; padding: 0em;margin-right: 2em;text-align: right;}  
-
-/* tree */
-#tree_control_panel{ position: absolute; top: 20em; left: 12em; width: 26em; height: 14em; z-index: 2000; background: #101010; border: 1px solid #777 }
-#tree_control_panel button{ width: 8em; height: 3em; overflow: hidden; background-color: #888; margin-bottom: 1em }
-#tree_control_panel div{ padding: 1em; border: 1px solid #777 }
-#tree_control_panel h3{ color: #777; padding-left: 1em; cursor: move }
-

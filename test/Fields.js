@@ -1321,3 +1321,31 @@ describe("AutoCompleteField",function(){
 
 
 
+
+describe("NodesWithParent",function(){
+    require("../Nodes.js");
+    var fs;
+    it("create the fieldset container",function(){
+        var b=document.createElement("div");
+        b.id="test";
+        document.body.appendChild(b);
+        
+        fs=Apoco.display.fieldset({
+            id:'MyFS',
+            DOM:'test',
+            components:[{field:'input', name:'aName',type:"string",value:"some Text"},
+                        {node:'heading',size:'h1',text:"A heading"}]
+        });
+        assert.isObject(fs);
+        document.getElementsByTagName("body")[0].appendChild(fs.element);
+    });
+    it("deleting a node removes it from the parent",function(){
+        var c=fs.getChildren();
+        assert.strictEqual(c.length,2);
+        c[0].delete();
+        c=fs.getChildren();
+        assert.strictEqual(c.length,1);
+        
+    });
+    
+});

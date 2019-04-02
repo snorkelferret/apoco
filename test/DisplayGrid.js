@@ -303,11 +303,14 @@ describe("DisplayGrid-(start with data but no subgrids)",function(){
         b.element.addEventListener("click",function(self){
             return function(e){
                 var row;
-                row=self.findRow(e,self);
-                assert.isObject(row);
-                assert.strictEqual(row,{one:"one",two:"hat"});
+                assert.isObject(self);
+                if(self){
+                    row=self.findRow(e,self);
+                    assert.isObject(row);
+                    assert.strictEqual(row,{one:"one",two:"hat"});
+                }
             };
-        }(b),false);
+        },false);
         var h=document.getElementsByTagName("TR");
         assert.isObject(h);
         h[0].click();

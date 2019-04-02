@@ -1,27 +1,18 @@
-# apoco
+
+![] (https://snorkelferret.github.io/css/images/apoco02.png)
+
 ##  Javascript web framework
+Apoco is a set of modules that can be used to form a 'Single Page Application' [SPA](https://en.wikipedia.org/wiki/Single-page_application) or used as a page or part of a page.It is a real time web framework, with automatic two way synchronisation between browser and server content.
+The components can be used together or individually.Apoco employs a 'sort of' shabow dom, in so far as the DOM elements are kept in memory and accessed using getters and setters.
+More in the spirit of a conventional C type window system. Writing html is not required, as Apoco creates all the HTML. Apoco can use an MVC pattern, where views are kept as a JSON (like) object, controls in a separate javascript file, and the model can come from another JSON object or the server or a combination of both. For larger and more complex projects an additional build.js file can be deployed, to construct more complex objects 
+Apoco supports both REST and websockets. 
 
-Apoco is a set of modules that can be used to form an SPA or used as a page or part of a page.
-It is a data-driven enterprise level library/Frontend real time framework, with automatic two way synchronisation between browser and server content.
+![] (https://snorkelferret.github.io/css/images/treeStruct.png)
 
-The components can be used together or individually.
-
-(SPA - Single Page Application. )
-[Definition of a SPA](https://en.wikipedia.org/wiki/Single-page_application)
+Apoco is arranged hierarchically starting with windows and ending with nodes and/or fields. It supports multiple windows. Apoco is very fast, as it only updates specific element values sent by the server and doesn't need to update the page. Ypu can also add and remove elements without page refresh.
+Data types are specified in the fields and nodes 
 
 [Online manual](https://snorkelferret.github.io)
-
-Apoco is arranged hierarchically.
-
-##### Windows
-    Windows contain
-##### Panels
-    Panels contain
-##### displays
-    displays contain
-##### fields or nodes
-    which contain
-##### types
 
 You don't have to use the hierarchy, any of the components can be used independently, e.g you can use the display templates without using the Panel, or fields without using displays, but you can't use displays without specifying the appropriate field(s)
 

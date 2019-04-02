@@ -354,14 +354,26 @@ String.prototype.trim = String.prototype.trim || function trim() {
             }
                         
         },
-        formatDate: function(d){ //YYYY-MMM-DD to human
+        formatDate: function(d){ //YYYY-MM-DD to human
             //	console.log("date is " + d);
 	    var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	    var months = ["January", "February", "March", "April", "May",
 		          "June", "July", "August", "September", "October", "November", "December"];
 
 	    var parts=d.split("-"); // because Safari does not understand the ISO8601 format
-            //	var date=new Date(d);
+            
+            if(parts.length !== 3){
+                parts=[];
+                d=d.trim();
+                if(d.length !== 8){
+                    throw new Error("date is in wrong format - YYYY-MM-DD or YYYYMMDD","Utils.js");
+                }
+                parts[0]=d.substr(0,4);
+                parts[1]=d.substr(4,2);
+                parts[2]=d.substr(6);
+    
+            }
+           
 	    var date=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])); // stuoid workaround for Safari 5.1
 	    var month=date.getMonth();
 	    var day=date.getDay();

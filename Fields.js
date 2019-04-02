@@ -169,8 +169,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 	},
         delete:function(){
             // remove all the nodes
+
             while (this.element.lastChild) {
                 this.element.removeChild(this.element.lastChild);
+            }
+        
+            if(this.parent){
+                this.parent.deleteChild(this);
+                return;
             }
             if(this.element.parentNode){
                 this.element.parentNode.removeChild(this.element);
@@ -779,6 +785,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             throw new Error("NumberArrayfield needs a size or value");
         }
         d.field="numberArray";
+        if(!d.type){
+            d.type="integerArray";
+        }
 	_Field.call(this,d,element);
         if(!this.size){
             this.size=this.value.length;
@@ -869,8 +878,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             if(index !== -1){
                 this.input.splice(index,1);
+                return this;
             }
-            return this;
+            return null;
         },
 	setValue: function(v){
             if(v.length >this.input.length){
@@ -1670,7 +1680,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
     // base class for Image file reads and other input type "file"
     var FileField=function(d,element){
         var that=this,container,q,p;
-        d.field="FileField";
+        d.field="fileReader";
         d.type="fileArray";
 	_Field.call(this,d,element);
 

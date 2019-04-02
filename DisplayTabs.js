@@ -2,6 +2,7 @@ var Apoco=require('./declare').Apoco;
 
 require("./DisplayBase.js");
 // Menu display object
+require("./Types.js");
 
 
 ;(function(){
@@ -19,11 +20,12 @@ require("./DisplayBase.js");
         this._execute();
     };
 
-
     var default_select_tabs_action=function (that){
         var name=that.selected.name;
-        Apoco.Panel.hideAll();
-        Apoco.Panel.show(name);
+        if(Apoco.Panel){
+            Apoco.Panel.hideAll();
+            Apoco.Panel.show(name);
+        }
         
     };
 
@@ -35,7 +37,7 @@ require("./DisplayBase.js");
 	    
             tablist=document.createElement("ul");
             tablist.role="tablist";
-            //  tablist.classList.add("ui-tabs-nav","ui-helper-reset","ui-helper-clearfix","ui-widget-header","ui-corner-all","tabs");
+         
             tablist.classList.add("tabs");
           
             this.element.appendChild(tablist);
@@ -91,8 +93,7 @@ require("./DisplayBase.js");
             s.textContent=label;
             t.element.appendChild(s);
 	    t.parent=this;
-         //   this.components[index]=t;
-          //  this.components[index].parent=this;
+    
             if(t.action){
                 t.element.addEventListener("click",function(e){
                   
@@ -122,12 +123,7 @@ require("./DisplayBase.js");
         },
 	update:function(name){
             var p=this.getChild(name);
-	   /* for(var i=0;i<this.components.length;i++){
-		if(this.components[i].name == name){
-		    var p=this.components[i].name;
-		    break;
-		}
-	    } */
+	
 	    if(p){
 		p.element.click();
 	    }
@@ -148,10 +144,8 @@ require("./DisplayBase.js");
              	if(this.components[i].name == name){
                     this.selected=this.components[i];
 		    this.components[i].element.classList.add("selected");
-                    //this.components[i].element.classList.remove("ui-state-default");
 		}
 		else{
-                    //this.components[i].element.classList.add("ui-state-default");
 		    this.components[i].element.classList.remove("selected");
 		}
 	    }

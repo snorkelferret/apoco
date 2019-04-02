@@ -22,7 +22,8 @@
     "test": "cross-env NODE_ENV=test mocha --exit -R mocha-tldr-reporter -C test",
     "posttest": "rimraf .__browserify_string_empty.js",
     "prepublish": "npm run apoco",
-    "apoco": "browserify  ./index.js -o apoco.js"
+    "apoco": "browserify  ./index.js -o apoco.js",
+    "apoco_lite": "browserify ./index_lite.js -o apoco_lite.js"
   },
   "author": {
     "name": "Basil Valentine",
@@ -41,7 +42,7 @@
     "cross-env": "^1.0.7",
     "eslint": "^2.7.0",
     "jsdom": "^8.3.1",
-    "mocha": "^5.2.0",
+    "mocha": "^6.0.2",
     "mocha-tldr-reporter": "^1.0.0",
     "rimraf": "^2.6.3",
     "selenium-webdriver": "^3.0.0",
@@ -49,7 +50,7 @@
   },
   "dependencies": {
     "clone-deep": "^0.2.4",
-    "es6-promise": "^4.2.5"
+    "es6-promise": "^4.2.6"
   },
   "browserify": {
     "transform": [
