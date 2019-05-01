@@ -91,7 +91,7 @@ test.describe("Manual",function(){
         });
     });
     test.it("we have some tabs",function(done){
-        assert.strictEqual(tabs.length,11);
+        assert.strictEqual(tabs.length,12);
 //        console.log("we have poxy tabs " + tabs.length);
         done();
     });
@@ -99,7 +99,7 @@ test.describe("Manual",function(){
     test.it("can get the tab list with Apoco",function(){
         driver.executeScript("return Apoco.Panel.get('Tabs').getChild('Tabs').getChildren().length")
             .then(function(p){
-                assert.strictEqual(p,11);
+                assert.strictEqual(p,12);
             });
     });
 
@@ -135,38 +135,38 @@ test.describe("Manual",function(){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Fields')]"));
 //        console.log("tab is " + tab);
         tab.click();
-        assert.isObject(driver.findElement(By.id("FieldsMenu")));
+        assert.isObject(driver.findElement(By.id("fieldMenu")));
         done();
     });
-      test.it("click fields tab loads Nodes page",function(done){
+      test.it("click node tab loads Nodes page",function(done){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Nodes')]"));
 //        console.log("tab is " + tab);
         tab.click();
-        assert.isObject(driver.findElement(By.id("NodesMenu")));
+        assert.isObject(driver.findElement(By.id("nodeMenu")));
         done();
     });
-    test.it("click fields tab loads Displays page",function(done){
+    test.it("click display tab loads Displays page",function(done){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Displays')]"));
 //        console.log("tab is " + tab);
         tab.click();
-        assert.isObject(driver.findElement(By.id("DisplaysMenu")));
+        assert.isObject(driver.findElement(By.id("displayMenu")));
         done();
     });
-    test.it("click fields tab loads Panels page",function(done){
+    test.it("click Panels tab loads Panels page",function(done){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Panels')]"));
 //        console.log("tab is " + tab);
         tab.click();
-        assert.isObject(driver.findElement(By.id("PanelsMenu")));
+        assert.isObject(driver.findElement(By.id("PanelMenu")));
         done();
     });
-    test.it("click fields tab loads Types page",function(done){
+    test.it("click Types tab loads Types page",function(done){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Types')]"));
 //        console.log("tab is " + tab);
         tab.click();
-        assert.isObject(driver.findElement(By.id("TypesMenu")));
+        assert.isObject(driver.findElement(By.id("typeMenu")));
         done();
     });
-    test.it("click fields tab loads IO page",function(done){
+    test.it("click IO tab loads IO page",function(done){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'IO')]"));
 //        console.log("tab is " + tab);
         tab.click();
@@ -177,7 +177,7 @@ test.describe("Manual",function(){
         var tab=driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Popups')]"));
 //        console.log("tab is " + tab);
         tab.click();
-        assert.isObject(driver.findElement(By.id("PopupsMenu")));
+        assert.isObject(driver.findElement(By.id("popupMenu")));
         done();
     });
     test.it("click fields tab loads Utils page",function(done){
@@ -204,7 +204,7 @@ test.describe("Manual",function(){
         });
         test.it("has found a list of nodes",function(done){
             
-            driver.findElements(By.css("#NodesMenu ul li"))
+            driver.findElements(By.css("#nodeMenu ul li"))
                 .then(function(mi){
                     menu_items=mi;
                 //    console.log("got " + menu_items.length);
@@ -255,11 +255,11 @@ test.describe("Manual",function(){
         });
         test.it("has found a list of fields",function(done){
             
-            driver.findElements(By.css("#FieldsMenu ul li"))
+            driver.findElements(By.css("#fieldMenu ul li"))
                 .then(function(mi){
                     menu_items=mi;
                 //    console.log("got " + menu_items.length);
-                    assert.strictEqual(menu_items.length,16);
+                    assert.strictEqual(menu_items.length,17);
                
                     done();
                 })
@@ -306,7 +306,7 @@ test.describe("Manual",function(){
         });
         test.it("has found a list of fields",function(done){
             
-            driver.findElements(By.css("#DisplaysMenu ul li"))
+            driver.findElements(By.css("#displayMenu ul li"))
                 .then(function(mi){
                     menu_items=mi;
                 //    console.log("got " + menu_items.length);
