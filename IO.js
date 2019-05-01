@@ -70,12 +70,17 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                     p.push(this._subscribers[name][i].context);
                 }
             }
-            return p;
+            if(p.length > 0){
+                return p;
+            }
+            return null;
         },
         unsubscribe:function(that,name){ //pubsub
 	    // var names=[];
             var n;
-
+            if(!that || !that.listen){
+                throw new Error("unsubscribe needs an object with a key value pair of listen:[{name:'someName'}]");
+            }
 	    for(var i=0; i< that.listen.length; i++){
                 n=that.listen[i].name;
 	        //   console.log("finding name " + that.listen[i].name);
@@ -85,12 +90,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
 		        if(this._subscribers[n][j]["context"].action === that.action){
                             if(name === undefined || name === n){
 			        this._subscribers[n].splice(j,1);
+                                break;
 		            }
 		        }
 	            }
                 }
                 
 	    }
+            
             for(var k in this._subscribers){
                 if(this._subscribers[k].length === 0){ //nobody listening
                     delete this._subscribers[k];

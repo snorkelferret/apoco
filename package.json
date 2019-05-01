@@ -22,8 +22,7 @@
     "test": "cross-env NODE_ENV=test mocha --exit -R mocha-tldr-reporter -C test",
     "posttest": "rimraf .__browserify_string_empty.js",
     "prepublish": "npm run apoco",
-    "apoco": "browserify  ./index.js -o apoco.js",
-    "apoco_lite": "browserify ./index_lite.js -o apoco_lite.js"
+    "apoco": "browserify  ./index.js -o apoco.js"
   },
   "author": {
     "name": "Basil Valentine",

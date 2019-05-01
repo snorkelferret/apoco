@@ -38,6 +38,7 @@ require("./DisplayBase");
             if(this.heading){
                 s=document.createElement("span");
                 s.textContent=this.heading;
+                s.onclick=void(0); // this is for IOS Safari hover bug
                 this.element.appendChild(s);
             }
 

@@ -160,7 +160,12 @@ String.prototype.trim = String.prototype.trim || function trim() {
 		    for(var i=0;i<sort_order.length;i++){
 		        field=sort_order[i];
                         item=data[field];
-                        curr=aa[field].value;
+                        if(aa[field].hasOwnProperty("value")){
+                            curr=aa[field].value;
+                        }
+                        else{
+                            curr=aa[field];
+                        }
                       //  console.log("sort field is " + field + " item is " + item + " compare " + aa[field].value);
                         if(curr == item){ // && i === sort_order.length -1){
 		        //    console.log(curr + " equals " + item);
@@ -545,6 +550,10 @@ String.prototype.trim = String.prototype.trim || function trim() {
                // console.log("path is " + p);
 		history.pushState(c_obj,name,p);
 	    },
+            fragString:function(){
+                var name=null,u=window.location.href;
+                var p=u.split("?"); 
+            },
             queryString:function(){
                 var name=null,u=window.location.href;
                 var p=u.split("?");

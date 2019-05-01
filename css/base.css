@@ -379,7 +379,7 @@ ul{list-style-type: none;}
 
 .apoco_dialog div.message p{
     width: inherit;
-    margin-left: 1em;
+    margin: 1em;
     word-wrap: break-word;
 }
 

@@ -2,6 +2,8 @@ h1{font-size:26px;}
 h2{font-size:22px;}
 h3{font-size:20px;}
 h4{font-size:18px;
+   color: #4499ee;
+   font-weight:bold;
   font-family:"monospace"}
 embed{display:block; clear: both}
 
@@ -93,9 +95,25 @@ dl.well{padding: 4px;
 @media (min-width: 1190px) {
  
 }
+
 @media (min-width: 768px){
-    
+    .navbar-nav>li>a {
+	padding-top: 25px;
+	padding-bottom: 25px;
+    }
+    #Tabs ul.tabs{
+        display:inline-flex;
+    }
 }
+
+@media (max-width: 768px) {
+    #Tabs ul.tabs {
+        width:unset;
+        display: block;
+        padding-bottom: 0px;
+    }
+}  
+
 right h3{
     margin-left: 40px;
 }

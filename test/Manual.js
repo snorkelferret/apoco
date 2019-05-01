@@ -187,15 +187,161 @@ test.describe("Manual",function(){
         assert.isObject(driver.findElement(By.id("UtilsMenu")));
         done();
     });
-    /*
-    test.it("can hide a Panel",function(){
-         driver.executeScript("return Apoco.Panel.get('Tabs');")
-            .then(function(p){
-                var tab=driver.findElement(By.Id("Tabs"));
-                assert.isEqual(tab,);
-            });
-    }); */
+ 
     
+    test.describe("Nodes",function(){
+        var menu_items=[];
+        test.it("can go back to Nodes page",function(done){
+            driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Nodes')]"))
+                .then(function(tab){
+                  //  console.log("Node tab is " + tab);
+                    tab.click();
+                    done();
+                }).catch(function(err){
+                    done();
+                });
+
+        });
+        test.it("has found a list of nodes",function(done){
+            
+            driver.findElements(By.css("#NodesMenu ul li"))
+                .then(function(mi){
+                    menu_items=mi;
+                //    console.log("got " + menu_items.length);
+                    assert.strictEqual(menu_items.length,12);
+               
+                    done();
+                })
+                .catch(function(err){
+                    console.log("Error " + err);
+                    done();
+                }); 
+            
+        }); 
+        test.it("can click on each menu item",function(done){
+            var p,name;
+            for(var i=0;i<menu_items.length;i++){
+              //  console.log("menu item is " + menu_items[i]);
+              
+                menu_items[i].click();
+                driver.executeScript('return arguments[0].getAttribute("name")',menu_items[i])
+                    .then(function(name){
+                        test.it("has loaded the menu item",function(done){
+                            p=document.findElementById(name);
+                            assert.isObject(p);
+                            done();
+                        });
+                    });
+            }
+            
+            done();
+        });
+        
+    });
+     
+    
+    test.describe("Fields",function(){
+        var menu_items=[];
+        test.it("can go back to Fields page",function(done){
+            driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Fields')]"))
+                .then(function(tab){
+                  //  console.log("Node tab is " + tab);
+                    tab.click();
+                    done();
+                }).catch(function(err){
+                    done();
+                });
+
+        });
+        test.it("has found a list of fields",function(done){
+            
+            driver.findElements(By.css("#FieldsMenu ul li"))
+                .then(function(mi){
+                    menu_items=mi;
+                //    console.log("got " + menu_items.length);
+                    assert.strictEqual(menu_items.length,16);
+               
+                    done();
+                })
+                .catch(function(err){
+                    console.log("Error " + err);
+                    done();
+                }); 
+            
+        }); 
+        test.it("can click on each menu item",function(done){
+            var p,name;
+            for(var i=0;i<menu_items.length;i++){
+              //  console.log("menu item is " + menu_items[i]);
+              
+                menu_items[i].click();
+                driver.executeScript('return arguments[0].getAttribute("name")',menu_items[i])
+                    .then(function(name){
+                        test.it("has loaded the menu item",function(done){
+                            p=document.findElementById(name);
+                            assert.isObject(p);
+                            done();
+                        });
+                    });
+            }
+            done();
+        });
+        
+    });
+
+   
+    
+    test.describe("Displays",function(){
+        var menu_items=[];
+        test.it("can go back to Displays page",function(done){
+            driver.findElement(By.xpath(".//div[@id='Tabs']/ul/li/span[contains(.,'Display')]"))
+                .then(function(tab){
+                  //  console.log("Node tab is " + tab);
+                    tab.click();
+                    done();
+                }).catch(function(err){
+                    done();
+                });
+
+        });
+        test.it("has found a list of fields",function(done){
+            
+            driver.findElements(By.css("#DisplaysMenu ul li"))
+                .then(function(mi){
+                    menu_items=mi;
+                //    console.log("got " + menu_items.length);
+                    assert.strictEqual(menu_items.length,6);
+               
+                    done();
+                })
+                .catch(function(err){
+                    console.log("Error " + err);
+                    done();
+                }); 
+            
+        }); 
+        test.it("can click on each menu item",function(done){
+            var p,name;
+            for(var i=0;i<menu_items.length;i++){
+              //  console.log("menu item is " + menu_items[i]);
+              
+                menu_items[i].click();
+                driver.executeScript('return arguments[0].getAttribute("name")',menu_items[i])
+                    .then(function(name){
+                        test.it("has loaded the menu item",function(done){
+                            p=document.findElementById(name);
+                            assert.isObject(p);
+                            done();
+                        });
+                    });
+            }
+            done();
+        });
+        
+    });
+
+    
+     
     function execute() {
         return driver.executeScript.apply(driver, arguments);
     }
