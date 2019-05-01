@@ -231,7 +231,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 that._files=[];
             }
          
-            console.log("getFiles that is %j",that);
+         //   console.log("getFiles that is %j",that);
             for (var i = 0; i<f.length; i++) {
               //  console.log("got file number " + i + " name " + f[i].name + " type " + f[i].type + " size " + f[i].size + " bytes, date  " + f[i].lastModifiedDate );
                 if(that.opts){
