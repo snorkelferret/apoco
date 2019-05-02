@@ -19,7 +19,7 @@
     "eslint": "eslint -f compact --env browser commonjs *.js",
     "eslint:test": "eslint -f compact --config test/eslint.conf --env mocha test/*.js",
     "pretest": "npm run eslint && npm run eslint:test",
-    "test": "cross-env NODE_ENV=test mocha --exit -R mocha-tldr-reporter -C test",
+    "test": "cross-env NODE_ENV=test mocha --exit  -C test",
     "posttest": "rimraf .__browserify_string_empty.js",
     "prepublish": "npm run apoco",
     "apoco": "browserify  ./index.js -o apoco.js"
@@ -41,15 +41,15 @@
     "cross-env": "^1.0.7",
     "eslint": "^2.7.0",
     "jsdom": "^8.3.1",
-    "mocha": "^6.0.2",
-    "mocha-tldr-reporter": "^1.0.0",
+    "mocha": "^6.1.4",
     "rimraf": "^2.6.3",
     "selenium-webdriver": "^3.0.0",
     "sinon": "^1.17.3"
   },
   "dependencies": {
     "clone-deep": "^0.2.4",
-    "es6-promise": "^4.2.6"
+    "es6-promise": "^4.2.6",
+    "js-yaml": "^3.13.1"
   },
   "browserify": {
     "transform": [
