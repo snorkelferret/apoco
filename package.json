@@ -48,8 +48,7 @@
   },
   "dependencies": {
     "clone-deep": "^0.2.4",
-    "es6-promise": "^4.2.6",
-    "js-yaml": "^3.13.1"
+    "es6-promise": "^4.2.6"
   },
   "browserify": {
     "transform": [
@@ -64,10 +63,5 @@
       ]
     ]
   },
-  "license": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/snorkelferret/apoco/LICENSE"
-    }
-  ]
+  "license": "MIT"
 }
