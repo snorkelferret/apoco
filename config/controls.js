@@ -24,12 +24,13 @@ if(!UI){
             return f;
         },
         setTab: function(name,pop){
-            var b,c,
+            var b,c,that,
                 old_tab=null,
                 next_tab=null,
                 ct=Apoco.Panel.get("Tabs").getChild("Tabs");
            
             if(Apoco.type["object"].check(name)){
+                that=name;
                 name=name.name;
             }
             // cleanup redirects if they exist
