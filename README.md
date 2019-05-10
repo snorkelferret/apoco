@@ -1,7 +1,8 @@
-
 ![] (https://snorkelferret.github.io/css/images/apoco02.png)
 
 ##  Javascript web framework
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco?ref=badge_shield)
+
 Apoco is a set of modules that can be used to form a 'Single Page Application' [SPA](https://en.wikipedia.org/wiki/Single-page_application) or used as a page or part of a page.It is a real time web framework, with automatic two way synchronisation between browser and server content.
 The components can be used together or individually.Apoco employs a 'sort of' shabow dom, in so far as the DOM elements are kept in memory and accessed using getters and setters.
 More in the spirit of a conventional C type window system. Writing html is not required, as Apoco creates all the HTML. Apoco can use an MVC pattern, where views are kept as a JSON (like) object, controls in a separate javascript file, and the model can come from another JSON object or the server or a combination of both. For larger and more complex projects an additional build.js file can be deployed, to construct more complex objects 
@@ -107,3 +108,7 @@ however,there are some "shop front" Websites using apoco.
 
 (eating out own dogfood)
 [Online manual](https://snorkelferret.github.io)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco?ref=badge_large)
