@@ -1691,10 +1691,10 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         this.element.classList.add(d.field);
         if(this.editable !== false){
 	    if(!window.FileReader){
-	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the image reader");
+	        Apoco.popup.dialog("Sorry No FileReader","Your browser does not support the reader");
 	        throw new Error("No FileReader");
 	    }
-            console.log("making a container");
+         //   console.log("making a container");
             this.container=document.createElement("div");
             this.container.classList.add("file_container");
             this.element.appendChild(this.container);
@@ -1806,7 +1806,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         _addInputListener:function(){
             var that=this,rc;
             that.input.addEventListener("change",function(e){
-                console.log("FileReader got change event ");
+             //   console.log("FileReader got change event ");
                 rc=that._getFiles(e,that);
                 // for(var i=0;i<that._promises.length; i++){
                 that._processFileIn();
@@ -1816,11 +1816,11 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             var that=this;
             Promise.all(that._promises).then(function(files){
                 var pb=that.progressBar;
-                console.log("errors are %j ", that._errors );
+              //  console.log("errors are %j ", that._errors );
                 that.showError();
                 
                 for(var i=0;i<files.length;i++){
-                    console.log("adding value " + files[i].name);
+                //    console.log("adding value " + files[i].name);
                     that.addValue(files[i]);
    
                     if(pb){
@@ -1899,7 +1899,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             for(var i=0;i<this.value.length;i++){
                 if(this.value[i].name === v.name ){
-                    console.log("already have this value");
+                 //   console.log("already have this value");
                     return false;
                 }
             }
@@ -1926,7 +1926,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             if(this._files){
                 this._files.length=0;
             }
-            console.log("clearFilenames file s");
+           // console.log("clearFilenames file s");
         },
         findFile:function(name){
             var that=this;
@@ -1967,7 +1967,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             // remove the embed onject for the file(s)
            
             for(var i=0;i<this.value.length;i++){
-                console.log("FireReader removing embedded stuff");
+         //       console.log("FireReader removing embedded stuff");
                 this.element.removeChild(this.value[i].element);
             }
             this.reset();
@@ -1976,14 +1976,14 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         deleteValue:function(name){
             var that=this,found=null;
             for(var i=0;i< that._promises.length; i++){
-                console.log("looking at promise " + i);
+             //   console.log("looking at promise " + i);
                 that._promises[i].then(function(file){
                     if(file.name === name ){
                         found=i;
                     }
                 });
             }
-            console.log("FileReader: got promise to delete " + found);
+          //  console.log("FileReader: got promise to delete " + found);
            
             for(var i=0;i< that.value.length;i++){
                 if(that.value[i].name === name){
@@ -1991,9 +1991,9 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 }
             }
             if(i<that.value.length){
-                console.log(Object.keys(that.value[i]));
+               // console.log(Object.keys(that.value[i]));
                 for(var k in that.value[i]){
-                    console.log("k is " + k);
+                 //   console.log("k is " + k);
                     if(k === "element"){
                         if(that.value[i].element.parentNode){
                             that.value[i].element.parentNode.removeChild(that.value[i].element);
@@ -2094,15 +2094,15 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             v.element.appendChild(v.object);
             that.element.appendChild(v.element);
             // console.log("appending child");
-            console.log("FileReader: promises length is " + that._promises.length);
-            console.log("Filereader has " + that.value.length);        
+         //   console.log("FileReader: promises length is " + that._promises.length);
+         //   console.log("Filereader has " + that.value.length);        
             return v;
         },
         reset:function(){
             var that=this;
-            console.log("FileReader: reset is here");
+          //  console.log("FileReader: reset is here");
             for(var i=0;i< that.value.length; i++){
-                console.log("deleting file " + that.value[i].name);
+            //    console.log("deleting file " + that.value[i].name);
                 that.deleteValue(that.value[i].name);
             }
             that.clearFileNames();
@@ -2121,7 +2121,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
         _doProgress:function(evt){
             var pl,pb,that=this;
            // console.log("do progress options %j", that.opts);
-            console.log("_doProgress got event %j ", evt);
+           // console.log("_doProgress got event %j ", evt);
             if(!that["progressBar"]){
                 throw new Error("Cannot find progressBar");
             }
@@ -2165,13 +2165,13 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
             }
             
             if(that.opts.mimeType){
-                console.log("checking mimetype");
+            //    console.log("checking mimetype");
                 for(var i=0;i<f.length; i++){
                  //   console.log("filereader getting file of type " + that.MIMEType);
-                    console.log("evt target MIMEType is " + f[i].type);
+               //     console.log("evt target MIMEType is " + f[i].type);
                     for(var j=0;j<that.opts.mimeType.length;j++){
                         if (f[i].type.match(that.opts.mimeType[j])) {
-                            console.log("Got matching file types");
+                          //  console.log("Got matching file types");
                             files.push(f[i]);
                             break;
                         }
@@ -2186,7 +2186,7 @@ var Promise=require('es6-promise').Promise; //polyfill for ie11
                 return 0;
             }
           
-            console.log("_getFileSelect has files %j ",files);
+           // console.log("_getFileSelect has files %j ",files);
             rc=Apoco.IO.getFiles(files,that);
             return rc; // an array of promises
         }
