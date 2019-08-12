@@ -53,6 +53,11 @@ button{padding: 0 1em;
     width: unset;
 }
 
+#Blurb img{
+    max-width: 100%;
+    height: auto;
+}
+
 .inline{
     display: inline-flex;
 }
@@ -159,8 +164,7 @@ div.ui-dialog-titlebar span.ui-dialog-title{ color: #222222 }
     bottom: 0em;
     left: 0em;
 
-}
-
+}   
 
 .footer_text {
 

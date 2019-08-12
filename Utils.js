@@ -379,7 +379,7 @@ String.prototype.trim = String.prototype.trim || function trim() {
     
             }
            
-	    var date=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])); // stuoid workaround for Safari 5.1
+	    var date=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])); // stupid workaround for Safari 5.1
 	    var month=date.getMonth();
 	    var day=date.getDay();
 	    var n=date.getDate();

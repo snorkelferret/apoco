@@ -55,6 +55,12 @@ require("./Types.js");
            // console.log("++++++++++++++++Node adding name " + this.name);
             this.element.setAttribute("name",this.name);
         }
+        if(this.props){
+           
+            for(var k in this.props){
+                this.element[k]=this.props[k];
+            }
+        }
         if(element){
         //    console.log("APPERNFING NODE TO ELEMENT " + element);
             element.appendChild(this.element);
@@ -140,6 +146,7 @@ require("./Types.js");
                     }
                   
                 }
+               // console.log("",that.attr);
                 if(that.attr){
                     for(var i=0;i<that.attr.length;i++){
                         for(var k in that.attr[i]){

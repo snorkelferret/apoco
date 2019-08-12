@@ -101,7 +101,7 @@ require("./Fields.js");
                 }
                 else if(n.display){  // where the component is itself a display
                     parent_element.appendChild(el);
-                    n.show();  // let the parent display control visibility
+                    n.show(true);  // let the parent display control visibility
                 }
                 else{
                     parent_element.appendChild(n.element);

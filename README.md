@@ -1,7 +1,8 @@
 ![] (https://snorkelferret.github.io/css/images/apocoRGB02.png)
 
 [![npm version](https://img.shields.io/npm/v/single-spa.svg?style=flat-square)](https://www.npmjs.org/package/apoco)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsnorkelferret%2Fapoco?ref=badge_shield)
+
 
 # Javascript SPA web framework
 Apoco is a set of modules that can be used to form a 'Single Page Application' [SPA](https://en.wikipedia.org/wiki/Single-page_application) or used as a page or part of a page.It is a real time web framework, with automatic two way synchronisation between browser and server content.
@@ -37,9 +38,9 @@ Apoco components be found by walking the hierarchy, with many methods including 
 
 ```javascript
 let myField=Apoco.Panel.get("MyPanel).getChild("AChild").getChild("AField");
-// similarly
+// similarly 
 
-let myPanel=AField.getParent().getParent().getParent();
+let myPanel=AField.getParent().getParent();
 
 ```
 

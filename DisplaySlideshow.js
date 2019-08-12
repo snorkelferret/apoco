@@ -71,13 +71,13 @@ require("./DisplayBase");
             console.log("isVisible is here");
             if(that.DOM.contains(that.element)){
                 if(document.hidden){
-                    console.log("+++++++++++++++=hidden");
+                  //  console.log("+++++++++++++++=hidden");
                     if(that.interval){
                         that.stop();
                     }
                 }
                 else{
-                    console.log("++++++++++++++++visible");
+                 //   console.log("++++++++++++++++visible");
                     if(that.autoplay){
                         if(that.controls){
                             that.element.querySelector(".play").click();
@@ -182,7 +182,7 @@ require("./DisplayBase");
             var e,y=this.element.offsetTop;
             e=this.element;
           //  console.log("initial offset is " +y);
-            while(e=e.offsetParent){
+            while(e==e.offsetParent){
                 y+=e.offsetTop;
             //    console.log("offset is " + y);
             }

@@ -41,11 +41,11 @@ if(!UI){
                 {display:"fieldset",
                  DOM: "right",
                  id:"Blurb",
-                 class:["col-sm-12","col-md-10","col-lg-8"],
+                 class:["col-sm-12","col-md-10","col-lg-8,align-center"],
                  components:[
                      {node:"heading", class:"center-block", size:"h1",text: "Apoco"},
                      {node:"paragraph",text:"Apoco is a set of modules that can be used to form a 'Single Page Application' (SPA) or used as a page or part of a page.<br>It is a real time web framework, with automatic two way synchronisation between browser and server content.<br>The components can be used together or individually.<br> Apoco employs a 'sort of' shabow dom, in so far as the DOM elements are kept in memory and accessed using getters and setters. More in the spirit of a conventional C type window system. Writing html is not required, as Apoco creates all the HTML. <br>  Apoco can use an MVC pattern, where views are kept as a JSON (like) object, controls in a separate javascript file, and the model can come from another JSON object or the server or a combination of both. For larger and more complex projects an additional build.js file can be deployed, to construct more complex objects <br> Apoco supports both REST and websockets. <br>"},
-                     {node:"image",src:"css/images/treeStruct.png"},
+                     {node:"whatever",nodeType:"img",attr:[{src:"css/images/treeStruct.png"},{width:"625"} ,{height:"180"}]},
                      {node:"paragraph",text:"Apoco is arranged hierarchically starting with windows and ending with nodes and/or fields. It supports multiple windows. Apoco is very fast, as it only updates specific element values sent by the server and doesn't need to update the page. Ypu can also add and remove elements without page refresh.<br>Data types are specified in the fields and nodes "}
                  ]
                 }
@@ -55,7 +55,7 @@ if(!UI){
             components:[{display:"fieldset",
                          DOM:"right",
                          id:"Blurb",
-                         class:["col-sm-12","col-md-10","col-lg-8"],
+                         class:["col-sm-12","col-md-10","col-lg-8,align-center"],
                          components:[
                              {node:"heading",size:"h1",text:"Getting Started"},
                              {node:"heading",size:"h2", text: "Download and install"},
