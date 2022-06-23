@@ -40,7 +40,7 @@
     "chai": "^3.5.0",
     "cross-env": "^1.0.7",
     "eslint": "^2.7.0",
-    "jsdom": "^8.3.1",
+    "jsdom": "^16.5.0",
     "mocha": "^6.1.4",
     "rimraf": "^2.6.3",
     "selenium-webdriver": "^3.0.0",
