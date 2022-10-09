@@ -37,7 +37,7 @@ You don't have to use Apoco to make an SPA it will happily make the components f
 Apoco components be found by walking the hierarchy, with many methods including getChildren, getParent, getSiblings. 
 
 ```javascript
-let myField=Apoco.Panel.get("MyPanel).getChild("AChild").getChild("AField");
+let myField=Apoco.Panel.get("MyPanel").getChild("AChild").getChild("AField");
 // similarly 
 
 let myPanel=AField.getParent().getParent();
